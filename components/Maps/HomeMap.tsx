@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from 'react';
 
-import MapView from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
-import MapStyle from '../mapStyle.json';
+import MapStyle from '../../mapStyle.json';
 import { StyleSheet } from 'react-native';
+import { supabase } from '@/services/supabase';
+import { PubType } from '@/types';
 
 export default function HomeMap() {
     const [location, setLocation] = useState<Location.LocationObject | null>(
         null,
     );
+
+    const [pubs, setPubs] = useState<PubType[]>([]);
 
     useEffect(() => {
         (async () => {
@@ -23,6 +27,15 @@ export default function HomeMap() {
             setLocation(l);
             console.log('LOCATION:', l);
         })();
+    }, []);
+
+    useEffect(() => {
+        const f = async () => {
+            const res = await supabase.from('pubs').select().limit(50);
+            setPubs(res.data ? res.data : []);
+        };
+
+        f();
     }, []);
 
     return (
@@ -40,8 +53,19 @@ export default function HomeMap() {
                           longitudeDelta: 0.0092,
                       }
                     : undefined
-            }
-        />
+            }>
+            {pubs.map(pub => (
+                <Marker
+                    onPress={() => console.log('PRESS:', pub)}
+                    key={pub.id}
+                    coordinate={{
+                        latitude: pub.latitude,
+                        longitude: pub.longitude,
+                    }}
+                    title={pub.name}
+                />
+            ))}
+        </MapView>
     );
 }
 

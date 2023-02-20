@@ -5,12 +5,24 @@ import Navigator from '@/nav/Navigator';
 import { Provider } from 'react-redux';
 import store from '@/store';
 
+import 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { StyleSheet } from 'react-native';
+
 export default function App() {
     return (
-        <Provider store={store}>
-            <NavigationContainer>
-                <Navigator />
-            </NavigationContainer>
-        </Provider>
+        <GestureHandlerRootView style={styles.flexOne}>
+            <Provider store={store}>
+                <NavigationContainer>
+                    <Navigator />
+                </NavigationContainer>
+            </Provider>
+        </GestureHandlerRootView>
     );
 }
+
+const styles = StyleSheet.create({
+    flexOne: {
+        flex: 1,
+    },
+});
