@@ -3,9 +3,14 @@
 // This enables autocomplete, go to definition, etc.
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.8.0';
 
 const RADIUS = 1000;
-const LOCATION = { lat: 51.55241, lng: -0.05702 };
+const MIN_LAT = 51.276092;
+const MAX_LAT = 51.698523;
+
+const MIN_LNG = -0.535085;
+const MAX_LNG = 0.30317;
 
 type OpeningHoursObject = {
     day: number;
@@ -15,19 +20,29 @@ type OpeningHoursObject = {
 type PlaceType = {
     name: string;
     address: string;
-    location: {
-        type: 'Point';
-        coordinates: number[];
-    };
-    openingHours: { open: OpeningHoursObject; close: OpeningHoursObject }[];
-    phoneNumber: string;
-    googleOverview: string;
-    googlePhotos: string[];
-    googleRating: number;
-    googleRatingsAmount: number;
-    googleId: string;
+    longitude: number;
+    latitude: number;
+    opening_hours: { open: OpeningHoursObject; close: OpeningHoursObject }[];
+    phone_number: string;
+    google_overview: string;
+    google_photos: string[];
+    google_rating: number;
+    google_ratings_amount: number;
+    google_id: string;
     reservable: boolean;
     website: string;
+};
+
+const generateLocation = (): { lat: number; lng: number } => {
+    const latDistance = (MAX_LAT - MIN_LAT) * 1_000_000;
+    const latRand = Math.floor(Math.random() * latDistance) / 1_000_000;
+    const lat = MIN_LAT + latRand;
+
+    const lngDistance = (MAX_LNG - MIN_LNG) * 1_000_000;
+    const lngRand = Math.floor(Math.random() * lngDistance) / 1_000_000;
+    const lng = MIN_LNG + lngRand;
+
+    return { lat, lng };
 };
 
 const attemptNearbySearch = (
@@ -43,7 +58,7 @@ const attemptNearbySearch = (
         if (amountCalled < NUM_TRIES) {
             try {
                 const URL = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=${key}&location=${Object.values(
-                    LOCATION,
+                    generateLocation(),
                 ).join(',')}&radius=${RADIUS}&type=bar${
                     pagetoken ? `&pagetoken=${pagetoken}` : ''
                 }`;
@@ -124,14 +139,9 @@ const getPage = async (key: string, pagetoken?: string): Promise<any> => {
                 places.push({
                     name: p.name,
                     address: p.formatted_address,
-                    location: {
-                        type: 'Point',
-                        coordinates: [
-                            p.geometry.location.lat,
-                            p.geometry.location.lng,
-                        ],
-                    },
-                    openingHours: p.opening_hours.periods.map(
+                    latitude: p.geometry.location.lat,
+                    longitude: p.geometry.location.lng,
+                    opening_hours: p.opening_hours.periods.map(
                         (period: any) => ({
                             open: {
                                 day: period.open.day,
@@ -143,15 +153,16 @@ const getPage = async (key: string, pagetoken?: string): Promise<any> => {
                             },
                         }),
                     ),
-                    phoneNumber: p.formatted_phone_number,
+                    phone_number: p.formatted_phone_number,
                     // @ts-ignore 2339
-                    googleOverview: p.editorial_summary?.overview,
-                    googlePhotos: p.photos.map(
-                        (photo: any) => photo.photo_reference,
+                    google_overview: p.editorial_summary?.overview,
+                    google_photos: p.photos.map(
+                        (photo: { photo_reference: string }) =>
+                            photo.photo_reference,
                     ),
-                    googleRating: p.rating,
-                    googleRatingsAmount: p.user_ratings_total,
-                    googleId: p.place_id,
+                    google_rating: p.rating,
+                    google_ratings_amount: p.user_ratings_total,
+                    google_id: p.place_id,
                     // @ts-ignore 2339
                     reservable: p.reservable || false,
                     website: p.website,
@@ -192,16 +203,23 @@ const getPlaces = async (key: string) => {
     return places;
 };
 
-serve(async () => {
+serve(async req => {
     const data = await getPlaces(Deno.env.get('GOOGLE_MAPS_KEY') || '');
 
-    return new Response(JSON.stringify(data), {
+    const supabase = createClient(
+        Deno.env.get('SUPABASE_URL') || '',
+        Deno.env.get('SUPABASE_ANON_KEY') || '',
+        {
+            global: {
+                headers: { Authorization: req.headers.get('Authorization')! },
+            },
+        },
+    );
+
+    const res = await supabase.from('pubs').insert(data);
+    console.log(res);
+
+    return new Response(JSON.stringify(res), {
         headers: { 'Content-Type': 'application/json' },
     });
 });
-
-// To invoke:
-// curl -i --location --request POST 'http://localhost:54321/functions/v1/' \
-//   --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0' \
-//   --header 'Content-Type: application/json' \
-//   --data '{"name":"Functions"}'
