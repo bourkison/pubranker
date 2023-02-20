@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
@@ -6,13 +6,15 @@ import MapStyle from '../../mapStyle.json';
 import { StyleSheet } from 'react-native';
 import { supabase } from '@/services/supabase';
 import { PubType } from '@/types';
-import { selectPub } from '@/store/slices/pub';
+import { setPub } from '@/store/slices/pub';
 import { useAppDispatch } from '@/store/hooks';
 
 export default function HomeMap() {
     const [location, setLocation] = useState<Location.LocationObject | null>(
         null,
     );
+
+    const MapRef = useRef<MapView>(null);
 
     const [pubs, setPubs] = useState<PubType[]>([]);
 
@@ -42,12 +44,21 @@ export default function HomeMap() {
     }, []);
 
     const markerPress = (pub: PubType) => {
-        dispatch(selectPub(pub));
+        dispatch(setPub(pub));
+        if (MapRef.current) {
+            MapRef.current.animateToRegion({
+                latitude: pub.latitude,
+                longitude: pub.longitude,
+                latitudeDelta: 0.005,
+                longitudeDelta: 0.005,
+            });
+        }
     };
 
     return (
         <MapView
             provider="google"
+            ref={MapRef}
             showsUserLocation={true}
             style={styles.map}
             customMapStyle={MapStyle}

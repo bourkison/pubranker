@@ -7,11 +7,12 @@ import BottomBarContent from '@/components/Maps/BottomBar/BottomBarContent';
 
 export default function Home() {
     const BottomBarContainer = useRef<View>(null);
+    const SearchBarContainer = useRef<View>(null);
 
     return (
         <View style={styles.container}>
             {/* <StatusBar style="auto" /> */}
-            <View style={styles.searchBarContainer}>
+            <View style={styles.searchBarContainer} ref={SearchBarContainer}>
                 <View style={styles.searchBar}>
                     <TextInput
                         style={styles.searchInput}
@@ -24,7 +25,9 @@ export default function Home() {
                 <HomeMap />
             </View>
             <View style={styles.bottomBarContainer} ref={BottomBarContainer}>
-                <BottomBarAnimated containerRef={BottomBarContainer}>
+                <BottomBarAnimated
+                    containerRef={BottomBarContainer}
+                    searchBarRef={SearchBarContainer}>
                     <BottomBarContent />
                 </BottomBarAnimated>
             </View>
@@ -45,7 +48,7 @@ const styles = StyleSheet.create({
         top: 50,
         width: '100%',
         paddingHorizontal: 25,
-        zIndex: 2,
+        zIndex: 3,
         elevation: 2,
     },
     searchBar: {
