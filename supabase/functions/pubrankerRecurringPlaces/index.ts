@@ -5,7 +5,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.8.0';
 
-const RADIUS = 1000;
+const RADIUS = 5000;
 const MIN_LAT = 51.276092;
 const MAX_LAT = 51.698523;
 
