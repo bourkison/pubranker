@@ -21,6 +21,15 @@ const pubSlice = createSlice({
     initialState,
     reducers: {
         setPub(state, action: PayloadAction<PubType | null>) {
+            if (
+                action.payload &&
+                state.selectedPub?.id === action.payload.id &&
+                state.bottomBarState === 'preview'
+            ) {
+                state.bottomBarState = 'expanded';
+                return;
+            }
+
             state.bottomBarType =
                 action.payload !== null ? 'selected' : 'discover';
             state.selectedPub = action.payload;

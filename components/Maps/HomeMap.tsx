@@ -6,7 +6,7 @@ import MapStyle from '../../mapStyle.json';
 import { StyleSheet } from 'react-native';
 import { supabase } from '@/services/supabase';
 import { PubType } from '@/types';
-import { setPub } from '@/store/slices/pub';
+import { setBottomBarState, setPub } from '@/store/slices/pub';
 import { useAppDispatch } from '@/store/hooks';
 
 export default function HomeMap() {
@@ -61,14 +61,15 @@ export default function HomeMap() {
             ref={MapRef}
             showsUserLocation={true}
             style={styles.map}
+            onPanDrag={() => dispatch(setBottomBarState('hidden'))}
             customMapStyle={MapStyle}
             initialRegion={
                 location
                     ? {
                           latitude: location.coords.latitude,
                           longitude: location.coords.longitude,
-                          latitudeDelta: 0.0082,
-                          longitudeDelta: 0.0092,
+                          latitudeDelta: 0.01,
+                          longitudeDelta: 0.01,
                       }
                     : undefined
             }>

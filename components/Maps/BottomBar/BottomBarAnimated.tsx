@@ -9,8 +9,10 @@ import { View, StyleSheet } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
     Easing,
+    interpolate,
     runOnJS,
     runOnUI,
+    SharedValue,
     useAnimatedStyle,
     useSharedValue,
     withTiming,
@@ -18,18 +20,22 @@ import Animated, {
 
 type HomeBottomBarProps = {
     containerRef: RefObject<View>;
-    searchBarRef: RefObject<View>;
+    searchBarRef: RefObject<Animated.View>;
     children: JSX.Element;
+    translateY: SharedValue<number>;
+    minY: SharedValue<number>;
+    animationProgress: SharedValue<number>;
 };
 
 export default function HomeBottomBar({
     containerRef,
     children,
     searchBarRef,
+    translateY,
+    minY,
+    animationProgress,
 }: HomeBottomBarProps) {
     const context = useSharedValue(0);
-    const translateY = useSharedValue(0);
-    const minY = useSharedValue(0);
     const previewY = useSharedValue(0);
     const minHeight = useSharedValue(0);
 
@@ -41,6 +47,21 @@ export default function HomeBottomBar({
         return {
             transform: [{ translateY: translateY.value }],
             minHeight: minHeight.value,
+            shadowOpacity: interpolate(
+                animationProgress.value,
+                [0, 0.9, 1],
+                [0.2, 0.2, 0],
+            ),
+        };
+    });
+
+    const rHandleStyle = useAnimatedStyle(() => {
+        return {
+            opacity: interpolate(
+                animationProgress.value,
+                [0, 0.9, 1],
+                [1, 1, 0],
+            ),
         };
     });
 
@@ -138,49 +159,45 @@ export default function HomeBottomBar({
         })
         .onFinalize(() => {
             const TRANSLATE_AMOUNT = 100;
+            const PREVIEW_BOUNDARY = 50;
 
-            // If not expanded and should be.
-            // Or expanded but didn't go far enough to close.
-            // Go to expanded state
             if (
-                (bottomBarState === 'hidden' &&
-                    translateY.value < -TRANSLATE_AMOUNT) ||
-                (bottomBarState === 'preview' &&
-                    translateY.value - previewY.value < -TRANSLATE_AMOUNT) ||
-                (bottomBarState === 'expanded' &&
-                    minY.value - translateY.value >= -TRANSLATE_AMOUNT)
+                (bottomBarState === 'expanded' && // If expanded
+                    translateY.value > minY.value + TRANSLATE_AMOUNT && // And outside of bounds to go back to expanded
+                    translateY.value < previewY.value + PREVIEW_BOUNDARY) || // But still not far enough to hide
+                (bottomBarState === 'hidden' && // Or, if hidden
+                    translateY.value < -TRANSLATE_AMOUNT && // And outside of bounds to go back hidden
+                    translateY.value > previewY.value - PREVIEW_BOUNDARY) || // But still not far enough to expand
+                (bottomBarState === 'preview' && // Or, if already on preview
+                    translateY.value < previewY.value + PREVIEW_BOUNDARY &&
+                    translateY.value > previewY.value - PREVIEW_BOUNDARY)
+            ) {
+                runOnJS(setState)('preview');
+                animateBar('preview');
+            } else if (
+                (bottomBarState === 'expanded' && // If expanded
+                    translateY.value < minY.value + TRANSLATE_AMOUNT) || // And within bounds to go back to expanded
+                ((bottomBarState === 'hidden' ||
+                    bottomBarState === 'preview') && // Or, if hidden or on preview
+                    translateY.value < previewY.value - PREVIEW_BOUNDARY) // And outside of preview boundary
             ) {
                 runOnJS(setState)('expanded');
                 animateBar('expanded');
-            }
-            // Vice versa
-            else if (
-                (bottomBarState === 'expanded' &&
-                    minY.value - translateY.value < -TRANSLATE_AMOUNT) ||
-                (bottomBarState === 'preview' &&
-                    translateY.value - previewY.value >= TRANSLATE_AMOUNT) ||
-                (bottomBarState === 'hidden' &&
-                    translateY.value >= -TRANSLATE_AMOUNT)
+            } else if (
+                ((bottomBarState === 'expanded' ||
+                    bottomBarState === 'preview') && // If expanded or preview
+                    translateY.value > previewY.value + PREVIEW_BOUNDARY) || // And outside of preview boundary
+                (bottomBarState === 'hidden' && // Or, if hidden
+                    translateY.value > -TRANSLATE_AMOUNT) // And within bounds to go back
             ) {
                 runOnJS(setState)('hidden');
                 animateBar('hidden');
             }
-            // Or if preview and didnt go far enough to expand or hide.
-            else if (
-                bottomBarState === 'preview' &&
-                translateY.value - previewY.value < TRANSLATE_AMOUNT &&
-                translateY.value - previewY.value >= -TRANSLATE_AMOUNT
-            ) {
-                runOnJS(setState)('preview');
-                animateBar('preview');
-            }
         });
 
     useEffect(() => {
-        if (bottomBarState === 'preview' && previewY.value) {
-            runOnUI(animateBar)('preview');
-        }
-    }, [bottomBarState, previewY.value, animateBar]);
+        runOnUI(animateBar)(bottomBarState);
+    }, [bottomBarState, animateBar]);
 
     return (
         <Animated.View
@@ -189,7 +206,7 @@ export default function HomeBottomBar({
             <GestureDetector gesture={panGesture}>
                 <View>
                     <View style={styles.handleContainer}>
-                        <View style={styles.handle} />
+                        <Animated.View style={[styles.handle, rHandleStyle]} />
                     </View>
                     <View style={styles.contentContainer}>{children}</View>
                 </View>
@@ -211,7 +228,6 @@ const styles = StyleSheet.create({
         right: 0,
         bottom: 0,
         shadowColor: '#000',
-        shadowOpacity: 0.2,
         shadowOffset: {
             width: 0,
             height: 0,
