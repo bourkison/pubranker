@@ -6,6 +6,8 @@ import MapStyle from '../../mapStyle.json';
 import { StyleSheet } from 'react-native';
 import { supabase } from '@/services/supabase';
 import { PubType } from '@/types';
+import { selectPub } from '@/store/slices/pub';
+import { useAppDispatch } from '@/store/hooks';
 
 export default function HomeMap() {
     const [location, setLocation] = useState<Location.LocationObject | null>(
@@ -13,6 +15,8 @@ export default function HomeMap() {
     );
 
     const [pubs, setPubs] = useState<PubType[]>([]);
+
+    const dispatch = useAppDispatch();
 
     useEffect(() => {
         (async () => {
@@ -25,7 +29,6 @@ export default function HomeMap() {
 
             let l = await Location.getCurrentPositionAsync();
             setLocation(l);
-            console.log('LOCATION:', l);
         })();
     }, []);
 
@@ -37,6 +40,10 @@ export default function HomeMap() {
 
         f();
     }, []);
+
+    const markerPress = (pub: PubType) => {
+        dispatch(selectPub(pub));
+    };
 
     return (
         <MapView
@@ -56,7 +63,7 @@ export default function HomeMap() {
             }>
             {pubs.map(pub => (
                 <Marker
-                    onPress={() => console.log('PRESS:', pub)}
+                    onPress={() => markerPress(pub)}
                     key={pub.id}
                     coordinate={{
                         latitude: pub.latitude,

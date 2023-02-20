@@ -2,9 +2,11 @@ import React, { RefObject } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
+    Easing,
     runOnJS,
     useAnimatedStyle,
     useSharedValue,
+    withTiming,
 } from 'react-native-reanimated';
 
 type HomeBottomBarProps = {
@@ -20,6 +22,7 @@ export default function HomeBottomBar({
     const translateY = useSharedValue(0);
     const minY = useSharedValue(0);
     const minHeight = useSharedValue(0);
+    const expanded = useSharedValue(false);
 
     const rStyle = useAnimatedStyle(() => {
         return {
@@ -55,6 +58,40 @@ export default function HomeBottomBar({
             } else if (translateY.value < minY.value) {
                 translateY.value = minY.value;
             }
+        })
+        .onFinalize(() => {
+            const TRANSLATE_AMOUNT = 100;
+            const animation = {
+                duration: 300,
+                easing: Easing.inOut(Easing.quad),
+            };
+
+            // If not expanded and should be.
+            // Or expanded but didn't go far enough to close.
+            // Go to expanded state
+            if (
+                (!expanded.value && translateY.value < -TRANSLATE_AMOUNT) ||
+                (expanded.value &&
+                    minY.value - translateY.value >= -TRANSLATE_AMOUNT)
+            ) {
+                expanded.value = true;
+                translateY.value = withTiming(minY.value, animation);
+            }
+            // Vice versa
+            else if (
+                (expanded.value &&
+                    minY.value - translateY.value < -TRANSLATE_AMOUNT) ||
+                (!expanded.value && translateY.value >= -TRANSLATE_AMOUNT)
+            ) {
+                expanded.value = false;
+                translateY.value = withTiming(0, animation);
+            }
+
+            console.log(
+                minY.value,
+                translateY.value,
+                minY.value - translateY.value,
+            );
         });
 
     return (
@@ -62,11 +99,13 @@ export default function HomeBottomBar({
             style={[styles.container, rStyle]}
             onLayout={measureMinY}>
             <GestureDetector gesture={panGesture}>
-                <View style={styles.handleContainer}>
-                    <View style={styles.handle} />
+                <View>
+                    <View style={styles.handleContainer}>
+                        <View style={styles.handle} />
+                    </View>
+                    <View style={styles.contentContainer}>{children}</View>
                 </View>
             </GestureDetector>
-            <View style={styles.contentContainer}>{children}</View>
         </Animated.View>
     );
 }
