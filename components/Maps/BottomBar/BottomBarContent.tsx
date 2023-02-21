@@ -1,6 +1,7 @@
 import { useAppSelector } from '@/store/hooks';
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import BottomBarDiscover from './BottomBarDiscover';
 
 export default function BottomBarContent() {
     const bottomBarType = useAppSelector(state => state.pub.bottomBarType);
@@ -10,11 +11,7 @@ export default function BottomBarContent() {
         bottomBarType === 'discover' ||
         (bottomBarType === 'selected' && !selectedPub)
     ) {
-        return (
-            <View>
-                <Text style={styles.title}>Discover Pubs Near You</Text>
-            </View>
-        );
+        return <BottomBarDiscover />;
     }
 
     if (bottomBarType === 'selected' && selectedPub) {

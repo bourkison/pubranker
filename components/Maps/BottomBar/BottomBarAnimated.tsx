@@ -234,15 +234,15 @@ const styles = StyleSheet.create({
         },
     },
     handleContainer: {
-        flexBasis: 6,
+        flexBasis: 4,
         flexGrow: 0,
         flexShrink: 0,
-        marginTop: 5,
+        marginVertical: 7,
         alignItems: 'center',
         justifyContent: 'center',
     },
     handle: {
-        width: 72,
+        width: 60,
         backgroundColor: 'rgba(0, 0, 0, 0.05)',
         height: '100%',
         borderRadius: 10,
