@@ -22,8 +22,6 @@ export default function DiscoverPub({ pub }: DiscoverPubProps) {
 
             setImageUrls(urls);
         }
-
-        console.log('PHOTOS:', pub.photos, imageUrls);
     }, [pub, imageUrls]);
 
     return (

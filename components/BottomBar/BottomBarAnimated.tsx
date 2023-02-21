@@ -4,98 +4,101 @@ import {
     setAnimating,
     setBottomBarState,
 } from '@/store/slices/pub';
-import React, { RefObject, useCallback, useEffect, useRef } from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useCallback, useRef, useEffect } from 'react';
+import { View, StyleSheet, useWindowDimensions } from 'react-native';
 import {
     Gesture,
     GestureDetector,
     ScrollView,
 } from 'react-native-gesture-handler';
 import Animated, {
+    interpolate,
     runOnJS,
-    runOnUI,
-    SharedValue,
+    WithSpringConfig,
     useAnimatedProps,
     useAnimatedScrollHandler,
     useAnimatedStyle,
     useSharedValue,
     withSpring,
-    WithSpringConfig,
-    withTiming,
-    WithTimingConfig,
+    runOnUI,
+    SharedValue,
 } from 'react-native-reanimated';
 
 type HomeBottomBarProps = {
-    containerRef: RefObject<View>;
     children: JSX.Element;
-    translateY: SharedValue<number>;
-    minY: SharedValue<number>;
-    animationProgress: SharedValue<number>;
+    readonly open: number;
+    readonly preview: number;
+    readonly closed: number;
+    readonly translateY: SharedValue<number>;
 };
-
-const MARGIN_TOP = 100;
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
 export default function HomeBottomBar({
-    containerRef,
     children,
+    open,
+    preview,
+    closed,
     translateY,
-    minY,
-    animationProgress,
 }: HomeBottomBarProps) {
-    const context = useSharedValue(0);
-    const previewY = useSharedValue(0);
-    const minHeight = useSharedValue(0);
-    const scrollY = useSharedValue(0);
-    const contextScrollY = useSharedValue(0);
-    const moving = useSharedValue(false);
     const scrollRef = useRef<ScrollView>(null);
 
-    const bottomBarState = useAppSelector(state => state.pub.bottomBarState);
-    const sharedState = useSharedValue<'open' | 'closed'>(
-        bottomBarState === 'expanded' ? 'open' : 'closed',
-    );
-    const stateContext = useSharedValue<'open' | 'closed'>(sharedState.value);
+    const { height } = useWindowDimensions();
 
+    const moving = useSharedValue(false);
+    const prevY = useSharedValue(closed);
+    const movedY = useSharedValue(0);
+    const scrollY = useSharedValue(0);
+
+    const bottomBarState = useAppSelector(state => state.pub.bottomBarState);
     const dispatch = useAppDispatch();
 
     const rStyle = useAnimatedStyle(() => {
         return {
-            transform: [{ translateY: translateY.value }],
-            minHeight: minHeight.value,
+            transform: [
+                {
+                    translateY: interpolate(
+                        translateY.value,
+                        [0, open, closed, height],
+                        [open, open, closed, closed + 20],
+                        'clamp',
+                    ),
+                },
+            ],
         };
     });
 
     const scrollHandler = useAnimatedScrollHandler(({ contentOffset }) => {
-        if (contentOffset.y === 0) {
-            console.log('****** RESET:', scrollY.value);
-        }
-        console.log('CONTENT OFFSET:', contentOffset.y);
         scrollY.value = Math.round(contentOffset.y);
     });
 
     const scrollProps = useAnimatedProps(() => {
         return {
-            scrollEnabled: sharedState.value === 'open' || scrollY.value !== 0,
+            // only scroll if sheet is open
+            scrollEnabled: prevY.value === open,
+            // only bounce at bottom or not touching screen
             bounces: scrollY.value > 0 || !moving.value,
         };
     });
 
-    // Our minY is equal to -y position of container, + search y position and height.
-    // Our min height is equal to y position of container - y position of
-    const measureMinY = () => {
-        if (containerRef.current) {
-            containerRef.current.measure(
-                (_x, _y, _width, contHeight, _pageX, contPageY) => {
-                    minY.value = -contPageY + MARGIN_TOP;
-                    minHeight.value = contPageY + contHeight - MARGIN_TOP;
+    const scrollTo = useCallback(
+        (y: number) => {
+            if (scrollRef && scrollRef.current) {
+                scrollRef?.current.scrollTo({
+                    y: y,
+                    animated: false,
+                });
+            }
+        },
+        [scrollRef],
+    );
 
-                    previewY.value = minY.value * 0.4;
-                },
-            );
-        }
-    };
+    const setState = useCallback(
+        (s: BottomBarState) => {
+            dispatch(setBottomBarState(s));
+        },
+        [dispatch],
+    );
 
     const setIsAnimating = useCallback(
         (val: boolean) => {
@@ -116,131 +119,97 @@ export default function HomeBottomBar({
                 damping: 10,
             };
 
-            const timingAnimation: WithTimingConfig = {
-                duration: 250,
-            };
+            const roundedTransY = Math.round(translateY.value);
 
             if (type === 'hidden') {
-                translateY.value = withTiming(0, timingAnimation, () =>
+                translateY.value = withSpring(closed, springAnimation, () =>
                     runOnJS(setIsAnimating)(false),
                 );
+
+                prevY.value = closed;
             } else if (type === 'expanded') {
-                translateY.value = withSpring(minY.value, springAnimation, () =>
+                if (roundedTransY > open) {
+                    translateY.value = withSpring(open, springAnimation, () =>
+                        runOnJS(setIsAnimating)(false),
+                    );
+                }
+
+                prevY.value = open;
+            } else if (type === 'preview') {
+                translateY.value = withSpring(preview, springAnimation, () =>
                     runOnJS(setIsAnimating)(false),
                 );
-            } else if (type === 'preview') {
-                translateY.value = withSpring(
-                    previewY.value,
-                    springAnimation,
-                    () => runOnJS(setIsAnimating)(false),
-                );
+                prevY.value = preview;
             }
         },
-        [minY.value, translateY, previewY.value, setIsAnimating],
-    );
-
-    const setState = useCallback(
-        (s: BottomBarState) => {
-            if (s === 'expanded') {
-                sharedState.value = 'open';
-            } else {
-                sharedState.value = 'closed';
-            }
-
-            dispatch(setBottomBarState(s));
-        },
-        [dispatch, sharedState],
-    );
-
-    const scrollTo = useCallback(
-        (y: number) => {
-            if (scrollRef && scrollRef.current) {
-                scrollRef.current.scrollTo({
-                    y: y,
-                    animated: false,
-                });
-            }
-        },
-        [scrollRef],
+        [translateY, setIsAnimating, closed, open, preview, prevY],
     );
 
     const panGesture = Gesture.Pan()
-        .onStart(() => {
-            context.value = translateY.value;
-            contextScrollY.value = scrollY.value;
-            stateContext.value = sharedState.value;
+        .onBegin(() => {
+            // touching screen
             moving.value = true;
-
-            if (!minY.value) {
-                runOnJS(measureMinY)();
-            }
         })
         .onUpdate(e => {
-            const moved = e.translationY + context.value - contextScrollY.value;
+            // move sheet if top or scrollview or is closed state
+            if (
+                scrollY.value === 0 ||
+                prevY.value === closed ||
+                prevY.value === preview
+            ) {
+                translateY.value = prevY.value + e.translationY - movedY.value;
 
-            // Move sheet if top of scroll view or is closedr
-            if (scrollY.value === 0 || sharedState.value === 'closed') {
-                translateY.value = moved;
-                sharedState.value = 'closed';
-
-                if (translateY.value > 0) {
-                    translateY.value = 0;
-                } else if (translateY.value < minY.value) {
-                    translateY.value = minY.value;
-                    sharedState.value = 'open';
-                }
+                // capture movement, but don't move sheet
+            } else {
+                movedY.value = e.translationY;
             }
 
             // simulate scroll if user continues touching screen
-            if (
-                translateY.value <= minY.value &&
-                stateContext.value !== 'open'
-            ) {
-                console.log('SCROLLING TO:', -moved + minY.value);
-                runOnJS(scrollTo)(-moved + minY.value);
+            if (prevY.value !== open && translateY.value < open) {
+                runOnJS(scrollTo)(-translateY.value + open);
             }
         })
         .onEnd(() => {
-            console.log('END');
-        })
-        .onFinalize(() => {
-            moving.value = false;
-
             const TRANSLATE_AMOUNT = 100;
             const PREVIEW_BOUNDARY = 50;
 
             if (
                 (bottomBarState === 'expanded' && // If expanded
-                    translateY.value > minY.value + TRANSLATE_AMOUNT && // And outside of bounds to go back to expanded
-                    translateY.value < previewY.value + PREVIEW_BOUNDARY) || // But still not far enough to hide
+                    translateY.value > open + TRANSLATE_AMOUNT && // And outside of bounds to go back to expanded
+                    translateY.value < preview + PREVIEW_BOUNDARY) || // But still not far enough to hide
                 (bottomBarState === 'hidden' && // Or, if hidden
-                    translateY.value < -TRANSLATE_AMOUNT && // And outside of bounds to go back hidden
-                    translateY.value > previewY.value - PREVIEW_BOUNDARY) || // But still not far enough to expand
+                    translateY.value < closed - TRANSLATE_AMOUNT && // And outside of bounds to go back hidden
+                    translateY.value > preview - PREVIEW_BOUNDARY) || // But still not far enough to expand
                 (bottomBarState === 'preview' && // Or, if already on preview
-                    translateY.value < previewY.value + PREVIEW_BOUNDARY &&
-                    translateY.value > previewY.value - PREVIEW_BOUNDARY)
+                    translateY.value < preview + PREVIEW_BOUNDARY &&
+                    translateY.value > preview - PREVIEW_BOUNDARY)
             ) {
                 runOnJS(setState)('preview');
                 animateBar('preview');
             } else if (
                 (bottomBarState === 'expanded' && // If expanded
-                    translateY.value < minY.value + TRANSLATE_AMOUNT) || // And within bounds to go back to expanded
+                    translateY.value < open + TRANSLATE_AMOUNT) || // And within bounds to go back to expanded
                 ((bottomBarState === 'hidden' ||
                     bottomBarState === 'preview') && // Or, if hidden or on preview
-                    translateY.value < previewY.value - PREVIEW_BOUNDARY) // And outside of preview boundary
+                    translateY.value < preview - PREVIEW_BOUNDARY) // And outside of preview boundary
             ) {
                 runOnJS(setState)('expanded');
                 animateBar('expanded');
             } else if (
                 ((bottomBarState === 'expanded' ||
                     bottomBarState === 'preview') && // If expanded or preview
-                    translateY.value > previewY.value + PREVIEW_BOUNDARY) || // And outside of preview boundary
+                    translateY.value > preview + PREVIEW_BOUNDARY) || // And outside of preview boundary
                 (bottomBarState === 'hidden' && // Or, if hidden
                     translateY.value > -TRANSLATE_AMOUNT) // And within bounds to go back
             ) {
                 runOnJS(setState)('hidden');
                 animateBar('hidden');
             }
+        })
+        .onFinalize(() => {
+            // stopped touching screen
+            moving.value = false;
+            movedY.value = 0;
         })
         .simultaneousWithExternalGesture(scrollRef);
 
@@ -249,10 +218,8 @@ export default function HomeBottomBar({
     }, [bottomBarState, animateBar]);
 
     return (
-        <Animated.View
-            style={[styles.container, rStyle]}
-            onLayout={measureMinY}>
-            <GestureDetector gesture={panGesture}>
+        <GestureDetector gesture={panGesture}>
+            <Animated.View style={[styles.container, rStyle]}>
                 <View>
                     <View style={styles.handleContainer}>
                         <View style={styles.handle} />
@@ -266,8 +233,8 @@ export default function HomeBottomBar({
                         {children}
                     </AnimatedScrollView>
                 </View>
-            </GestureDetector>
-        </Animated.View>
+            </Animated.View>
+        </GestureDetector>
     );
 }
 
@@ -278,11 +245,6 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         zIndex: 9,
         overflow: 'visible',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
         shadowColor: '#000',
         shadowOffset: {
             width: 0,

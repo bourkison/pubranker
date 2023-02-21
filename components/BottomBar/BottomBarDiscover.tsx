@@ -3,6 +3,7 @@ import { fetchPubs } from '@/store/slices/discoverPubs';
 import React, { useEffect } from 'react';
 import { View, TextInput, StyleSheet, Text } from 'react-native';
 import DiscoverPub from '@/components/Pubs/DiscoverPub';
+import { setBottomBarState } from '@/store/slices/pub';
 
 export default function BottomBarDiscover() {
     const dispatch = useAppDispatch();
@@ -24,6 +25,7 @@ export default function BottomBarDiscover() {
                     style={styles.searchInput}
                     placeholder="Search"
                     placeholderTextColor="#A3A3A3"
+                    onFocus={() => dispatch(setBottomBarState('expanded'))}
                 />
             </View>
             <View>

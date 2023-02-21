@@ -49,7 +49,9 @@ export default function HomeMap() {
         dispatch(setPub(pub));
         if (MapRef.current) {
             MapRef.current.animateToRegion({
+                // @ts-ignore
                 latitude: pub.latitude - 0.15 * DELTA,
+                // @ts-ignore
                 longitude: pub.longitude,
                 latitudeDelta: DELTA,
                 longitudeDelta: DELTA,
@@ -80,7 +82,9 @@ export default function HomeMap() {
                     onPress={() => markerPress(pub)}
                     key={pub.id}
                     coordinate={{
+                        // @ts-ignore
                         latitude: pub.latitude,
+                        // @ts-ignore
                         longitude: pub.longitude,
                     }}
                     title={pub.name}
@@ -92,7 +96,6 @@ export default function HomeMap() {
 
 const styles = StyleSheet.create({
     map: {
-        width: '100%',
-        height: '100%',
+        ...StyleSheet.absoluteFillObject,
     },
 });
