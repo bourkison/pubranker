@@ -47,12 +47,16 @@ export default function HomeBottomBar({
     const context = useSharedValue(0);
     const previewY = useSharedValue(0);
     const minHeight = useSharedValue(0);
-
     const scrollY = useSharedValue(0);
+    const contextScrollY = useSharedValue(0);
     const moving = useSharedValue(false);
     const scrollRef = useRef<ScrollView>(null);
 
     const bottomBarState = useAppSelector(state => state.pub.bottomBarState);
+    const sharedState = useSharedValue<'open' | 'closed'>(
+        bottomBarState === 'expanded' ? 'open' : 'closed',
+    );
+    const stateContext = useSharedValue<'open' | 'closed'>(sharedState.value);
 
     const dispatch = useAppDispatch();
 
@@ -64,13 +68,19 @@ export default function HomeBottomBar({
     });
 
     const scrollHandler = useAnimatedScrollHandler(({ contentOffset }) => {
+        if (contentOffset.y === 0) {
+            console.log('****** RESET:', scrollY.value);
+        }
+        console.log('CONTENT OFFSET:', contentOffset.y);
         scrollY.value = Math.round(contentOffset.y);
     });
 
-    const scrollProps = useAnimatedProps(() => ({
-        scrollEnabled: animationProgress.value >= 1,
-        bounces: scrollY.value > 0 || !moving.value,
-    }));
+    const scrollProps = useAnimatedProps(() => {
+        return {
+            scrollEnabled: sharedState.value === 'open' || scrollY.value !== 0,
+            bounces: scrollY.value > 0 || !moving.value,
+        };
+    });
 
     // Our minY is equal to -y position of container, + search y position and height.
     // Our min height is equal to y position of container - y position of
@@ -131,9 +141,15 @@ export default function HomeBottomBar({
 
     const setState = useCallback(
         (s: BottomBarState) => {
+            if (s === 'expanded') {
+                sharedState.value = 'open';
+            } else {
+                sharedState.value = 'closed';
+            }
+
             dispatch(setBottomBarState(s));
         },
-        [dispatch],
+        [dispatch, sharedState],
     );
 
     const scrollTo = useCallback(
@@ -151,6 +167,8 @@ export default function HomeBottomBar({
     const panGesture = Gesture.Pan()
         .onStart(() => {
             context.value = translateY.value;
+            contextScrollY.value = scrollY.value;
+            stateContext.value = sharedState.value;
             moving.value = true;
 
             if (!minY.value) {
@@ -158,19 +176,32 @@ export default function HomeBottomBar({
             }
         })
         .onUpdate(e => {
-            const change = e.translationY + context.value;
-            translateY.value = change;
+            const moved = e.translationY + context.value - contextScrollY.value;
 
-            if (translateY.value > 0) {
-                translateY.value = 0;
-            } else if (translateY.value < minY.value) {
-                translateY.value = minY.value;
+            // Move sheet if top of scroll view or is closedr
+            if (scrollY.value === 0 || sharedState.value === 'closed') {
+                translateY.value = moved;
+                sharedState.value = 'closed';
+
+                if (translateY.value > 0) {
+                    translateY.value = 0;
+                } else if (translateY.value < minY.value) {
+                    translateY.value = minY.value;
+                    sharedState.value = 'open';
+                }
             }
 
             // simulate scroll if user continues touching screen
-            if (change < minY.value) {
-                runOnJS(scrollTo)(-change - minY.value);
+            if (
+                translateY.value <= minY.value &&
+                stateContext.value !== 'open'
+            ) {
+                console.log('SCROLLING TO:', -moved + minY.value);
+                runOnJS(scrollTo)(-moved + minY.value);
             }
+        })
+        .onEnd(() => {
+            console.log('END');
         })
         .onFinalize(() => {
             moving.value = false;
@@ -227,6 +258,7 @@ export default function HomeBottomBar({
                         <View style={styles.handle} />
                     </View>
                     <AnimatedScrollView
+                        scrollEventThrottle={1}
                         ref={scrollRef}
                         style={styles.contentContainer}
                         onScroll={scrollHandler}
