@@ -1,7 +1,8 @@
 import { useAppSelector } from '@/store/hooks';
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text } from 'react-native';
 import BottomBarDiscover from '@/components/BottomBar/BottomBarDiscover';
+import BottomBarPubView from '@/components/BottomBar/BottomBarPubView';
 
 export default function BottomBarContent() {
     const bottomBarType = useAppSelector(state => state.pub.bottomBarType);
@@ -15,12 +16,7 @@ export default function BottomBarContent() {
     }
 
     if (bottomBarType === 'selected' && selectedPub) {
-        return (
-            <View>
-                <Text style={styles.title}>{selectedPub.name}</Text>
-                <Text>{selectedPub.google_overview}</Text>
-            </View>
-        );
+        return <BottomBarPubView pub={selectedPub} />;
     }
 
     return (
@@ -29,10 +25,3 @@ export default function BottomBarContent() {
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    title: {
-        fontSize: 24,
-        fontWeight: '600',
-    },
-});

@@ -7,7 +7,8 @@ import { StyleSheet } from 'react-native';
 import { supabase } from '@/services/supabase';
 import { PubType } from '@/types';
 import { setBottomBarState, setPub } from '@/store/slices/pub';
-import { useAppDispatch } from '@/store/hooks';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { mapArrResponseToPubType } from '@/services';
 
 const DELTA = 0.0075;
 
@@ -21,6 +22,7 @@ export default function HomeMap() {
     const [pubs, setPubs] = useState<PubType[]>([]);
 
     const dispatch = useAppDispatch();
+    const selectedPub = useAppSelector(state => state.pub.selectedPub);
 
     useEffect(() => {
         (async () => {
@@ -37,27 +39,24 @@ export default function HomeMap() {
     }, []);
 
     useEffect(() => {
-        const f = async () => {
+        const fetchPubs = async () => {
             const res = await supabase.from('pubs').select().limit(50);
-            setPubs(res.data ? res.data : []);
+            setPubs(mapArrResponseToPubType(res.data));
         };
 
-        f();
+        fetchPubs();
     }, []);
 
-    const markerPress = (pub: PubType) => {
-        dispatch(setPub(pub));
-        if (MapRef.current) {
+    useEffect(() => {
+        if (selectedPub && MapRef && MapRef.current) {
             MapRef.current.animateToRegion({
-                // @ts-ignore
-                latitude: pub.latitude - 0.15 * DELTA,
-                // @ts-ignore
-                longitude: pub.longitude,
+                latitude: selectedPub.location.lat - 0.15 * DELTA,
+                longitude: selectedPub.location.lng,
                 latitudeDelta: DELTA,
                 longitudeDelta: DELTA,
             });
         }
-    };
+    }, [selectedPub, MapRef]);
 
     return (
         <MapView
@@ -79,13 +78,11 @@ export default function HomeMap() {
             }>
             {pubs.map(pub => (
                 <Marker
-                    onPress={() => markerPress(pub)}
+                    onPress={() => dispatch(setPub(pub))}
                     key={pub.id}
                     coordinate={{
-                        // @ts-ignore
-                        latitude: pub.latitude,
-                        // @ts-ignore
-                        longitude: pub.longitude,
+                        latitude: pub.location.lat,
+                        longitude: pub.location.lng,
                     }}
                     title={pub.name}
                 />

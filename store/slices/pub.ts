@@ -20,7 +20,7 @@ const pubSlice = createSlice({
     name: 'pub',
     initialState,
     reducers: {
-        setPub(state, action: PayloadAction<PubType | null>) {
+        setPub(state, action: PayloadAction<PubType>) {
             if (
                 action.payload &&
                 state.selectedPub?.id === action.payload.id &&
@@ -30,10 +30,14 @@ const pubSlice = createSlice({
                 return;
             }
 
-            state.bottomBarType =
-                action.payload !== null ? 'selected' : 'discover';
+            state.bottomBarType = 'selected';
             state.selectedPub = action.payload;
             state.bottomBarState = 'preview';
+        },
+        deselectPub(state) {
+            state.bottomBarType = 'discover';
+            state.selectedPub = null;
+            state.bottomBarState = 'hidden';
         },
         setBottomBarState(state, action: PayloadAction<BottomBarState>) {
             state.bottomBarState = action.payload;
@@ -44,5 +48,6 @@ const pubSlice = createSlice({
     },
 });
 
-export const { setPub, setBottomBarState, setAnimating } = pubSlice.actions;
+export const { setPub, setBottomBarState, setAnimating, deselectPub } =
+    pubSlice.actions;
 export default pubSlice.reducer;

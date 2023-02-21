@@ -12,7 +12,7 @@ export default function BottomBarDiscover() {
 
     useEffect(() => {
         const f = async () => {
-            await dispatch(fetchPubs());
+            await dispatch(fetchPubs({ amount: 10 }));
         };
 
         f();

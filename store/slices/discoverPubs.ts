@@ -1,4 +1,4 @@
-import { convertPointStringToObject } from '@/services';
+import { mapArrResponseToPubType } from '@/services';
 import { supabase } from '@/services/supabase';
 import { PubType } from '@/types';
 import {
@@ -19,7 +19,7 @@ const initialState = discoverPubsAdapter.getInitialState({
 
 export const fetchPubs = createAsyncThunk(
     'discoverPubs/fetchPubs',
-    async (): Promise<PubType[]> => {
+    async ({ amount }: { amount: number }): Promise<PubType[]> => {
         let { status } = await Location.requestForegroundPermissionsAsync();
 
         if (status !== 'granted') {
@@ -35,31 +35,11 @@ export const fetchPubs = createAsyncThunk(
                 dist_lat: l.coords.latitude,
                 dist_long: l.coords.longitude,
             })
-            .limit(10);
+            .limit(amount);
 
-        return response.data.map((p: any) => ({
-            id: p.id,
-            name: p.name,
-            address: p.address,
-            location: convertPointStringToObject(p.location),
-            opening_hours: p.opening_hours,
-            phone_number: p.phone_number,
-            google_overview: p.google_overview,
-            google_photos: p.google_photos,
-            google_rating: p.google_rating,
-            google_ratings_amount: p.google_ratings_amount,
-            google_id: p.google_id,
-            reservable: p.reservable,
-            website: p.website,
-            photos: [
-                '56/star_hd_1.png',
-                '56/star_hd_2.png',
-                '56/star_hd_3.png',
-                '56/star_hd_4.png',
-                '56/star_hd_5.png',
-                '56/star_hd_6.png',
-            ],
-        }));
+        console.log(response.data[0]);
+
+        return mapArrResponseToPubType(response.data);
     },
 );
 

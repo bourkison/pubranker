@@ -17,5 +17,6 @@ export type PubType = {
     google_id: string;
     reservable: boolean;
     website: string;
+    dist_meters: number;
     photos: string[];
 };
