@@ -1,13 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 import userReducer from '@/store/slices/user';
 import pubReducer from '@/store/slices/pub';
-import pubsNearMeReducer from '@/store/slices/pubsNearMe';
+import discoverPubsReducer from '@/store/slices/discoverPubs';
 
 const store = configureStore({
     reducer: {
         user: userReducer,
         pub: pubReducer,
-        pubsNearMe: pubsNearMeReducer,
+        discoverPubs: discoverPubsReducer,
     },
 });
 

@@ -7,8 +7,7 @@ export type PubType = {
     id: number;
     name: string;
     address: string;
-    longitude: number;
-    latitude: number;
+    location: { lng: number; lat: number };
     opening_hours: { open: OpeningHoursObject; close: OpeningHoursObject }[];
     phone_number: string;
     google_overview: string;
@@ -18,4 +17,5 @@ export type PubType = {
     google_id: string;
     reservable: boolean;
     website: string;
+    photos: string[];
 };

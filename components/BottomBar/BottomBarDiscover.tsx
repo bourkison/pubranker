@@ -1,10 +1,13 @@
-import { useAppDispatch } from '@/store/hooks';
-import { fetchPubs } from '@/store/slices/pubsNearMe';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { fetchPubs } from '@/store/slices/discoverPubs';
 import React, { useEffect } from 'react';
 import { View, TextInput, StyleSheet, Text } from 'react-native';
+import DiscoverPub from '@/components/Pubs/DiscoverPub';
 
 export default function BottomBarDiscover() {
     const dispatch = useAppDispatch();
+
+    const pubs = useAppSelector(state => state.discoverPubs.pubs);
 
     useEffect(() => {
         const f = async () => {
@@ -25,6 +28,14 @@ export default function BottomBarDiscover() {
             </View>
             <View>
                 <Text style={styles.subHeading}>Filters</Text>
+            </View>
+            <View>
+                <Text style={styles.subHeading}>Results</Text>
+                <View>
+                    {pubs.map(pub => (
+                        <DiscoverPub pub={pub} key={pub.id} />
+                    ))}
+                </View>
             </View>
         </View>
     );

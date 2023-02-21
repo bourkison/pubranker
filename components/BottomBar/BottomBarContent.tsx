@@ -1,7 +1,7 @@
 import { useAppSelector } from '@/store/hooks';
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import BottomBarDiscover from './BottomBarDiscover';
+import BottomBarDiscover from '@/components/BottomBar/BottomBarDiscover';
 
 export default function BottomBarContent() {
     const bottomBarType = useAppSelector(state => state.pub.bottomBarType);

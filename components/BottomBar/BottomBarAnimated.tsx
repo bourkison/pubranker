@@ -4,17 +4,25 @@ import {
     setAnimating,
     setBottomBarState,
 } from '@/store/slices/pub';
-import React, { RefObject, useCallback, useEffect } from 'react';
+import React, { RefObject, useCallback, useEffect, useRef } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import {
+    Gesture,
+    GestureDetector,
+    ScrollView,
+} from 'react-native-gesture-handler';
 import Animated, {
-    Easing,
     runOnJS,
     runOnUI,
     SharedValue,
+    useAnimatedProps,
+    useAnimatedScrollHandler,
     useAnimatedStyle,
     useSharedValue,
+    withSpring,
+    WithSpringConfig,
     withTiming,
+    WithTimingConfig,
 } from 'react-native-reanimated';
 
 type HomeBottomBarProps = {
@@ -22,19 +30,27 @@ type HomeBottomBarProps = {
     children: JSX.Element;
     translateY: SharedValue<number>;
     minY: SharedValue<number>;
+    animationProgress: SharedValue<number>;
 };
 
 const MARGIN_TOP = 100;
+
+const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
 export default function HomeBottomBar({
     containerRef,
     children,
     translateY,
     minY,
+    animationProgress,
 }: HomeBottomBarProps) {
     const context = useSharedValue(0);
     const previewY = useSharedValue(0);
     const minHeight = useSharedValue(0);
+
+    const scrollY = useSharedValue(0);
+    const moving = useSharedValue(false);
+    const scrollRef = useRef<ScrollView>(null);
 
     const bottomBarState = useAppSelector(state => state.pub.bottomBarState);
 
@@ -46,6 +62,15 @@ export default function HomeBottomBar({
             minHeight: minHeight.value,
         };
     });
+
+    const scrollHandler = useAnimatedScrollHandler(({ contentOffset }) => {
+        scrollY.value = Math.round(contentOffset.y);
+    });
+
+    const scrollProps = useAnimatedProps(() => ({
+        scrollEnabled: animationProgress.value >= 1,
+        bounces: scrollY.value > 0 || !moving.value,
+    }));
 
     // Our minY is equal to -y position of container, + search y position and height.
     // Our min height is equal to y position of container - y position of
@@ -75,22 +100,29 @@ export default function HomeBottomBar({
 
             runOnJS(setIsAnimating)(true);
 
-            const animation = {
-                duration: 300,
-                easing: Easing.inOut(Easing.quad),
+            const springAnimation: WithSpringConfig = {
+                stiffness: 100,
+                mass: 0.6,
+                damping: 10,
+            };
+
+            const timingAnimation: WithTimingConfig = {
+                duration: 250,
             };
 
             if (type === 'hidden') {
-                translateY.value = withTiming(0, animation, () =>
+                translateY.value = withTiming(0, timingAnimation, () =>
                     runOnJS(setIsAnimating)(false),
                 );
             } else if (type === 'expanded') {
-                translateY.value = withTiming(minY.value, animation, () =>
+                translateY.value = withSpring(minY.value, springAnimation, () =>
                     runOnJS(setIsAnimating)(false),
                 );
             } else if (type === 'preview') {
-                translateY.value = withTiming(previewY.value, animation, () =>
-                    runOnJS(setIsAnimating)(false),
+                translateY.value = withSpring(
+                    previewY.value,
+                    springAnimation,
+                    () => runOnJS(setIsAnimating)(false),
                 );
             }
         },
@@ -104,24 +136,45 @@ export default function HomeBottomBar({
         [dispatch],
     );
 
+    const scrollTo = useCallback(
+        (y: number) => {
+            if (scrollRef && scrollRef.current) {
+                scrollRef.current.scrollTo({
+                    y: y,
+                    animated: false,
+                });
+            }
+        },
+        [scrollRef],
+    );
+
     const panGesture = Gesture.Pan()
         .onStart(() => {
             context.value = translateY.value;
+            moving.value = true;
 
             if (!minY.value) {
                 runOnJS(measureMinY)();
             }
         })
         .onUpdate(e => {
-            translateY.value = e.translationY + context.value;
+            const change = e.translationY + context.value;
+            translateY.value = change;
 
             if (translateY.value > 0) {
                 translateY.value = 0;
             } else if (translateY.value < minY.value) {
                 translateY.value = minY.value;
             }
+
+            // simulate scroll if user continues touching screen
+            if (change < minY.value) {
+                runOnJS(scrollTo)(-change - minY.value);
+            }
         })
         .onFinalize(() => {
+            moving.value = false;
+
             const TRANSLATE_AMOUNT = 100;
             const PREVIEW_BOUNDARY = 50;
 
@@ -157,7 +210,8 @@ export default function HomeBottomBar({
                 runOnJS(setState)('hidden');
                 animateBar('hidden');
             }
-        });
+        })
+        .simultaneousWithExternalGesture(scrollRef);
 
     useEffect(() => {
         runOnUI(animateBar)(bottomBarState);
@@ -172,7 +226,13 @@ export default function HomeBottomBar({
                     <View style={styles.handleContainer}>
                         <View style={styles.handle} />
                     </View>
-                    <View style={styles.contentContainer}>{children}</View>
+                    <AnimatedScrollView
+                        ref={scrollRef}
+                        style={styles.contentContainer}
+                        onScroll={scrollHandler}
+                        animatedProps={scrollProps}>
+                        {children}
+                    </AnimatedScrollView>
                 </View>
             </GestureDetector>
         </Animated.View>

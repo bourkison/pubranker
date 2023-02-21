@@ -2,9 +2,9 @@ import React, { useRef } from 'react';
 // import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View } from 'react-native';
 import HomeMap from '@/components/Maps/HomeMap';
-import BottomBarAnimated from '@/components/Maps/BottomBar/BottomBarAnimated';
-import BottomBarContent from '@/components/Maps/BottomBar/BottomBarContent';
-import StatusBarInterpolate from '@/components/Maps/BottomBar/StatusBarInterpolate';
+import BottomBarAnimated from '@/components/BottomBar/BottomBarAnimated';
+import BottomBarContent from '@/components/BottomBar/BottomBarContent';
+import TopBarOverlay from '@/components/BottomBar/TopOverlay';
 import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 
 export default function Home() {
@@ -25,7 +25,7 @@ export default function Home() {
 
     return (
         <View style={styles.container}>
-            <StatusBarInterpolate
+            <TopBarOverlay
                 animationProgress={animationProgress}
                 height={
                     styles.searchBarContainer.top + styles.searchInput.height
@@ -38,7 +38,8 @@ export default function Home() {
                 <BottomBarAnimated
                     translateY={translateY}
                     minY={minY}
-                    containerRef={BottomBarContainer}>
+                    containerRef={BottomBarContainer}
+                    animationProgress={animationProgress}>
                     <BottomBarContent />
                 </BottomBarAnimated>
             </View>
@@ -79,6 +80,6 @@ const styles = StyleSheet.create({
         width: '100%',
         zIndex: 9,
         overflow: 'visible',
-        backgroundColor: 'transparent',
+        backgroundColor: 'white',
     },
 });
