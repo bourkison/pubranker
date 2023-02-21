@@ -9,6 +9,8 @@ import { PubType } from '@/types';
 import { setBottomBarState, setPub } from '@/store/slices/pub';
 import { useAppDispatch } from '@/store/hooks';
 
+const DELTA = 0.0075;
+
 export default function HomeMap() {
     const [location, setLocation] = useState<Location.LocationObject | null>(
         null,
@@ -47,10 +49,10 @@ export default function HomeMap() {
         dispatch(setPub(pub));
         if (MapRef.current) {
             MapRef.current.animateToRegion({
-                latitude: pub.latitude,
+                latitude: pub.latitude - 0.15 * DELTA,
                 longitude: pub.longitude,
-                latitudeDelta: 0.005,
-                longitudeDelta: 0.005,
+                latitudeDelta: DELTA,
+                longitudeDelta: DELTA,
             });
         }
     };

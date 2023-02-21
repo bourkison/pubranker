@@ -1,4 +1,3 @@
-import { convertPointStringToObject } from '@/services';
 import { supabase } from '@/services/supabase';
 import { PubType } from '@/types';
 import {
@@ -26,12 +25,16 @@ export const fetchPubs = createAsyncThunk('pubsNearMe/fetchPubs', async () => {
     }
 
     let l = await Location.getCurrentPositionAsync();
-    const response = await supabase.rpc('nearby_pubs', {
-        lat: l.coords.latitude,
-        long: l.coords.longitude,
-    });
+    const response = await supabase
+        .rpc('nearby_pubs', {
+            order_lat: l.coords.latitude,
+            order_long: l.coords.longitude,
+            dist_lat: l.coords.latitude,
+            dist_long: l.coords.longitude,
+        })
+        .limit(10);
 
-    console.log(convertPointStringToObject(response.data[0].location));
+    console.log(response.data.length);
 });
 
 const pubsNearMeSlice = createSlice({

@@ -1,22 +1,14 @@
 import React, { useRef } from 'react';
 // import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, TextInput, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import HomeMap from '@/components/Maps/HomeMap';
 import BottomBarAnimated from '@/components/Maps/BottomBar/BottomBarAnimated';
 import BottomBarContent from '@/components/Maps/BottomBar/BottomBarContent';
 import StatusBarInterpolate from '@/components/Maps/BottomBar/StatusBarInterpolate';
-import Animated, {
-    interpolate,
-    useAnimatedStyle,
-    useDerivedValue,
-    useSharedValue,
-} from 'react-native-reanimated';
-
-const SEARCH_BAR_SHADOW_OPACITY = 0.3;
+import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 
 export default function Home() {
     const BottomBarContainer = useRef<View>(null);
-    const SearchBarContainer = useRef<Animated.View>(null);
 
     const translateY = useSharedValue(0);
     const minY = useSharedValue(0);
@@ -31,29 +23,8 @@ export default function Home() {
         return val;
     });
 
-    const rSearchBarContainerStyle = useAnimatedStyle(() => {
-        return {
-            shadowOpacity: interpolate(
-                animationProgress.value,
-                [0, 0.9, 1],
-                [SEARCH_BAR_SHADOW_OPACITY, SEARCH_BAR_SHADOW_OPACITY, 0],
-            ),
-        };
-    });
-
     return (
         <View style={styles.container}>
-            <Animated.View
-                style={[styles.searchBarContainer, rSearchBarContainerStyle]}
-                ref={SearchBarContainer}>
-                <View style={styles.searchBar}>
-                    <TextInput
-                        style={styles.searchInput}
-                        placeholder="Search"
-                        placeholderTextColor="#D1D5DB"
-                    />
-                </View>
-            </Animated.View>
             <StatusBarInterpolate
                 animationProgress={animationProgress}
                 height={
@@ -67,9 +38,7 @@ export default function Home() {
                 <BottomBarAnimated
                     translateY={translateY}
                     minY={minY}
-                    containerRef={BottomBarContainer}
-                    searchBarRef={SearchBarContainer}
-                    animationProgress={animationProgress}>
+                    containerRef={BottomBarContainer}>
                     <BottomBarContent />
                 </BottomBarAnimated>
             </View>

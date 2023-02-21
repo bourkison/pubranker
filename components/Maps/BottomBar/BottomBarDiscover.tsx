@@ -1,7 +1,7 @@
 import { useAppDispatch } from '@/store/hooks';
 import { fetchPubs } from '@/store/slices/pubsNearMe';
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, TextInput, StyleSheet, Text } from 'react-native';
 
 export default function BottomBarDiscover() {
     const dispatch = useAppDispatch();
@@ -16,14 +16,32 @@ export default function BottomBarDiscover() {
 
     return (
         <View>
-            <Text style={styles.title}>Discover Pubs Near You</Text>
+            <View style={styles.searchBar}>
+                <TextInput
+                    style={styles.searchInput}
+                    placeholder="Search"
+                    placeholderTextColor="#A3A3A3"
+                />
+            </View>
+            <View>
+                <Text style={styles.subHeading}>Filters</Text>
+            </View>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    title: {
-        fontSize: 24,
-        fontWeight: '600',
+    searchBar: {
+        borderRadius: 7,
+        backgroundColor: '#F5F5F5',
+        paddingHorizontal: 10,
+        marginHorizontal: 15,
+    },
+    searchInput: { width: '100%', paddingVertical: 8 },
+    subHeading: {
+        fontWeight: 'bold',
+        color: '#A3A3A3',
+        marginHorizontal: 15,
+        marginTop: 15,
     },
 });

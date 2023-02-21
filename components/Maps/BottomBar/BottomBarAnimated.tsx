@@ -9,7 +9,6 @@ import { View, StyleSheet } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
     Easing,
-    interpolate,
     runOnJS,
     runOnUI,
     SharedValue,
@@ -20,20 +19,18 @@ import Animated, {
 
 type HomeBottomBarProps = {
     containerRef: RefObject<View>;
-    searchBarRef: RefObject<Animated.View>;
     children: JSX.Element;
     translateY: SharedValue<number>;
     minY: SharedValue<number>;
-    animationProgress: SharedValue<number>;
 };
+
+const MARGIN_TOP = 100;
 
 export default function HomeBottomBar({
     containerRef,
     children,
-    searchBarRef,
     translateY,
     minY,
-    animationProgress,
 }: HomeBottomBarProps) {
     const context = useSharedValue(0);
     const previewY = useSharedValue(0);
@@ -47,21 +44,6 @@ export default function HomeBottomBar({
         return {
             transform: [{ translateY: translateY.value }],
             minHeight: minHeight.value,
-            shadowOpacity: interpolate(
-                animationProgress.value,
-                [0, 0.9, 1],
-                [0.2, 0.2, 0],
-            ),
-        };
-    });
-
-    const rHandleStyle = useAnimatedStyle(() => {
-        return {
-            opacity: interpolate(
-                animationProgress.value,
-                [0, 0.9, 1],
-                [1, 1, 0],
-            ),
         };
     });
 
@@ -71,28 +53,10 @@ export default function HomeBottomBar({
         if (containerRef.current) {
             containerRef.current.measure(
                 (_x, _y, _width, contHeight, _pageX, contPageY) => {
-                    if (searchBarRef.current) {
-                        searchBarRef.current.measure(
-                            (
-                                __x,
-                                __y,
-                                __width,
-                                searchHeight,
-                                __pageX,
-                                searchPageY,
-                            ) => {
-                                minY.value =
-                                    -contPageY + searchPageY + searchHeight;
-                                minHeight.value =
-                                    contPageY +
-                                    contHeight -
-                                    searchPageY -
-                                    searchHeight;
+                    minY.value = -contPageY + MARGIN_TOP;
+                    minHeight.value = contPageY + contHeight - MARGIN_TOP;
 
-                                previewY.value = minY.value * 0.4;
-                            },
-                        );
-                    }
+                    previewY.value = minY.value * 0.4;
                 },
             );
         }
@@ -206,7 +170,7 @@ export default function HomeBottomBar({
             <GestureDetector gesture={panGesture}>
                 <View>
                     <View style={styles.handleContainer}>
-                        <Animated.View style={[styles.handle, rHandleStyle]} />
+                        <View style={styles.handle} />
                     </View>
                     <View style={styles.contentContainer}>{children}</View>
                 </View>
