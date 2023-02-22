@@ -14,11 +14,11 @@ type DiscoverPubProps = {
 };
 
 export default function DiscoverPub({ pub }: DiscoverPubProps) {
-    const [imageUrls, setImageUrls] = useState<string[]>([]);
+    const [imageUrls, setImageUrls] = useState<string[] | null>(null);
     const dispatch = useAppDispatch();
 
     useEffect(() => {
-        if (!imageUrls.length) {
+        if (imageUrls === null) {
             let urls: string[] = [];
 
             pub.photos.forEach(photo => {
@@ -67,7 +67,7 @@ export default function DiscoverPub({ pub }: DiscoverPubProps) {
                 </View>
             </View>
             <View>
-                <ImageScroller images={imageUrls} />
+                <ImageScroller images={imageUrls || []} />
             </View>
         </View>
     );

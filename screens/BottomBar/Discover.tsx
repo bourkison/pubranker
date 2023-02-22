@@ -1,27 +1,32 @@
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { fetchPubs } from '@/store/slices/discoverPubs';
-import React, { useEffect } from 'react';
-import { View, TextInput, StyleSheet, Text } from 'react-native';
+import { fetchPubs, setSearchText } from '@/store/slices/discoverPubs';
+import React, { useCallback, useEffect } from 'react';
+import {
+    View,
+    TextInput,
+    StyleSheet,
+    Text,
+    ActivityIndicator,
+} from 'react-native';
 import DiscoverPub from '@/components/Pubs/DiscoverPub';
 import { setBottomBarState } from '@/store/slices/pub';
 import FilterScroller from '@/components/Utility/FilterScroller';
+
+const LOAD_AMOUNT = 10;
 
 export default function Discover() {
     const dispatch = useAppDispatch();
 
     const pubs = useAppSelector(state => state.discoverPubs.pubs);
+    const isLoading = useAppSelector(state => state.discoverPubs.isLoading);
 
-    useEffect(() => {
-        const f = async () => {
-            await dispatch(fetchPubs({ amount: 10 }));
-        };
-
-        f();
+    const search = useCallback(async () => {
+        await dispatch(fetchPubs({ amount: LOAD_AMOUNT }));
     }, [dispatch]);
 
     useEffect(() => {
-        console.log('DISCOVER');
-    }, []);
+        search();
+    }, [search]);
 
     return (
         <View>
@@ -31,20 +36,26 @@ export default function Discover() {
                     placeholder="Search"
                     placeholderTextColor="#A3A3A3"
                     returnKeyType="search"
+                    onSubmitEditing={search}
+                    onChangeText={s => dispatch(setSearchText(s))}
                     onFocus={() => dispatch(setBottomBarState('expanded'))}
                 />
             </View>
             <View>
                 <Text style={styles.subHeading}>Filters</Text>
-                <FilterScroller />
+                <FilterScroller pubLoadAmount={LOAD_AMOUNT} />
             </View>
             <View>
                 <Text style={styles.subHeading}>Results</Text>
-                <View>
-                    {pubs.map(pub => (
-                        <DiscoverPub pub={pub} key={pub.id} />
-                    ))}
-                </View>
+                {!isLoading ? (
+                    <View>
+                        {pubs.map(pub => (
+                            <DiscoverPub pub={pub} key={pub.id} />
+                        ))}
+                    </View>
+                ) : (
+                    <ActivityIndicator />
+                )}
             </View>
         </View>
     );

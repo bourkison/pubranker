@@ -8,7 +8,7 @@ import { supabase } from '@/services/supabase';
 import { PubType } from '@/types';
 import { setBottomBarState, setPub } from '@/store/slices/pub';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { mapArrResponseToPubType } from '@/services';
+import { forcePubType } from '@/services';
 
 const DELTA = 0.0075;
 
@@ -45,7 +45,10 @@ export default function HomeMap({ bottomPadding }: HomeMapProps) {
     useEffect(() => {
         const fetchPubs = async () => {
             const res = await supabase.from('pubs').select().limit(50);
-            setPubs(mapArrResponseToPubType(res.data));
+
+            if (res.data && res.data.length) {
+                setPubs(res.data.map((p: any) => forcePubType(p, [])));
+            }
         };
 
         fetchPubs();

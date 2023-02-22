@@ -1,12 +1,19 @@
-import { mapArrResponseToPubType } from '@/services';
+import { applyFilters, forcePubType } from '@/services';
 import { supabase } from '@/services/supabase';
-import { PubFilters, PubType } from '@/types';
+import { BoolOrUnset, PubFilters, PubType } from '@/types';
 import {
     createAsyncThunk,
     createEntityAdapter,
     createSlice,
+    PayloadAction,
 } from '@reduxjs/toolkit';
 import * as Location from 'expo-location';
+import { RootState } from '@/store';
+
+type RejectWithValueType = {
+    message?: string;
+    code?: number;
+};
 
 const discoverPubsAdapter = createEntityAdapter();
 
@@ -15,6 +22,7 @@ const initialState = discoverPubsAdapter.getInitialState({
     isLoading: false,
     moreToLoad: true,
     isLoadingMore: false,
+    searchText: '',
     filters: {
         dogFriendly: 'unset',
         liveSport: 'unset',
@@ -32,9 +40,14 @@ const initialState = discoverPubsAdapter.getInitialState({
     } as PubFilters,
 });
 
-export const fetchPubs = createAsyncThunk(
+export const fetchPubs = createAsyncThunk<
+    PubType[],
+    { amount: number },
+    { rejectValue: RejectWithValueType }
+>(
     'discoverPubs/fetchPubs',
-    async ({ amount }: { amount: number }): Promise<PubType[]> => {
+    async ({ amount }, { getState, rejectWithValue }) => {
+        const state = getState() as RootState;
         let { status } = await Location.requestForegroundPermissionsAsync();
 
         if (status !== 'granted') {
@@ -43,25 +56,62 @@ export const fetchPubs = createAsyncThunk(
         }
 
         let l = await Location.getCurrentPositionAsync();
-        const response = await supabase
-            .rpc('nearby_pubs', {
-                order_lat: l.coords.latitude,
-                order_long: l.coords.longitude,
-                dist_lat: l.coords.latitude,
-                dist_long: l.coords.longitude,
-            })
-            .limit(amount);
 
-        console.log(response.data[0]);
+        let query = supabase.rpc('nearby_pubs', {
+            order_lat: l.coords.latitude,
+            order_long: l.coords.longitude,
+            dist_lat: l.coords.latitude,
+            dist_long: l.coords.longitude,
+        });
 
-        return mapArrResponseToPubType(response.data);
+        query = applyFilters(
+            query,
+            state.discoverPubs.filters,
+            state.discoverPubs.searchText,
+        );
+
+        const response = await query.limit(amount);
+
+        if (response.data && response.data.length) {
+            let promises: Promise<PubType>[] = [];
+
+            response.data.forEach((pub: any) => {
+                promises.push(
+                    new Promise(async resolve => {
+                        const photo = await supabase
+                            .from('pub_photos')
+                            .select()
+                            .eq('pub_id', pub.id);
+
+                        console.log('PHOTO:', photo, pub.id);
+
+                        resolve(forcePubType(pub, photo.data));
+                    }),
+                );
+            });
+
+            return await Promise.all(promises);
+        } else {
+            console.log('HERE');
+            return rejectWithValue({});
+        }
     },
 );
 
 const discoverPubsSlice = createSlice({
     name: 'discoverPubs',
     initialState,
-    reducers: {},
+    reducers: {
+        setSearchText(state, action: PayloadAction<string>) {
+            state.searchText = action.payload;
+        },
+        setFilter(
+            state,
+            action: PayloadAction<{ key: keyof PubFilters; val: BoolOrUnset }>,
+        ) {
+            state.filters[action.payload.key] = action.payload.val;
+        },
+    },
     extraReducers: builder => {
         builder
             .addCase(fetchPubs.pending, state => {
@@ -71,9 +121,15 @@ const discoverPubsSlice = createSlice({
                 state.pubs = action.payload;
                 state.isLoading = false;
                 state.isLoadingMore = false;
+
+                console.log('fetch pubs fulfilled');
+            })
+            .addCase(fetchPubs.rejected, (state, { meta, payload }) => {
+                // TODO: handle errors.
+                console.error('Error fetching pubs', meta, payload);
             });
     },
 });
 
-export const {} = discoverPubsSlice.actions;
+export const { setSearchText, setFilter } = discoverPubsSlice.actions;
 export default discoverPubsSlice.reducer;

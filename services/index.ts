@@ -1,4 +1,5 @@
-import { PubType } from '@/types';
+import { PubFilters, PubType } from '@/types';
+import { PostgrestFilterBuilder } from '@supabase/postgrest-js';
 
 export const convertPointStringToObject = (
     input: string,
@@ -21,7 +22,16 @@ export const convertPointStringToObject = (
     };
 };
 
-export const forcePubType = (input: any): PubType => {
+export const forcePubType = (input: any, photos: any): PubType => {
+    const convertPhotos = (p: any[]): string[] => {
+        console.log(
+            'p:',
+            p,
+            p.map(photo => photo.key),
+        );
+        return p.map(photo => photo.key);
+    };
+
     // TODO: Add checking
     return {
         id: input.id,
@@ -40,12 +50,8 @@ export const forcePubType = (input: any): PubType => {
         reservable: input.reservable || false,
         website: input.website || '',
         dist_meters: input.dist_meters || -1,
-        photos: input.photos || [],
+        photos: convertPhotos(photos) || [],
     };
-};
-
-export const mapArrResponseToPubType = (input: any): PubType[] => {
-    return input.map((i: any) => forcePubType(i));
 };
 
 export const roundToNearest = (input: number, nearest: number) => {
@@ -62,4 +68,78 @@ export const distanceString = (input: number) => {
     } else {
         return `${amount}m away`;
     }
+};
+
+export const applyFilters = (
+    query: PostgrestFilterBuilder<any, any, any>,
+    filters: PubFilters,
+    searchText: string,
+): PostgrestFilterBuilder<any, any, any> => {
+    if (searchText) {
+        query = query.textSearch('name', `'${searchText}'`);
+    }
+
+    if (filters.dogFriendly !== 'unset') {
+        query = query.eq('dog_friendly', filters.dogFriendly);
+    }
+
+    if (filters.liveSport !== 'unset') {
+        query = query.eq('live_sport', filters.liveSport);
+    }
+
+    if (filters.darts !== 'unset') {
+        if (filters.darts === true) {
+            query = query.gt('dart_board_amount', 0);
+        } else {
+            query = query.eq('dart_board_amount', 0);
+        }
+    }
+
+    if (filters.pool !== 'unset') {
+        if (filters.pool === true) {
+            query = query.gt('pool_table_amount', 0);
+        } else {
+            query = query.eq('pool_table_amount', 0);
+        }
+    }
+
+    if (filters.sundayRoast !== 'unset') {
+        // TODO:
+        console.warn('No sunday roast filter yet');
+    }
+
+    if (filters.garden !== 'unset') {
+        query = query.eq('beer_garden', filters.garden);
+    }
+
+    if (filters.kidFriendly !== 'unset') {
+        query = query.eq('kid_friendly', filters.kidFriendly);
+    }
+
+    if (filters.liveMusic !== 'unset') {
+        query = query.eq('live_music', filters.liveMusic);
+    }
+
+    if (filters.boardGames !== 'unset') {
+        // TODO:
+        console.warn('No board games filter yet');
+    }
+
+    if (filters.freeWifi !== 'unset') {
+        query = query.eq('live_music', filters.freeWifi);
+    }
+
+    if (filters.roof !== 'unset') {
+        query = query.eq('rooftop', filters.roof);
+    }
+
+    if (filters.foosball !== 'unset') {
+        if (filters.foosball === true) {
+            query = query.gt('foosball_table_amount', 0);
+        } else {
+            query = query.eq('foosball_table_amount', 0);
+        }
+    }
+
+    return query;
 };

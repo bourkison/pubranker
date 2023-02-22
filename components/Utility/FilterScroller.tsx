@@ -4,7 +4,11 @@ import FilterItem from '@/components/Utility/FilterItem';
 import { useAppSelector } from '@/store/hooks';
 import { PubFilters } from '@/types';
 
-export default function FilterScroller() {
+type FilterScrollerProps = {
+    pubLoadAmount: number;
+};
+
+export default function FilterScroller({ pubLoadAmount }: FilterScrollerProps) {
     const filters = useAppSelector(state => state.discoverPubs.filters);
     const filterKeys = Object.keys(filters) as unknown as Array<
         keyof PubFilters
@@ -24,7 +28,7 @@ export default function FilterScroller() {
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item }) => (
                     <View style={styles.rowMargin}>
-                        <FilterItem type={item} />
+                        <FilterItem type={item} pubLoadAmount={pubLoadAmount} />
                     </View>
                 )}
                 contentContainerStyle={styles.filtersContainer}

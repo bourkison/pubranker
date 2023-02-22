@@ -1,13 +1,17 @@
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { fetchPubs, setFilter } from '@/store/slices/discoverPubs';
 import { PubFilters } from '@/types';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 type FilterItemProps = {
     type: keyof PubFilters;
+    pubLoadAmount: number;
 };
 
-export default function FilterItem({ type }: FilterItemProps) {
-    const [val, setVal] = useState<PubFilters[typeof type]>('unset');
+export default function FilterItem({ type, pubLoadAmount }: FilterItemProps) {
+    const val = useAppSelector(state => state.discoverPubs.filters[type]);
+    const dispatch = useAppDispatch();
 
     const title = useMemo(() => {
         switch (type) {
@@ -60,12 +64,14 @@ export default function FilterItem({ type }: FilterItemProps) {
 
     const press = () => {
         if (val === 'unset') {
-            setVal(true);
+            dispatch(setFilter({ key: type, val: true }));
         } else if (val === false) {
-            setVal('unset');
+            dispatch(setFilter({ key: type, val: 'unset' }));
         } else if (val === true) {
-            setVal(false);
+            dispatch(setFilter({ key: type, val: false }));
         }
+
+        dispatch(fetchPubs({ amount: pubLoadAmount }));
     };
 
     return (
