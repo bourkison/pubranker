@@ -6,7 +6,7 @@ import DiscoverPub from '@/components/Pubs/DiscoverPub';
 import { setBottomBarState } from '@/store/slices/pub';
 import FilterScroller from '@/components/Utility/FilterScroller';
 
-export default function BottomBarDiscover() {
+export default function Discover() {
     const dispatch = useAppDispatch();
 
     const pubs = useAppSelector(state => state.discoverPubs.pubs);
@@ -19,6 +19,10 @@ export default function BottomBarDiscover() {
         f();
     }, [dispatch]);
 
+    useEffect(() => {
+        console.log('DISCOVER');
+    }, []);
+
     return (
         <View>
             <View style={styles.searchBar}>
@@ -26,6 +30,7 @@ export default function BottomBarDiscover() {
                     style={styles.searchInput}
                     placeholder="Search"
                     placeholderTextColor="#A3A3A3"
+                    returnKeyType="search"
                     onFocus={() => dispatch(setBottomBarState('expanded'))}
                 />
             </View>

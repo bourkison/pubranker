@@ -44,7 +44,18 @@ export default function DiscoverPub({ pub }: DiscoverPubProps) {
                         <View>
                             <Text style={styles.title}>{pub.name}</Text>
                         </View>
-                        <View>
+                        <View style={styles.subtitleContainer}>
+                            <Ionicons
+                                name="logo-google"
+                                color="#A3A3A3"
+                                style={styles.googleLogo}
+                            />
+                            <Text style={styles.subtitle}>
+                                {pub.google_rating}
+                                {' ('}
+                                {pub.google_ratings_amount}
+                                {') | '}
+                            </Text>
                             <Text style={styles.subtitle}>
                                 {distanceString(pub.dist_meters)}
                             </Text>
@@ -81,8 +92,15 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '400',
     },
+    subtitleContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
     subtitle: {
         fontSize: 12,
         color: '#A3A3A3',
+    },
+    googleLogo: {
+        marginRight: 2,
     },
 });

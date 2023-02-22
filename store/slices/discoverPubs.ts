@@ -69,6 +69,8 @@ const discoverPubsSlice = createSlice({
             })
             .addCase(fetchPubs.fulfilled, (state, action) => {
                 state.pubs = action.payload;
+                state.isLoading = false;
+                state.isLoadingMore = false;
             });
     },
 });

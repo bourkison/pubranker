@@ -2,13 +2,14 @@ import React from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import HomeMap from '@/components/Maps/HomeMap';
 import BottomBarAnimated from '@/components/BottomBar/BottomBarAnimated';
-import BottomBarContent from '@/components/BottomBar/BottomBarContent';
 import TopBarOverlay from '@/components/BottomBar/TopOverlay';
 import {
     interpolate,
     useDerivedValue,
     useSharedValue,
 } from 'react-native-reanimated';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import BottomBarNavigator from '@/nav/BottomBarNavigator';
 
 export default function Home() {
     const { height } = useWindowDimensions();
@@ -16,6 +17,7 @@ export default function Home() {
     const preview = Math.round(height * 0.6);
     const closed = Math.round(height * 0.82);
 
+    const tabHeight = useBottomTabBarHeight();
     const translateY = useSharedValue(closed);
 
     const animationProgress = useDerivedValue(() =>
@@ -24,7 +26,7 @@ export default function Home() {
 
     return (
         <View style={styles.container}>
-            <HomeMap />
+            <HomeMap bottomPadding={height - closed - tabHeight} />
             <TopBarOverlay
                 height={height * 0.4}
                 animationProgress={animationProgress}
@@ -34,7 +36,7 @@ export default function Home() {
                 preview={preview}
                 closed={closed}
                 translateY={translateY}>
-                <BottomBarContent />
+                <BottomBarNavigator />
             </BottomBarAnimated>
         </View>
     );
@@ -47,30 +49,5 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         overflow: 'visible',
         backgroundColor: 'transparent',
-    },
-    searchBarContainer: {
-        position: 'absolute',
-        top: 50,
-        width: '100%',
-        paddingHorizontal: 25,
-        zIndex: 3,
-        elevation: 2,
-    },
-    searchBar: {
-        backgroundColor: 'white',
-        borderRadius: 5,
-        shadowColor: 'black',
-        paddingHorizontal: 10,
-    },
-    searchInput: { width: '100%', height: 48 },
-    mapContainer: {
-        ...StyleSheet.absoluteFillObject,
-    },
-    bottomBarContainer: {
-        height: 72,
-        width: '100%',
-        zIndex: 9,
-        overflow: 'visible',
-        backgroundColor: 'white',
     },
 });

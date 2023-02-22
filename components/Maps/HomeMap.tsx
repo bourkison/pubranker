@@ -12,7 +12,11 @@ import { mapArrResponseToPubType } from '@/services';
 
 const DELTA = 0.0075;
 
-export default function HomeMap() {
+type HomeMapProps = {
+    bottomPadding: number;
+};
+
+export default function HomeMap({ bottomPadding }: HomeMapProps) {
     const [location, setLocation] = useState<Location.LocationObject | null>(
         null,
     );
@@ -70,6 +74,7 @@ export default function HomeMap() {
             style={styles.map}
             onPanDrag={panDrag}
             customMapStyle={MapStyle}
+            mapPadding={{ bottom: bottomPadding, top: 0, right: 0, left: 0 }}
             initialRegion={
                 location
                     ? {

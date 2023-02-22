@@ -1,16 +1,16 @@
 import { distanceString } from '@/services';
-import { PubType } from '@/types';
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { Octicons, Ionicons } from '@expo/vector-icons';
 import { useAppDispatch } from '@/store/hooks';
 import { deselectPub } from '@/store/slices/pub';
+import { PubType } from '@/types';
 
-type BottomBarPubViewProps = {
+type PubViewProps = {
     pub: PubType;
 };
 
-export default function BottomBarPubView({ pub }: BottomBarPubViewProps) {
+export default function PubView({ pub }: PubViewProps) {
     const dispatch = useAppDispatch();
 
     return (
