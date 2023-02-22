@@ -1,3 +1,5 @@
+// https://github.com/software-mansion/react-native-gesture-handler/issues/420#issuecomment-1356861934
+
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
     BottomBarState,
