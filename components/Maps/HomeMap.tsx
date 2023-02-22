@@ -58,13 +58,17 @@ export default function HomeMap() {
         }
     }, [selectedPub, MapRef]);
 
+    const panDrag = () => {
+        dispatch(setBottomBarState('hidden'));
+    };
+
     return (
         <MapView
             provider="google"
             ref={MapRef}
             showsUserLocation={true}
             style={styles.map}
-            onPanDrag={() => dispatch(setBottomBarState('hidden'))}
+            onPanDrag={panDrag}
             customMapStyle={MapStyle}
             initialRegion={
                 location

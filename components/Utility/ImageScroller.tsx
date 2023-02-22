@@ -10,6 +10,7 @@ export default function ImageScroller({ images }: ImageScrollerImages) {
         <FlatList
             horizontal={true}
             data={images}
+            showsHorizontalScrollIndicator={false}
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => (
                 <Image

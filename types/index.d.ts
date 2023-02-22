@@ -20,3 +20,21 @@ export type PubType = {
     dist_meters: number;
     photos: string[];
 };
+
+export type BoolOrUnset = boolean | 'unset';
+
+export type PubFilters = {
+    dogFriendly: BoolOrUnset;
+    liveSport: BoolOrUnset;
+    darts: BoolOrUnset;
+    pool: BoolOrUnset;
+    sundayRoast: BoolOrUnset;
+    garden: BoolOrUnset;
+    kidFriendly: BoolOrUnset;
+    liveMusic: BoolOrUnset;
+    boardGames: BoolOrUnset;
+    freeWifi: BoolOrUnset;
+    roof: BoolOrUnset;
+    foosball: BoolOrUnset;
+    wheelchairAccessible: BoolOrUnset;
+};

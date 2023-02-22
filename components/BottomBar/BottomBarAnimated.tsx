@@ -5,7 +5,7 @@ import {
     setBottomBarState,
 } from '@/store/slices/pub';
 import React, { useCallback, useRef, useEffect } from 'react';
-import { View, StyleSheet, useWindowDimensions } from 'react-native';
+import { View, StyleSheet, useWindowDimensions, Pressable } from 'react-native';
 import {
     Gesture,
     GestureDetector,
@@ -222,7 +222,10 @@ export default function HomeBottomBar({
             <Animated.View style={[styles.container, rStyle]}>
                 <View>
                     <View style={styles.handleContainer}>
-                        <View style={styles.handle} />
+                        <Pressable
+                            style={styles.handle}
+                            onPressIn={() => console.log('PRESS')}
+                        />
                     </View>
                     <AnimatedScrollView
                         scrollEventThrottle={1}

@@ -1,6 +1,6 @@
 import { mapArrResponseToPubType } from '@/services';
 import { supabase } from '@/services/supabase';
-import { PubType } from '@/types';
+import { PubFilters, PubType } from '@/types';
 import {
     createAsyncThunk,
     createEntityAdapter,
@@ -15,6 +15,21 @@ const initialState = discoverPubsAdapter.getInitialState({
     isLoading: false,
     moreToLoad: true,
     isLoadingMore: false,
+    filters: {
+        dogFriendly: 'unset',
+        liveSport: 'unset',
+        darts: 'unset',
+        pool: 'unset',
+        sundayRoast: 'unset',
+        garden: 'unset',
+        kidFriendly: 'unset',
+        liveMusic: 'unset',
+        boardGames: 'unset',
+        freeWifi: 'unset',
+        roof: 'unset',
+        foosball: 'unset',
+        wheelchairAccessible: 'unset',
+    } as PubFilters,
 });
 
 export const fetchPubs = createAsyncThunk(

@@ -40,14 +40,7 @@ export const forcePubType = (input: any): PubType => {
         reservable: input.reservable || false,
         website: input.website || '',
         dist_meters: input.dist_meters || -1,
-        photos: [
-            '56/star_hd_1.png',
-            '56/star_hd_2.png',
-            '56/star_hd_3.png',
-            '56/star_hd_4.png',
-            '56/star_hd_5.png',
-            '56/star_hd_6.png',
-        ],
+        photos: input.photos || [],
     };
 };
 

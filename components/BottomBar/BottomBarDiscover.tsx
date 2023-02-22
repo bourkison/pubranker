@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import { View, TextInput, StyleSheet, Text } from 'react-native';
 import DiscoverPub from '@/components/Pubs/DiscoverPub';
 import { setBottomBarState } from '@/store/slices/pub';
+import FilterScroller from '@/components/Utility/FilterScroller';
 
 export default function BottomBarDiscover() {
     const dispatch = useAppDispatch();
@@ -30,6 +31,7 @@ export default function BottomBarDiscover() {
             </View>
             <View>
                 <Text style={styles.subHeading}>Filters</Text>
+                <FilterScroller />
             </View>
             <View>
                 <Text style={styles.subHeading}>Results</Text>
