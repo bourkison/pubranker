@@ -12,7 +12,6 @@ export type BottomBarState = 'hidden' | 'preview' | 'expanded';
 const initialState = pubAdapter.getInitialState({
     bottomBarType: 'discover' as 'selected' | 'discover' | 'search',
     selectedPub: null as PubType | null,
-    isAnimating: false,
 });
 
 const pubSlice = createSlice({
@@ -27,11 +26,8 @@ const pubSlice = createSlice({
             state.bottomBarType = 'discover';
             state.selectedPub = null;
         },
-        setAnimating(state, action: PayloadAction<boolean>) {
-            state.isAnimating = action.payload;
-        },
     },
 });
 
-export const { setPub, setAnimating, deselectPub } = pubSlice.actions;
+export const { setPub, deselectPub } = pubSlice.actions;
 export default pubSlice.reducer;

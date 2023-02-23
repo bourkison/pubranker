@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, StyleSheet } from 'react-native';
+import { Image, StyleSheet, FlatList, Platform } from 'react-native';
 import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 
 type ImageScrollerImages = {
@@ -7,17 +7,30 @@ type ImageScrollerImages = {
 };
 
 export default function ImageScroller({ images }: ImageScrollerImages) {
-    return (
-        <BottomSheetFlatList
-            horizontal={true}
-            data={images}
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => (
-                <Image source={{ uri: item }} style={styles.image} />
-            )}
-        />
-    );
+    const comp =
+        Platform.OS === 'ios' ? (
+            <FlatList
+                horizontal={true}
+                data={images}
+                showsHorizontalScrollIndicator={false}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item }) => (
+                    <Image source={{ uri: item }} style={styles.image} />
+                )}
+            />
+        ) : (
+            <BottomSheetFlatList
+                horizontal={true}
+                data={images}
+                showsHorizontalScrollIndicator={false}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item }) => (
+                    <Image source={{ uri: item }} style={styles.image} />
+                )}
+            />
+        );
+
+    return comp;
 }
 
 const styles = StyleSheet.create({

@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { fetchPubs, setFilter } from '@/store/slices/discoverPubs';
+import { fetchPubs, setFilter } from '@/store/slices/discover';
 import { PubFilters } from '@/types';
 import React, { useMemo } from 'react';
 import { Text, StyleSheet, TouchableOpacity } from 'react-native';
@@ -10,7 +10,7 @@ type FilterItemProps = {
 };
 
 export default function FilterItem({ type, pubLoadAmount }: FilterItemProps) {
-    const val = useAppSelector(state => state.discoverPubs.filters[type]);
+    const val = useAppSelector(state => state.discover.filters[type]);
     const dispatch = useAppDispatch();
 
     const title = useMemo(() => {

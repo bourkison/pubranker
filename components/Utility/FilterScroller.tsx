@@ -13,7 +13,7 @@ export default function FilterScroller({
     pubLoadAmount,
     rows,
 }: FilterScrollerProps) {
-    const filters = useAppSelector(state => state.discoverPubs.filters);
+    const filters = useAppSelector(state => state.discover.filters);
     const filterKeys = Object.keys(filters) as unknown as Array<
         keyof PubFilters
     >;

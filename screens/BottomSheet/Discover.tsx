@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { fetchPubs } from '@/store/slices/discoverPubs';
+import { fetchMorePubs, fetchPubs } from '@/store/slices/discover';
 import React, { useCallback, useEffect, useRef } from 'react';
 import {
     View,
@@ -13,15 +13,17 @@ import FilterScroller from '@/components/Utility/FilterScroller';
 import { BottomSheetFlatList, useBottomSheet } from '@gorhom/bottom-sheet';
 import SearchBar from '@/components/Utility/SearchBar';
 
-const LOAD_AMOUNT = 10;
+const LOAD_AMOUNT = 5;
 
 export default function Discover() {
     const dispatch = useAppDispatch();
     const FlatListRef = useRef<FlatList>(null);
     const { collapse, animatedIndex, close } = useBottomSheet();
 
-    const pubs = useAppSelector(state => state.discoverPubs.pubs);
-    const isLoading = useAppSelector(state => state.discoverPubs.isLoading);
+    const pubs = useAppSelector(state => state.discover.pubs);
+    const isLoading = useAppSelector(state => state.discover.isLoading);
+    const isLoadingMore = useAppSelector(state => state.discover.isLoadingMore);
+    const moreToLoad = useAppSelector(state => state.discover.moreToLoad);
 
     const bottomBarType = useAppSelector(state => state.pub.bottomBarType);
     const selectedPub = useAppSelector(state => state.pub.selectedPub);
@@ -45,11 +47,15 @@ export default function Discover() {
         }
     }, [bottomBarType, collapse, animatedIndex, close, selectedPub]);
 
-    // const isLoading = useAppSelector(state => state.discoverPubs.isLoading);
-
     const search = useCallback(async () => {
         await dispatch(fetchPubs({ amount: LOAD_AMOUNT }));
     }, [dispatch]);
+
+    const loadMore = useCallback(async () => {
+        if (!isLoading && !isLoadingMore && moreToLoad) {
+            await dispatch(fetchMorePubs({ amount: LOAD_AMOUNT }));
+        }
+    }, [dispatch, isLoadingMore, isLoading, moreToLoad]);
 
     useEffect(() => {
         search();
@@ -75,6 +81,10 @@ export default function Discover() {
             data={pubs}
             renderItem={({ item }) => <DiscoverPub pub={item} />}
             keyExtractor={item => item.id.toString()}
+            onEndReached={loadMore}
+            ListFooterComponent={() =>
+                isLoadingMore ? <ActivityIndicator /> : <View />
+            }
         />
     );
 }

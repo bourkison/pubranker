@@ -9,7 +9,7 @@ import {
 import { Ionicons, Feather } from '@expo/vector-icons';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { useBottomSheet } from '@gorhom/bottom-sheet';
-import { setSearchText } from '@/store/slices/discoverPubs';
+import { setSearchText } from '@/store/slices/discover';
 
 type SearchBarProps = {
     search: () => void;
@@ -20,7 +20,7 @@ export default function SearchBar({ search }: SearchBarProps) {
 
     const [focused, setFocused] = useState(-1); // -1 is not focused, 0 is focused at index 0, etc.
 
-    const searchText = useAppSelector(state => state.discoverPubs.searchText);
+    const searchText = useAppSelector(state => state.discover.searchText);
     const { expand, snapToIndex, animatedIndex } = useBottomSheet();
 
     const dispatch = useAppDispatch();

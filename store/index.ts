@@ -1,13 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 import userReducer from '@/store/slices/user';
 import pubReducer from '@/store/slices/pub';
-import discoverPubsReducer from '@/store/slices/discoverPubs';
+import discoverReducer from '@/store/slices/discover';
 
 const store = configureStore({
     reducer: {
         user: userReducer,
         pub: pubReducer,
-        discoverPubs: discoverPubsReducer,
+        discover: discoverReducer,
     },
 });
 
