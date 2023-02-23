@@ -1,5 +1,8 @@
 import { BoundingBox, PubFilters, PubType } from '@/types';
 import { PostgrestFilterBuilder } from '@supabase/postgrest-js';
+import * as turf from '@turf/turf';
+// @ts-ignore
+import de9im from 'de9im';
 
 export const convertPointStringToObject = (
     input: string,
@@ -139,63 +142,59 @@ export const applyFilters = (
     return query;
 };
 
-type Coordinates = { x: number; y: number };
-type BoundingBoxCoordinates = {
-    topLeft: Coordinates;
-    topRight: Coordinates;
-    bottomLeft: Coordinates;
-    bottomRight: Coordinates;
+export const convertBoxToCoordinates = (input: BoundingBox): number[][] => [
+    [input.minLong, input.maxLat],
+    [input.maxLong, input.maxLat],
+    [input.maxLong, input.minLat],
+    [input.minLong, input.minLat],
+    [input.minLong, input.maxLat],
+];
+
+export const convertCoordsToMultiPolygon = (polygonArr: number[][][][]) => {
+    return turf
+        .multiPolygon(polygonArr[0].map(polygon => [polygon]))
+        .geometry.coordinates.map(t =>
+            t[0].map(c => ({ latitude: c[1], longitude: c[0] })),
+        );
 };
 
-const convertBoxToCoordinates = (
-    input: BoundingBox,
-): BoundingBoxCoordinates => ({
-    topLeft: { x: input.minLat, y: input.maxLong },
-    topRight: { x: input.maxLat, y: input.maxLong },
-    bottomLeft: { x: input.minLat, y: input.minLong },
-    bottomRight: { x: input.maxLat, y: input.minLong },
-});
-
+// TODO: Alot of improvements can be made on this function.
+// i.e. should break up request to only get regions I haven't searched yet.
+// (i.e. of 50% of screen) has been searched, only request the other 50%.
 export const hasFetchedPreviously = (
     toFetch: BoundingBox,
     previouslyFetched: BoundingBox[],
 ): boolean => {
-    const toFetchCoords = convertBoxToCoordinates(toFetch);
+    let response = false;
 
-    for (let i = 0; i < previouslyFetched.length; i++) {
-        const toCheck = convertBoxToCoordinates(previouslyFetched[i]);
+    if (previouslyFetched.length > 0) {
+        const toFetchPolygon = turf.polygon([convertBoxToCoordinates(toFetch)]);
+        const previouslyFetchedMultiPolygon = turf.multiPolygon([
+            previouslyFetched.map(c => convertBoxToCoordinates(c)),
+        ]);
 
-        if (
-            toFetchCoords.topLeft.x < toCheck.topLeft.x ||
-            toFetchCoords.topLeft.y > toCheck.topLeft.y
-        ) {
-            continue;
-        }
-
-        if (
-            toFetchCoords.topRight.x > toCheck.topRight.x ||
-            toFetchCoords.topRight.y > toCheck.topRight.y
-        ) {
-            continue;
-        }
-
-        if (
-            toFetchCoords.bottomLeft.x < toCheck.bottomLeft.x ||
-            toFetchCoords.bottomLeft.y < toCheck.bottomLeft.y
-        ) {
-            continue;
-        }
-
-        if (
-            toFetchCoords.bottomRight.x > toCheck.bottomRight.x ||
-            toFetchCoords.bottomRight.y < toCheck.bottomRight.y
-        ) {
-            continue;
-        }
-
-        console.log('PREVIOusLY CHECKED.');
-        return true;
+        response = !de9im.within(previouslyFetchedMultiPolygon, toFetchPolygon);
+        console.log('HAS FETCHED:', response);
     }
 
-    return false;
+    return true;
+};
+
+export const joinPolygons = (
+    newPolygon: turf.helpers.MultiPolygon,
+    originalPolygon: turf.helpers.MultiPolygon | turf.helpers.Polygon | null,
+): turf.helpers.MultiPolygon | turf.helpers.Polygon => {
+    if (!originalPolygon) {
+        return newPolygon;
+    }
+
+    const response = turf.union(newPolygon, originalPolygon);
+
+    if (!response) {
+        throw new Error('Error in polygon union');
+    }
+
+    console.log('JOINED POLY', response.geometry.coordinates);
+
+    return response.geometry;
 };

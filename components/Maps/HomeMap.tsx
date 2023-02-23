@@ -1,6 +1,6 @@
-import React, { RefObject, useEffect, useRef, useState } from 'react';
+import React, { RefObject, useEffect, useMemo, useRef, useState } from 'react';
 
-import MapView, { Marker, Region } from 'react-native-maps';
+import MapView, { Marker, Polygon, Region } from 'react-native-maps';
 import * as Location from 'expo-location';
 import MapStyle from '../../mapStyle.json';
 import { Keyboard, StyleSheet } from 'react-native';
@@ -8,6 +8,13 @@ import { setPub } from '@/store/slices/pub';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { fetchMapPubs } from '@/store/slices/map';
+import {
+    convertBoxToCoordinates,
+    convertCoordsToMultiPolygon,
+} from '@/services';
+import { WITH_POLYGONS } from '@/screens/constants';
+import { getType } from '@turf/turf';
+import * as turf from '@turf/turf';
 
 const ANIMATE_DELTA = 0.0075;
 const INITIAL_DELTA = 0.01;
@@ -30,6 +37,57 @@ export default function HomeMap({
     const dispatch = useAppDispatch();
     const selectedPub = useAppSelector(state => state.pub.selectedPub);
     const pubs = useAppSelector(state => state.map.pubs);
+
+    // const coordinates = useAppSelector(state => state.map.previouslyFetched);
+    const previouslyFetched = useAppSelector(
+        state => state.map.previouslyFetchedPolygon,
+    );
+
+    const latLngPolygon = useMemo(() => {
+        try {
+            if (previouslyFetched) {
+                if (getType(previouslyFetched) === 'MultiPolygon') {
+                    const multi =
+                        previouslyFetched as turf.helpers.MultiPolygon;
+
+                    const response = multi.coordinates.map(first => {
+                        return first.map(second => {
+                            return second.map(third => {
+                                return {
+                                    latitude: third[1],
+                                    longitude: third[0],
+                                };
+                            });
+                        });
+                    });
+
+                    return response;
+                } else if (getType(previouslyFetched) === 'Polygon') {
+                    const poly = previouslyFetched as turf.helpers.Polygon;
+
+                    const response = [
+                        poly.coordinates.map(first => {
+                            return first.map(second => {
+                                return {
+                                    latitude: second[1],
+                                    longitude: second[0],
+                                };
+                            });
+                        }),
+                    ];
+
+                    return response;
+                } else {
+                    throw new Error('Unrecognised poly');
+                }
+            } else {
+                throw new Error('No poly');
+            }
+        } catch (err) {
+            console.warn(err);
+            return [];
+        }
+    }, [previouslyFetched]);
 
     useEffect(() => {
         (async () => {
@@ -118,6 +176,13 @@ export default function HomeMap({
                     title={pub.name}
                 />
             ))}
+            {WITH_POLYGONS && latLngPolygon
+                ? latLngPolygon.map((latLngArr, i) =>
+                      latLngArr.map((latLng, j) => (
+                          <Polygon coordinates={latLng} key={i * j} />
+                      )),
+                  )
+                : undefined}
         </MapView>
     );
 }

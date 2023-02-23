@@ -1,4 +1,9 @@
-import { forcePubType, hasFetchedPreviously } from '@/services';
+import {
+    convertBoxToCoordinates,
+    forcePubType,
+    hasFetchedPreviously,
+    joinPolygons,
+} from '@/services';
 import { supabase } from '@/services/supabase';
 import { BoundingBox, PubType, RejectWithValueType } from '@/types';
 import {
@@ -8,6 +13,7 @@ import {
 } from '@reduxjs/toolkit';
 import * as Location from 'expo-location';
 import { RootState } from '..';
+import * as turf from '@turf/turf';
 
 const mapAdapter = createEntityAdapter();
 
@@ -16,6 +22,10 @@ const initialState = mapAdapter.getInitialState({
     previouslyFetched: [] as BoundingBox[],
     isLoading: false,
     isLoadingMore: false,
+    previouslyFetchedPolygon: null as
+        | turf.helpers.MultiPolygon
+        | turf.helpers.Polygon
+        | null,
 });
 
 export const fetchMapPubs = createAsyncThunk<
@@ -41,8 +51,6 @@ export const fetchMapPubs = createAsyncThunk<
         dist_lat: l.coords.latitude,
         dist_long: l.coords.longitude,
     });
-
-    console.log('RESPONSE:', response.data);
 
     let promises: Promise<PubType>[] = [];
 
@@ -82,6 +90,12 @@ const mapSlice = createSlice({
                 ...state.previouslyFetched,
                 ...action.payload.requestedBox,
             ];
+
+            state.previouslyFetchedPolygon = joinPolygons(
+                turf.multiPolygon([[convertBoxToCoordinates(action.meta.arg)]])
+                    .geometry,
+                state.previouslyFetchedPolygon,
+            );
 
             state.isLoading = false;
         });
