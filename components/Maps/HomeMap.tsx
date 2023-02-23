@@ -80,7 +80,12 @@ export default function HomeMap({
                   latitudeDelta: INITIAL_DELTA,
                   longitudeDelta: INITIAL_DELTA,
               }
-            : undefined;
+            : {
+                  latitude: 51.553064,
+                  longitude: -0.056349,
+                  latitudeDelta: INITIAL_DELTA,
+                  longitudeDelta: INITIAL_DELTA,
+              };
     }, [location]);
 
     useEffect(() => {

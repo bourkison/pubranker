@@ -1,9 +1,9 @@
+import { forcePubType } from '@/services';
 import {
-    convertBoxToCoordinates,
-    forcePubType,
-    hasFetchedPreviously,
     joinPolygons,
-} from '@/services';
+    hasFetchedPreviously,
+    convertBoxToCoordinates,
+} from '@/services/geo';
 import { supabase } from '@/services/supabase';
 import { BoundingBox, PubType, RejectWithValueType } from '@/types';
 import {
@@ -19,14 +19,12 @@ const mapAdapter = createEntityAdapter();
 
 const initialState = mapAdapter.getInitialState({
     pubs: [] as PubType[],
-    previouslyFetched: [] as BoundingBox[],
     isLoading: false,
     isLoadingMore: false,
-    previouslyFetchedPolygon: null as turf.helpers.Feature<
+    previouslyFetched: null as turf.helpers.Feature<
         turf.helpers.MultiPolygon | turf.helpers.Polygon
     > | null,
-    currentSelectedPolygon:
-        null as turf.helpers.Feature<turf.helpers.Polygon> | null,
+    currentSelected: null as turf.helpers.Feature<turf.helpers.Polygon> | null,
 });
 
 export const fetchMapPubs = createAsyncThunk<
@@ -36,7 +34,12 @@ export const fetchMapPubs = createAsyncThunk<
 >('map/fetchMapPubs', async (boundingBox, { getState }) => {
     const state = getState() as RootState;
 
-    if (hasFetchedPreviously(boundingBox, state.map.previouslyFetched)) {
+    if (
+        hasFetchedPreviously(
+            state.map.currentSelected,
+            state.map.previouslyFetched,
+        )
+    ) {
         return { pubs: [], requestedBox: [] };
     }
 
@@ -87,19 +90,14 @@ const mapSlice = createSlice({
                 }
             });
 
-            state.previouslyFetched = [
-                ...state.previouslyFetched,
-                ...action.payload.requestedBox,
-            ];
-
-            if (state.currentSelectedPolygon) {
-                state.previouslyFetchedPolygon = joinPolygons(
-                    state.currentSelectedPolygon,
-                    state.previouslyFetchedPolygon,
+            if (state.currentSelected) {
+                state.previouslyFetched = joinPolygons(
+                    state.currentSelected,
+                    state.previouslyFetched,
                 );
             }
 
-            state.currentSelectedPolygon = turf.polygon([
+            state.currentSelected = turf.polygon([
                 convertBoxToCoordinates(action.meta.arg),
             ]);
 

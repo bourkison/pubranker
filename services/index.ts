@@ -1,8 +1,5 @@
-import { BoundingBox, PubFilters, PubType } from '@/types';
+import { PubFilters, PubType } from '@/types';
 import { PostgrestFilterBuilder } from '@supabase/postgrest-js';
-import * as turf from '@turf/turf';
-// @ts-ignore
-import de9im from 'de9im';
 
 export const convertPointStringToObject = (
     input: string,
@@ -140,64 +137,4 @@ export const applyFilters = (
     }
 
     return query;
-};
-
-export const convertBoxToCoordinates = (input: BoundingBox): number[][] => [
-    [input.minLong, input.maxLat],
-    [input.maxLong, input.maxLat],
-    [input.maxLong, input.minLat],
-    [input.minLong, input.minLat],
-    [input.minLong, input.maxLat],
-];
-
-export const convertCoordsToMultiPolygon = (polygonArr: number[][][][]) => {
-    return turf
-        .multiPolygon(polygonArr[0].map(polygon => [polygon]))
-        .geometry.coordinates.map(t =>
-            t[0].map(c => ({ latitude: c[1], longitude: c[0] })),
-        );
-};
-
-// TODO: Alot of improvements can be made on this function.
-// i.e. should break up request to only get regions I haven't searched yet.
-// (i.e. of 50% of screen) has been searched, only request the other 50%.
-export const hasFetchedPreviously = (
-    toFetch: BoundingBox,
-    previouslyFetched: BoundingBox[],
-): boolean => {
-    let response = false;
-
-    if (previouslyFetched.length > 0) {
-        const toFetchPolygon = turf.polygon([convertBoxToCoordinates(toFetch)]);
-        const previouslyFetchedMultiPolygon = turf.multiPolygon([
-            previouslyFetched.map(c => convertBoxToCoordinates(c)),
-        ]);
-
-        response = !de9im.within(previouslyFetchedMultiPolygon, toFetchPolygon);
-        console.log('HAS FETCHED:', response);
-    }
-
-    return true;
-};
-
-export const joinPolygons = (
-    newPolygon: turf.helpers.Feature<
-        turf.helpers.MultiPolygon | turf.helpers.Polygon
-    >,
-    originalPolygon: turf.helpers.Feature<
-        turf.helpers.MultiPolygon | turf.helpers.Polygon
-    > | null,
-): turf.helpers.Feature<turf.helpers.MultiPolygon | turf.helpers.Polygon> => {
-    if (!originalPolygon) {
-        return newPolygon;
-    }
-
-    const response = turf.union(newPolygon, originalPolygon);
-
-    if (!response) {
-        console.warn('Error in polygon uniuon');
-        return originalPolygon;
-    }
-
-    return response;
 };
