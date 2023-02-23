@@ -181,9 +181,13 @@ export const hasFetchedPreviously = (
 };
 
 export const joinPolygons = (
-    newPolygon: turf.helpers.MultiPolygon | turf.helpers.Polygon,
-    originalPolygon: turf.helpers.MultiPolygon | turf.helpers.Polygon | null,
-): turf.helpers.MultiPolygon | turf.helpers.Polygon => {
+    newPolygon: turf.helpers.Feature<
+        turf.helpers.MultiPolygon | turf.helpers.Polygon
+    >,
+    originalPolygon: turf.helpers.Feature<
+        turf.helpers.MultiPolygon | turf.helpers.Polygon
+    > | null,
+): turf.helpers.Feature<turf.helpers.MultiPolygon | turf.helpers.Polygon> => {
     if (!originalPolygon) {
         return newPolygon;
     }
@@ -195,7 +199,5 @@ export const joinPolygons = (
         return originalPolygon;
     }
 
-    console.log('JOINED POLY', response.geometry.coordinates);
-
-    return response.geometry;
+    return response;
 };

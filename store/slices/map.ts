@@ -22,14 +22,11 @@ const initialState = mapAdapter.getInitialState({
     previouslyFetched: [] as BoundingBox[],
     isLoading: false,
     isLoadingMore: false,
-    previouslyFetchedPolygon: null as
-        | turf.helpers.MultiPolygon
-        | turf.helpers.Polygon
-        | null,
-    currentSelectedPolygon: null as
-        | turf.helpers.MultiPolygon
-        | turf.helpers.Polygon
-        | null,
+    previouslyFetchedPolygon: null as turf.helpers.Feature<
+        turf.helpers.MultiPolygon | turf.helpers.Polygon
+    > | null,
+    currentSelectedPolygon:
+        null as turf.helpers.Feature<turf.helpers.Polygon> | null,
 });
 
 export const fetchMapPubs = createAsyncThunk<
@@ -79,7 +76,7 @@ const mapSlice = createSlice({
     initialState,
     reducers: {},
     extraReducers: builder => {
-        builder.addCase(fetchMapPubs.pending, (state, action) => {
+        builder.addCase(fetchMapPubs.pending, state => {
             state.isLoading = true;
         });
         builder.addCase(fetchMapPubs.fulfilled, (state, action) => {
@@ -96,16 +93,15 @@ const mapSlice = createSlice({
             ];
 
             if (state.currentSelectedPolygon) {
-                console.log('Joining polygon');
                 state.previouslyFetchedPolygon = joinPolygons(
                     state.currentSelectedPolygon,
                     state.previouslyFetchedPolygon,
                 );
             }
 
-            state.currentSelectedPolygon = turf.multiPolygon([
-                [convertBoxToCoordinates(action.meta.arg)],
-            ]).geometry;
+            state.currentSelectedPolygon = turf.polygon([
+                convertBoxToCoordinates(action.meta.arg),
+            ]);
 
             state.isLoading = false;
         });

@@ -103,7 +103,6 @@ export default function HomeMap({
     };
 
     const mapDragFinished = (region: Region) => {
-        console.log('FETCHING PUBSW REGION', location, region, hasLoaded);
         if (location !== undefined && !hasLoaded) {
             fetchPubs(region);
         } else {
