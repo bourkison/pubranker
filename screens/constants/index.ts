@@ -1,1 +1,1 @@
-export const WITH_POLYGONS = false;
+export const WITH_POLYGONS = true;
