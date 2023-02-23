@@ -26,6 +26,10 @@ const initialState = mapAdapter.getInitialState({
         | turf.helpers.MultiPolygon
         | turf.helpers.Polygon
         | null,
+    currentSelectedPolygon: null as
+        | turf.helpers.MultiPolygon
+        | turf.helpers.Polygon
+        | null,
 });
 
 export const fetchMapPubs = createAsyncThunk<
@@ -75,7 +79,7 @@ const mapSlice = createSlice({
     initialState,
     reducers: {},
     extraReducers: builder => {
-        builder.addCase(fetchMapPubs.pending, state => {
+        builder.addCase(fetchMapPubs.pending, (state, action) => {
             state.isLoading = true;
         });
         builder.addCase(fetchMapPubs.fulfilled, (state, action) => {
@@ -91,16 +95,22 @@ const mapSlice = createSlice({
                 ...action.payload.requestedBox,
             ];
 
-            state.previouslyFetchedPolygon = joinPolygons(
-                turf.multiPolygon([[convertBoxToCoordinates(action.meta.arg)]])
-                    .geometry,
-                state.previouslyFetchedPolygon,
-            );
+            if (state.currentSelectedPolygon) {
+                console.log('Joining polygon');
+                state.previouslyFetchedPolygon = joinPolygons(
+                    state.currentSelectedPolygon,
+                    state.previouslyFetchedPolygon,
+                );
+            }
+
+            state.currentSelectedPolygon = turf.multiPolygon([
+                [convertBoxToCoordinates(action.meta.arg)],
+            ]).geometry;
 
             state.isLoading = false;
         });
         builder.addCase(fetchMapPubs.rejected, () => {
-            console.error('Error fetching map');
+            console.error('Error fetching the map');
         });
     },
 });

@@ -181,7 +181,7 @@ export const hasFetchedPreviously = (
 };
 
 export const joinPolygons = (
-    newPolygon: turf.helpers.MultiPolygon,
+    newPolygon: turf.helpers.MultiPolygon | turf.helpers.Polygon,
     originalPolygon: turf.helpers.MultiPolygon | turf.helpers.Polygon | null,
 ): turf.helpers.MultiPolygon | turf.helpers.Polygon => {
     if (!originalPolygon) {
@@ -191,7 +191,8 @@ export const joinPolygons = (
     const response = turf.union(newPolygon, originalPolygon);
 
     if (!response) {
-        throw new Error('Error in polygon union');
+        console.warn('Error in polygon uniuon');
+        return originalPolygon;
     }
 
     console.log('JOINED POLY', response.geometry.coordinates);
