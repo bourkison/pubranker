@@ -32,8 +32,6 @@ export default function DiscoverPub({ pub }: DiscoverPubProps) {
 
     const selectPub = () => {
         dispatch(setPub(pub));
-
-        console.log('SELECT:', pub);
     };
 
     return (

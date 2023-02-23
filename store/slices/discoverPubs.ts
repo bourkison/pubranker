@@ -83,8 +83,6 @@ export const fetchPubs = createAsyncThunk<
                             .select()
                             .eq('pub_id', pub.id);
 
-                        console.log('PHOTO:', photo, pub.id);
-
                         resolve(forcePubType(pub, photo.data));
                     }),
                 );
@@ -92,7 +90,6 @@ export const fetchPubs = createAsyncThunk<
 
             return await Promise.all(promises);
         } else {
-            console.log('HERE');
             return rejectWithValue({});
         }
     },
@@ -116,13 +113,12 @@ const discoverPubsSlice = createSlice({
         builder
             .addCase(fetchPubs.pending, state => {
                 state.isLoading = true;
+                state.pubs = [];
             })
             .addCase(fetchPubs.fulfilled, (state, action) => {
                 state.pubs = action.payload;
                 state.isLoading = false;
                 state.isLoadingMore = false;
-
-                console.log('fetch pubs fulfilled');
             })
             .addCase(fetchPubs.rejected, (state, { meta, payload }) => {
                 // TODO: handle errors.

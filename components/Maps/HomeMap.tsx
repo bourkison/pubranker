@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { RefObject, useEffect, useRef, useState } from 'react';
 
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
@@ -6,17 +6,22 @@ import MapStyle from '../../mapStyle.json';
 import { StyleSheet } from 'react-native';
 import { supabase } from '@/services/supabase';
 import { PubType } from '@/types';
-import { setBottomBarState, setPub } from '@/store/slices/pub';
+import { setPub } from '@/store/slices/pub';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { forcePubType } from '@/services';
+import BottomSheet from '@gorhom/bottom-sheet';
 
 const DELTA = 0.0075;
 
 type HomeMapProps = {
     bottomPadding: number;
+    bottomSheetRef: RefObject<BottomSheet>;
 };
 
-export default function HomeMap({ bottomPadding }: HomeMapProps) {
+export default function HomeMap({
+    bottomPadding,
+    bottomSheetRef,
+}: HomeMapProps) {
     const [location, setLocation] = useState<Location.LocationObject | null>(
         null,
     );
@@ -66,7 +71,9 @@ export default function HomeMap({ bottomPadding }: HomeMapProps) {
     }, [selectedPub, MapRef]);
 
     const panDrag = () => {
-        dispatch(setBottomBarState('hidden'));
+        if (bottomSheetRef && bottomSheetRef.current) {
+            bottomSheetRef.current.collapse();
+        }
     };
 
     return (

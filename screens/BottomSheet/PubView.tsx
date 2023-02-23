@@ -1,25 +1,45 @@
 import { distanceString } from '@/services';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { Octicons, Ionicons } from '@expo/vector-icons';
-import { useAppDispatch } from '@/store/hooks';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { deselectPub } from '@/store/slices/pub';
-import { PubType } from '@/types';
+import { useBottomSheet } from '@gorhom/bottom-sheet';
 
-type PubViewProps = {
-    pub: PubType;
-};
-
-export default function PubView({ pub }: PubViewProps) {
+export default function PubView() {
     const dispatch = useAppDispatch();
+    const { animatedIndex, close, snapToIndex } = useBottomSheet();
+
+    const bottomBarType = useAppSelector(state => state.pub.bottomBarType);
+    const selectedPub = useAppSelector(state => state.pub.selectedPub);
+
+    useEffect(() => {
+        if (
+            bottomBarType === 'selected' &&
+            selectedPub &&
+            animatedIndex.value === -1
+        ) {
+            snapToIndex(1);
+        } else if (bottomBarType === 'discover' && animatedIndex.value !== -1) {
+            close();
+        }
+    }, [bottomBarType, snapToIndex, animatedIndex, close, selectedPub]);
+
+    if (!selectedPub) {
+        return (
+            <View>
+                <Text>Error</Text>
+            </View>
+        );
+    }
 
     return (
         <View>
             <View style={styles.headerContainer}>
                 <View style={styles.titleSubTitleContainer}>
-                    <Text style={styles.title}>{pub.name}</Text>
+                    <Text style={styles.title}>{selectedPub.name}</Text>
                     <Text style={styles.subtitle}>
-                        {distanceString(pub.dist_meters)}
+                        {distanceString(selectedPub.dist_meters)}
                     </Text>
                 </View>
                 <View style={styles.buttonsContainer}>
@@ -37,7 +57,7 @@ export default function PubView({ pub }: PubViewProps) {
                     </Pressable>
                 </View>
             </View>
-            <Text>{pub.google_overview}</Text>
+            <Text>{selectedPub.google_overview}</Text>
         </View>
     );
 }

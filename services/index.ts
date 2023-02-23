@@ -24,11 +24,6 @@ export const convertPointStringToObject = (
 
 export const forcePubType = (input: any, photos: any): PubType => {
     const convertPhotos = (p: any[]): string[] => {
-        console.log(
-            'p:',
-            p,
-            p.map(photo => photo.key),
-        );
         return p.map(photo => photo.key);
     };
 

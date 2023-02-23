@@ -191,8 +191,6 @@ const getPlaces = async (key: string) => {
 
         places = [...places, ...response.places];
 
-        console.log('PLACES', places.length);
-
         if (token === response.pagetoken || !response.pagetoken) {
             break;
         }
@@ -217,7 +215,6 @@ serve(async req => {
     );
 
     const res = await supabase.from('pubs').insert(data);
-    console.log(res);
 
     return new Response(JSON.stringify(res), {
         headers: { 'Content-Type': 'application/json' },
