@@ -3,7 +3,7 @@ import React, { RefObject, useEffect, useRef, useState } from 'react';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import MapStyle from '../../mapStyle.json';
-import { StyleSheet } from 'react-native';
+import { Keyboard, StyleSheet } from 'react-native';
 import { supabase } from '@/services/supabase';
 import { PubType } from '@/types';
 import { setPub } from '@/store/slices/pub';
@@ -74,6 +74,8 @@ export default function HomeMap({
         if (bottomSheetRef && bottomSheetRef.current) {
             bottomSheetRef.current.collapse();
         }
+
+        Keyboard.dismiss();
     };
 
     return (

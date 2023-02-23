@@ -16,7 +16,7 @@ export default function BottomSheetNavigator({
     discoverSheetRef,
     selectedSheetRef,
 }: BottomSheetNavigatorProps) {
-    const snapPoints = useMemo(() => ['10%', '50%', '90%'], []);
+    const snapPoints = useMemo(() => ['10%', '40%', '90%'], []);
 
     const animationConfigs = useBottomSheetSpringConfigs({
         damping: 10,

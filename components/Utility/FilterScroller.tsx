@@ -6,9 +6,13 @@ import { PubFilters } from '@/types';
 
 type FilterScrollerProps = {
     pubLoadAmount: number;
+    rows: number;
 };
 
-export default function FilterScroller({ pubLoadAmount }: FilterScrollerProps) {
+export default function FilterScroller({
+    pubLoadAmount,
+    rows,
+}: FilterScrollerProps) {
     const filters = useAppSelector(state => state.discoverPubs.filters);
     const filterKeys = Object.keys(filters) as unknown as Array<
         keyof PubFilters
@@ -24,7 +28,7 @@ export default function FilterScroller({ pubLoadAmount }: FilterScrollerProps) {
                 scrollEnabled={false}
                 showsVerticalScrollIndicator={false}
                 showsHorizontalScrollIndicator={false}
-                numColumns={Math.ceil(filterKeys.length / 2)}
+                numColumns={Math.ceil(filterKeys.length / rows)}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item }) => (
                     <View style={styles.rowMargin}>
