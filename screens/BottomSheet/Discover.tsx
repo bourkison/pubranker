@@ -1,5 +1,8 @@
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { fetchMorePubs, fetchPubs } from '@/store/slices/discover';
+import {
+    fetchMoreDiscoverPubs,
+    fetchDiscoverPubs,
+} from '@/store/slices/discover';
 import React, { useCallback, useEffect, useRef } from 'react';
 import {
     View,
@@ -48,12 +51,12 @@ export default function Discover() {
     }, [bottomBarType, collapse, animatedIndex, close, selectedPub]);
 
     const search = useCallback(async () => {
-        await dispatch(fetchPubs({ amount: LOAD_AMOUNT }));
+        await dispatch(fetchDiscoverPubs({ amount: LOAD_AMOUNT }));
     }, [dispatch]);
 
     const loadMore = useCallback(async () => {
         if (!isLoading && !isLoadingMore && moreToLoad) {
-            await dispatch(fetchMorePubs({ amount: LOAD_AMOUNT }));
+            await dispatch(fetchMoreDiscoverPubs({ amount: LOAD_AMOUNT }));
         }
     }, [dispatch, isLoadingMore, isLoading, moreToLoad]);
 

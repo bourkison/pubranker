@@ -38,3 +38,8 @@ export type PubFilters = {
     foosball: BoolOrUnset;
     wheelchairAccessible: BoolOrUnset;
 };
+
+export type RejectWithValueType = {
+    message?: string;
+    code?: number;
+};

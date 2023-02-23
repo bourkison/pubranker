@@ -1,17 +1,16 @@
 import React, { RefObject, useEffect, useRef, useState } from 'react';
 
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, Region } from 'react-native-maps';
 import * as Location from 'expo-location';
 import MapStyle from '../../mapStyle.json';
 import { Keyboard, StyleSheet } from 'react-native';
-import { supabase } from '@/services/supabase';
-import { PubType } from '@/types';
 import { setPub } from '@/store/slices/pub';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { forcePubType } from '@/services';
 import BottomSheet from '@gorhom/bottom-sheet';
+import { fetchMapPubs } from '@/store/slices/map';
 
-const DELTA = 0.0075;
+const ANIMATE_DELTA = 0.0075;
+const INITIAL_DELTA = 0.01;
 
 type HomeMapProps = {
     bottomPadding: number;
@@ -28,10 +27,9 @@ export default function HomeMap({
 
     const MapRef = useRef<MapView>(null);
 
-    const [pubs, setPubs] = useState<PubType[]>([]);
-
     const dispatch = useAppDispatch();
     const selectedPub = useAppSelector(state => state.pub.selectedPub);
+    const pubs = useAppSelector(state => state.map.pubs);
 
     useEffect(() => {
         (async () => {
@@ -47,25 +45,24 @@ export default function HomeMap({
         })();
     }, []);
 
-    useEffect(() => {
-        const fetchPubs = async () => {
-            const res = await supabase.from('pubs').select().limit(50);
-
-            if (res.data && res.data.length) {
-                setPubs(res.data.map((p: any) => forcePubType(p, [])));
-            }
-        };
-
-        fetchPubs();
-    }, []);
+    const fetchPubs = (region: Region) => {
+        dispatch(
+            fetchMapPubs({
+                minLat: region.latitude - region.latitudeDelta,
+                minLong: region.longitude - region.longitudeDelta,
+                maxLat: region.latitude + region.latitudeDelta,
+                maxLong: region.longitude + region.longitudeDelta,
+            }),
+        );
+    };
 
     useEffect(() => {
         if (selectedPub && MapRef && MapRef.current) {
             MapRef.current.animateToRegion({
-                latitude: selectedPub.location.lat - 0.15 * DELTA,
+                latitude: selectedPub.location.lat - 0.15 * ANIMATE_DELTA,
                 longitude: selectedPub.location.lng,
-                latitudeDelta: DELTA,
-                longitudeDelta: DELTA,
+                latitudeDelta: ANIMATE_DELTA,
+                longitudeDelta: ANIMATE_DELTA,
             });
         }
     }, [selectedPub, MapRef]);
@@ -87,13 +84,14 @@ export default function HomeMap({
             onPanDrag={panDrag}
             customMapStyle={MapStyle}
             mapPadding={{ bottom: bottomPadding, top: 0, right: 0, left: 0 }}
+            onRegionChangeComplete={fetchPubs}
             initialRegion={
                 location
                     ? {
                           latitude: location.coords.latitude,
                           longitude: location.coords.longitude,
-                          latitudeDelta: 0.01,
-                          longitudeDelta: 0.01,
+                          latitudeDelta: INITIAL_DELTA,
+                          longitudeDelta: INITIAL_DELTA,
                       }
                     : undefined
             }>

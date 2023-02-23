@@ -1,6 +1,6 @@
 import { applyFilters, forcePubType } from '@/services';
 import { supabase } from '@/services/supabase';
-import { BoolOrUnset, PubFilters, PubType } from '@/types';
+import { BoolOrUnset, PubFilters, PubType, RejectWithValueType } from '@/types';
 import {
     createAsyncThunk,
     createEntityAdapter,
@@ -9,11 +9,6 @@ import {
 } from '@reduxjs/toolkit';
 import * as Location from 'expo-location';
 import { RootState } from '@/store';
-
-type RejectWithValueType = {
-    message?: string;
-    code?: number;
-};
 
 const discoverAdapter = createEntityAdapter();
 
@@ -84,42 +79,45 @@ const queryDb = async (
     }
 };
 
-export const fetchPubs = createAsyncThunk<
-    PubType[],
-    { amount: number },
-    { rejectValue: RejectWithValueType }
->('discover/fetchPubs', async ({ amount }, { getState, rejectWithValue }) => {
-    const state = getState() as RootState;
-    let { status } = await Location.requestForegroundPermissionsAsync();
-
-    if (status !== 'granted') {
-        // TODO: Error.
-        throw new Error('No location granted');
-    }
-
-    try {
-        const pubs = await queryDb(
-            amount,
-            state.discover.filters,
-            state.discover.searchText,
-            0,
-        );
-
-        return pubs;
-    } catch (err: any) {
-        return rejectWithValue({
-            message: err?.message,
-            code: err?.statusCode,
-        });
-    }
-});
-
-export const fetchMorePubs = createAsyncThunk<
+export const fetchDiscoverPubs = createAsyncThunk<
     PubType[],
     { amount: number },
     { rejectValue: RejectWithValueType }
 >(
-    'discover/fetchMorePubs',
+    'discover/fetchDiscoverPubs',
+    async ({ amount }, { getState, rejectWithValue }) => {
+        const state = getState() as RootState;
+        let { status } = await Location.requestForegroundPermissionsAsync();
+
+        if (status !== 'granted') {
+            // TODO: Error.
+            throw new Error('No location granted');
+        }
+
+        try {
+            const pubs = await queryDb(
+                amount,
+                state.discover.filters,
+                state.discover.searchText,
+                0,
+            );
+
+            return pubs;
+        } catch (err: any) {
+            return rejectWithValue({
+                message: err?.message,
+                code: err?.statusCode,
+            });
+        }
+    },
+);
+
+export const fetchMoreDiscoverPubs = createAsyncThunk<
+    PubType[],
+    { amount: number },
+    { rejectValue: RejectWithValueType }
+>(
+    'discover/fetchMoreDiscoverPubs',
     async ({ amount }, { getState, rejectWithValue }) => {
         const state = getState() as RootState;
         let { status } = await Location.requestForegroundPermissionsAsync();
@@ -163,33 +161,33 @@ const discoverSlice = createSlice({
     },
     extraReducers: builder => {
         builder
-            .addCase(fetchPubs.pending, state => {
+            .addCase(fetchDiscoverPubs.pending, state => {
                 state.isLoading = true;
                 state.isLoadingMore = false;
                 state.moreToLoad = true;
                 state.pubs = [];
             })
-            .addCase(fetchPubs.fulfilled, (state, action) => {
+            .addCase(fetchDiscoverPubs.fulfilled, (state, action) => {
                 state.pubs = action.payload;
                 state.isLoading = false;
                 state.isLoadingMore = false;
             })
-            .addCase(fetchPubs.rejected, (state, { meta, payload }) => {
+            .addCase(fetchDiscoverPubs.rejected, (state, { meta, payload }) => {
                 // TODO: handle errors.
                 console.error('Error fetching pubs', meta, payload);
                 state.moreToLoad = false;
                 state.isLoadingMore = false;
                 state.isLoading = false;
             })
-            .addCase(fetchMorePubs.pending, state => {
+            .addCase(fetchMoreDiscoverPubs.pending, state => {
                 state.isLoadingMore = true;
             })
-            .addCase(fetchMorePubs.fulfilled, (state, action) => {
+            .addCase(fetchMoreDiscoverPubs.fulfilled, (state, action) => {
                 state.pubs = [...state.pubs, ...action.payload];
                 state.isLoadingMore = false;
                 state.moreToLoad = true;
             })
-            .addCase(fetchMorePubs.rejected, state => {
+            .addCase(fetchMoreDiscoverPubs.rejected, state => {
                 state.moreToLoad = false;
                 state.isLoadingMore = false;
                 state.isLoading = false;
