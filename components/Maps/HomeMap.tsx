@@ -48,10 +48,22 @@ export default function HomeMap({
     const fetchPubs = (region: Region) => {
         dispatch(
             fetchMapPubs({
-                minLat: region.latitude - region.latitudeDelta,
-                minLong: region.longitude - region.longitudeDelta,
-                maxLat: region.latitude + region.latitudeDelta,
-                maxLong: region.longitude + region.longitudeDelta,
+                minLat:
+                    region.latitude -
+                    region.latitudeDelta / 2 +
+                    region.latitudeDelta * 0.01,
+                minLong:
+                    region.longitude -
+                    region.longitudeDelta / 2 +
+                    region.longitudeDelta * 0.01,
+                maxLat:
+                    region.latitude +
+                    region.latitudeDelta / 2 +
+                    region.latitudeDelta * 0.01,
+                maxLong:
+                    region.longitude +
+                    region.longitudeDelta / 2 +
+                    region.longitudeDelta * 0.01,
             }),
         );
     };

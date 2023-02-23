@@ -21,6 +21,13 @@ export type PubType = {
     photos: string[];
 };
 
+export type BoundingBox = {
+    minLat: number;
+    minLong: number;
+    maxLat: number;
+    maxLong: number;
+};
+
 export type BoolOrUnset = boolean | 'unset';
 
 export type PubFilters = {

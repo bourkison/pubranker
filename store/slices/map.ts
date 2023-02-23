@@ -1,26 +1,36 @@
-import { forcePubType } from '@/services';
+import { forcePubType, hasFetchedPreviously } from '@/services';
 import { supabase } from '@/services/supabase';
-import { PubType, RejectWithValueType } from '@/types';
+import { BoundingBox, PubType, RejectWithValueType } from '@/types';
 import {
     createAsyncThunk,
     createEntityAdapter,
     createSlice,
 } from '@reduxjs/toolkit';
 import * as Location from 'expo-location';
+import { RootState } from '..';
 
 const mapAdapter = createEntityAdapter();
 
 const initialState = mapAdapter.getInitialState({
     pubs: [] as PubType[],
+    previouslyFetched: [] as BoundingBox[],
     isLoading: false,
     isLoadingMore: false,
 });
 
 export const fetchMapPubs = createAsyncThunk<
-    PubType[],
-    { minLat: number; minLong: number; maxLat: number; maxLong: number },
+    { pubs: PubType[]; requestedBox: BoundingBox[] },
+    BoundingBox,
     { rejectValue: RejectWithValueType }
->('map/fetchMapPubs', async ({ minLat, minLong, maxLat, maxLong }) => {
+>('map/fetchMapPubs', async (boundingBox, { getState }) => {
+    const state = getState() as RootState;
+
+    if (hasFetchedPreviously(boundingBox, state.map.previouslyFetched)) {
+        return { pubs: [], requestedBox: [] };
+    }
+
+    const { minLat, minLong, maxLat, maxLong } = boundingBox;
+
     let l = await Location.getCurrentPositionAsync();
 
     const response = await supabase.rpc('pubs_in_range', {
@@ -49,7 +59,7 @@ export const fetchMapPubs = createAsyncThunk<
         );
     });
 
-    return await Promise.all(promises);
+    return { pubs: await Promise.all(promises), requestedBox: [boundingBox] };
 });
 
 const mapSlice = createSlice({
@@ -62,11 +72,16 @@ const mapSlice = createSlice({
         });
         builder.addCase(fetchMapPubs.fulfilled, (state, action) => {
             // Only add unique pubs.
-            action.payload.forEach(pub => {
+            action.payload.pubs.forEach(pub => {
                 if (state.pubs.findIndex(p => p.id === pub.id) === -1) {
                     state.pubs = [...state.pubs, pub];
                 }
             });
+
+            state.previouslyFetched = [
+                ...state.previouslyFetched,
+                ...action.payload.requestedBox,
+            ];
 
             state.isLoading = false;
         });

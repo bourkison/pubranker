@@ -1,4 +1,4 @@
-import { PubFilters, PubType } from '@/types';
+import { BoundingBox, PubFilters, PubType } from '@/types';
 import { PostgrestFilterBuilder } from '@supabase/postgrest-js';
 
 export const convertPointStringToObject = (
@@ -137,4 +137,65 @@ export const applyFilters = (
     }
 
     return query;
+};
+
+type Coordinates = { x: number; y: number };
+type BoundingBoxCoordinates = {
+    topLeft: Coordinates;
+    topRight: Coordinates;
+    bottomLeft: Coordinates;
+    bottomRight: Coordinates;
+};
+
+const convertBoxToCoordinates = (
+    input: BoundingBox,
+): BoundingBoxCoordinates => ({
+    topLeft: { x: input.minLat, y: input.maxLong },
+    topRight: { x: input.maxLat, y: input.maxLong },
+    bottomLeft: { x: input.minLat, y: input.minLong },
+    bottomRight: { x: input.maxLat, y: input.minLong },
+});
+
+export const hasFetchedPreviously = (
+    toFetch: BoundingBox,
+    previouslyFetched: BoundingBox[],
+): boolean => {
+    const toFetchCoords = convertBoxToCoordinates(toFetch);
+
+    for (let i = 0; i < previouslyFetched.length; i++) {
+        const toCheck = convertBoxToCoordinates(previouslyFetched[i]);
+
+        if (
+            toFetchCoords.topLeft.x < toCheck.topLeft.x ||
+            toFetchCoords.topLeft.y > toCheck.topLeft.y
+        ) {
+            continue;
+        }
+
+        if (
+            toFetchCoords.topRight.x > toCheck.topRight.x ||
+            toFetchCoords.topRight.y > toCheck.topRight.y
+        ) {
+            continue;
+        }
+
+        if (
+            toFetchCoords.bottomLeft.x < toCheck.bottomLeft.x ||
+            toFetchCoords.bottomLeft.y < toCheck.bottomLeft.y
+        ) {
+            continue;
+        }
+
+        if (
+            toFetchCoords.bottomRight.x > toCheck.bottomRight.x ||
+            toFetchCoords.bottomRight.y < toCheck.bottomRight.y
+        ) {
+            continue;
+        }
+
+        console.log('PREVIOusLY CHECKED.');
+        return true;
+    }
+
+    return false;
 };
