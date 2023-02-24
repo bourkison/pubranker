@@ -1,4 +1,4 @@
-import { applyFilters, forcePubType } from '@/services';
+import { applyFilters, convertPointStringToObject } from '@/services';
 import { supabase } from '@/services/supabase';
 import { BoolOrUnset, PubFilters, PubType, RejectWithValueType } from '@/types';
 import {
@@ -60,15 +60,31 @@ const queryDb = async (
     if (response.data && response.data.length) {
         let promises: Promise<PubType>[] = [];
 
-        response.data.forEach((pub: any) => {
+        response.data.forEach(pub => {
             promises.push(
                 new Promise(async resolve => {
-                    const photo = await supabase
+                    const photos = await supabase
                         .from('pub_photos')
                         .select()
                         .eq('pub_id', pub.id);
 
-                    resolve(forcePubType(pub, photo.data));
+                    resolve({
+                        id: pub.id,
+                        name: pub.name,
+                        address: pub.address,
+                        location: convertPointStringToObject(pub.location),
+                        opening_hours:
+                            pub.opening_hours as PubType['opening_hours'],
+                        phone_number: pub.phone_number,
+                        google_id: '', // TODO: fix up google_id
+                        google_overview: pub.google_overview,
+                        google_rating: pub.google_rating,
+                        google_ratings_amount: pub.google_ratings_amount,
+                        website: pub.website,
+                        dist_meters: pub.dist_meters,
+                        photos: photos.data?.map(photo => photo.key) || [],
+                        reservable: pub.reservable,
+                    });
                 }),
             );
         });

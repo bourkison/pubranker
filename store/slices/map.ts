@@ -31,7 +31,7 @@ export const fetchMapPubs = createAsyncThunk<
     { pubs: PubType[]; requestedBox: BoundingBox[] },
     BoundingBox,
     { rejectValue: RejectWithValueType }
->('map/fetchMapPubs', async (boundingBox, { getState }) => {
+>('map/fetchMapPubs', async (boundingBox, { getState, rejectWithValue }) => {
     const state = getState() as RootState;
 
     let l = await Location.getCurrentPositionAsync();
@@ -45,15 +45,20 @@ export const fetchMapPubs = createAsyncThunk<
         return { pubs: [], requestedBox: [] };
     }
 
-    const response = await supabase.rpc('pubs_in_polygon', {
-        geojson: geojson.geometry,
+    const { data, error } = await supabase.rpc('pubs_in_polygon_v2', {
+        geojson: JSON.stringify(geojson.geometry),
         dist_lat: l.coords.latitude,
         dist_long: l.coords.longitude,
     });
 
-    let promises: Promise<PubType>[] = [];
+    console.log('data', data, error);
 
-    response.data.forEach((pub: any) => {
+    if (!data) {
+        console.error(error);
+        return rejectWithValue({ message: error.message, code: error.code });
+    }
+
+    data.forEach((pub: any) => {
         promises.push(
             new Promise(async resolve => {
                 const photo = await supabase

@@ -1,4 +1,6 @@
-type OpeningHoursObject = {
+import { Database } from './schema';
+
+export type OpeningHoursObject = {
     day: number;
     time: string;
 };
@@ -11,7 +13,6 @@ export type PubType = {
     opening_hours: { open: OpeningHoursObject; close: OpeningHoursObject }[];
     phone_number: string;
     google_overview: string;
-    google_photos: string[];
     google_rating: number;
     google_ratings_amount: number;
     google_id: string;
@@ -48,5 +49,7 @@ export type PubFilters = {
 
 export type RejectWithValueType = {
     message?: string;
-    code?: number;
+    code?: string;
 };
+
+export type UserType = Database['public']['Tables']['users']['Row'];

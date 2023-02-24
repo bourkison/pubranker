@@ -38,7 +38,6 @@ export const forcePubType = (input: any, photos: any): PubType => {
         opening_hours: input.opening_hours || [],
         phone_number: input.phone_number || '',
         google_overview: input.google_overview || '',
-        google_photos: input.google_photos || [],
         google_rating: input.google_rating || -1,
         google_ratings_amount: input.google_ratings_amount || -1,
         google_id: input.google_id || '',
