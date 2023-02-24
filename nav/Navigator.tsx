@@ -5,6 +5,7 @@ import Home from '@/screens/Home';
 import Saved from '@/screens/Saved';
 import { Ionicons } from '@expo/vector-icons';
 import { requestBackgroundPermissionsAsync } from 'expo-location';
+import Settings from '@/screens/Settings';
 
 const Tab = createBottomTabNavigator();
 
@@ -44,7 +45,7 @@ export default function Navigator() {
             />
             <Tab.Screen
                 name="Settings"
-                component={Saved}
+                component={Settings}
                 options={{
                     tabBarIcon: ({ size, focused }) => (
                         <Ionicons
