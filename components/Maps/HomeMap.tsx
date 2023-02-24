@@ -2,7 +2,7 @@ import React, { RefObject, useEffect, useMemo, useRef, useState } from 'react';
 
 import MapView, { Marker, Region } from 'react-native-maps';
 import * as Location from 'expo-location';
-import MapStyle from '../../mapStyle.json';
+import MapStyle from '../../json/map_style.json';
 import { Keyboard, StyleSheet } from 'react-native';
 import { setPub } from '@/store/slices/pub';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';

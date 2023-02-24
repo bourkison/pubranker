@@ -1,4 +1,4 @@
-import { WITH_POLYGONS } from '@/screens/constants';
+import { WITH_POLYGONS } from '@/constants';
 import { useAppSelector } from '@/store/hooks';
 import { getType } from '@turf/turf';
 import * as turf from '@turf/turf';

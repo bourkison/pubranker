@@ -22,7 +22,7 @@ export default function Navigator() {
                 options={{
                     tabBarIcon: ({ size, focused }) => (
                         <Ionicons
-                            name="home"
+                            name={focused ? 'home' : 'home-outline'}
                             size={size}
                             color={focused ? 'rgb(229, 130, 68)' : undefined}
                         />
@@ -35,7 +35,7 @@ export default function Navigator() {
                 options={{
                     tabBarIcon: ({ size, focused }) => (
                         <Ionicons
-                            name="heart"
+                            name={focused ? 'heart' : 'heart-outline'}
                             size={size}
                             color={focused ? 'rgb(229, 130, 68)' : undefined}
                         />
@@ -48,7 +48,7 @@ export default function Navigator() {
                 options={{
                     tabBarIcon: ({ size, focused }) => (
                         <Ionicons
-                            name="cog"
+                            name={focused ? 'cog' : 'cog-outline'}
                             size={size}
                             color={focused ? 'rgb(229, 130, 68)' : undefined}
                         />
