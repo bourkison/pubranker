@@ -34,24 +34,19 @@ export const fetchMapPubs = createAsyncThunk<
 >('map/fetchMapPubs', async (boundingBox, { getState }) => {
     const state = getState() as RootState;
 
-    if (
-        hasFetchedPreviously(
-            state.map.currentSelected,
-            state.map.previouslyFetched,
-        )
-    ) {
+    let l = await Location.getCurrentPositionAsync();
+
+    let geojson = hasFetchedPreviously(
+        state.map.currentSelected,
+        state.map.previouslyFetched,
+    );
+
+    if (!geojson) {
         return { pubs: [], requestedBox: [] };
     }
 
-    const { minLat, minLong, maxLat, maxLong } = boundingBox;
-
-    let l = await Location.getCurrentPositionAsync();
-
-    const response = await supabase.rpc('pubs_in_range', {
-        min_lat: minLat,
-        min_long: minLong,
-        max_lat: maxLat,
-        max_long: maxLong,
+    const response = await supabase.rpc('pubs_in_polygon', {
+        geojson: geojson.geometry,
         dist_lat: l.coords.latitude,
         dist_long: l.coords.longitude,
     });
@@ -79,16 +74,8 @@ const mapSlice = createSlice({
     initialState,
     reducers: {},
     extraReducers: builder => {
-        builder.addCase(fetchMapPubs.pending, state => {
+        builder.addCase(fetchMapPubs.pending, (state, action) => {
             state.isLoading = true;
-        });
-        builder.addCase(fetchMapPubs.fulfilled, (state, action) => {
-            // Only add unique pubs.
-            action.payload.pubs.forEach(pub => {
-                if (state.pubs.findIndex(p => p.id === pub.id) === -1) {
-                    state.pubs = [...state.pubs, pub];
-                }
-            });
 
             if (state.currentSelected) {
                 state.previouslyFetched = joinPolygons(
@@ -100,6 +87,14 @@ const mapSlice = createSlice({
             state.currentSelected = turf.polygon([
                 convertBoxToCoordinates(action.meta.arg),
             ]);
+        });
+        builder.addCase(fetchMapPubs.fulfilled, (state, action) => {
+            // Only add unique pubs.
+            action.payload.pubs.forEach(pub => {
+                if (state.pubs.findIndex(p => p.id === pub.id) === -1) {
+                    state.pubs = [...state.pubs, pub];
+                }
+            });
 
             state.isLoading = false;
         });

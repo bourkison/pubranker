@@ -19,7 +19,7 @@ export const hasFetchedPreviously = (
 > | null => {
     try {
         if (!previouslyFetched) {
-            throw new Error('No previously fetched');
+            return currentSelected;
         }
 
         if (!currentSelected) {
