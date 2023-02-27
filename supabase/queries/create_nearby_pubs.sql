@@ -1,3 +1,5 @@
+drop function if exists nearby_pubs;
+
 create or replace function nearby_pubs(
         order_lat float,
         order_long float,

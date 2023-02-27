@@ -14,11 +14,12 @@ const initialState = savedAdapter.getInitialState({
     isLoading: false,
     moreToLoad: true,
     isLoadingMore: false,
+    isRefreshing: false,
 });
 
 export const fetchSavedPubs = createAsyncThunk<
     SavedPub[],
-    { amount: number; id: string },
+    { amount: number; id: string; refreshing: boolean },
     { rejectValue: RejectWithValueType }
 >('saved/fetchSavedPubs', async ({ amount, id }, { rejectWithValue }) => {
     const currentLocation = await Location.getCurrentPositionAsync();
@@ -47,12 +48,17 @@ const savedSlice = createSlice({
     reducers: {},
     extraReducers: builder =>
         builder
-            .addCase(fetchSavedPubs.pending, state => {
-                state.isLoading = true;
+            .addCase(fetchSavedPubs.pending, (state, action) => {
+                if (!action.meta.arg.refreshing) {
+                    state.isLoading = true;
+                } else {
+                    state.isRefreshing = true;
+                }
             })
             .addCase(fetchSavedPubs.fulfilled, (state, action) => {
                 state.pubs = action.payload;
                 state.isLoading = false;
+                state.isRefreshing = false;
             }),
 });
 

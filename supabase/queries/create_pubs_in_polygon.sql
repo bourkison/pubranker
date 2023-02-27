@@ -1,3 +1,5 @@
+drop function pubs_in_polygon;
+
 create or replace function pubs_in_polygon(geojson text, dist_long float, dist_lat float) returns table(
         id int,
         google_rating real,
