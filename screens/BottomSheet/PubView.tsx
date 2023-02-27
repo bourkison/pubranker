@@ -1,10 +1,17 @@
 import { distanceString } from '@/services';
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import {
+    View,
+    Text,
+    StyleSheet,
+    Pressable,
+    TouchableOpacity,
+} from 'react-native';
 import { Octicons, Ionicons } from '@expo/vector-icons';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { deselectPub } from '@/store/slices/pub';
 import { useBottomSheet } from '@gorhom/bottom-sheet';
+import { supabase } from '@/services/supabase';
 
 export default function PubView() {
     const dispatch = useAppDispatch();
@@ -25,6 +32,18 @@ export default function PubView() {
         }
     }, [bottomBarType, snapToIndex, animatedIndex, close, selectedPub]);
 
+    const savePub = async () => {
+        if (!selectedPub) {
+            return;
+        }
+
+        const { data, error } = await supabase.from('saves').insert({
+            pub_id: selectedPub.id,
+        });
+
+        console.log('SAVE:', data, error);
+    };
+
     if (!selectedPub) {
         return (
             <View>
@@ -43,13 +62,16 @@ export default function PubView() {
                     </Text>
                 </View>
                 <View style={styles.buttonsContainer}>
-                    <View style={styles.likeButton}>
+                    <TouchableOpacity
+                        style={styles.likeButton}
+                        onPress={savePub}>
                         <Ionicons
                             name="heart-outline"
                             size={18}
                             color="#dc2626"
                         />
-                    </View>
+                    </TouchableOpacity>
+
                     <Pressable
                         onPress={() => dispatch(deselectPub())}
                         style={styles.closeButton}>
@@ -58,6 +80,7 @@ export default function PubView() {
                 </View>
             </View>
             <Text>{selectedPub.google_overview}</Text>
+            <Text>{JSON.stringify(selectedPub.opening_hours)}</Text>
         </View>
     );
 }

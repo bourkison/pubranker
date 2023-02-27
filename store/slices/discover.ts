@@ -41,13 +41,13 @@ const queryDb = async (
     searchText: string,
     skip?: number,
 ): Promise<PubType[]> => {
-    let l = await Location.getCurrentPositionAsync();
+    const currentLocation = await Location.getCurrentPositionAsync();
 
     let query = supabase.rpc('nearby_pubs', {
-        order_lat: l.coords.latitude,
-        order_long: l.coords.longitude,
-        dist_lat: l.coords.latitude,
-        dist_long: l.coords.longitude,
+        order_lat: currentLocation.coords.latitude,
+        order_long: currentLocation.coords.longitude,
+        dist_lat: currentLocation.coords.latitude,
+        dist_long: currentLocation.coords.longitude,
     });
 
     query = applyFilters(query, filters, searchText);
@@ -63,10 +63,16 @@ const queryDb = async (
         response.data.forEach(pub => {
             promises.push(
                 new Promise(async resolve => {
-                    const photos = await supabase
-                        .from('pub_photos')
-                        .select()
-                        .eq('pub_id', pub.id);
+                    const [photos, openingHours] = await Promise.all([
+                        supabase
+                            .from('pub_photos')
+                            .select()
+                            .eq('pub_id', pub.id),
+                        supabase
+                            .from('opening_hours')
+                            .select()
+                            .eq('pub_id', pub.id),
+                    ]);
 
                     resolve({
                         id: pub.id,
@@ -74,7 +80,13 @@ const queryDb = async (
                         address: pub.address,
                         location: convertPointStringToObject(pub.location),
                         opening_hours:
-                            pub.opening_hours as PubType['opening_hours'],
+                            openingHours.data?.map(oh => ({
+                                open: { day: oh.open_day, time: oh.open_hour },
+                                close: {
+                                    day: oh.close_day,
+                                    time: oh.close_hour,
+                                },
+                            })) || [],
                         phone_number: pub.phone_number,
                         google_id: '', // TODO: fix up google_id
                         google_overview: pub.google_overview,
@@ -103,12 +115,6 @@ export const fetchDiscoverPubs = createAsyncThunk<
     'discover/fetchDiscoverPubs',
     async ({ amount }, { getState, rejectWithValue }) => {
         const state = getState() as RootState;
-        let { status } = await Location.requestForegroundPermissionsAsync();
-
-        if (status !== 'granted') {
-            // TODO: Error.
-            throw new Error('No location granted');
-        }
 
         try {
             const pubs = await queryDb(
@@ -136,12 +142,6 @@ export const fetchMoreDiscoverPubs = createAsyncThunk<
     'discover/fetchMoreDiscoverPubs',
     async ({ amount }, { getState, rejectWithValue }) => {
         const state = getState() as RootState;
-        let { status } = await Location.requestForegroundPermissionsAsync();
-
-        if (status !== 'granted') {
-            // TODO: Error.
-            throw new Error('No location granted');
-        }
 
         try {
             const pubs = await queryDb(

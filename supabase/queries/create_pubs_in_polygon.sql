@@ -1,6 +1,5 @@
 create or replace function pubs_in_polygon(geojson text, dist_long float, dist_lat float) returns table(
         id int,
-        opening_hours jsonb [],
         google_rating real,
         name text,
         address text,
@@ -24,7 +23,6 @@ create or replace function pubs_in_polygon(geojson text, dist_long float, dist_l
         dist_meters float
     ) language sql as $$
 select id,
-    opening_hours,
     google_rating,
     name,
     address,

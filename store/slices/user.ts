@@ -5,7 +5,6 @@ import {
     createEntityAdapter,
     createSlice,
 } from '@reduxjs/toolkit';
-import { Session } from '@supabase/supabase-js';
 
 const userAdapter = createEntityAdapter();
 
@@ -17,17 +16,28 @@ const initialState = userAdapter.getInitialState({
 
 export const fetchUser = createAsyncThunk<
     UserType,
-    Session,
+    undefined,
     { rejectValue: RejectWithValueType }
->('user/fetchUser', async (session, { rejectWithValue }) => {
+>('user/fetchUser', async (_, { rejectWithValue }) => {
+    const session = await supabase.auth.getSession();
+
+    if (!session.data || !session.data.session) {
+        console.log('No session', session);
+        return rejectWithValue({
+            message: session.error?.message,
+            code: session.error?.name,
+        });
+    }
+
     const { data, error } = await supabase
         .from('users')
         .select()
-        .eq('id', session.user.id)
+        .eq('id', session.data.session.user.id)
         .limit(1)
         .single();
 
     if (!data) {
+        console.log('No user data');
         return rejectWithValue({
             message: error.message,
             code: error.code,

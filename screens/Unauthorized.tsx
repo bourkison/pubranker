@@ -1,4 +1,5 @@
 import SignUpModal from '@/components/Auth/SignUpModal';
+import LoginModal from '@/components/Auth/LoginModal';
 import React, { useMemo, useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity } from 'react-native';
 
@@ -8,6 +9,7 @@ type UnauthorizedProps = {
 
 export default function Unauthorized({ type }: UnauthorizedProps) {
     const [signUpModalVisible, setSignUpModalVisible] = useState(false);
+    const [loginModalVisible, setLoginModalVisible] = useState(false);
 
     const test = useMemo(() => {
         switch (type) {
@@ -30,9 +32,16 @@ export default function Unauthorized({ type }: UnauthorizedProps) {
                 visible={signUpModalVisible}
                 setVisible={setSignUpModalVisible}
             />
-            <TouchableOpacity style={styles.loginButton}>
+
+            <TouchableOpacity
+                style={styles.loginButton}
+                onPress={() => setLoginModalVisible(!loginModalVisible)}>
                 <Text style={styles.loginButtonText}>Login</Text>
             </TouchableOpacity>
+            <LoginModal
+                visible={loginModalVisible}
+                setVisible={setLoginModalVisible}
+            />
         </SafeAreaView>
     );
 }

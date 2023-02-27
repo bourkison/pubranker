@@ -1,4 +1,4 @@
-import { forcePubType } from '@/services';
+import { convertPointStringToObject } from '@/services';
 import {
     joinPolygons,
     hasFetchedPreviously,
@@ -45,7 +45,7 @@ export const fetchMapPubs = createAsyncThunk<
         return { pubs: [], requestedBox: [] };
     }
 
-    const { data, error } = await supabase.rpc('pubs_in_polygon_v2', {
+    const { data, error } = await supabase.rpc('pubs_in_polygon', {
         geojson: JSON.stringify(geojson.geometry),
         dist_lat: l.coords.latitude,
         dist_long: l.coords.longitude,
@@ -58,15 +58,41 @@ export const fetchMapPubs = createAsyncThunk<
         return rejectWithValue({ message: error.message, code: error.code });
     }
 
+    let promises: Promise<PubType>[] = [];
+
     data.forEach((pub: any) => {
         promises.push(
             new Promise(async resolve => {
-                const photo = await supabase
-                    .from('pub_photos')
-                    .select()
-                    .eq('pub_id', pub.id);
+                const [photos, openingHours] = await Promise.all([
+                    supabase.from('pub_photos').select().eq('pub_id', pub.id),
+                    supabase
+                        .from('opening_hours')
+                        .select()
+                        .eq('pub_id', pub.id),
+                ]);
 
-                resolve(forcePubType(pub, photo.data));
+                console.log('OPENING HOURS:', openingHours, pub.id);
+
+                resolve({
+                    id: pub.id,
+                    name: pub.name,
+                    address: pub.address,
+                    location: convertPointStringToObject(pub.location),
+                    opening_hours:
+                        openingHours.data?.map(oh => ({
+                            open: { day: oh.open_day, time: oh.open_hour },
+                            close: { day: oh.close_day, time: oh.close_hour },
+                        })) || [],
+                    phone_number: pub.phone_number,
+                    google_id: '', // TODO: fix up google_id
+                    google_overview: pub.google_overview,
+                    google_rating: pub.google_rating,
+                    google_ratings_amount: pub.google_ratings_amount,
+                    website: pub.website,
+                    dist_meters: pub.dist_meters,
+                    photos: photos.data?.map(photo => photo.key) || [],
+                    reservable: pub.reservable,
+                });
             }),
         );
     });

@@ -57,6 +57,32 @@ export interface Database {
                     type?: string;
                 };
             };
+            opening_hours: {
+                Row: {
+                    close_day: number;
+                    close_hour: string;
+                    id: number;
+                    open_day: number;
+                    open_hour: string;
+                    pub_id: number;
+                };
+                Insert: {
+                    close_day: number;
+                    close_hour: string;
+                    id?: number;
+                    open_day: number;
+                    open_hour: string;
+                    pub_id: number;
+                };
+                Update: {
+                    close_day?: number;
+                    close_hour?: string;
+                    id?: number;
+                    open_day?: number;
+                    open_hour?: string;
+                    pub_id?: number;
+                };
+            };
             pub_photos: {
                 Row: {
                     admin: boolean;
@@ -107,7 +133,6 @@ export interface Database {
                     longitude: number | null;
                     menu: Json | null;
                     name: string | null;
-                    opening_hours: Json[] | null;
                     phone_number: string | null;
                     pool_table_amount: number | null;
                     reservable: boolean | null;
@@ -139,7 +164,6 @@ export interface Database {
                     longitude?: number | null;
                     menu?: Json | null;
                     name?: string | null;
-                    opening_hours?: Json[] | null;
                     phone_number?: string | null;
                     pool_table_amount?: number | null;
                     reservable?: boolean | null;
@@ -171,7 +195,6 @@ export interface Database {
                     longitude?: number | null;
                     menu?: Json | null;
                     name?: string | null;
-                    opening_hours?: Json[] | null;
                     phone_number?: string | null;
                     pool_table_amount?: number | null;
                     reservable?: boolean | null;
@@ -239,7 +262,7 @@ export interface Database {
                     created_at?: string | null;
                     id?: number;
                     pub_id: number;
-                    user_id: string;
+                    user_id?: string;
                 };
                 Update: {
                     created_at?: string | null;
@@ -279,7 +302,6 @@ export interface Database {
                 };
                 Returns: {
                     id: number;
-                    opening_hours: Json[];
                     google_rating: number;
                     name: string;
                     address: string;
@@ -311,7 +333,6 @@ export interface Database {
                 };
                 Returns: {
                     id: number;
-                    opening_hours: Json[];
                     google_rating: number;
                     name: string;
                     address: string;
@@ -331,6 +352,39 @@ export interface Database {
                     rooftop: boolean;
                     foosball_table_amount: number;
                     wheelchair_accessible: boolean;
+                    location: string;
+                    dist_meters: number;
+                }[];
+            };
+            saved_pubs: {
+                Args: {
+                    input_id: string;
+                    dist_long: number;
+                    dist_lat: number;
+                };
+                Returns: {
+                    id: number;
+                    google_rating: number;
+                    name: string;
+                    address: string;
+                    phone_number: string;
+                    google_overview: string;
+                    google_ratings_amount: number;
+                    reservable: boolean;
+                    website: string;
+                    dog_friendly: boolean;
+                    live_sport: boolean;
+                    pool_table_amount: number;
+                    dart_board_amount: number;
+                    menu: Json;
+                    beer_garden: boolean;
+                    kid_friendly: boolean;
+                    free_wifi: boolean;
+                    rooftop: boolean;
+                    foosball_table_amount: number;
+                    wheelchair_accessible: boolean;
+                    pub_photos: string[];
+                    opening_hours: Json;
                     location: string;
                     dist_meters: number;
                 }[];

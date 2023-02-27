@@ -22,6 +22,11 @@ export type PubType = {
     photos: string[];
 };
 
+export type DiscoveredPub =
+    Database['public']['Functions']['pubs_in_polygon']['Returns'][number];
+export type SavedPub =
+    Database['public']['Functions']['saved_pubs']['Returns'][number];
+
 export type BoundingBox = {
     minLat: number;
     minLong: number;

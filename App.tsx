@@ -2,6 +2,7 @@ import React from 'react';
 
 import { NavigationContainer } from '@react-navigation/native';
 import Navigator from '@/nav/Navigator';
+import AuthContainer from '@/components/Auth/AuthContainer';
 import { Provider } from 'react-redux';
 import store from '@/store';
 
@@ -14,7 +15,9 @@ export default function App() {
         <GestureHandlerRootView style={styles.flexOne}>
             <Provider store={store}>
                 <NavigationContainer>
-                    <Navigator />
+                    <AuthContainer>
+                        <Navigator />
+                    </AuthContainer>
                 </NavigationContainer>
             </Provider>
         </GestureHandlerRootView>
