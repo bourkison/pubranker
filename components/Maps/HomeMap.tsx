@@ -121,6 +121,7 @@ export default function HomeMap({
 
     const panDrag = () => {
         if (bottomSheetRef && bottomSheetRef.current) {
+            console.log('COLLAPSE 123');
             bottomSheetRef.current.collapse();
         }
 

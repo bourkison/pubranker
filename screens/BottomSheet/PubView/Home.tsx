@@ -1,5 +1,5 @@
 import { distanceString, parseOpeningHours } from '@/services';
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
     View,
     Text,
@@ -10,30 +10,15 @@ import {
 import { Octicons, Ionicons } from '@expo/vector-icons';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { deselectPub, toggleSave as toggleMapSave } from '@/store/slices/pub';
-import { useBottomSheet } from '@gorhom/bottom-sheet';
 import { toggleSave } from '@/store/slices/saved';
 import { toggleSave as toggleDiscoverSave } from '@/store/slices/discover';
 import OpeningHours from '@/components/Pubs/OpeningHours';
 
 export default function PubView() {
     const dispatch = useAppDispatch();
-    const { animatedIndex, close, snapToIndex } = useBottomSheet();
 
-    const bottomBarType = useAppSelector(state => state.pub.bottomBarType);
     const selectedPub = useAppSelector(state => state.pub.selectedPub);
     const reference = useAppSelector(state => state.pub.selectedPubReference);
-
-    useEffect(() => {
-        if (
-            bottomBarType === 'selected' &&
-            selectedPub &&
-            animatedIndex.value === -1
-        ) {
-            snapToIndex(1);
-        } else if (bottomBarType === 'discover' && animatedIndex.value !== -1) {
-            close();
-        }
-    }, [bottomBarType, snapToIndex, animatedIndex, close, selectedPub]);
 
     const save = async () => {
         if (!selectedPub) {

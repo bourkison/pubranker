@@ -5,7 +5,8 @@ import BottomSheet, {
     useBottomSheetSpringConfigs,
 } from '@gorhom/bottom-sheet';
 import Discover from '@/screens/BottomSheet/Discover';
-import PubView from '@/screens/BottomSheet/PubView';
+import PubViewNavigator from '@/nav/PubViewNavigator';
+// import PubViewHome from '@/screens/BottomSheet/PubView/Home';
 
 type BottomSheetNavigatorProps = {
     discoverSheetRef: RefObject<BottomSheet>;
@@ -16,7 +17,8 @@ export default function BottomSheetNavigator({
     discoverSheetRef,
     selectedSheetRef,
 }: BottomSheetNavigatorProps) {
-    const snapPoints = useMemo(() => ['10%', '40%', '90%'], []);
+    const discoverSnapPoints = useMemo(() => ['10%', '40%', '90%'], []);
+    const selectedSnapPoints = useMemo(() => ['10%', '40%', '90%'], []);
 
     const animationConfigs = useBottomSheetSpringConfigs({
         damping: 10,
@@ -28,7 +30,7 @@ export default function BottomSheetNavigator({
         <>
             <BottomSheet
                 ref={discoverSheetRef}
-                snapPoints={snapPoints}
+                snapPoints={discoverSnapPoints}
                 overDragResistanceFactor={0.1}
                 enableOverDrag={true}
                 backdropComponent={props => (
@@ -40,6 +42,9 @@ export default function BottomSheetNavigator({
                     />
                 )}
                 index={1}
+                onChange={i => {
+                    console.log('DISCOVER:', i);
+                }}
                 animationConfigs={animationConfigs}
                 handleComponent={() => (
                     <View style={styles.handleContainer}>
@@ -50,7 +55,7 @@ export default function BottomSheetNavigator({
             </BottomSheet>
             <BottomSheet
                 ref={selectedSheetRef}
-                snapPoints={snapPoints}
+                snapPoints={selectedSnapPoints}
                 index={-1}
                 overDragResistanceFactor={0.1}
                 backdropComponent={props => (
@@ -61,6 +66,9 @@ export default function BottomSheetNavigator({
                         pressBehavior="collapse"
                     />
                 )}
+                onChange={i => {
+                    console.log('SELECTED:', i);
+                }}
                 enableOverDrag={true}
                 animationConfigs={animationConfigs}
                 handleComponent={() => (
@@ -68,7 +76,8 @@ export default function BottomSheetNavigator({
                         <View style={styles.handle} />
                     </View>
                 )}>
-                <PubView />
+                <PubViewNavigator />
+                {/* <PubViewHome /> */}
             </BottomSheet>
         </>
     );

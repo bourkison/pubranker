@@ -33,6 +33,7 @@ export default function SearchBar({ search }: SearchBarProps) {
         if (animatedIndex.value === 0 || focused === 2) {
             return;
         } else {
+            console.log('I SNAP');
             snapToIndex(1);
         }
     };

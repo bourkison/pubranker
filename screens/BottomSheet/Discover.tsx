@@ -32,7 +32,10 @@ export default function Discover() {
     const selectedPub = useAppSelector(state => state.pub.selectedPub);
 
     useEffect(() => {
+        console.log('CHANGED:', bottomBarType, animatedIndex.value);
+
         if (bottomBarType === 'discover' && animatedIndex.value === -1) {
+            console.log('COLLAPSE');
             collapse();
         } else if (
             bottomBarType === 'selected' &&
