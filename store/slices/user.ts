@@ -22,7 +22,6 @@ export const fetchUser = createAsyncThunk<
     const session = await supabase.auth.getSession();
 
     if (!session.data || !session.data.session) {
-        console.log('No session', session);
         return rejectWithValue({
             message: session.error?.message,
             code: session.error?.name,
@@ -37,14 +36,11 @@ export const fetchUser = createAsyncThunk<
         .single();
 
     if (!data) {
-        console.log('No user data');
         return rejectWithValue({
             message: error.message,
             code: error.code,
         });
     }
-
-    console.log('SIGNED IN');
 
     return data;
 });

@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { fetchMapPubs } from '@/store/slices/map';
 import DebugPolygons from './DebugPolygons';
+import { parseLocation } from '@/services';
 
 const ANIMATE_DELTA = 0.0075;
 const INITIAL_DELTA = 0.01;
@@ -46,6 +47,19 @@ export default function HomeMap({
             setLocation(l);
         })();
     }, []);
+
+    const selectedPubLocation = useMemo(() => {
+        if (!selectedPub?.location) {
+            return null;
+        }
+
+        try {
+            return parseLocation(selectedPub.location);
+        } catch (err) {
+            console.warn(err);
+            return null;
+        }
+    }, [selectedPub]);
 
     const buildBoundingBox = (region: Region) => {
         return {
@@ -89,15 +103,21 @@ export default function HomeMap({
     }, [location]);
 
     useEffect(() => {
-        if (selectedPub && MapRef && MapRef.current) {
+        if (
+            selectedPubLocation &&
+            selectedPubLocation.coordinates &&
+            MapRef &&
+            MapRef.current
+        ) {
             MapRef.current.animateToRegion({
-                latitude: selectedPub.location.lat - 0.15 * ANIMATE_DELTA,
-                longitude: selectedPub.location.lng,
+                latitude:
+                    selectedPubLocation.coordinates[1] - 0.15 * ANIMATE_DELTA,
+                longitude: selectedPubLocation.coordinates[0],
                 latitudeDelta: ANIMATE_DELTA,
                 longitudeDelta: ANIMATE_DELTA,
             });
         }
-    }, [selectedPub, MapRef]);
+    }, [selectedPubLocation, MapRef]);
 
     const panDrag = () => {
         if (bottomSheetRef && bottomSheetRef.current) {
@@ -126,17 +146,25 @@ export default function HomeMap({
             mapPadding={{ bottom: bottomPadding, top: 0, right: 0, left: 0 }}
             onRegionChangeComplete={mapDragFinished}
             initialRegion={initialRegion}>
-            {pubs.map(pub => (
-                <Marker
-                    onPress={() => dispatch(setPub(pub))}
-                    key={pub.id}
-                    coordinate={{
-                        latitude: pub.location.lat,
-                        longitude: pub.location.lng,
-                    }}
-                    title={pub.name}
-                />
-            ))}
+            {pubs.map(pub => {
+                const pubLocation = parseLocation(pub.location);
+
+                if (location) {
+                    return (
+                        <Marker
+                            onPress={() => dispatch(setPub(pub))}
+                            key={pub.id}
+                            coordinate={{
+                                latitude: pubLocation.coordinates[1],
+                                longitude: pubLocation.coordinates[0],
+                            }}
+                            title={pub.name}
+                        />
+                    );
+                } else {
+                    return undefined;
+                }
+            })}
             <DebugPolygons />
         </MapView>
     );

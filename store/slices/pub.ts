@@ -1,4 +1,4 @@
-import { PubType } from '@/types';
+import { DiscoveredPub, NearbyPub } from '@/types';
 import {
     createEntityAdapter,
     createSlice,
@@ -11,14 +11,14 @@ export type BottomBarState = 'hidden' | 'preview' | 'expanded';
 
 const initialState = pubAdapter.getInitialState({
     bottomBarType: 'discover' as 'selected' | 'discover' | 'search',
-    selectedPub: null as PubType | null,
+    selectedPub: null as DiscoveredPub | NearbyPub | null,
 });
 
 const pubSlice = createSlice({
     name: 'pub',
     initialState,
     reducers: {
-        setPub(state, action: PayloadAction<PubType>) {
+        setPub(state, action: PayloadAction<DiscoveredPub | NearbyPub>) {
             state.bottomBarType = 'selected';
             state.selectedPub = action.payload;
         },

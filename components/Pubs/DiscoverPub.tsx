@@ -1,5 +1,5 @@
 import { supabase } from '@/services/supabase';
-import { PubType } from '@/types';
+import { DiscoveredPub } from '@/types';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import ImageScroller from '@/components/Utility/ImageScroller';
@@ -10,7 +10,7 @@ import { setPub } from '@/store/slices/pub';
 import { distanceString } from '@/services';
 
 type DiscoverPubProps = {
-    pub: PubType;
+    pub: DiscoveredPub;
 };
 
 export default function DiscoverPub({ pub }: DiscoverPubProps) {

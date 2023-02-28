@@ -1,6 +1,11 @@
-import { applyFilters, convertPointStringToObject } from '@/services';
+import { applyFilters } from '@/services';
 import { supabase } from '@/services/supabase';
-import { BoolOrUnset, PubFilters, PubType, RejectWithValueType } from '@/types';
+import {
+    BoolOrUnset,
+    DiscoveredPub,
+    PubFilters,
+    RejectWithValueType,
+} from '@/types';
 import {
     createAsyncThunk,
     createEntityAdapter,
@@ -13,7 +18,7 @@ import { RootState } from '@/store';
 const discoverAdapter = createEntityAdapter();
 
 const initialState = discoverAdapter.getInitialState({
-    pubs: [] as PubType[],
+    pubs: [] as DiscoveredPub[],
     isLoading: false,
     moreToLoad: true,
     isLoadingMore: false,
@@ -40,7 +45,7 @@ const queryDb = async (
     filters: PubFilters,
     searchText: string,
     skip?: number,
-): Promise<PubType[]> => {
+): Promise<DiscoveredPub[]> => {
     const currentLocation = await Location.getCurrentPositionAsync();
 
     let query = supabase.rpc('nearby_pubs', {
@@ -55,60 +60,17 @@ const queryDb = async (
     const from = skip || 0;
     const to = amount + from;
 
-    const response = await query.range(from, to);
+    const { data, error } = await query.range(from, to);
 
-    if (response.data && response.data.length) {
-        let promises: Promise<PubType>[] = [];
-
-        response.data.forEach(pub => {
-            promises.push(
-                new Promise(async resolve => {
-                    const [photos, openingHours] = await Promise.all([
-                        supabase
-                            .from('pub_photos')
-                            .select()
-                            .eq('pub_id', pub.id),
-                        supabase
-                            .from('opening_hours')
-                            .select()
-                            .eq('pub_id', pub.id),
-                    ]);
-
-                    resolve({
-                        id: pub.id,
-                        name: pub.name,
-                        address: pub.address,
-                        location: convertPointStringToObject(pub.location),
-                        opening_hours:
-                            openingHours.data?.map(oh => ({
-                                open: { day: oh.open_day, time: oh.open_hour },
-                                close: {
-                                    day: oh.close_day,
-                                    time: oh.close_hour,
-                                },
-                            })) || [],
-                        phone_number: pub.phone_number,
-                        google_id: '', // TODO: fix up google_id
-                        google_overview: pub.google_overview,
-                        google_rating: pub.google_rating,
-                        google_ratings_amount: pub.google_ratings_amount,
-                        website: pub.website,
-                        dist_meters: pub.dist_meters,
-                        photos: photos.data?.map(photo => photo.key) || [],
-                        reservable: pub.reservable,
-                    });
-                }),
-            );
-        });
-
-        return await Promise.all(promises);
-    } else {
-        throw new Error('No response');
+    if (!data) {
+        throw new Error(error.message);
     }
+
+    return data;
 };
 
 export const fetchDiscoverPubs = createAsyncThunk<
-    PubType[],
+    DiscoveredPub[],
     { amount: number },
     { rejectValue: RejectWithValueType }
 >(
@@ -135,7 +97,7 @@ export const fetchDiscoverPubs = createAsyncThunk<
 );
 
 export const fetchMoreDiscoverPubs = createAsyncThunk<
-    PubType[],
+    DiscoveredPub[],
     { amount: number },
     { rejectValue: RejectWithValueType }
 >(

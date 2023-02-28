@@ -1,5 +1,6 @@
-import { PubFilters, PubType } from '@/types';
+import { OpeningHoursType, PubFilters } from '@/types';
 import { PostgrestFilterBuilder } from '@supabase/postgrest-js';
+import * as turf from '@turf/turf';
 
 export const convertPointStringToObject = (
     input: string,
@@ -22,30 +23,61 @@ export const convertPointStringToObject = (
     };
 };
 
-export const forcePubType = (input: any, photos: any): PubType => {
-    const convertPhotos = (p: any[]): string[] => {
-        return p.map(photo => photo.key);
-    };
+export const parseLocation = (locationString: string): turf.helpers.Point => {
+    const location: turf.helpers.Point = JSON.parse(locationString);
 
-    // TODO: Add checking
-    return {
-        id: input.id,
-        name: input.name,
-        address: input.address || '',
-        location: !input.latitude
-            ? convertPointStringToObject(input.location)
-            : { lat: input.latitude, lng: input.longitude },
-        opening_hours: input.opening_hours || [],
-        phone_number: input.phone_number || '',
-        google_overview: input.google_overview || '',
-        google_rating: input.google_rating || -1,
-        google_ratings_amount: input.google_ratings_amount || -1,
-        google_id: input.google_id || '',
-        reservable: input.reservable || false,
-        website: input.website || '',
-        dist_meters: input.dist_meters || -1,
-        photos: convertPhotos(photos) || [],
-    };
+    if (!location?.coordinates || location.coordinates.length !== 2) {
+        throw new Error('Invalid coordinates array provided');
+    }
+
+    return location;
+};
+
+export const parseOpeningHours = (
+    openingHoursString: string,
+): OpeningHoursType[] => {
+    const oh: OpeningHoursType[] = JSON.parse(openingHoursString);
+    let response: OpeningHoursType[] = [];
+
+    for (let i = 0; i < oh.length; i++) {
+        const openingHour = oh[i];
+
+        if (
+            openingHour.close_day === undefined ||
+            openingHour.close_day === null
+        ) {
+            console.warn('No close day at index', i, oh[i]);
+            continue;
+        }
+
+        if (
+            openingHour.open_day === undefined ||
+            openingHour.open_day === null
+        ) {
+            console.warn('No open day at index', i, oh[i]);
+            continue;
+        }
+
+        if (
+            openingHour.close_hour === undefined ||
+            openingHour.close_hour === null
+        ) {
+            console.warn('No close hour at index', i, oh[i]);
+            continue;
+        }
+
+        if (
+            openingHour.open_hour === undefined ||
+            openingHour.open_hour === null
+        ) {
+            console.warn('No open hour at index', i, oh[i]);
+            continue;
+        }
+
+        response.push(openingHour);
+    }
+
+    return response;
 };
 
 export const roundToNearest = (input: number, nearest: number) => {

@@ -21,12 +21,11 @@ export const fetchSavedPubs = createAsyncThunk<
     SavedPub[],
     { amount: number; id: string; refreshing: boolean },
     { rejectValue: RejectWithValueType }
->('saved/fetchSavedPubs', async ({ amount, id }, { rejectWithValue }) => {
+>('saved/fetchSavedPubs', async ({ amount }, { rejectWithValue }) => {
     const currentLocation = await Location.getCurrentPositionAsync();
 
     const { data, error } = await supabase
         .rpc('saved_pubs', {
-            input_id: id,
             dist_lat: currentLocation.coords.latitude,
             dist_long: currentLocation.coords.longitude,
         })

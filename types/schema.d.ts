@@ -317,6 +317,9 @@ export interface Database {
                     wheelchair_accessible: boolean;
                     location: string;
                     dist_meters: number;
+                    photos: string[];
+                    opening_hours: Json;
+                    saved: boolean;
                 }[];
             };
             pubs_in_polygon: {
@@ -348,11 +351,13 @@ export interface Database {
                     wheelchair_accessible: boolean;
                     location: string;
                     dist_meters: number;
+                    photos: string[];
+                    opening_hours: Json;
+                    saved: boolean;
                 }[];
             };
             saved_pubs: {
                 Args: {
-                    input_id: string;
                     dist_long: number;
                     dist_lat: number;
                 };

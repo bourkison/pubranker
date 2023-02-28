@@ -22,10 +22,15 @@ export type PubType = {
     photos: string[];
 };
 
+export type NearbyPub =
+    Database['public']['Functions']['nearby_pubs']['Returns'][number];
 export type DiscoveredPub =
     Database['public']['Functions']['pubs_in_polygon']['Returns'][number];
 export type SavedPub =
     Database['public']['Functions']['saved_pubs']['Returns'][number];
+
+export type OpeningHoursType =
+    Database['public']['Tables']['opening_hours']['Row'];
 
 export type BoundingBox = {
     minLat: number;
