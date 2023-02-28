@@ -1,6 +1,7 @@
 import { OpeningHoursType, PubFilters } from '@/types';
 import { PostgrestFilterBuilder } from '@supabase/postgrest-js';
 import * as turf from '@turf/turf';
+import dayjs from 'dayjs';
 
 export const convertPointStringToObject = (
     input: string,
@@ -33,10 +34,17 @@ export const parseLocation = (locationString: string): turf.helpers.Point => {
     return location;
 };
 
-export const parseOpeningHours = (
-    openingHoursString: string,
-): OpeningHoursType[] => {
-    const oh: OpeningHoursType[] = JSON.parse(openingHoursString);
+export const parseOpeningHours = (openingHours: any): OpeningHoursType[] => {
+    let oh: OpeningHoursType[];
+
+    if (typeof openingHours === 'object') {
+        oh = openingHours;
+    } else if (typeof openingHours === 'string') {
+        oh = JSON.parse(openingHours);
+    } else {
+        throw new Error('Unrecognised type');
+    }
+
     let response: OpeningHoursType[] = [];
 
     for (let i = 0; i < oh.length; i++) {
@@ -80,11 +88,64 @@ export const parseOpeningHours = (
     return response;
 };
 
-export const roundToNearest = (input: number, nearest: number) => {
+export const dayString = (input: number): string => {
+    switch (input) {
+        case 0:
+            return 'Sunday';
+        case 1:
+            return 'Monday';
+        case 2:
+            return 'Tuesday';
+        case 3:
+            return 'Wednesday';
+        case 4:
+            return 'Thursday';
+        case 5:
+            return 'Friday';
+        case 6:
+            return 'Saturday';
+        default:
+            console.warn('Undefined day', input);
+            return 'undefined';
+    }
+};
+
+export const timeString = (input: string): string => {
+    let dayjsInput = '';
+
+    for (let i = 0; i < 4 - input.length; i++) {
+        dayjsInput += '0';
+    }
+
+    dayjsInput += input;
+
+    const hour = parseInt(dayjsInput.substring(0, 2), 10);
+    const minute = parseInt(dayjsInput.substring(2, 4), 10);
+
+    if (isNaN(hour) || isNaN(minute)) {
+        throw new Error(
+            `Not a number, input: ${dayjsInput}, hour: ${hour}, minute: ${minute}`,
+        );
+    }
+
+    const response = dayjs().hour(hour).minute(minute);
+
+    let output = response.format('h');
+
+    if (response.format('mm') !== '00') {
+        output += `:${response.format('mm')}`;
+    }
+
+    output += response.format('a');
+
+    return output;
+};
+
+export const roundToNearest = (input: number, nearest: number): number => {
     return Math.ceil(input / nearest) * nearest;
 };
 
-export const distanceString = (input: number) => {
+export const distanceString = (input: number): string => {
     // TODO: Miles vs Metric.
 
     const amount = roundToNearest(input, 10);

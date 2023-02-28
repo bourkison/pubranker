@@ -156,6 +156,10 @@ const discoverSlice = createSlice({
                 state.pubs = action.payload;
                 state.isLoading = false;
                 state.isLoadingMore = false;
+
+                if (action.payload.length < action.meta.arg.amount) {
+                    state.moreToLoad = false;
+                }
             })
             .addCase(fetchDiscoverPubs.rejected, (state, { meta, payload }) => {
                 // TODO: handle errors.
@@ -171,6 +175,10 @@ const discoverSlice = createSlice({
                 state.pubs = [...state.pubs, ...action.payload];
                 state.isLoadingMore = false;
                 state.moreToLoad = true;
+
+                if (action.payload.length < action.meta.arg.amount) {
+                    state.moreToLoad = false;
+                }
             })
             .addCase(fetchMoreDiscoverPubs.rejected, state => {
                 state.moreToLoad = false;

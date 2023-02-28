@@ -1,4 +1,4 @@
-import { distanceString } from '@/services';
+import { distanceString, parseOpeningHours } from '@/services';
 import React, { useEffect } from 'react';
 import {
     View,
@@ -13,6 +13,7 @@ import { deselectPub, toggleSave as toggleMapSave } from '@/store/slices/pub';
 import { useBottomSheet } from '@gorhom/bottom-sheet';
 import { toggleSave } from '@/store/slices/saved';
 import { toggleSave as toggleDiscoverSave } from '@/store/slices/discover';
+import OpeningHours from '@/components/Pubs/OpeningHours';
 
 export default function PubView() {
     const dispatch = useAppDispatch();
@@ -84,8 +85,18 @@ export default function PubView() {
                     </Pressable>
                 </View>
             </View>
-            <Text>{selectedPub.google_overview}</Text>
-            <Text>{JSON.stringify(selectedPub.opening_hours)}</Text>
+            <View style={styles.contentContainer}>
+                <Text>{selectedPub.google_overview}</Text>
+                <View>
+                    <View style={styles.openingHoursContainer}>
+                        <OpeningHours
+                            openingHours={parseOpeningHours(
+                                selectedPub.opening_hours,
+                            )}
+                        />
+                    </View>
+                </View>
+            </View>
         </View>
     );
 }
@@ -94,6 +105,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         marginBottom: 5,
         justifyContent: 'space-between',
+    },
+    contentContainer: {
+        width: '100%',
     },
     titleSubTitleContainer: {
         marginLeft: 10,
@@ -129,5 +143,8 @@ const styles = StyleSheet.create({
             width: 0,
             height: 0,
         },
+    },
+    openingHoursContainer: {
+        maxWidth: 256,
     },
 });

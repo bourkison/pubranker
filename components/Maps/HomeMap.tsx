@@ -149,7 +149,7 @@ export default function HomeMap({
             {pubs.map(pub => {
                 const pubLocation = parseLocation(pub.location);
 
-                if (location) {
+                if (pubLocation) {
                     return (
                         <Marker
                             onPress={() =>
