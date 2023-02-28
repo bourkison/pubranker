@@ -22,6 +22,7 @@ export default function DiscoverPub({ pub }: DiscoverPubProps) {
             let urls: string[] = [];
 
             pub.photos.forEach(photo => {
+                console.log('PHOTO:', photo);
                 const url = supabase.storage.from('pubs').getPublicUrl(photo);
                 urls.push(url.data.publicUrl);
             });
@@ -31,7 +32,7 @@ export default function DiscoverPub({ pub }: DiscoverPubProps) {
     }, [pub, imageUrls]);
 
     const selectPub = () => {
-        dispatch(setPub(pub));
+        dispatch(setPub({ pub, reference: 'discover' }));
     };
 
     return (
@@ -61,7 +62,15 @@ export default function DiscoverPub({ pub }: DiscoverPubProps) {
                     </View>
                 </TouchableOpacity>
                 <View>
-                    <Ionicons name="heart-outline" size={18} color="#dc2626" />
+                    {pub.saved ? (
+                        <Ionicons name="heart" size={18} color="#dc2626" />
+                    ) : (
+                        <Ionicons
+                            name="heart-outline"
+                            size={18}
+                            color="#dc2626"
+                        />
+                    )}
                 </View>
             </View>
             <View>

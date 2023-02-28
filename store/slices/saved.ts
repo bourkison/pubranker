@@ -6,6 +6,7 @@ import {
 import { RejectWithValueType, SavedPub } from '@/types';
 import * as Location from 'expo-location';
 import { supabase } from '@/services/supabase';
+import { RootState } from '..';
 
 const savedAdapter = createEntityAdapter();
 
@@ -29,6 +30,7 @@ export const fetchSavedPubs = createAsyncThunk<
             dist_lat: currentLocation.coords.latitude,
             dist_long: currentLocation.coords.longitude,
         })
+        .order('created_at', { ascending: false })
         .limit(amount);
 
     if (!data) {
@@ -39,6 +41,44 @@ export const fetchSavedPubs = createAsyncThunk<
     }
 
     return data;
+});
+
+export const toggleSave = createAsyncThunk<
+    undefined,
+    { id: number; saved: boolean },
+    { rejectValue: RejectWithValueType }
+>('saved/toggleSave', async ({ id, saved }, { rejectWithValue, getState }) => {
+    if (!saved) {
+        const { error } = await supabase.from('saves').insert({
+            pub_id: id,
+        });
+
+        if (error) {
+            return rejectWithValue({
+                message: error.message,
+                code: error.code,
+            });
+        }
+    } else {
+        const state = getState() as RootState;
+
+        console.log('DELETING');
+
+        const { data, error } = await supabase
+            .from('saves')
+            .delete()
+            .eq('pub_id', id)
+            .eq('user_id', state.user.docData?.id);
+
+        console.log('RESPONSE:', data, error);
+
+        if (error) {
+            return rejectWithValue({
+                message: error.message,
+                code: error.code,
+            });
+        }
+    }
 });
 
 const savedSlice = createSlice({

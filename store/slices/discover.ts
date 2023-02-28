@@ -136,6 +136,13 @@ const discoverSlice = createSlice({
         ) {
             state.filters[action.payload.key] = action.payload.val;
         },
+        toggleSave(state, action: PayloadAction<{ id: number }>) {
+            const index = state.pubs.findIndex(x => x.id === action.payload.id);
+
+            if (index > -1) {
+                state.pubs[index].saved = !state.pubs[index].saved;
+            }
+        },
     },
     extraReducers: builder => {
         builder
@@ -173,5 +180,5 @@ const discoverSlice = createSlice({
     },
 });
 
-export const { setSearchText, setFilter } = discoverSlice.actions;
+export const { setSearchText, setFilter, toggleSave } = discoverSlice.actions;
 export default discoverSlice.reducer;

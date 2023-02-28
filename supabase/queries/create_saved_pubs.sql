@@ -3,6 +3,7 @@ drop function if exists saved_pubs;
 create
 or replace function saved_pubs(dist_long float, dist_lat float) returns table(
     id int,
+    created_at timestamptz,
     google_rating real,
     name text,
     address text,
@@ -29,6 +30,7 @@ or replace function saved_pubs(dist_long float, dist_lat float) returns table(
 ) language sql as $ $
 select
     p.id,
+    s.created_at,
     p.google_rating,
     p.name,
     p.address,
@@ -48,7 +50,7 @@ select
     p.rooftop,
     p.foosball_table_amount,
     p.wheelchair_accessible,
-    array_agg(distinct pp.key) as pub_photos,
+    array_remove(array_agg(distinct pp.key), NULL) as pub_photos,
     json_agg(distinct oh) as opening_hours,
     st_asgeojson(p.location) as location,
     st_distance(
@@ -63,4 +65,5 @@ from
 where
     s.user_id = auth.uid()
 group by
-    p.id $ $;
+    p.id,
+    s.id $ $;

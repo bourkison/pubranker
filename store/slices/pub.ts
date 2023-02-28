@@ -8,9 +8,11 @@ import {
 const pubAdapter = createEntityAdapter();
 
 export type BottomBarState = 'hidden' | 'preview' | 'expanded';
+type SelectedPubReference = 'map' | 'discover';
 
 const initialState = pubAdapter.getInitialState({
-    bottomBarType: 'discover' as 'selected' | 'discover' | 'search',
+    bottomBarType: 'discover' as 'selected' | 'discover',
+    selectedPubReference: null as SelectedPubReference | null,
     selectedPub: null as DiscoveredPub | NearbyPub | null,
 });
 
@@ -18,16 +20,29 @@ const pubSlice = createSlice({
     name: 'pub',
     initialState,
     reducers: {
-        setPub(state, action: PayloadAction<DiscoveredPub | NearbyPub>) {
+        setPub(
+            state,
+            action: PayloadAction<{
+                pub: DiscoveredPub | NearbyPub;
+                reference: SelectedPubReference;
+            }>,
+        ) {
             state.bottomBarType = 'selected';
-            state.selectedPub = action.payload;
+            state.selectedPub = action.payload.pub;
+            state.selectedPubReference = action.payload.reference;
         },
         deselectPub(state) {
             state.bottomBarType = 'discover';
             state.selectedPub = null;
+            state.selectedPubReference = null;
+        },
+        toggleSave(state) {
+            if (state.selectedPub) {
+                state.selectedPub.saved = !state.selectedPub.saved;
+            }
         },
     },
 });
 
-export const { setPub, deselectPub } = pubSlice.actions;
+export const { setPub, deselectPub, toggleSave } = pubSlice.actions;
 export default pubSlice.reducer;

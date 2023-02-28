@@ -363,6 +363,7 @@ export interface Database {
                 };
                 Returns: {
                     id: number;
+                    created_at: string;
                     google_rating: number;
                     name: string;
                     address: string;

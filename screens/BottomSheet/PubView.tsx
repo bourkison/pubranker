@@ -9,9 +9,10 @@ import {
 } from 'react-native';
 import { Octicons, Ionicons } from '@expo/vector-icons';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { deselectPub } from '@/store/slices/pub';
+import { deselectPub, toggleSave as toggleMapSave } from '@/store/slices/pub';
 import { useBottomSheet } from '@gorhom/bottom-sheet';
-import { supabase } from '@/services/supabase';
+import { toggleSave } from '@/store/slices/saved';
+import { toggleSave as toggleDiscoverSave } from '@/store/slices/discover';
 
 export default function PubView() {
     const dispatch = useAppDispatch();
@@ -19,6 +20,7 @@ export default function PubView() {
 
     const bottomBarType = useAppSelector(state => state.pub.bottomBarType);
     const selectedPub = useAppSelector(state => state.pub.selectedPub);
+    const reference = useAppSelector(state => state.pub.selectedPubReference);
 
     useEffect(() => {
         if (
@@ -32,16 +34,17 @@ export default function PubView() {
         }
     }, [bottomBarType, snapToIndex, animatedIndex, close, selectedPub]);
 
-    const savePub = async () => {
+    const save = async () => {
         if (!selectedPub) {
             return;
         }
 
-        const { data, error } = await supabase.from('saves').insert({
-            pub_id: selectedPub.id,
-        });
+        dispatch(toggleSave({ id: selectedPub.id, saved: selectedPub.saved }));
+        dispatch(toggleMapSave());
 
-        console.log('SAVE:', data, error);
+        if (reference === 'discover') {
+            dispatch(toggleDiscoverSave({ id: selectedPub.id }));
+        }
     };
 
     if (!selectedPub) {
@@ -62,14 +65,16 @@ export default function PubView() {
                     </Text>
                 </View>
                 <View style={styles.buttonsContainer}>
-                    <TouchableOpacity
-                        style={styles.likeButton}
-                        onPress={savePub}>
-                        <Ionicons
-                            name="heart-outline"
-                            size={18}
-                            color="#dc2626"
-                        />
+                    <TouchableOpacity style={styles.likeButton} onPress={save}>
+                        {selectedPub.saved ? (
+                            <Ionicons name="heart" size={18} color="#dc2626" />
+                        ) : (
+                            <Ionicons
+                                name="heart-outline"
+                                size={18}
+                                color="#dc2626"
+                            />
+                        )}
                     </TouchableOpacity>
 
                     <Pressable

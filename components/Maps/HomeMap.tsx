@@ -152,7 +152,9 @@ export default function HomeMap({
                 if (location) {
                     return (
                         <Marker
-                            onPress={() => dispatch(setPub(pub))}
+                            onPress={() =>
+                                dispatch(setPub({ pub, reference: 'map' }))
+                            }
                             key={pub.id}
                             coordinate={{
                                 latitude: pubLocation.coordinates[1],

@@ -59,7 +59,7 @@ select
         location,
         st_point(dist_long, dist_lat) :: geography
     ) as dist_meters,
-    array_agg(distinct pp.key) as photos,
+    array_remove(array_agg(distinct pp.key), NULL) as photos,
     json_agg(distinct oh) as opening_hours,
     count(
         s.pub_id = p.id
