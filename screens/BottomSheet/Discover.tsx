@@ -13,45 +13,54 @@ import {
 } from 'react-native';
 import DiscoverPub from '@/components/Pubs/DiscoverPub';
 import FilterScroller from '@/components/Utility/FilterScroller';
-import { BottomSheetFlatList, useBottomSheet } from '@gorhom/bottom-sheet';
+import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import SearchBar from '@/components/Utility/SearchBar';
+import { setPub } from '@/store/slices/pub';
+import { useNavigation } from '@react-navigation/native';
+import { BottomSheetStackParamList } from '@/nav/BottomSheetNavigator';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { useBottomSheet } from '@gorhom/bottom-sheet';
+import { DiscoveredPub } from '@/types';
 
 const LOAD_AMOUNT = 5;
 
 export default function Discover() {
     const dispatch = useAppDispatch();
     const FlatListRef = useRef<FlatList>(null);
-    const { collapse, animatedIndex, close } = useBottomSheet();
+    // const { collapse, animatedIndex } = useBottomSheet();
 
     const pubs = useAppSelector(state => state.discover.pubs);
     const isLoading = useAppSelector(state => state.discover.isLoading);
     const isLoadingMore = useAppSelector(state => state.discover.isLoadingMore);
     const moreToLoad = useAppSelector(state => state.discover.moreToLoad);
 
-    const bottomBarType = useAppSelector(state => state.pub.bottomBarType);
-    const selectedPub = useAppSelector(state => state.pub.selectedPub);
+    const navigation =
+        useNavigation<StackNavigationProp<BottomSheetStackParamList>>();
 
-    useEffect(() => {
-        console.log('CHANGED:', bottomBarType, animatedIndex.value);
+    const { expand } = useBottomSheet();
 
-        if (bottomBarType === 'discover' && animatedIndex.value === -1) {
-            console.log('COLLAPSE');
-            collapse();
-        } else if (
-            bottomBarType === 'selected' &&
-            selectedPub &&
-            animatedIndex.value !== -1
-        ) {
-            close();
+    // const selectedPub = useAppSelector(state => state.pub.selectedPub);
 
-            if (FlatListRef && FlatListRef.current) {
-                FlatListRef.current.scrollToOffset({
-                    offset: 0,
-                    animated: true,
-                });
-            }
-        }
-    }, [bottomBarType, collapse, animatedIndex, close, selectedPub]);
+    // TODO: Fix this up.
+    // useEffect(() => {
+    //     console.log('CHANGED:', bottomBarType, animatedIndex.value);
+
+    //     if (bottomBarType === 'discover' && animatedIndex.value === -1) {
+    //         console.log('COLLAPSE');
+    //         collapse();
+    //     } else if (
+    //         bottomBarType === 'selected' &&
+    //         selectedPub &&
+    //         animatedIndex.value !== -1
+    //     ) {
+    //         if (FlatListRef && FlatListRef.current) {
+    //             FlatListRef.current.scrollToOffset({
+    //                 offset: 0,
+    //                 animated: true,
+    //             });
+    //         }
+    //     }
+    // }, [bottomBarType, collapse, animatedIndex, selectedPub]);
 
     const search = useCallback(async () => {
         await dispatch(fetchDiscoverPubs({ amount: LOAD_AMOUNT }));
@@ -66,6 +75,12 @@ export default function Discover() {
     useEffect(() => {
         search();
     }, [search]);
+
+    const selectPub = (pub: DiscoveredPub) => {
+        dispatch(setPub({ pub, reference: 'discover' }));
+        navigation.navigate('PubView');
+        expand();
+    };
 
     return (
         <BottomSheetFlatList
@@ -85,7 +100,9 @@ export default function Discover() {
                 </View>
             )}
             data={pubs}
-            renderItem={({ item }) => <DiscoverPub pub={item} />}
+            renderItem={({ item }) => (
+                <DiscoverPub pub={item} onSelect={() => selectPub(item)} />
+            )}
             keyExtractor={item => item.id.toString()}
             onEndReached={loadMore}
             ListFooterComponent={() =>

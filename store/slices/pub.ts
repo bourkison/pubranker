@@ -11,7 +11,6 @@ export type BottomBarState = 'hidden' | 'preview' | 'expanded';
 type SelectedPubReference = 'map' | 'discover';
 
 const initialState = pubAdapter.getInitialState({
-    bottomBarType: 'discover' as 'selected' | 'discover',
     selectedPubReference: null as SelectedPubReference | null,
     selectedPub: null as DiscoveredPub | NearbyPub | null,
 });
@@ -27,12 +26,10 @@ const pubSlice = createSlice({
                 reference: SelectedPubReference;
             }>,
         ) {
-            state.bottomBarType = 'selected';
             state.selectedPub = action.payload.pub;
             state.selectedPubReference = action.payload.reference;
         },
         deselectPub(state) {
-            state.bottomBarType = 'discover';
             state.selectedPub = null;
             state.selectedPubReference = null;
         },

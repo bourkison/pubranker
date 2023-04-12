@@ -22,7 +22,7 @@ or replace function saved_pubs(dist_long float, dist_lat float) returns table(
     rooftop boolean,
     foosball_table_amount smallint,
     wheelchair_accessible boolean,
-    pub_photos text [],
+    photos text [],
     opening_hours jsonb,
     location text,
     dist_meters float
@@ -48,7 +48,7 @@ select
     p.rooftop,
     p.foosball_table_amount,
     p.wheelchair_accessible,
-    array_remove(array_agg(distinct pp.key), NULL) as pub_photos,
+    array_remove(array_agg(distinct pp.key), NULL) as photos,
     json_agg(distinct oh) as opening_hours,
     st_asgeojson(p.location) as location,
     st_distance(

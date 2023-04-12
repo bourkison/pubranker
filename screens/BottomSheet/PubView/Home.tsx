@@ -14,11 +14,18 @@ import { toggleSave } from '@/store/slices/saved';
 import { toggleSave as toggleDiscoverSave } from '@/store/slices/discover';
 import OpeningHours from '@/components/Pubs/OpeningHours';
 
+import { useNavigation } from '@react-navigation/native';
+import { BottomSheetStackParamList } from '@/nav/BottomSheetNavigator';
+import { StackNavigationProp } from '@react-navigation/stack';
+
 export default function PubView() {
     const dispatch = useAppDispatch();
 
     const selectedPub = useAppSelector(state => state.pub.selectedPub);
     const reference = useAppSelector(state => state.pub.selectedPubReference);
+
+    const navigation =
+        useNavigation<StackNavigationProp<BottomSheetStackParamList>>();
 
     const save = async () => {
         if (!selectedPub) {
@@ -64,7 +71,10 @@ export default function PubView() {
                     </TouchableOpacity>
 
                     <Pressable
-                        onPress={() => dispatch(deselectPub())}
+                        onPress={() => {
+                            dispatch(deselectPub());
+                            navigation.navigate('Discover');
+                        }}
                         style={styles.closeButton}>
                         <Octicons name="x" color="#A3A3A3" size={18} />
                     </Pressable>

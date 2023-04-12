@@ -10,6 +10,8 @@ import BottomSheet from '@gorhom/bottom-sheet';
 import { fetchMapPubs } from '@/store/slices/map';
 import DebugPolygons from './DebugPolygons';
 import { parseLocation } from '@/services';
+import { CommonActions, useNavigation } from '@react-navigation/native';
+import { NearbyPub } from '@/types';
 
 const ANIMATE_DELTA = 0.0075;
 const INITIAL_DELTA = 0.01;
@@ -27,6 +29,8 @@ export default function HomeMap({
         Location.LocationObject | undefined
     >(undefined);
     const MapRef = useRef<MapView>(null);
+
+    const navigation = useNavigation();
 
     const [hasLoaded, setHasLoaded] = useState(false);
 
@@ -121,7 +125,6 @@ export default function HomeMap({
 
     const panDrag = () => {
         if (bottomSheetRef && bottomSheetRef.current) {
-            console.log('COLLAPSE 123');
             bottomSheetRef.current.collapse();
         }
 
@@ -133,6 +136,15 @@ export default function HomeMap({
             fetchPubs(region);
         } else {
             setHasLoaded(true);
+        }
+    };
+
+    const selectPub = (pub: NearbyPub) => {
+        dispatch(setPub({ pub, reference: 'map' }));
+        navigation.dispatch(CommonActions.navigate('PubView'));
+
+        if (bottomSheetRef && bottomSheetRef.current) {
+            bottomSheetRef.current.snapToIndex(1);
         }
     };
 
@@ -153,9 +165,7 @@ export default function HomeMap({
                 if (pubLocation) {
                     return (
                         <Marker
-                            onPress={() =>
-                                dispatch(setPub({ pub, reference: 'map' }))
-                            }
+                            onPress={() => selectPub(pub)}
                             key={pub.id}
                             coordinate={{
                                 latitude: pubLocation.coordinates[1],

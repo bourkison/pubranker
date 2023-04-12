@@ -5,13 +5,13 @@ import {
     FlatList,
     ActivityIndicator,
     View,
-    Text,
     StyleSheet,
     RefreshControl,
 } from 'react-native';
 import Unauthorized from '@/screens/Unauthorized';
 
 import { fetchSavedPubs } from '@/store/slices/saved';
+import DiscoverPub from '@/components/Pubs/DiscoverPub';
 
 export default function SavedPubs() {
     const loggedIn = useAppSelector(state => state.user.loggedIn);
@@ -53,7 +53,7 @@ export default function SavedPubs() {
                     isLoading ? <ActivityIndicator /> : <View />
                 }
                 data={savedPubs}
-                renderItem={({ item }) => <Text>{item.name}</Text>}
+                renderItem={({ item }) => <DiscoverPub pub={item} />}
                 keyExtractor={item => item.id.toString()}
                 refreshControl={
                     <RefreshControl

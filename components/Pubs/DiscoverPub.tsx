@@ -1,21 +1,19 @@
 import { supabase } from '@/services/supabase';
-import { DiscoveredPub } from '@/types';
+import { DiscoveredPub, SavedPub } from '@/types';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import ImageScroller from '@/components/Utility/ImageScroller';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
-import { useAppDispatch } from '@/store/hooks';
-import { setPub } from '@/store/slices/pub';
 import { distanceString } from '@/services';
 
 type DiscoverPubProps = {
-    pub: DiscoveredPub;
+    pub: DiscoveredPub | SavedPub;
+    onSelect?: () => void;
 };
 
-export default function DiscoverPub({ pub }: DiscoverPubProps) {
+export default function DiscoverPub({ pub, onSelect }: DiscoverPubProps) {
     const [imageUrls, setImageUrls] = useState<string[] | null>(null);
-    const dispatch = useAppDispatch();
 
     useEffect(() => {
         if (imageUrls === null) {
@@ -31,14 +29,11 @@ export default function DiscoverPub({ pub }: DiscoverPubProps) {
         }
     }, [pub, imageUrls]);
 
-    const selectPub = () => {
-        dispatch(setPub({ pub, reference: 'discover' }));
-    };
-
     return (
         <View style={styles.container}>
             <View style={styles.headerContainer}>
-                <TouchableOpacity onPress={selectPub}>
+                <TouchableOpacity
+                    onPress={() => (onSelect ? onSelect() : undefined)}>
                     <View style={styles.titleSubTitleContainer}>
                         <View>
                             <Text style={styles.title}>{pub.name}</Text>
