@@ -3,14 +3,8 @@ import {
     fetchMoreDiscoverPubs,
     fetchDiscoverPubs,
 } from '@/store/slices/discover';
-import React, { useCallback, useEffect, useRef } from 'react';
-import {
-    View,
-    StyleSheet,
-    Text,
-    FlatList,
-    ActivityIndicator,
-} from 'react-native';
+import React, { useCallback, useEffect } from 'react';
+import { View, StyleSheet, Text, ActivityIndicator } from 'react-native';
 import DiscoverPub from '@/components/Pubs/DiscoverPub';
 import FilterScroller from '@/components/Utility/FilterScroller';
 import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
@@ -26,8 +20,6 @@ const LOAD_AMOUNT = 5;
 
 export default function Discover() {
     const dispatch = useAppDispatch();
-    const FlatListRef = useRef<FlatList>(null);
-    // const { collapse, animatedIndex } = useBottomSheet();
 
     const pubs = useAppSelector(state => state.discover.pubs);
     const isLoading = useAppSelector(state => state.discover.isLoading);
@@ -38,29 +30,6 @@ export default function Discover() {
         useNavigation<StackNavigationProp<BottomSheetStackParamList>>();
 
     const { expand } = useBottomSheet();
-
-    // const selectedPub = useAppSelector(state => state.pub.selectedPub);
-
-    // TODO: Fix this up.
-    // useEffect(() => {
-    //     console.log('CHANGED:', bottomBarType, animatedIndex.value);
-
-    //     if (bottomBarType === 'discover' && animatedIndex.value === -1) {
-    //         console.log('COLLAPSE');
-    //         collapse();
-    //     } else if (
-    //         bottomBarType === 'selected' &&
-    //         selectedPub &&
-    //         animatedIndex.value !== -1
-    //     ) {
-    //         if (FlatListRef && FlatListRef.current) {
-    //             FlatListRef.current.scrollToOffset({
-    //                 offset: 0,
-    //                 animated: true,
-    //             });
-    //         }
-    //     }
-    // }, [bottomBarType, collapse, animatedIndex, selectedPub]);
 
     const search = useCallback(async () => {
         await dispatch(fetchDiscoverPubs({ amount: LOAD_AMOUNT }));
@@ -78,14 +47,13 @@ export default function Discover() {
 
     const selectPub = (pub: DiscoveredPub) => {
         dispatch(setPub({ pub, reference: 'discover' }));
-        navigation.navigate('PubView');
+        navigation.navigate('PubHome', { pub });
+
         expand();
     };
 
     return (
         <BottomSheetFlatList
-            // @ts-ignore
-            ref={FlatListRef}
             ListEmptyComponent={() =>
                 isLoading ? <ActivityIndicator /> : <View />
             }

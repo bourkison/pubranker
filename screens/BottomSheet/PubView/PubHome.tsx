@@ -1,12 +1,6 @@
 import { distanceString, parseOpeningHours } from '@/services';
 import React from 'react';
-import {
-    View,
-    Text,
-    StyleSheet,
-    Pressable,
-    TouchableOpacity,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Octicons, Ionicons } from '@expo/vector-icons';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { deselectPub, toggleSave as toggleMapSave } from '@/store/slices/pub';
@@ -16,50 +10,43 @@ import OpeningHours from '@/components/Pubs/OpeningHours';
 
 import { useNavigation } from '@react-navigation/native';
 import { BottomSheetStackParamList } from '@/nav/BottomSheetNavigator';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { StackNavigationProp, StackScreenProps } from '@react-navigation/stack';
 
-export default function PubView() {
+export default function PubHome({
+    route,
+}: StackScreenProps<BottomSheetStackParamList, 'PubHome'>) {
     const dispatch = useAppDispatch();
-
-    const selectedPub = useAppSelector(state => state.pub.selectedPub);
     const reference = useAppSelector(state => state.pub.selectedPubReference);
 
     const navigation =
         useNavigation<StackNavigationProp<BottomSheetStackParamList>>();
 
     const save = async () => {
-        if (!selectedPub) {
-            return;
-        }
-
-        dispatch(toggleSave({ id: selectedPub.id, saved: selectedPub.saved }));
+        dispatch(
+            toggleSave({
+                id: route.params.pub.id,
+                saved: route.params.pub.saved,
+            }),
+        );
         dispatch(toggleMapSave());
 
         if (reference === 'discover') {
-            dispatch(toggleDiscoverSave({ id: selectedPub.id }));
+            dispatch(toggleDiscoverSave({ id: route.params.pub.id }));
         }
     };
-
-    if (!selectedPub) {
-        return (
-            <View>
-                <Text>Error</Text>
-            </View>
-        );
-    }
 
     return (
         <View>
             <View style={styles.headerContainer}>
                 <View style={styles.titleSubTitleContainer}>
-                    <Text style={styles.title}>{selectedPub.name}</Text>
+                    <Text style={styles.title}>{route.params.pub.name}</Text>
                     <Text style={styles.subtitle}>
-                        {distanceString(selectedPub.dist_meters)}
+                        {distanceString(route.params.pub.dist_meters)}
                     </Text>
                 </View>
                 <View style={styles.buttonsContainer}>
                     <TouchableOpacity style={styles.likeButton} onPress={save}>
-                        {selectedPub.saved ? (
+                        {route.params.pub.saved ? (
                             <Ionicons name="heart" size={18} color="#dc2626" />
                         ) : (
                             <Ionicons
@@ -70,26 +57,40 @@ export default function PubView() {
                         )}
                     </TouchableOpacity>
 
-                    <Pressable
+                    <TouchableOpacity
                         onPress={() => {
                             dispatch(deselectPub());
                             navigation.navigate('Discover');
                         }}
                         style={styles.closeButton}>
                         <Octicons name="x" color="#A3A3A3" size={18} />
-                    </Pressable>
+                    </TouchableOpacity>
                 </View>
             </View>
             <View style={styles.contentContainer}>
-                <Text>{selectedPub.google_overview}</Text>
+                <Text>{route.params.pub.google_overview}</Text>
                 <View>
                     <View style={styles.openingHoursContainer}>
                         <OpeningHours
                             openingHours={parseOpeningHours(
-                                selectedPub.opening_hours,
+                                route.params.pub.opening_hours,
                             )}
                         />
                     </View>
+                </View>
+
+                <View style={styles.reviewButtonContainer}>
+                    <TouchableOpacity
+                        style={styles.reviewButton}
+                        onPress={() =>
+                            navigation.navigate('CreateReview', {
+                                pub: route.params.pub,
+                            })
+                        }>
+                        <Text style={styles.reviewButtonText}>
+                            Review This Pub
+                        </Text>
+                    </TouchableOpacity>
                 </View>
             </View>
         </View>
@@ -141,5 +142,19 @@ const styles = StyleSheet.create({
     },
     openingHoursContainer: {
         maxWidth: 256,
+    },
+    reviewButtonContainer: {
+        paddingHorizontal: 100,
+        marginTop: 25,
+    },
+    reviewButton: {
+        backgroundColor: '#2B5256',
+        paddingVertical: 10,
+        borderRadius: 5,
+    },
+    reviewButtonText: {
+        color: '#F5F5F5',
+        fontWeight: 'bold',
+        textAlign: 'center',
     },
 });

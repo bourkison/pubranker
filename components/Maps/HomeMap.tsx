@@ -140,8 +140,8 @@ export default function HomeMap({
     };
 
     const selectPub = (pub: NearbyPub) => {
+        navigation.dispatch(CommonActions.navigate('PubHome', { pub }));
         dispatch(setPub({ pub, reference: 'map' }));
-        navigation.dispatch(CommonActions.navigate('PubView'));
 
         if (bottomSheetRef && bottomSheetRef.current) {
             bottomSheetRef.current.snapToIndex(1);

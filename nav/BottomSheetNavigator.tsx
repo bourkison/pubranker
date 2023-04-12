@@ -3,11 +3,16 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import Discover from '@/screens/BottomSheet/Discover';
-import PubView from '@/screens/BottomSheet/PubView/Home';
+import PubHome from '@/screens/BottomSheet/PubView/PubHome';
+import { DiscoveredPub, NearbyPub } from '@/types';
+import CreateReview from '@/screens/BottomSheet/PubView/CreateReview';
+
+type SelectedPub = DiscoveredPub | NearbyPub;
 
 export type BottomSheetStackParamList = {
     Discover: undefined;
-    PubView: undefined;
+    PubHome: { pub: SelectedPub };
+    CreateReview: { pub: SelectedPub };
 };
 
 const Stack = createStackNavigator<BottomSheetStackParamList>();
@@ -20,7 +25,8 @@ export default function BottomSheetNavigator({}) {
                 cardStyle: { backgroundColor: 'white' },
             }}>
             <Stack.Screen name="Discover" component={Discover} />
-            <Stack.Screen name="PubView" component={PubView} />
+            <Stack.Screen name="PubHome" component={PubHome} />
+            <Stack.Screen name="CreateReview" component={CreateReview} />
         </Stack.Navigator>
     );
 }
