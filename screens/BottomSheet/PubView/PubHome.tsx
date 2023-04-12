@@ -8,18 +8,15 @@ import { toggleSave } from '@/store/slices/saved';
 import { toggleSave as toggleDiscoverSave } from '@/store/slices/discover';
 import OpeningHours from '@/components/Pubs/OpeningHours';
 
-import { useNavigation } from '@react-navigation/native';
 import { BottomSheetStackParamList } from '@/nav/BottomSheetNavigator';
-import { StackNavigationProp, StackScreenProps } from '@react-navigation/stack';
+import { StackScreenProps } from '@react-navigation/stack';
 
 export default function PubHome({
     route,
+    navigation,
 }: StackScreenProps<BottomSheetStackParamList, 'PubHome'>) {
     const dispatch = useAppDispatch();
     const reference = useAppSelector(state => state.pub.selectedPubReference);
-
-    const navigation =
-        useNavigation<StackNavigationProp<BottomSheetStackParamList>>();
 
     const save = async () => {
         dispatch(

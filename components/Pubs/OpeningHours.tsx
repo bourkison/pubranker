@@ -10,7 +10,6 @@ type OpeningHoursProps = {
 export default function OpeningHours({ openingHours }: OpeningHoursProps) {
     const testing = useMemo(() => {
         return Array.from(Array(7)).map((_, index) => {
-            console.log('INDEX:', index);
             let dayNum = index + 1;
             if (dayNum > 6) {
                 dayNum = 0;
