@@ -10,6 +10,7 @@ import OpeningHours from '@/components/Pubs/OpeningHours';
 
 import { BottomSheetStackParamList } from '@/nav/BottomSheetNavigator';
 import { StackScreenProps } from '@react-navigation/stack';
+import PubReviews from '@/components/Pubs/PubReviews';
 
 export default function PubHome({
     route,
@@ -19,6 +20,13 @@ export default function PubHome({
     const reference = useAppSelector(state => state.pub.selectedPubReference);
 
     const save = async () => {
+        navigation.setParams({
+            pub: {
+                ...route.params.pub,
+                saved: !route.params.pub.saved,
+            },
+        });
+
         dispatch(
             toggleSave({
                 id: route.params.pub.id,
@@ -74,6 +82,10 @@ export default function PubHome({
                             )}
                         />
                     </View>
+                </View>
+
+                <View>
+                    <PubReviews pubId={route.params.pub.id} />
                 </View>
 
                 <View style={styles.reviewButtonContainer}>
