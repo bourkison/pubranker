@@ -25,8 +25,14 @@ or replace function pubs_in_polygon(geojson text, dist_long float, dist_lat floa
 	dist_meters float,
 	photos text [],
 	opening_hours json,
-	saved boolean
-) language sql as $ $
+	saved boolean,
+	review_vibe float,
+	review_beer float,
+	review_music float,
+	review_service float,
+	review_location float,
+	review_food float
+) language sql as $$
 select
 	p.id,
 	p.google_rating,
@@ -49,7 +55,7 @@ select
 	p.wheelchair_accessible,
 	st_asgeojson(p.location) as location,
 	st_distance(
-		location,
+		p.location,
 		st_point(dist_long, dist_lat) :: geography
 	) as dist_meters,
 	array_remove(array_agg(distinct pp.key), NULL) as photos,
@@ -57,16 +63,23 @@ select
 	count(
 		s.pub_id = p.id
 		and s.user_id = auth.uid()
-	) > 0 as saved
+	) > 0 as saved,
+	avg(r.vibe) as review_vibe,
+	avg(r.beer) as review_beer,
+	avg(r.music) as review_music,
+	avg(r.service) as review_service,
+	avg(r.location) as review_location,
+	avg(r.food) as review_food
 from
 	public.pubs p
 	left join public.saves s on p.id = s.pub_id
 	left join pub_photos pp on pp.pub_id = p.id
 	left join opening_hours oh on p.id = oh.pub_id
+	left join reviews r on p.id = r.pub_id
 where
 	ST_Within(
-		location :: geometry,
+		p.location :: geometry,
 		ST_GeomFromGeoJSON(geojson)
 	)
 group by
-	p.id $ $;
+	p.id $$;

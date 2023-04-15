@@ -18,7 +18,7 @@ import { supabase } from '@/services/supabase';
 export default function CreateReview({
     route,
     navigation,
-}: StackScreenProps<BottomSheetStackParamList, 'PubHome'>) {
+}: StackScreenProps<BottomSheetStackParamList, 'CreateReview'>) {
     const [vibe, setVibe] = useState(1);
     const [beer, setBeer] = useState(1);
     const [music, setMusic] = useState(1);

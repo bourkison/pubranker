@@ -11,6 +11,7 @@ import OpeningHours from '@/components/Pubs/OpeningHours';
 import { BottomSheetStackParamList } from '@/nav/BottomSheetNavigator';
 import { StackScreenProps } from '@react-navigation/stack';
 import PubReviews from '@/components/Pubs/PubReviews';
+import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 
 export default function PubHome({
     route,
@@ -41,7 +42,7 @@ export default function PubHome({
     };
 
     return (
-        <View>
+        <BottomSheetScrollView>
             <View style={styles.headerContainer}>
                 <View style={styles.titleSubTitleContainer}>
                     <Text style={styles.title}>{route.params.pub.name}</Text>
@@ -73,7 +74,9 @@ export default function PubHome({
                 </View>
             </View>
             <View style={styles.contentContainer}>
-                <Text>{route.params.pub.google_overview}</Text>
+                <View style={styles.descriptionContainer}>
+                    <Text>{route.params.pub.google_overview}</Text>
+                </View>
                 <View>
                     <View style={styles.openingHoursContainer}>
                         <OpeningHours
@@ -84,8 +87,8 @@ export default function PubHome({
                     </View>
                 </View>
 
-                <View>
-                    <PubReviews pubId={route.params.pub.id} />
+                <View style={styles.reviewsContainer}>
+                    <PubReviews pub={route.params.pub} />
                 </View>
 
                 <View style={styles.reviewButtonContainer}>
@@ -102,7 +105,7 @@ export default function PubHome({
                     </TouchableOpacity>
                 </View>
             </View>
-        </View>
+        </BottomSheetScrollView>
     );
 }
 const styles = StyleSheet.create({
@@ -149,8 +152,16 @@ const styles = StyleSheet.create({
             height: 0,
         },
     },
+    descriptionContainer: {
+        paddingHorizontal: 10,
+        marginTop: 10,
+    },
     openingHoursContainer: {
         maxWidth: 256,
+        marginTop: 25,
+    },
+    reviewsContainer: {
+        marginTop: 25,
     },
     reviewButtonContainer: {
         paddingHorizontal: 100,

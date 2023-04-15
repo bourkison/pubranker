@@ -29,13 +29,13 @@ export const fetchUser = createAsyncThunk<
     }
 
     const { data, error } = await supabase
-        .from('users')
+        .from('users_public')
         .select()
         .eq('id', session.data.session.user.id)
         .limit(1)
         .single();
 
-    if (!data) {
+    if (error) {
         return rejectWithValue({
             message: error.message,
             code: error.code,
@@ -43,6 +43,21 @@ export const fetchUser = createAsyncThunk<
     }
 
     return data;
+});
+
+export const signOut = createAsyncThunk<
+    undefined,
+    undefined,
+    { rejectValue: RejectWithValueType }
+>('user/signOut', async (_, { rejectWithValue }) => {
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+        return rejectWithValue({
+            message: error.message,
+            code: error.status?.toString(),
+        });
+    }
 });
 
 const userSlice = createSlice({
@@ -71,7 +86,22 @@ const userSlice = createSlice({
                     payload.error.message,
                     payload.error.code,
                 ),
-            ),
+            )
+            .addCase(signOut.pending, state => {
+                state.status = 'loading';
+            })
+            .addCase(signOut.fulfilled, state => {
+                state.loggedIn = false;
+                state.docData = null;
+                state.status = 'idle';
+            })
+            .addCase(signOut.rejected, (_, payload) => {
+                console.warn(
+                    'error signing out',
+                    payload.error.message,
+                    payload.error.code,
+                );
+            }),
 });
 
 export const { logout } = userSlice.actions;

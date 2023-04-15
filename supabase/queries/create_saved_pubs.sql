@@ -25,7 +25,13 @@ or replace function saved_pubs(dist_long float, dist_lat float) returns table(
     photos text [],
     opening_hours jsonb,
     location text,
-    dist_meters float
+    dist_meters float,
+    review_vibe float,
+    review_beer float,
+    review_music float,
+    review_service float,
+    review_location float,
+    review_food float
 ) language sql as $ $
 select
     p.id,
@@ -54,12 +60,19 @@ select
     st_distance(
         p.location,
         st_point(dist_long, dist_lat) :: geography
-    ) as dist_meters
+    ) as dist_meters,
+    avg(r.vibe) as review_vibe,
+    avg(r.beer) as review_beer,
+    avg(r.music) as review_music,
+    avg(r.service) as review_service,
+    avg(r.location) as review_location,
+    avg(r.food) as review_food
 from
     public.pubs p
     join public.saves s on p.id = s.pub_id
     left join pub_photos pp on pp.pub_id = p.id
     join opening_hours oh on p.id = oh.pub_id
+    left join reviews r on p.id = r.pub_id
 where
     s.user_id = auth.uid()
 group by

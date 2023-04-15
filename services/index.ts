@@ -2,6 +2,9 @@ import { OpeningHoursType, PubFilters } from '@/types';
 import { PostgrestFilterBuilder } from '@supabase/postgrest-js';
 import * as turf from '@turf/turf';
 import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+dayjs.extend(relativeTime);
 
 export const convertPointStringToObject = (
     input: string,
@@ -229,4 +232,19 @@ export const applyFilters = (
     }
 
     return query;
+};
+
+export const fromNowString = (dateString: string) => {
+    return dayjs(dateString).fromNow();
+};
+
+export const averageReviews = (
+    beer: number,
+    food: number,
+    location: number,
+    music: number,
+    service: number,
+    vibe: number,
+) => {
+    return (beer + food + location + music + service + vibe) / 6;
 };
