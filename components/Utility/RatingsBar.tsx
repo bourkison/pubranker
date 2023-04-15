@@ -1,5 +1,10 @@
-import React, { useMemo } from 'react';
-import { StyleSheet, View } from 'react-native';
+import React, { useEffect, useMemo } from 'react';
+import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import Animated, {
+    useAnimatedStyle,
+    useSharedValue,
+    withTiming,
+} from 'react-native-reanimated';
 
 type RatingsBarProps = {
     height?: number;
@@ -30,8 +35,20 @@ export default function RatingsBar({
         return `${res}%`;
     }, [current, max]);
 
+    const { width } = useWindowDimensions();
+
+    const translateX = useSharedValue(-width);
+
+    const rStyle = useAnimatedStyle(() => ({
+        transform: [{ translateX: translateX.value }],
+    }));
+
     return (
         <View
+            onLayout={({ nativeEvent: { layout } }) => {
+                translateX.value = -layout.width;
+                translateX.value = withTiming(0, { duration: 1000 });
+            }}
             style={[
                 styles.backgroundBar,
                 {
@@ -40,7 +57,7 @@ export default function RatingsBar({
                     backgroundColor: backgroundColor,
                 },
             ]}>
-            <View
+            <Animated.View
                 style={[
                     styles.progressBar,
                     {
@@ -49,6 +66,7 @@ export default function RatingsBar({
                         width: progress,
                         backgroundColor: progressColor,
                     },
+                    rStyle,
                 ]}
             />
         </View>
@@ -58,6 +76,7 @@ export default function RatingsBar({
 const styles = StyleSheet.create({
     backgroundBar: {
         width: '100%',
+        overflow: 'hidden',
     },
     progressBar: {
         position: 'absolute',
