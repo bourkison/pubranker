@@ -20,7 +20,6 @@ export default function DiscoverPub({ pub, onSelect }: DiscoverPubProps) {
             let urls: string[] = [];
 
             pub.photos.forEach(photo => {
-                console.log('PHOTO:', photo);
                 const url = supabase.storage.from('pubs').getPublicUrl(photo);
                 urls.push(url.data.publicUrl);
             });

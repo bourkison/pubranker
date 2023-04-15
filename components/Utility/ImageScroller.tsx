@@ -4,9 +4,17 @@ import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 
 type ImageScrollerImages = {
     images: string[];
+    height?: number;
+    width?: number;
+    margin?: number;
 };
 
-export default function ImageScroller({ images }: ImageScrollerImages) {
+export default function ImageScroller({
+    images,
+    height = 158,
+    width = 158,
+    margin = 5,
+}: ImageScrollerImages) {
     const comp =
         Platform.OS === 'ios' ? (
             <FlatList
@@ -15,7 +23,13 @@ export default function ImageScroller({ images }: ImageScrollerImages) {
                 showsHorizontalScrollIndicator={false}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item }) => (
-                    <Image source={{ uri: item }} style={styles.image} />
+                    <Image
+                        source={{ uri: item }}
+                        style={[
+                            styles.image,
+                            { height, width, marginHorizontal: margin },
+                        ]}
+                    />
                 )}
             />
         ) : (
@@ -25,7 +39,13 @@ export default function ImageScroller({ images }: ImageScrollerImages) {
                 showsHorizontalScrollIndicator={false}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item }) => (
-                    <Image source={{ uri: item }} style={styles.image} />
+                    <Image
+                        source={{ uri: item }}
+                        style={[
+                            styles.image,
+                            { height, width, marginHorizontal: margin },
+                        ]}
+                    />
                 )}
             />
         );
@@ -34,5 +54,5 @@ export default function ImageScroller({ images }: ImageScrollerImages) {
 }
 
 const styles = StyleSheet.create({
-    image: { height: 158, width: 158, marginRight: 5 },
+    image: { borderRadius: 3 },
 });

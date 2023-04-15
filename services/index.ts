@@ -248,3 +248,70 @@ export const averageReviews = (
 ) => {
     return (beer + food + location + music + service + vibe) / 6;
 };
+
+export const checkIfOpen = (
+    openingHours: OpeningHoursType[],
+): { isOpen: boolean; nextHours: dayjs.Dayjs } => {
+    let nextOpeningHours: dayjs.Dayjs | null = null;
+
+    for (let i = 0; i < openingHours.length; i++) {
+        const oh = openingHours[i];
+
+        // As some opening hours are '100' for 1am, convert to '0100'
+        let openInput = '';
+        let closeInput = '';
+
+        for (let j = 0; j < 4 - oh.open_hour.length; j++) {
+            openInput += '0';
+        }
+
+        for (let j = 0; j < 4 - oh.close_hour.length; j++) {
+            closeInput += '0';
+        }
+
+        openInput += oh.open_hour;
+        closeInput += oh.close_hour;
+
+        let open = dayjs()
+            .day(oh.open_day)
+            .hour(parseInt(openInput.substring(0, 2), 10))
+            .minute(parseInt(openInput.substring(2), 10));
+
+        let close = dayjs()
+            .day(oh.close_day)
+            .hour(parseInt(closeInput.substring(0, 2), 10))
+            .minute(parseInt(closeInput.substring(2), 10));
+
+        // If today is saturday or sunday, need to manipulate dates to allow for more intuitive checking
+        if (dayjs().day() === 6 && open.day() === 6 && close.day() === 0) {
+            close = close.add(1, 'w');
+        } else if (
+            dayjs().day() === 0 &&
+            open.day() === 6 &&
+            close.day() === 0
+        ) {
+            open = open.subtract(1, 'w');
+        }
+
+        if (dayjs().isAfter(open) && dayjs().isBefore(close)) {
+            return { isOpen: true, nextHours: close };
+        }
+
+        // Check if we're closer than ever to an opening time (so we can display to users at the end when it next opens).
+        // If today's Saturday, we'll need to push everything ahead by a week for accurate checking.
+        if (dayjs().day() === 6) {
+            open = open.add(1, 'w');
+        }
+
+        if (
+            !nextOpeningHours ||
+            open.unix() - dayjs().unix() <
+                nextOpeningHours.unix() - dayjs().unix()
+        ) {
+            nextOpeningHours = open;
+        }
+    }
+
+    // @ts-ignore
+    return { isOpen: false, nextHours: nextOpeningHours };
+};

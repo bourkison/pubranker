@@ -28,11 +28,19 @@ export default function BottomSheetNavigator({}) {
             screenOptions={{
                 headerShown: false,
                 cardStyle: { backgroundColor: 'white' },
+                gestureEnabled: true,
+                gestureResponseDistance: 100,
             }}>
             <Stack.Screen name="Discover" component={Discover} />
             <Stack.Screen name="PubHome" component={PubHome} />
             <Stack.Screen name="CreateReview" component={CreateReview} />
-            <Stack.Screen name="ViewReview" component={ViewReview} />
+            <Stack.Screen
+                name="ViewReview"
+                component={ViewReview}
+                options={{
+                    headerShown: true,
+                }}
+            />
             <Stack.Screen name="EditReview" component={EditReview} />
         </Stack.Navigator>
     );

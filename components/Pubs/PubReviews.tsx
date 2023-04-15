@@ -33,6 +33,7 @@ export default function PubReviews({ pub }: PubReviewsProps) {
                 .select()
                 .eq('pub_id', pub.id)
                 .neq('content', null)
+                .neq('content', '')
                 .order('created_at', { ascending: false });
 
             if (error) {
@@ -75,8 +76,10 @@ export default function PubReviews({ pub }: PubReviewsProps) {
             setIsLoading(false);
         };
 
-        fetchReviews();
-    }, [pub, dispatch]);
+        if (!reviews.length) {
+            fetchReviews();
+        }
+    }, [pub, reviews, dispatch]);
 
     return (
         <View>

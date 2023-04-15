@@ -31,7 +31,9 @@ or replace function saved_pubs(dist_long float, dist_lat float) returns table(
     review_music float,
     review_service float,
     review_location float,
-    review_food float
+    review_food float,
+    num_reviews int,
+    saved boolean
 ) language sql as $ $
 select
     p.id,
@@ -66,7 +68,9 @@ select
     avg(r.music) as review_music,
     avg(r.service) as review_service,
     avg(r.location) as review_location,
-    avg(r.food) as review_food
+    avg(r.food) as review_food,
+    count(distinct r) as num_reviews,
+    true as saved
 from
     public.pubs p
     join public.saves s on p.id = s.pub_id

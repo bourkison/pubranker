@@ -1,5 +1,5 @@
 import { distanceString, parseOpeningHours } from '@/services';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Octicons, Ionicons } from '@expo/vector-icons';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -12,6 +12,9 @@ import { BottomSheetStackParamList } from '@/nav/BottomSheetNavigator';
 import { StackScreenProps } from '@react-navigation/stack';
 import PubReviews from '@/components/Pubs/PubReviews';
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import ImageScroller from '@/components/Utility/ImageScroller';
+import { supabase } from '@/services/supabase';
+import TopBarPub from '@/components/Pubs/TopBarPub';
 
 export default function PubHome({
     route,
@@ -19,6 +22,21 @@ export default function PubHome({
 }: StackScreenProps<BottomSheetStackParamList, 'PubHome'>) {
     const dispatch = useAppDispatch();
     const reference = useAppSelector(state => state.pub.selectedPubReference);
+
+    const [imageUrls, setImageUrls] = useState<string[] | null>(null);
+
+    useEffect(() => {
+        if (imageUrls === null) {
+            let urls: string[] = [];
+
+            route.params.pub.photos.forEach(photo => {
+                const url = supabase.storage.from('pubs').getPublicUrl(photo);
+                urls.push(url.data.publicUrl);
+            });
+
+            setImageUrls(urls);
+        }
+    }, [route, imageUrls]);
 
     const save = async () => {
         navigation.setParams({
@@ -73,9 +91,21 @@ export default function PubHome({
                     </TouchableOpacity>
                 </View>
             </View>
+
             <View style={styles.contentContainer}>
                 <View style={styles.descriptionContainer}>
                     <Text>{route.params.pub.google_overview}</Text>
+                </View>
+                <View style={{ marginVertical: 5 }}>
+                    <TopBarPub pub={route.params.pub} />
+                </View>
+                <View style={{ marginTop: 10 }}>
+                    <ImageScroller
+                        images={imageUrls || []}
+                        height={220}
+                        width={220}
+                        margin={5}
+                    />
                 </View>
                 <View>
                     <View style={styles.openingHoursContainer}>

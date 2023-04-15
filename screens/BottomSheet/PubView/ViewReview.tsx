@@ -8,6 +8,7 @@ import { supabase } from '@/services/supabase';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useAppDispatch } from '@/store/hooks';
 import { deleteReview as deleteReviewStore } from '@/store/slices/pub';
+import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 
 export default function ViewReview({
     route,
@@ -30,7 +31,12 @@ export default function ViewReview({
     };
 
     return (
-        <View>
+        <BottomSheetScrollView>
+            {/* <View style={{ flexDirection: 'row' }}>
+                <View>
+                    <Ionicons name="chevron-back" />
+                </View>
+            </View> */}
             <OverallRatings
                 beer={route.params.review.review.beer}
                 location={route.params.review.review.location}
@@ -63,7 +69,7 @@ export default function ViewReview({
                     </TouchableOpacity>
                 </View>
             </View>
-        </View>
+        </BottomSheetScrollView>
     );
 }
 

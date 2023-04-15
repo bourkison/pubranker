@@ -313,6 +313,7 @@ export interface Database {
                     review_service: number;
                     review_location: number;
                     review_food: number;
+                    num_reviews: number;
                 }[];
             };
             pubs_in_polygon: {
@@ -352,6 +353,7 @@ export interface Database {
                     review_service: number;
                     review_location: number;
                     review_food: number;
+                    num_reviews: number;
                 }[];
             };
             saved_pubs: {
@@ -390,6 +392,8 @@ export interface Database {
                     review_service: number;
                     review_location: number;
                     review_food: number;
+                    num_reviews: number;
+                    saved: boolean;
                 }[];
             };
         };
