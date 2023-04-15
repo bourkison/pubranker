@@ -15,31 +15,35 @@ import { BottomSheetStackParamList } from '@/nav/BottomSheetNavigator';
 import { StackScreenProps } from '@react-navigation/stack';
 import { supabase } from '@/services/supabase';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { addReview } from '@/store/slices/pub';
+import { editReview } from '@/store/slices/pub';
 
 export default function CreateReview({
     route,
     navigation,
-}: StackScreenProps<BottomSheetStackParamList, 'CreateReview'>) {
-    const [vibe, setVibe] = useState(1);
-    const [beer, setBeer] = useState(1);
-    const [music, setMusic] = useState(1);
-    const [service, setService] = useState(1);
-    const [location, setLocation] = useState(1);
-    const [food, setFood] = useState(1);
-    const [content, setContent] = useState('');
+}: StackScreenProps<BottomSheetStackParamList, 'EditReview'>) {
+    const [vibe, setVibe] = useState(route.params.review.review.vibe);
+    const [beer, setBeer] = useState(route.params.review.review.beer);
+    const [music, setMusic] = useState(route.params.review.review.music);
+    const [service, setService] = useState(route.params.review.review.service);
+    const [location, setLocation] = useState(
+        route.params.review.review.location,
+    );
+    const [food, setFood] = useState(route.params.review.review.food);
+    const [content, setContent] = useState(
+        route.params.review.review.content || '',
+    );
 
     const [isLoading, setIsLoading] = useState(false);
 
     const dispatch = useAppDispatch();
     const user = useAppSelector(state => state.user.docData);
 
-    const postReview = async () => {
+    const updateReview = async () => {
         setIsLoading(true);
 
         const { data, error } = await supabase
             .from('reviews')
-            .insert({
+            .update({
                 content,
                 beer,
                 vibe,
@@ -49,8 +53,8 @@ export default function CreateReview({
                 food,
                 pub_id: route.params.pub.id,
             })
+            .eq('id', route.params.review.review.id)
             .select()
-            .limit(1)
             .single();
 
         setIsLoading(false);
@@ -61,8 +65,11 @@ export default function CreateReview({
             return;
         }
 
-        dispatch(addReview({ review: data, createdBy: user }));
-        navigation.goBack();
+        dispatch(editReview({ review: data, createdBy: user }));
+        navigation.navigate('ViewReview', {
+            pub: route.params.pub,
+            review: { review: data, createdBy: user },
+        });
     };
 
     return (
@@ -156,6 +163,7 @@ export default function CreateReview({
                             textAlignVertical="top"
                             style={styles.contentInput}
                             onChangeText={setContent}
+                            value={content}
                         />
                     </View>
                 </View>
@@ -170,11 +178,11 @@ export default function CreateReview({
 
                 <TouchableOpacity
                     style={styles.postButton}
-                    onPress={postReview}>
+                    onPress={updateReview}>
                     {isLoading ? (
                         <ActivityIndicator />
                     ) : (
-                        <Text style={styles.postButtonText}>Post</Text>
+                        <Text style={styles.postButtonText}>Update</Text>
                     )}
                 </TouchableOpacity>
             </View>

@@ -1,31 +1,33 @@
 import { supabase } from '@/services/supabase';
 import { Database } from '@/types/schema';
 import React, { useEffect, useState } from 'react';
-import { Ionicons } from '@expo/vector-icons';
 
-import { StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import Review from '@/components/Pubs/Review';
-import { DiscoveredPub, NearbyPub } from '@/types';
-import { averageReviews, roundToNearest } from '@/services';
-import RatingsBar from '../Utility/RatingsBar';
-import RatingsCategory from './RatingsCategory';
+import { SelectedPub } from '@/nav/BottomSheetNavigator';
+import OverallRatings from '@/components/Ratings/OverallRatings';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { setReviews } from '@/store/slices/pub';
 
 type Review = {
     review: Database['public']['Tables']['reviews']['Row'];
     createdBy: Database['public']['Tables']['users_public']['Row'];
 };
 
-type SelectedPub = DiscoveredPub | NearbyPub;
-
 type PubReviewsProps = {
     pub: SelectedPub;
 };
 
 export default function PubReviews({ pub }: PubReviewsProps) {
-    const [reviews, setReviews] = useState<Review[]>([]);
+    const reviews = useAppSelector(state => state.pub.selectedPubReviews);
+    const dispatch = useAppDispatch();
+
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         const fetchReviews = async () => {
+            setIsLoading(true);
+
             const { data, error } = await supabase
                 .from('reviews')
                 .select()
@@ -69,131 +71,40 @@ export default function PubReviews({ pub }: PubReviewsProps) {
                 }
             });
 
-            setReviews(res);
+            dispatch(setReviews(res));
+            setIsLoading(false);
         };
 
         fetchReviews();
-    }, [pub]);
+    }, [pub, dispatch]);
 
     return (
         <View>
-            <View style={styles.headerContainer}>
+            <OverallRatings
+                beer={pub.review_beer}
+                food={pub.review_food}
+                location={pub.review_location}
+                music={pub.review_music}
+                service={pub.review_service}
+                vibe={pub.review_vibe}
+            />
+            {!isLoading ? (
                 <View>
-                    <Text style={styles.headerText}>Overall</Text>
+                    {reviews.map(review => (
+                        <Review
+                            review={review}
+                            key={review.review.id}
+                            pub={pub}
+                        />
+                    ))}
                 </View>
-                <View style={styles.overallRatingsContainer}>
-                    <Ionicons name="star" size={12} color="#FFD700" />
-                    <Text style={styles.headerText}>
-                        {roundToNearest(
-                            averageReviews(
-                                pub.review_beer,
-                                pub.review_food,
-                                pub.review_location,
-                                pub.review_music,
-                                pub.review_service,
-                                pub.review_vibe,
-                            ),
-                            0.1,
-                        ).toFixed(1)}
-                    </Text>
-                </View>
-            </View>
-            <View style={styles.overallBarContainer}>
-                <RatingsBar
-                    current={
-                        pub.review_beer +
-                        pub.review_food +
-                        pub.review_location +
-                        pub.review_music +
-                        pub.review_service +
-                        pub.review_vibe
-                    }
-                    max={30}
-                />
-            </View>
-            <View>
-                <View style={styles.ratingsRow}>
-                    <View style={[styles.ratingsColumn, styles.rightBorder]}>
-                        <RatingsCategory
-                            rating={pub.review_beer}
-                            title="Beer"
-                        />
-                    </View>
-                    <View style={[styles.ratingsColumn, styles.rightBorder]}>
-                        <RatingsCategory
-                            rating={pub.review_food}
-                            title="Food"
-                        />
-                    </View>
-                    <View style={styles.ratingsColumn}>
-                        <RatingsCategory
-                            rating={pub.review_location}
-                            title="Location"
-                        />
-                    </View>
-                </View>
-                <View style={styles.ratingsRow}>
-                    <View style={[styles.ratingsColumn, styles.rightBorder]}>
-                        <RatingsCategory
-                            rating={pub.review_music}
-                            title="Music"
-                        />
-                    </View>
-                    <View style={[styles.ratingsColumn, styles.rightBorder]}>
-                        <RatingsCategory
-                            rating={pub.review_service}
-                            title="Service"
-                        />
-                    </View>
-                    <View style={styles.ratingsColumn}>
-                        <RatingsCategory
-                            rating={pub.review_vibe}
-                            title="Vibe"
-                        />
-                    </View>
-                </View>
-            </View>
-            <View>
-                {reviews.map(review => (
-                    <Review review={review} key={review.review.id} />
-                ))}
-            </View>
+            ) : (
+                <ActivityIndicator style={styles.activityIndicator} />
+            )}
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    ratingsRow: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderColor: '#E5E7EB',
-        borderBottomWidth: 1,
-    },
-    ratingsColumn: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingVertical: 10,
-        flex: 1,
-    },
-    rightBorder: {
-        borderRightWidth: 1,
-        borderRightColor: '#E5E7EB',
-    },
-    headerContainer: {
-        paddingHorizontal: 29,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-    },
-    headerText: {
-        fontSize: 16,
-        fontWeight: '500',
-    },
-    overallRatingsContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    overallBarContainer: {
-        paddingHorizontal: 25,
-    },
+    activityIndicator: { marginTop: 5 },
 });

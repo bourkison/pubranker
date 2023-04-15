@@ -1,3 +1,5 @@
+import { TReview } from '@/components/Pubs/Review';
+import { SelectedPub } from '@/nav/BottomSheetNavigator';
 import { DiscoveredPub, NearbyPub } from '@/types';
 import {
     createEntityAdapter,
@@ -12,7 +14,8 @@ type SelectedPubReference = 'map' | 'discover';
 
 const initialState = pubAdapter.getInitialState({
     selectedPubReference: null as SelectedPubReference | null,
-    selectedPub: null as DiscoveredPub | NearbyPub | null,
+    selectedPub: null as SelectedPub | null,
+    selectedPubReviews: [] as TReview[],
 });
 
 const pubSlice = createSlice({
@@ -28,10 +31,32 @@ const pubSlice = createSlice({
         ) {
             state.selectedPub = action.payload.pub;
             state.selectedPubReference = action.payload.reference;
+            state.selectedPubReviews = [];
         },
         deselectPub(state) {
             state.selectedPub = null;
             state.selectedPubReference = null;
+            state.selectedPubReviews = [];
+        },
+        setReviews(state, action: PayloadAction<TReview[]>) {
+            state.selectedPubReviews = action.payload;
+        },
+        addReview(state, action: PayloadAction<TReview>) {
+            state.selectedPubReviews.unshift(action.payload);
+        },
+        deleteReview(state, action: PayloadAction<number>) {
+            state.selectedPubReviews = state.selectedPubReviews.filter(
+                r => r.review.id !== action.payload,
+            );
+        },
+        editReview(state, action: PayloadAction<TReview>) {
+            const index = state.selectedPubReviews.findIndex(
+                r => r.review.id === action.payload.review.id,
+            );
+
+            if (index > -1) {
+                state.selectedPubReviews[index] = action.payload;
+            }
         },
         toggleSave(state) {
             if (state.selectedPub) {
@@ -41,5 +66,13 @@ const pubSlice = createSlice({
     },
 });
 
-export const { setPub, deselectPub, toggleSave } = pubSlice.actions;
+export const {
+    setPub,
+    deselectPub,
+    toggleSave,
+    setReviews,
+    addReview,
+    editReview,
+    deleteReview,
+} = pubSlice.actions;
 export default pubSlice.reducer;

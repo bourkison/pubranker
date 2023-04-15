@@ -3,17 +3,28 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Database } from '@/types/schema';
 import { Ionicons } from '@expo/vector-icons';
 import { averageReviews, fromNowString, roundToNearest } from '@/services';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { useNavigation } from '@react-navigation/native';
+import {
+    BottomSheetStackParamList,
+    SelectedPub,
+} from '@/nav/BottomSheetNavigator';
+import { StackNavigationProp } from '@react-navigation/stack';
 
-type TReview = {
+export type TReview = {
     review: Database['public']['Tables']['reviews']['Row'];
     createdBy: Database['public']['Tables']['users_public']['Row'];
 };
 
 type ReviewProps = {
     review: TReview;
+    pub: SelectedPub;
 };
 
-export default function Review({ review }: ReviewProps) {
+export default function Review({ pub, review }: ReviewProps) {
+    const navigation =
+        useNavigation<StackNavigationProp<BottomSheetStackParamList>>();
+
     const averageReview = useMemo(() => {
         const r = averageReviews(
             review.review.beer,
@@ -27,7 +38,9 @@ export default function Review({ review }: ReviewProps) {
     }, [review]);
 
     return (
-        <View style={styles.container}>
+        <TouchableOpacity
+            style={styles.container}
+            onPress={() => navigation.navigate('ViewReview', { pub, review })}>
             <View style={styles.contentContainer}>
                 <View style={styles.averageReviewContainer}>
                     <Ionicons name="star" size={12} color="#FFD700" />
@@ -43,7 +56,7 @@ export default function Review({ review }: ReviewProps) {
                     {fromNowString(review.review.created_at)}
                 </Text>
             </View>
-        </View>
+        </TouchableOpacity>
     );
 }
 
