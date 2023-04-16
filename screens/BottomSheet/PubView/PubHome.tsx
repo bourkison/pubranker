@@ -1,4 +1,4 @@
-import { parseLocation, parseOpeningHours } from '@/services';
+import { parseLocation } from '@/services';
 import React, { useMemo, useRef, useState } from 'react';
 import {
     View,
@@ -137,15 +137,7 @@ export default function PubHome({
                         margin={5}
                     />
                 </View>
-                {/* <View>
-                    <View style={styles.openingHoursContainer}>
-                        <OpeningHours
-                            openingHours={parseOpeningHours(
-                                route.params.pub.opening_hours,
-                            )}
-                        />
-                    </View>
-                </View> */}
+
                 <View style={styles.pubFeaturesContainer}>
                     <PubFeatures pub={route.params.pub} />
                 </View>
@@ -223,7 +215,6 @@ const styles = StyleSheet.create({
     imageScrollerContainer: { marginTop: 10 },
     pubFeaturesContainer: {
         marginTop: 20,
-        paddingHorizontal: 15,
     },
     reviewsContainer: {
         marginTop: 25,
