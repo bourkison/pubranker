@@ -1,4 +1,5 @@
 import { OpeningHoursType, PubFilters } from '@/types';
+import { Database } from '@/types/schema';
 import { PostgrestFilterBuilder } from '@supabase/postgrest-js';
 import * as turf from '@turf/turf';
 import dayjs from 'dayjs';
@@ -161,7 +162,11 @@ export const distanceString = (input: number): string => {
 };
 
 export const applyFilters = (
-    query: PostgrestFilterBuilder<any, any, any>,
+    query: PostgrestFilterBuilder<
+        Database['public'],
+        Database['public']['Functions']['nearby_pubs']['Returns'][number],
+        any
+    >,
     filters: PubFilters,
     searchText: string,
 ): PostgrestFilterBuilder<any, any, any> => {
@@ -178,19 +183,11 @@ export const applyFilters = (
     }
 
     if (filters.darts !== 'unset') {
-        if (filters.darts === true) {
-            query = query.gt('dart_board_amount', 0);
-        } else {
-            query = query.eq('dart_board_amount', 0);
-        }
+        query = query.eq('dart_board', filters.darts);
     }
 
     if (filters.pool !== 'unset') {
-        if (filters.pool === true) {
-            query = query.gt('pool_table_amount', 0);
-        } else {
-            query = query.eq('pool_table_amount', 0);
-        }
+        query = query.eq('pool_table', filters.pool);
     }
 
     if (filters.sundayRoast !== 'unset') {
@@ -216,7 +213,7 @@ export const applyFilters = (
     }
 
     if (filters.freeWifi !== 'unset') {
-        query = query.eq('live_music', filters.freeWifi);
+        query = query.eq('free_wifi', filters.freeWifi);
     }
 
     if (filters.roof !== 'unset') {
@@ -224,11 +221,7 @@ export const applyFilters = (
     }
 
     if (filters.foosball !== 'unset') {
-        if (filters.foosball === true) {
-            query = query.gt('foosball_table_amount', 0);
-        } else {
-            query = query.eq('foosball_table_amount', 0);
-        }
+        query = query.eq('foosball_table', filters.foosball);
     }
 
     return query;
@@ -303,10 +296,14 @@ export const checkIfOpen = (
             open = open.add(1, 'w');
         }
 
+        // If we haven't set nextOpeningHours
+        // OR the time between nextOpeningHours and now is sooner than currently saved
+        // AND this time difference is not negative (i.e. in the past)
         if (
             !nextOpeningHours ||
-            open.unix() - dayjs().unix() <
-                nextOpeningHours.unix() - dayjs().unix()
+            (open.unix() - dayjs().unix() <
+                nextOpeningHours.unix() - dayjs().unix() &&
+                open.unix() - dayjs().unix() > 0)
         ) {
             nextOpeningHours = open;
         }

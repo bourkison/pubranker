@@ -1,5 +1,6 @@
 import * as turf from '@turf/turf';
 import { BoundingBox } from '@/types';
+import * as boroughs from '@/json/boroughs.json';
 
 export const convertBoxToCoordinates = (input: BoundingBox): number[][] => [
     [input.minLong, input.maxLat],
@@ -61,4 +62,19 @@ export const joinPolygons = (
     }
 
     return response;
+};
+
+export const getBorough = (input: turf.Point) => {
+    for (let i = 0; i < boroughs.features.length; i++) {
+        const borough = boroughs.features[i];
+        const boroughPoly = turf.polygon(
+            boroughs.features[i].geometry.coordinates,
+        );
+
+        if (turf.booleanPointInPolygon(input, boroughPoly)) {
+            return borough.properties.name;
+        }
+    }
+
+    return 'London';
 };

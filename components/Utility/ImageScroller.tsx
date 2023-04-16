@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Ref } from 'react';
 import { Image, StyleSheet, FlatList, Platform } from 'react-native';
 import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 
@@ -7,6 +7,7 @@ type ImageScrollerImages = {
     height?: number;
     width?: number;
     margin?: number;
+    imageFlatListRef?: Ref<FlatList>;
 };
 
 export default function ImageScroller({
@@ -14,10 +15,12 @@ export default function ImageScroller({
     height = 158,
     width = 158,
     margin = 5,
+    imageFlatListRef,
 }: ImageScrollerImages) {
     const comp =
         Platform.OS === 'ios' ? (
             <FlatList
+                ref={imageFlatListRef}
                 horizontal={true}
                 data={images}
                 showsHorizontalScrollIndicator={false}
@@ -34,6 +37,8 @@ export default function ImageScroller({
             />
         ) : (
             <BottomSheetFlatList
+                /* @ts-ignore */
+                ref={imageFlatListRef}
                 horizontal={true}
                 data={images}
                 showsHorizontalScrollIndicator={false}

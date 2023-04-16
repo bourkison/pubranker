@@ -1,12 +1,17 @@
-import { distanceString, parseOpeningHours } from '@/services';
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { parseLocation, parseOpeningHours } from '@/services';
+import React, { useMemo, useRef, useState } from 'react';
+import {
+    View,
+    Text,
+    StyleSheet,
+    TouchableOpacity,
+    FlatList,
+} from 'react-native';
 import { Octicons, Ionicons } from '@expo/vector-icons';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { deselectPub, toggleSave as toggleMapSave } from '@/store/slices/pub';
 import { toggleSave } from '@/store/slices/saved';
 import { toggleSave as toggleDiscoverSave } from '@/store/slices/discover';
-import OpeningHours from '@/components/Pubs/OpeningHours';
 
 import { BottomSheetStackParamList } from '@/nav/BottomSheetNavigator';
 import { StackScreenProps } from '@react-navigation/stack';
@@ -15,6 +20,9 @@ import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import ImageScroller from '@/components/Utility/ImageScroller';
 import { supabase } from '@/services/supabase';
 import TopBarPub from '@/components/Pubs/TopBarPub';
+import { useFocusEffect } from '@react-navigation/native';
+import { getBorough } from '@/services/geo';
+import PubFeatures from '@/components/Pubs/PubFeatures';
 
 export default function PubHome({
     route,
@@ -23,20 +31,16 @@ export default function PubHome({
     const dispatch = useAppDispatch();
     const reference = useAppSelector(state => state.pub.selectedPubReference);
 
-    const [imageUrls, setImageUrls] = useState<string[] | null>(null);
+    const [activePubId, setActivePubId] = useState(0);
+    const [imageUrls, setImageUrls] = useState<string[]>([]);
 
-    useEffect(() => {
-        if (imageUrls === null) {
-            let urls: string[] = [];
+    const imageFlatListRef = useRef<FlatList>(null);
 
-            route.params.pub.photos.forEach(photo => {
-                const url = supabase.storage.from('pubs').getPublicUrl(photo);
-                urls.push(url.data.publicUrl);
-            });
-
-            setImageUrls(urls);
-        }
-    }, [route, imageUrls]);
+    const displayAddress = useMemo(() => {
+        return `${route.params.pub.address.split(', ')[0]}, ${getBorough(
+            parseLocation(route.params.pub.location),
+        )}`;
+    }, [route.params.pub]);
 
     const save = async () => {
         navigation.setParams({
@@ -59,14 +63,39 @@ export default function PubHome({
         }
     };
 
+    const loadImages = async () => {
+        let urls: string[] = [];
+        setImageUrls([]);
+
+        route.params.pub.photos.forEach(photo => {
+            const url = supabase.storage.from('pubs').getPublicUrl(photo);
+            urls.push(url.data.publicUrl);
+        });
+
+        setImageUrls(urls);
+    };
+
+    useFocusEffect(() => {
+        if (activePubId !== route.params.pub.id) {
+            setActivePubId(route.params.pub.id);
+
+            if (imageFlatListRef?.current) {
+                imageFlatListRef.current.scrollToOffset({
+                    animated: false,
+                    offset: 0,
+                });
+            }
+
+            loadImages();
+        }
+    });
+
     return (
         <BottomSheetScrollView>
             <View style={styles.headerContainer}>
                 <View style={styles.titleSubTitleContainer}>
                     <Text style={styles.title}>{route.params.pub.name}</Text>
-                    <Text style={styles.subtitle}>
-                        {distanceString(route.params.pub.dist_meters)}
-                    </Text>
+                    <Text style={styles.subtitle}>{displayAddress}</Text>
                 </View>
                 <View style={styles.buttonsContainer}>
                     <TouchableOpacity style={styles.likeButton} onPress={save}>
@@ -96,18 +125,19 @@ export default function PubHome({
                 <View style={styles.descriptionContainer}>
                     <Text>{route.params.pub.google_overview}</Text>
                 </View>
-                <View style={{ marginVertical: 5 }}>
+                <View style={styles.topBarContainer}>
                     <TopBarPub pub={route.params.pub} />
                 </View>
-                <View style={{ marginTop: 10 }}>
+                <View style={styles.imageScrollerContainer}>
                     <ImageScroller
+                        imageFlatListRef={imageFlatListRef}
                         images={imageUrls || []}
                         height={220}
                         width={220}
                         margin={5}
                     />
                 </View>
-                <View>
+                {/* <View>
                     <View style={styles.openingHoursContainer}>
                         <OpeningHours
                             openingHours={parseOpeningHours(
@@ -115,6 +145,9 @@ export default function PubHome({
                             )}
                         />
                     </View>
+                </View> */}
+                <View style={styles.pubFeaturesContainer}>
+                    <PubFeatures pub={route.params.pub} />
                 </View>
 
                 <View style={styles.reviewsContainer}>
@@ -156,7 +189,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     subtitle: {
-        fontSize: 16,
+        fontSize: 12,
         color: '#A3A3A3',
     },
     buttonsContainer: {
@@ -186,9 +219,11 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         marginTop: 10,
     },
-    openingHoursContainer: {
-        maxWidth: 256,
-        marginTop: 25,
+    topBarContainer: { marginVertical: 5 },
+    imageScrollerContainer: { marginTop: 10 },
+    pubFeaturesContainer: {
+        marginTop: 20,
+        paddingHorizontal: 15,
     },
     reviewsContainer: {
         marginTop: 25,

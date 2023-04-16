@@ -1,6 +1,9 @@
-import { SelectedPub } from '@/nav/BottomSheetNavigator';
+import {
+    BottomSheetStackParamList,
+    SelectedPub,
+} from '@/nav/BottomSheetNavigator';
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import {
     averageReviews,
@@ -10,6 +13,8 @@ import {
     roundToNearest,
 } from '@/services';
 import { timeString } from '@/services';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 type TopBarPubProps = {
     pub: SelectedPub;
@@ -18,6 +23,9 @@ type TopBarPubProps = {
 export default function TopBarPub({ pub }: TopBarPubProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [nextOpenCloseTime, setNextOpenCloseTime] = useState('');
+
+    const navigation =
+        useNavigation<StackNavigationProp<BottomSheetStackParamList>>();
 
     useEffect(() => {
         const openingHours = parseOpeningHours(pub.opening_hours);
@@ -59,7 +67,9 @@ export default function TopBarPub({ pub }: TopBarPubProps) {
                     </Text>
                 </View>
             </View>
-            <View style={styles.column}>
+            <TouchableOpacity
+                style={styles.column}
+                onPress={() => navigation.navigate('OpeningHours', { pub })}>
                 {isOpen ? (
                     <Text style={styles.openText}>Open</Text>
                 ) : (
@@ -68,7 +78,7 @@ export default function TopBarPub({ pub }: TopBarPubProps) {
                 <Text style={styles.nextOpenCloseTime}>
                     {nextOpenCloseTime}
                 </Text>
-            </View>
+            </TouchableOpacity>
             <View style={styles.column}>
                 <View style={styles.directionsColumnContainer}>
                     <FontAwesome name="map-marker" size={18} />

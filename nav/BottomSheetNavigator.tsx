@@ -9,6 +9,7 @@ import CreateReview from '@/screens/BottomSheet/PubView/CreateReview';
 import ViewReview from '@/screens/BottomSheet/PubView/ViewReview';
 import EditReview from '@/screens/BottomSheet/PubView/EditReview';
 import { TReview } from '@/components/Pubs/Review';
+import OpeningHours from '@/screens/BottomSheet/PubView/OpeningHours';
 
 export type SelectedPub = DiscoveredPub | NearbyPub;
 
@@ -18,6 +19,7 @@ export type BottomSheetStackParamList = {
     CreateReview: { pub: SelectedPub };
     ViewReview: { pub: SelectedPub; review: TReview };
     EditReview: { pub: SelectedPub; review: TReview };
+    OpeningHours: { pub: SelectedPub };
 };
 
 const Stack = createStackNavigator<BottomSheetStackParamList>();
@@ -42,6 +44,7 @@ export default function BottomSheetNavigator({}) {
                 }}
             />
             <Stack.Screen name="EditReview" component={EditReview} />
+            <Stack.Screen name="OpeningHours" component={OpeningHours} />
         </Stack.Navigator>
     );
 }

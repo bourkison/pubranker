@@ -3,11 +3,13 @@ import { OpeningHoursType } from '@/types';
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-type OpeningHoursProps = {
+type OpeningHoursComponentProps = {
     openingHours: OpeningHoursType[];
 };
 
-export default function OpeningHours({ openingHours }: OpeningHoursProps) {
+export default function OpeningHoursComponent({
+    openingHours,
+}: OpeningHoursComponentProps) {
     const testing = useMemo(() => {
         return Array.from(Array(7)).map((_, index) => {
             let dayNum = index + 1;
