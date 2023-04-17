@@ -18,6 +18,7 @@ import PubFeatures from '@/components/Pubs/PubFeatures';
 import ReviewPubButton from '@/components/Reviews/ReviewPubButton';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { SelectedPub, setPub } from '@/store/slices/pub';
+import DraughtBeersList from '@/components/Beers/DraughtBeersList';
 
 export default function PubHome({
     route,
@@ -97,6 +98,7 @@ export default function PubHome({
                 <View style={styles.topBarContainer}>
                     <PubTopBar pub={pub} />
                 </View>
+
                 <View style={styles.imageScrollerContainer}>
                     <ImageScroller
                         imageFlatListRef={imageFlatListRef}
@@ -105,6 +107,10 @@ export default function PubHome({
                         width={220}
                         margin={5}
                     />
+                </View>
+
+                <View style={styles.draughtContainer}>
+                    <DraughtBeersList pub={pub} />
                 </View>
 
                 <View style={styles.pubFeaturesContainer}>
@@ -133,6 +139,9 @@ const styles = StyleSheet.create({
     },
     topBarContainer: { marginVertical: 5 },
     imageScrollerContainer: { marginTop: 10 },
+    draughtContainer: {
+        marginTop: 20,
+    },
     pubFeaturesContainer: {
         marginTop: 20,
     },

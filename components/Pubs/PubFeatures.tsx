@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Octicons } from '@expo/vector-icons';
-import { SelectedPub } from '@/nav/BottomSheetNavigator';
+import { SelectedPub } from '@/store/slices/pub';
 
 type PubFeaturesProps = {
     pub: SelectedPub;

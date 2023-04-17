@@ -6,7 +6,7 @@ import { StackScreenProps } from '@react-navigation/stack';
 import OverallRatings from '@/components/Ratings/OverallRatings';
 import { supabase } from '@/services/supabase';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { useAppDispatch } from '@/store/hooks';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { deleteReview as deleteReviewStore } from '@/store/slices/pub';
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 
@@ -15,6 +15,7 @@ export default function ViewReview({
     navigation,
 }: StackScreenProps<BottomSheetStackParamList, 'ViewReview'>) {
     const dispatch = useAppDispatch();
+    const user = useAppSelector(state => state.user.docData);
 
     const deleteReview = async () => {
         const { data } = await supabase
@@ -46,27 +47,29 @@ export default function ViewReview({
             <View style={styles.contentContainer}>
                 <Text>{route.params.review.review.content}</Text>
             </View>
-            <View style={styles.buttonsContainer}>
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity
-                        style={styles.deleteButton}
-                        onPress={deleteReview}>
-                        <Text style={styles.deleteButtonText}>Delete</Text>
-                    </TouchableOpacity>
+            {user && user.id === route.params.review.createdBy.id ? (
+                <View style={styles.buttonsContainer}>
+                    <View style={styles.buttonContainer}>
+                        <TouchableOpacity
+                            style={styles.deleteButton}
+                            onPress={deleteReview}>
+                            <Text style={styles.deleteButtonText}>Delete</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={styles.buttonContainer}>
+                        <TouchableOpacity
+                            style={styles.editButton}
+                            onPress={() =>
+                                navigation.navigate('EditReview', {
+                                    pub: route.params.pub,
+                                    review: route.params.review,
+                                })
+                            }>
+                            <Text style={styles.editButtonText}>Edit</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity
-                        style={styles.editButton}
-                        onPress={() =>
-                            navigation.navigate('EditReview', {
-                                pub: route.params.pub,
-                                review: route.params.review,
-                            })
-                        }>
-                        <Text style={styles.editButtonText}>Edit</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
+            ) : undefined}
         </BottomSheetScrollView>
     );
 }

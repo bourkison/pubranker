@@ -28,11 +28,32 @@ export interface Database {
     };
     public: {
         Tables: {
+            beer_pub_relationships: {
+                Row: {
+                    beer_id: number;
+                    created_at: string | null;
+                    id: number;
+                    pub_id: number;
+                };
+                Insert: {
+                    beer_id: number;
+                    created_at?: string | null;
+                    id?: number;
+                    pub_id: number;
+                };
+                Update: {
+                    beer_id?: number;
+                    created_at?: string | null;
+                    id?: number;
+                    pub_id?: number;
+                };
+            };
             beers: {
                 Row: {
                     brewery: string;
                     created_at: string | null;
                     id: number;
+                    logo: string | null;
                     name: string;
                     type: string;
                 };
@@ -40,6 +61,7 @@ export interface Database {
                     brewery: string;
                     created_at?: string | null;
                     id?: number;
+                    logo?: string | null;
                     name: string;
                     type: string;
                 };
@@ -47,6 +69,7 @@ export interface Database {
                     brewery?: string;
                     created_at?: string | null;
                     id?: number;
+                    logo?: string | null;
                     name?: string;
                     type?: string;
                 };
@@ -283,7 +306,6 @@ export interface Database {
                 };
                 Returns: {
                     id: number;
-                    created_at: string;
                     google_rating: number;
                     name: string;
                     address: string;
