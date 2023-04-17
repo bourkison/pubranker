@@ -336,6 +336,7 @@ export interface Database {
                     review_food: number;
                     num_reviews: number;
                     saved: boolean;
+                    google_id: string;
                 }[];
             };
             nearby_pubs: {
@@ -377,6 +378,7 @@ export interface Database {
                     review_location: number;
                     review_food: number;
                     num_reviews: number;
+                    google_id: string;
                 }[];
             };
             pubs_in_polygon: {
@@ -417,6 +419,7 @@ export interface Database {
                     review_location: number;
                     review_food: number;
                     num_reviews: number;
+                    google_id: string;
                 }[];
             };
             saved_pubs: {
@@ -457,6 +460,7 @@ export interface Database {
                     review_food: number;
                     num_reviews: number;
                     saved: boolean;
+                    google_id: string;
                 }[];
             };
         };

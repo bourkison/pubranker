@@ -8,6 +8,7 @@ import { SelectedPub } from '@/store/slices/pub';
 import OverallRatings from '@/components/Ratings/OverallRatings';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setReviews } from '@/store/slices/pub';
+import ReviewPubButton from '@/components/Reviews/ReviewPubButton';
 
 type Review = {
     review: Database['public']['Tables']['reviews']['Row'];
@@ -19,8 +20,10 @@ type PubReviewsProps = {
 };
 
 export default function PubReviews({ pub }: PubReviewsProps) {
-    const reviews = useAppSelector(state => state.pub.selectedPubReviews);
     const dispatch = useAppDispatch();
+
+    const reviews = useAppSelector(state => state.pub.selectedPubReviews);
+    const user = useAppSelector(state => state.user.docData);
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -34,6 +37,7 @@ export default function PubReviews({ pub }: PubReviewsProps) {
                 .eq('pub_id', pub.id)
                 .neq('content', null)
                 .neq('content', '')
+                .neq('user_id', user?.id)
                 .order('created_at', { ascending: false });
 
             if (error) {
@@ -46,19 +50,19 @@ export default function PubReviews({ pub }: PubReviewsProps) {
             data.forEach(d => {
                 promises.push(
                     new Promise(async (resolve, reject) => {
-                        const user = await supabase
+                        const public_user = await supabase
                             .from('users_public')
                             .select()
                             .eq('id', d.user_id)
                             .limit(1)
                             .single();
 
-                        if (user.error) {
-                            console.error(user.error);
-                            return reject(user.error);
+                        if (public_user.error) {
+                            console.error(public_user.error);
+                            return reject(public_user.error);
                         }
 
-                        resolve(user.data);
+                        resolve(public_user.data);
                     }),
                 );
             });
@@ -79,7 +83,7 @@ export default function PubReviews({ pub }: PubReviewsProps) {
         if (!reviews.length) {
             fetchReviews();
         }
-    }, [pub, reviews, dispatch]);
+    }, [pub, reviews, dispatch, user]);
 
     return (
         <View>
@@ -92,6 +96,7 @@ export default function PubReviews({ pub }: PubReviewsProps) {
                 vibe={pub.review_vibe}
                 headerText="Ratings"
             />
+            <ReviewPubButton pub={pub} />
             {!isLoading ? (
                 <View>
                     {reviews.map(review => (

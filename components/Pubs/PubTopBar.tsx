@@ -1,4 +1,3 @@
-import { BottomSheetStackParamList } from '@/nav/BottomSheetNavigator';
 import { SelectedPub } from '@/store/slices/pub';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
@@ -7,12 +6,13 @@ import {
     averageReviews,
     checkIfOpen,
     distanceString,
+    parseLocation,
     parseOpeningHours,
     roundToNearest,
 } from '@/services';
 import { timeString } from '@/services';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import * as Location from 'expo-location';
+import { showLocation } from 'react-native-map-link';
 
 type TopBarPubProps = {
     pub: SelectedPub;
@@ -22,8 +22,26 @@ export default function PubTopBar({ pub }: TopBarPubProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [nextOpenCloseTime, setNextOpenCloseTime] = useState('');
 
-    const navigation =
-        useNavigation<StackNavigationProp<BottomSheetStackParamList>>();
+    const pubLocation = parseLocation(pub.location);
+    const [userLocation, setUserLocation] = useState<
+        Location.LocationObject | undefined
+    >(undefined);
+
+    useEffect(() => {
+        const setLocation = async () => {
+            const { status } =
+                await Location.requestForegroundPermissionsAsync();
+
+            if (status !== 'granted') {
+                return;
+            }
+
+            const l = await Location.getCurrentPositionAsync();
+            setUserLocation(l);
+        };
+
+        setLocation();
+    }, []);
 
     useEffect(() => {
         const openingHours = parseOpeningHours(pub.opening_hours);
@@ -46,7 +64,7 @@ export default function PubTopBar({ pub }: TopBarPubProps) {
 
     return (
         <View style={styles.container}>
-            <View style={styles.column}>
+            <TouchableOpacity style={styles.column}>
                 <View style={styles.reviewColumnContainer}>
                     <Ionicons name="star" />
                     <Text style={styles.reviewText}>
@@ -64,10 +82,8 @@ export default function PubTopBar({ pub }: TopBarPubProps) {
                         ({pub.num_reviews})
                     </Text>
                 </View>
-            </View>
-            <TouchableOpacity
-                style={styles.column}
-                onPress={() => navigation.navigate('OpeningHours', { pub })}>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.column}>
                 {isOpen ? (
                     <Text style={styles.openText}>Open</Text>
                 ) : (
@@ -77,7 +93,18 @@ export default function PubTopBar({ pub }: TopBarPubProps) {
                     {nextOpenCloseTime}
                 </Text>
             </TouchableOpacity>
-            <View style={styles.column}>
+            <TouchableOpacity
+                style={styles.column}
+                onPress={() =>
+                    showLocation({
+                        latitude: pubLocation.coordinates[1],
+                        longitude: pubLocation.coordinates[0],
+                        googlePlaceId: pub.google_id,
+                        sourceLatitude: userLocation?.coords.latitude,
+                        sourceLongitude: userLocation?.coords.longitude,
+                        directionsMode: 'public-transport',
+                    })
+                }>
                 <View style={styles.directionsColumnContainer}>
                     <FontAwesome name="map-marker" size={18} />
                     <Text style={styles.directionsText}>Directions</Text>
@@ -85,7 +112,7 @@ export default function PubTopBar({ pub }: TopBarPubProps) {
                         {distanceString(pub.dist_meters)}
                     </Text>
                 </View>
-            </View>
+            </TouchableOpacity>
         </View>
     );
 }

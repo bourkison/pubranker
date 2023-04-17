@@ -15,10 +15,10 @@ import { supabase } from '@/services/supabase';
 import PubTopBar from '@/components/Pubs/PubTopBar';
 import { useFocusEffect } from '@react-navigation/native';
 import PubFeatures from '@/components/Pubs/PubFeatures';
-import ReviewPubButton from '@/components/Reviews/ReviewPubButton';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { SelectedPub, setPub } from '@/store/slices/pub';
 import DraughtBeersList from '@/components/Beers/DraughtBeersList';
+import PubDetails from '@/components/Pubs/PubDetails';
 
 export default function PubHome({
     route,
@@ -121,8 +121,8 @@ export default function PubHome({
                     <PubReviews pub={pub} />
                 </View>
 
-                <View style={styles.reviewButtonContainer}>
-                    <ReviewPubButton pub={pub} />
+                <View>
+                    <PubDetails pub={pub} />
                 </View>
             </View>
         </BottomSheetScrollView>
@@ -146,9 +146,6 @@ const styles = StyleSheet.create({
         marginTop: 20,
     },
     reviewsContainer: {
-        marginTop: 25,
-    },
-    reviewButtonContainer: {
         marginTop: 25,
     },
 });

@@ -32,7 +32,8 @@ or replace function pubs_in_polygon(geojson text, dist_long float, dist_lat floa
 	review_service float,
 	review_location float,
 	review_food float,
-	num_reviews int
+	num_reviews int,
+	google_id text
 ) language sql as $ $
 select
 	p.id,
@@ -71,7 +72,8 @@ select
 	avg(r.service) as review_service,
 	avg(r.location) as review_location,
 	avg(r.food) as review_food,
-	count(distinct r) as num_reviews
+	count(distinct r) as num_reviews,
+	p.google_id
 from
 	public.pubs p
 	left join public.saves s on p.id = s.pub_id

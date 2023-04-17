@@ -4,10 +4,16 @@ import { useAppSelector } from '@/store/hooks';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useCallback, useState } from 'react';
-import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { TReview } from './Review';
-import Spinner from '../Utility/Spinner';
+import {
+    View,
+    TouchableOpacity,
+    Text,
+    StyleSheet,
+    ActivityIndicator,
+} from 'react-native';
+import { TReview } from '@/components/Reviews/Review';
 import { SelectedPub } from '@/store/slices/pub';
+import Review from './Review';
 
 type ReviewPubButtonProps = {
     pub: SelectedPub;
@@ -59,39 +65,51 @@ export default function ReviewPubButton({ pub }: ReviewPubButtonProps) {
         }
     };
 
+    if (isLoading) {
+        return <ActivityIndicator />;
+    }
+
+    if (!user) {
+        return <View />;
+    }
+
     return (
-        <View style={styles.reviewButtonContainer}>
-            <TouchableOpacity style={styles.reviewButton} onPress={buttonPress}>
-                {isLoading ? (
-                    <Spinner
-                        diameter={16}
-                        spinnerWidth={2}
-                        backgroundColor="#2B5256"
-                        spinnerColor="#f5f5f5"
-                    />
-                ) : (
-                    <Text style={styles.reviewButtonText}>
-                        {!review ? 'Review This Pub' : 'View Review'}
-                    </Text>
-                )}
-            </TouchableOpacity>
+        <View style={styles.container}>
+            {review ? (
+                <Review pub={pub} review={{ review, createdBy: user }} />
+            ) : (
+                <View style={styles.reviewButtonContainer}>
+                    <TouchableOpacity
+                        style={styles.reviewButton}
+                        onPress={buttonPress}>
+                        <Text style={styles.reviewButtonText}>
+                            Review This Pub
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+            )}
         </View>
     );
 }
 
 const styles = StyleSheet.create({
+    container: {},
     reviewButtonContainer: {
         paddingHorizontal: 100,
+        paddingVertical: 10,
+        borderBottomWidth: 1,
+        borderColor: '#E5E7EB',
     },
     reviewButton: {
         backgroundColor: '#2B5256',
-        paddingVertical: 10,
+        paddingVertical: 5,
         borderRadius: 5,
         alignItems: 'center',
     },
     reviewButtonText: {
         color: '#F5F5F5',
         fontWeight: 'bold',
+        fontSize: 12,
         textAlign: 'center',
     },
 });

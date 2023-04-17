@@ -33,7 +33,8 @@ or replace function saved_pubs(dist_long float, dist_lat float) returns table(
     review_location float,
     review_food float,
     num_reviews int,
-    saved boolean
+    saved boolean,
+    google_id text
 ) language sql as $ $
 select
     p.id,
@@ -70,7 +71,8 @@ select
     avg(r.location) as review_location,
     avg(r.food) as review_food,
     count(distinct r) as num_reviews,
-    true as saved
+    true as saved,
+    p.google_id
 from
     public.pubs p
     join public.saves s on p.id = s.pub_id

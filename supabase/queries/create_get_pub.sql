@@ -32,7 +32,8 @@ or replace function get_pub(input_id int, dist_long float, dist_lat float) retur
     review_location float,
     review_food float,
     num_reviews int,
-    saved boolean
+    saved boolean,
+    google_id text
 ) language sql as $ $
 select
     p.id,
@@ -71,7 +72,8 @@ select
     count(
         s.pub_id = p.id
         and s.user_id = auth.uid()
-    ) > 0 as saved
+    ) > 0 as saved,
+    p.google_id
 from
     public.pubs p
     left join public.saves s on p.id = s.pub_id

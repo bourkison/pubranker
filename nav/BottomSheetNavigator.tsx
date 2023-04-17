@@ -10,7 +10,6 @@ import CreateReview from '@/screens/BottomSheet/PubView/CreateReview';
 import ViewReview from '@/screens/BottomSheet/PubView/ViewReview';
 import EditReview from '@/screens/BottomSheet/PubView/EditReview';
 import { TReview } from '@/components/Reviews/Review';
-import OpeningHours from '@/screens/BottomSheet/PubView/OpeningHours';
 import PubHomeHeader from './Headers/PubHomeHeader';
 import ViewReviewHeader from './Headers/ViewReviewHeader';
 
@@ -20,7 +19,6 @@ export type BottomSheetStackParamList = {
     CreateReview: { pub: SelectedPub };
     ViewReview: { pub: SelectedPub; review: TReview };
     EditReview: { pub: SelectedPub; review: TReview };
-    OpeningHours: { pub: SelectedPub };
 };
 
 const Stack = createStackNavigator<BottomSheetStackParamList>();
@@ -62,7 +60,6 @@ export default function BottomSheetNavigator({}) {
                     header: props => <ViewReviewHeader {...props} />,
                 }}
             />
-            <Stack.Screen name="OpeningHours" component={OpeningHours} />
         </Stack.Navigator>
     );
 }
