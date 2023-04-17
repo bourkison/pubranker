@@ -62,4 +62,4 @@ export type RejectWithValueType = {
     code?: string;
 };
 
-export type UserType = Database['public']['Tables']['users']['Row'];
+export type UserType = Database['public']['Tables']['users_public']['Row'];

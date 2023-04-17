@@ -1,7 +1,6 @@
 import StarRanker from '@/components/Utility/StarRanker';
 import React, { useState } from 'react';
 import {
-    ActivityIndicator,
     KeyboardAvoidingView,
     StyleSheet,
     Text,
@@ -16,6 +15,7 @@ import { StackScreenProps } from '@react-navigation/stack';
 import { supabase } from '@/services/supabase';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { addReview } from '@/store/slices/pub';
+import Spinner from '@/components/Utility/Spinner';
 
 export default function CreateReview({
     route,
@@ -58,6 +58,12 @@ export default function CreateReview({
         if (error) {
             // TODO: Handle error
             console.error(error);
+            return;
+        }
+
+        if (!user) {
+            console.warn('No user, returning');
+            navigation.goBack();
             return;
         }
 
@@ -172,7 +178,12 @@ export default function CreateReview({
                     style={styles.postButton}
                     onPress={postReview}>
                     {isLoading ? (
-                        <ActivityIndicator />
+                        <Spinner
+                            diameter={16}
+                            spinnerWidth={2}
+                            backgroundColor="#2B5256"
+                            spinnerColor="#f5f5f5"
+                        />
                     ) : (
                         <Text style={styles.postButtonText}>Post</Text>
                     )}

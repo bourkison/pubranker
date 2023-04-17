@@ -90,6 +90,7 @@ export default function PubReviews({ pub }: PubReviewsProps) {
                 music={pub.review_music}
                 service={pub.review_service}
                 vibe={pub.review_vibe}
+                headerText="Ratings"
             />
             {!isLoading ? (
                 <View>

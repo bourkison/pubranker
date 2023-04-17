@@ -1,41 +1,61 @@
 import { TReview } from '@/components/Pubs/Review';
-import { SelectedPub } from '@/nav/BottomSheetNavigator';
-import { DiscoveredPub, NearbyPub } from '@/types';
+import { supabase } from '@/services/supabase';
+import { RejectWithValueType } from '@/types';
+import { Database } from '@/types/schema';
 import {
+    createAsyncThunk,
     createEntityAdapter,
     createSlice,
     PayloadAction,
 } from '@reduxjs/toolkit';
+import * as Location from 'expo-location';
 
 const pubAdapter = createEntityAdapter();
 
 export type BottomBarState = 'hidden' | 'preview' | 'expanded';
-type SelectedPubReference = 'map' | 'discover';
+export type SelectedPub =
+    Database['public']['Functions']['get_pub']['Returns'][number];
 
 const initialState = pubAdapter.getInitialState({
-    selectedPubReference: null as SelectedPubReference | null,
+    isLoading: 0, // Set to ID of pub we're loading.
     selectedPub: null as SelectedPub | null,
     selectedPubReviews: [] as TReview[],
+});
+
+export const setPub = createAsyncThunk<
+    SelectedPub,
+    { id: number },
+    { rejectValue: RejectWithValueType }
+>('pub/loadPub', async ({ id }, { rejectWithValue }) => {
+    const currentLocation = await Location.getCurrentPositionAsync();
+
+    const { data, error } = await supabase
+        .rpc('get_pub', {
+            input_id: id,
+            dist_lat: currentLocation.coords.latitude,
+            dist_long: currentLocation.coords.longitude,
+        })
+        .limit(1)
+        .single();
+
+    if (error || !data) {
+        // TODO: Handle error
+        console.error(error);
+        return rejectWithValue({
+            message: error.message,
+            code: error.code,
+        });
+    }
+
+    return data;
 });
 
 const pubSlice = createSlice({
     name: 'pub',
     initialState,
     reducers: {
-        setPub(
-            state,
-            action: PayloadAction<{
-                pub: DiscoveredPub | NearbyPub;
-                reference: SelectedPubReference;
-            }>,
-        ) {
-            state.selectedPub = action.payload.pub;
-            state.selectedPubReference = action.payload.reference;
-            state.selectedPubReviews = [];
-        },
         deselectPub(state) {
             state.selectedPub = null;
-            state.selectedPubReference = null;
             state.selectedPubReviews = [];
         },
         setReviews(state, action: PayloadAction<TReview[]>) {
@@ -64,10 +84,21 @@ const pubSlice = createSlice({
             }
         },
     },
+    extraReducers: builder => {
+        builder
+            .addCase(setPub.pending, (state, action) => {
+                state.isLoading = action.meta.arg.id;
+                state.selectedPubReviews = [];
+                state.selectedPub = null;
+            })
+            .addCase(setPub.fulfilled, (state, action) => {
+                state.isLoading = 0;
+                state.selectedPub = action.payload;
+            });
+    },
 });
 
 export const {
-    setPub,
     deselectPub,
     toggleSave,
     setReviews,

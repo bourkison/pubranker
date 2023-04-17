@@ -65,6 +65,12 @@ export default function CreateReview({
             return;
         }
 
+        if (!user) {
+            console.warn('No user, navigating to pub');
+            navigation.navigate('PubHome', { pubId: route.params.pub.id });
+            return;
+        }
+
         dispatch(editReview({ review: data, createdBy: user }));
         navigation.navigate('ViewReview', {
             pub: route.params.pub,
@@ -75,9 +81,6 @@ export default function CreateReview({
     return (
         <BottomSheetScrollView keyboardDismissMode="on-drag">
             <KeyboardAvoidingView behavior="position">
-                <View style={styles.titleContainer}>
-                    <Text style={styles.title}>{route.params.pub.name}</Text>
-                </View>
                 <View style={styles.contentContainer}>
                     <View style={styles.rankingSection}>
                         <Text style={styles.rankHeader}>Vibe</Text>
@@ -191,11 +194,6 @@ export default function CreateReview({
 }
 
 const styles = StyleSheet.create({
-    titleContainer: {},
-    title: {
-        fontWeight: 'bold',
-        fontSize: 18,
-    },
     contentContainer: {
         paddingHorizontal: 10,
     },

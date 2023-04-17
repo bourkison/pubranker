@@ -32,19 +32,17 @@ export default function ViewReview({
 
     return (
         <BottomSheetScrollView>
-            {/* <View style={{ flexDirection: 'row' }}>
-                <View>
-                    <Ionicons name="chevron-back" />
-                </View>
-            </View> */}
-            <OverallRatings
-                beer={route.params.review.review.beer}
-                location={route.params.review.review.location}
-                service={route.params.review.review.service}
-                vibe={route.params.review.review.vibe}
-                music={route.params.review.review.music}
-                food={route.params.review.review.food}
-            />
+            <View style={styles.ratingsContainer}>
+                <OverallRatings
+                    beer={route.params.review.review.beer}
+                    location={route.params.review.review.location}
+                    service={route.params.review.review.service}
+                    vibe={route.params.review.review.vibe}
+                    music={route.params.review.review.music}
+                    food={route.params.review.review.food}
+                    headerText="Overall"
+                />
+            </View>
             <View style={styles.contentContainer}>
                 <Text>{route.params.review.review.content}</Text>
             </View>
@@ -74,6 +72,9 @@ export default function ViewReview({
 }
 
 const styles = StyleSheet.create({
+    ratingsContainer: {
+        marginTop: 10,
+    },
     contentContainer: {
         padding: 10,
     },

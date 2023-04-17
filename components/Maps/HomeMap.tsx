@@ -4,7 +4,6 @@ import MapView, { Marker, Region } from 'react-native-maps';
 import * as Location from 'expo-location';
 import MapStyle from '../../json/map_style.json';
 import { Keyboard, StyleSheet } from 'react-native';
-import { setPub } from '@/store/slices/pub';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { fetchMapPubs } from '@/store/slices/map';
@@ -140,8 +139,9 @@ export default function HomeMap({
     };
 
     const selectPub = (pub: NearbyPub) => {
-        navigation.dispatch(CommonActions.navigate('PubHome', { pub }));
-        dispatch(setPub({ pub, reference: 'map' }));
+        navigation.dispatch(
+            CommonActions.navigate('PubHome', { pubId: pub.id }),
+        );
 
         if (bottomSheetRef && bottomSheetRef.current) {
             bottomSheetRef.current.snapToIndex(1);

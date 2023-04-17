@@ -12,6 +12,8 @@ type OverallRatingsProp = {
     music: number;
     service: number;
     vibe: number;
+
+    headerText: string;
 };
 
 export default function OverallRatings({
@@ -21,12 +23,13 @@ export default function OverallRatings({
     music,
     service,
     vibe,
+    headerText,
 }: OverallRatingsProp) {
     return (
         <>
             <View style={styles.headerContainer}>
                 <View>
-                    <Text style={styles.headerText}>Overall</Text>
+                    <Text style={styles.headerText}>{headerText}</Text>
                 </View>
                 <View style={styles.overallRatingsContainer}>
                     <Ionicons name="star" size={12} color="#FFD700" />

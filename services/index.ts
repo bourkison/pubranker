@@ -300,10 +300,10 @@ export const checkIfOpen = (
         // OR the time between nextOpeningHours and now is sooner than currently saved
         // AND this time difference is not negative (i.e. in the past)
         if (
-            !nextOpeningHours ||
-            (open.unix() - dayjs().unix() <
-                nextOpeningHours.unix() - dayjs().unix() &&
-                open.unix() - dayjs().unix() > 0)
+            (!nextOpeningHours ||
+                open.unix() - dayjs().unix() <
+                    nextOpeningHours.unix() - dayjs().unix()) &&
+            open.unix() - dayjs().unix() > 0
         ) {
             nextOpeningHours = open;
         }

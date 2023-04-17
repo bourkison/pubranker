@@ -9,7 +9,6 @@ import DiscoverPub from '@/components/Pubs/DiscoverPub';
 import FilterScroller from '@/components/Utility/FilterScroller';
 import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import SearchBar from '@/components/Utility/SearchBar';
-import { setPub } from '@/store/slices/pub';
 import { useNavigation } from '@react-navigation/native';
 import { BottomSheetStackParamList } from '@/nav/BottomSheetNavigator';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -46,9 +45,7 @@ export default function Discover() {
     }, [search]);
 
     const selectPub = (pub: DiscoveredPub) => {
-        dispatch(setPub({ pub, reference: 'discover' }));
-        navigation.navigate('PubHome', { pub });
-
+        navigation.navigate('PubHome', { pubId: pub.id });
         expand();
     };
 

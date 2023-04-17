@@ -275,6 +275,47 @@ export interface Database {
             [_ in never]: never;
         };
         Functions: {
+            get_pub: {
+                Args: {
+                    input_id: number;
+                    dist_long: number;
+                    dist_lat: number;
+                };
+                Returns: {
+                    id: number;
+                    created_at: string;
+                    google_rating: number;
+                    name: string;
+                    address: string;
+                    phone_number: string;
+                    google_overview: string;
+                    google_ratings_amount: number;
+                    reservable: boolean;
+                    website: string;
+                    dog_friendly: boolean;
+                    live_sport: boolean;
+                    pool_table: boolean;
+                    dart_board: boolean;
+                    beer_garden: boolean;
+                    kid_friendly: boolean;
+                    free_wifi: boolean;
+                    rooftop: boolean;
+                    foosball_table: boolean;
+                    wheelchair_accessible: boolean;
+                    photos: string[];
+                    opening_hours: Json;
+                    location: string;
+                    dist_meters: number;
+                    review_vibe: number;
+                    review_beer: number;
+                    review_music: number;
+                    review_service: number;
+                    review_location: number;
+                    review_food: number;
+                    num_reviews: number;
+                    saved: boolean;
+                }[];
+            };
             nearby_pubs: {
                 Args: {
                     order_lat: number;
