@@ -5,10 +5,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { averageReviews, fromNowString, roundToNearest } from '@/services';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
-import {
-    BottomSheetStackParamList,
-    SelectedPub,
-} from '@/nav/BottomSheetNavigator';
+import { BottomSheetStackParamList } from '@/nav/BottomSheetNavigator';
+import { SelectedPub } from '@/store/slices/pub';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 export type TReview = {

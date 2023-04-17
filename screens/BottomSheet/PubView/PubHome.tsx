@@ -8,14 +8,14 @@ import {
 } from 'react-native';
 import { BottomSheetStackParamList } from '@/nav/BottomSheetNavigator';
 import { StackScreenProps } from '@react-navigation/stack';
-import PubReviews from '@/components/Pubs/PubReviews';
+import PubReviews from '@/components/Reviews/PubReviews';
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import ImageScroller from '@/components/Utility/ImageScroller';
 import { supabase } from '@/services/supabase';
-import TopBarPub from '@/components/Pubs/TopBarPub';
+import PubTopBar from '@/components/Pubs/PubTopBar';
 import { useFocusEffect } from '@react-navigation/native';
 import PubFeatures from '@/components/Pubs/PubFeatures';
-import ReviewPubButton from '@/components/Pubs/ReviewPubButton';
+import ReviewPubButton from '@/components/Reviews/ReviewPubButton';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { SelectedPub, setPub } from '@/store/slices/pub';
 
@@ -95,7 +95,7 @@ export default function PubHome({
                     <Text>{pub.google_overview}</Text>
                 </View>
                 <View style={styles.topBarContainer}>
-                    <TopBarPub pub={pub} />
+                    <PubTopBar pub={pub} />
                 </View>
                 <View style={styles.imageScrollerContainer}>
                     <ImageScroller

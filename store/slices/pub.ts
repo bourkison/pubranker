@@ -1,4 +1,4 @@
-import { TReview } from '@/components/Pubs/Review';
+import { TReview } from '@/components/Reviews/Review';
 import { supabase } from '@/services/supabase';
 import { RejectWithValueType } from '@/types';
 import { Database } from '@/types/schema';

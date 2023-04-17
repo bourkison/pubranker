@@ -1,7 +1,5 @@
-import {
-    BottomSheetStackParamList,
-    SelectedPub,
-} from '@/nav/BottomSheetNavigator';
+import { BottomSheetStackParamList } from '@/nav/BottomSheetNavigator';
+import { SelectedPub } from '@/store/slices/pub';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
@@ -20,7 +18,7 @@ type TopBarPubProps = {
     pub: SelectedPub;
 };
 
-export default function TopBarPub({ pub }: TopBarPubProps) {
+export default function PubTopBar({ pub }: TopBarPubProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [nextOpenCloseTime, setNextOpenCloseTime] = useState('');
 

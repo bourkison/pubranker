@@ -9,7 +9,7 @@ import PubHome from '@/screens/BottomSheet/PubView/PubHome';
 import CreateReview from '@/screens/BottomSheet/PubView/CreateReview';
 import ViewReview from '@/screens/BottomSheet/PubView/ViewReview';
 import EditReview from '@/screens/BottomSheet/PubView/EditReview';
-import { TReview } from '@/components/Pubs/Review';
+import { TReview } from '@/components/Reviews/Review';
 import OpeningHours from '@/screens/BottomSheet/PubView/OpeningHours';
 import PubHomeHeader from './Headers/PubHomeHeader';
 import ViewReviewHeader from './Headers/ViewReviewHeader';

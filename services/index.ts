@@ -290,7 +290,6 @@ export const checkIfOpen = (
             return { isOpen: true, nextHours: close };
         }
 
-        // Check if we're closer than ever to an opening time (so we can display to users at the end when it next opens).
         // If today's Saturday, we'll need to push everything ahead by a week for accurate checking.
         if (dayjs().day() === 6) {
             open = open.add(1, 'w');

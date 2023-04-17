@@ -3,8 +3,8 @@ import { Database } from '@/types/schema';
 import React, { useEffect, useState } from 'react';
 
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
-import Review from '@/components/Pubs/Review';
-import { SelectedPub } from '@/nav/BottomSheetNavigator';
+import Review from '@/components/Reviews/Review';
+import { SelectedPub } from '@/store/slices/pub';
 import OverallRatings from '@/components/Ratings/OverallRatings';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setReviews } from '@/store/slices/pub';

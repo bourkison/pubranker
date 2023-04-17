@@ -1,7 +1,4 @@
-import {
-    BottomSheetStackParamList,
-    SelectedPub,
-} from '@/nav/BottomSheetNavigator';
+import { BottomSheetStackParamList } from '@/nav/BottomSheetNavigator';
 import { supabase } from '@/services/supabase';
 import { useAppSelector } from '@/store/hooks';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -10,6 +7,7 @@ import React, { useCallback, useState } from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { TReview } from './Review';
 import Spinner from '../Utility/Spinner';
+import { SelectedPub } from '@/store/slices/pub';
 
 type ReviewPubButtonProps = {
     pub: SelectedPub;
