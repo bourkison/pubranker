@@ -44,7 +44,7 @@ export default function DraughtBeersList({ pub }: DraughtBeersListProps) {
                 .select()
                 .in(
                     'id',
-                    relationships.map(r => r.id),
+                    relationships.map(r => r.beer_id),
                 );
 
             if (error) {
@@ -52,6 +52,8 @@ export default function DraughtBeersList({ pub }: DraughtBeersListProps) {
                 console.error(error);
                 return;
             }
+
+            console.log(relationships, data);
 
             setBeers(data);
             setIsLoading(false);

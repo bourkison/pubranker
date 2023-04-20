@@ -1,9 +1,15 @@
-import React, { useMemo } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useMemo, useState, useCallback } from 'react';
+import {
+    View,
+    Text,
+    StyleSheet,
+    TextLayoutEventData,
+    NativeSyntheticEvent,
+    TouchableOpacity,
+} from 'react-native';
 import { Database } from '@/types/schema';
 import { Ionicons } from '@expo/vector-icons';
 import { averageReviews, fromNowString, roundToNearest } from '@/services';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 import { BottomSheetStackParamList } from '@/nav/BottomSheetNavigator';
 import { SelectedPub } from '@/store/slices/pub';
@@ -19,7 +25,25 @@ type ReviewProps = {
     pub: SelectedPub;
 };
 
+const MAX_LINES_LENGTH = 4;
+
 export default function Review({ pub, review }: ReviewProps) {
+    const [textShown, setTextShown] = useState(false);
+    const [lengthMore, setLengthMore] = useState(false);
+
+    const onTextLayout = useCallback(
+        (e: NativeSyntheticEvent<TextLayoutEventData>) => {
+            setLengthMore(e.nativeEvent.lines.length >= MAX_LINES_LENGTH);
+            console.log('EVENT', e.nativeEvent.lines);
+        },
+        [],
+    );
+
+    const toggleText = () => {
+        console.log('TOGGLE');
+        setTextShown(!textShown);
+    };
+
     const navigation =
         useNavigation<StackNavigationProp<BottomSheetStackParamList>>();
 
@@ -36,9 +60,7 @@ export default function Review({ pub, review }: ReviewProps) {
     }, [review]);
 
     return (
-        <TouchableOpacity
-            style={styles.container}
-            onPress={() => navigation.navigate('ViewReview', { pub, review })}>
+        <View style={styles.container}>
             <View style={styles.contentContainer}>
                 <View style={styles.averageReviewContainer}>
                     <Ionicons name="star" size={12} color="#FFD700" />
@@ -46,7 +68,29 @@ export default function Review({ pub, review }: ReviewProps) {
                         {averageReview}
                     </Text>
                 </View>
-                <Text>{review.review.content}</Text>
+                <TouchableOpacity
+                    onPress={() =>
+                        navigation.navigate('ViewReview', { pub, review })
+                    }>
+                    <Text
+                        numberOfLines={textShown ? undefined : MAX_LINES_LENGTH}
+                        onTextLayout={onTextLayout}>
+                        {review.review.content}
+                    </Text>
+                </TouchableOpacity>
+                {lengthMore ? (
+                    <TouchableOpacity
+                        onPress={toggleText}
+                        style={
+                            textShown
+                                ? styles.seeLessContainer
+                                : styles.seeMoreContainer
+                        }>
+                        <Text style={styles.toggleTextText}>
+                            {textShown ? 'See Less' : '... See More'}
+                        </Text>
+                    </TouchableOpacity>
+                ) : undefined}
             </View>
             <View style={styles.nameContainer}>
                 <Text style={styles.nameText}>
@@ -54,7 +98,7 @@ export default function Review({ pub, review }: ReviewProps) {
                     {fromNowString(review.review.created_at)}
                 </Text>
             </View>
-        </TouchableOpacity>
+        </View>
     );
 }
 
@@ -78,5 +122,16 @@ const styles = StyleSheet.create({
     nameText: {
         color: '#A3A3A3',
         fontSize: 12,
+    },
+    seeLessContainer: {
+        alignSelf: 'flex-end',
+    },
+    seeMoreContainer: {
+        alignSelf: 'flex-end',
+        marginTop: -17,
+        backgroundColor: 'white',
+    },
+    toggleTextText: {
+        color: '#A3A3A3',
     },
 });

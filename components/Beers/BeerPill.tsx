@@ -18,14 +18,14 @@ export default function BeerPill({ beer }: BeerPillProps) {
                 supabase.storage.from('beers').getPublicUrl(beer.logo).data
                     .publicUrl,
             );
-
-            console.log('LOGO:', beer.logo);
         }
     }, [beer]);
 
     return (
         <View style={styles.container}>
-            <Image source={{ uri: imageUrl }} style={styles.logo} />
+            {imageUrl ? (
+                <Image source={{ uri: imageUrl }} style={styles.logo} />
+            ) : undefined}
             <Text style={styles.title}>{beer.name}</Text>
         </View>
     );
