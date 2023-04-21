@@ -1,5 +1,5 @@
 import { supabase } from '@/services/supabase';
-import { DiscoveredPub, SavedPub } from '@/types';
+import { DiscoveredPub } from '@/types';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import ImageScroller from '@/components/Utility/ImageScroller';
@@ -8,7 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { distanceString } from '@/services';
 
 type DiscoverPubProps = {
-    pub: DiscoveredPub | SavedPub;
+    pub: DiscoveredPub;
     onSelect?: () => void;
 };
 

@@ -22,18 +22,35 @@ export const fetchSavedPubs = createAsyncThunk<
     SavedPub[],
     { amount: number; id: string; refreshing: boolean },
     { rejectValue: RejectWithValueType }
->('saved/fetchSavedPubs', async ({ amount }, { rejectWithValue }) => {
+>('saved/fetchSavedPubs', async ({ amount, id }, { rejectWithValue }) => {
     const currentLocation = await Location.getCurrentPositionAsync();
 
-    const { data, error } = await supabase
-        .rpc('saved_pubs', {
-            dist_lat: currentLocation.coords.latitude,
-            dist_long: currentLocation.coords.longitude,
-        })
+    const { data: savedData, error: savedError } = await supabase
+        .from('saves')
+        .select()
+        .eq('user_id', id)
         .order('created_at', { ascending: false })
         .limit(amount);
 
-    if (!data) {
+    if (savedError) {
+        return rejectWithValue({
+            message: savedError.message,
+            code: savedError.code,
+        });
+    }
+
+    // TODO: Not sure if .in() returns in order. Verify.
+    const { data, error } = await supabase
+        .rpc('get_pub', {
+            dist_lat: currentLocation.coords.latitude,
+            dist_long: currentLocation.coords.longitude,
+        })
+        .in(
+            'id',
+            savedData.map(d => d.pub_id),
+        );
+
+    if (error) {
         return rejectWithValue({
             message: error.message,
             code: error.code,

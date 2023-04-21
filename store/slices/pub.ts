@@ -30,10 +30,10 @@ export const setPub = createAsyncThunk<
 
     const { data, error } = await supabase
         .rpc('get_pub', {
-            input_id: id,
             dist_lat: currentLocation.coords.latitude,
             dist_long: currentLocation.coords.longitude,
         })
+        .eq('id', id)
         .limit(1)
         .single();
 
