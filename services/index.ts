@@ -1,4 +1,9 @@
-import { OpeningHoursType, PubFilters, UserReviewType } from '@/types';
+import {
+    OpeningHoursType,
+    PubFilters,
+    UserCommentType,
+    UserReviewType,
+} from '@/types';
 import { Database } from '@/types/schema';
 import { PostgrestFilterBuilder } from '@supabase/postgrest-js';
 import * as turf from '@turf/turf';
@@ -332,6 +337,31 @@ export const convertUserReviewsToNonNullable = (
 
         if (!hasNull) {
             const nonNull = review as UserReviewType;
+            response.push(nonNull);
+        }
+    });
+
+    return response;
+};
+
+export const convertUserCommentsToNonNullable = (
+    userComments: Database['public']['Views']['user_comments']['Row'][],
+): UserCommentType[] => {
+    let response: UserCommentType[] = [];
+
+    userComments.forEach(comment => {
+        const keys = Object.keys(comment) as (keyof typeof comment)[];
+        let hasNull = false;
+
+        for (let i = 0; i < keys.length; i++) {
+            const key = keys[i];
+            if (comment[key] === null) {
+                hasNull = true;
+            }
+        }
+
+        if (!hasNull) {
+            const nonNull = comment as UserCommentType;
             response.push(nonNull);
         }
     });

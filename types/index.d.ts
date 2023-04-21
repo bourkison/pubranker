@@ -69,5 +69,7 @@ type NonNullableFields<T> = {
 };
 
 type tempURT = Database['public']['Views']['user_reviews']['Row'];
+type tempUCT = Database['public']['Views']['user_comments']['Row'];
 
 export type UserReviewType = NonNullableFields<tempURT>;
+export type UserCommentType = NonNullableFields<tempUCT>;

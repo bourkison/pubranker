@@ -74,6 +74,32 @@ export interface Database {
                     type?: string;
                 };
             };
+            comments: {
+                Row: {
+                    content: string;
+                    created_at: string;
+                    id: number;
+                    review_id: number;
+                    updated_at: string;
+                    user_id: string;
+                };
+                Insert: {
+                    content: string;
+                    created_at?: string;
+                    id?: number;
+                    review_id: number;
+                    updated_at?: string;
+                    user_id?: string;
+                };
+                Update: {
+                    content?: string;
+                    created_at?: string;
+                    id?: number;
+                    review_id?: number;
+                    updated_at?: string;
+                    user_id?: string;
+                };
+            };
             opening_hours: {
                 Row: {
                     close_day: number;
@@ -455,6 +481,17 @@ export interface Database {
                     saved: boolean | null;
                     website: string | null;
                     wheelchair_accessible: boolean | null;
+                };
+            };
+            user_comments: {
+                Row: {
+                    content: string | null;
+                    created_at: string | null;
+                    id: number | null;
+                    review_id: number | null;
+                    updated_at: string | null;
+                    user_id: string | null;
+                    user_name: string | null;
                 };
             };
             user_reviews: {

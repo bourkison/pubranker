@@ -12,6 +12,7 @@ import {
 } from '@/store/slices/pub';
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { Feather } from '@expo/vector-icons';
+import CommentSection from '@/components/Comments/CommentSection';
 
 export default function ViewReview({
     route,
@@ -147,6 +148,25 @@ export default function ViewReview({
             <View style={styles.contentContainer}>
                 <Text>{route.params.review.content}</Text>
             </View>
+            <View style={styles.helpfulContainer}>
+                <TouchableOpacity
+                    onPress={() => createHelpful(true)}
+                    style={styles.helpfulButton}>
+                    <Feather name="thumbs-up" size={16} color="#A3A3A3" />
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    onPress={() => createHelpful(false)}
+                    style={styles.helpfulButton}>
+                    <Feather name="thumbs-down" size={16} color="#A3A3A3" />
+                </TouchableOpacity>
+
+                <View>
+                    <Text style={styles.helpfulText}>
+                        {isHelpfuls} of {totalHelpfuls} found this helpful
+                    </Text>
+                </View>
+            </View>
             {user && user.id === route.params.review.user_id ? (
                 <View style={styles.buttonsContainer}>
                     <View style={styles.buttonContainer}>
@@ -169,27 +189,8 @@ export default function ViewReview({
                         </TouchableOpacity>
                     </View>
                 </View>
-            ) : (
-                <View style={styles.helpfulContainer}>
-                    <TouchableOpacity
-                        onPress={() => createHelpful(true)}
-                        style={styles.helpfulButton}>
-                        <Feather name="thumbs-up" size={16} color="#A3A3A3" />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        onPress={() => createHelpful(false)}
-                        style={styles.helpfulButton}>
-                        <Feather name="thumbs-down" size={16} color="#A3A3A3" />
-                    </TouchableOpacity>
-
-                    <View>
-                        <Text style={styles.helpfulText}>
-                            {isHelpfuls} of {totalHelpfuls} found this helpful
-                        </Text>
-                    </View>
-                </View>
-            )}
+            ) : undefined}
+            <CommentSection review={route.params.review} />
         </BottomSheetScrollView>
     );
 }
