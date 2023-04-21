@@ -16,22 +16,19 @@ import { StackScreenProps } from '@react-navigation/stack';
 import { supabase } from '@/services/supabase';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { editReview } from '@/store/slices/pub';
+import { editUserReview } from '@/services';
 
 export default function CreateReview({
     route,
     navigation,
 }: StackScreenProps<BottomSheetStackParamList, 'EditReview'>) {
-    const [vibe, setVibe] = useState(route.params.review.review.vibe);
-    const [beer, setBeer] = useState(route.params.review.review.beer);
-    const [music, setMusic] = useState(route.params.review.review.music);
-    const [service, setService] = useState(route.params.review.review.service);
-    const [location, setLocation] = useState(
-        route.params.review.review.location,
-    );
-    const [food, setFood] = useState(route.params.review.review.food);
-    const [content, setContent] = useState(
-        route.params.review.review.content || '',
-    );
+    const [vibe, setVibe] = useState(route.params.review.vibe);
+    const [beer, setBeer] = useState(route.params.review.beer);
+    const [music, setMusic] = useState(route.params.review.music);
+    const [service, setService] = useState(route.params.review.service);
+    const [location, setLocation] = useState(route.params.review.location);
+    const [food, setFood] = useState(route.params.review.food);
+    const [content, setContent] = useState(route.params.review.content);
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -53,7 +50,7 @@ export default function CreateReview({
                 food,
                 pub_id: route.params.pub.id,
             })
-            .eq('id', route.params.review.review.id)
+            .eq('id', route.params.review.id)
             .select()
             .single();
 
@@ -71,10 +68,12 @@ export default function CreateReview({
             return;
         }
 
-        dispatch(editReview({ review: data, createdBy: user }));
+        const editedReview = editUserReview(data, route.params.review);
+
+        dispatch(editReview(editedReview));
         navigation.navigate('ViewReview', {
             pub: route.params.pub,
-            review: { review: data, createdBy: user },
+            review: editedReview,
         });
     };
 

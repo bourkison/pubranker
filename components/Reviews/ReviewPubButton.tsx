@@ -11,9 +11,10 @@ import {
     StyleSheet,
     ActivityIndicator,
 } from 'react-native';
-import { TReview } from '@/components/Reviews/Review';
 import { SelectedPub } from '@/store/slices/pub';
 import Review from './Review';
+import { UserReviewType } from '@/types';
+import { convertUserReviewsToNonNullable } from '@/services';
 
 type ReviewPubButtonProps = {
     pub: SelectedPub;
@@ -21,7 +22,7 @@ type ReviewPubButtonProps = {
 
 export default function ReviewPubButton({ pub }: ReviewPubButtonProps) {
     const [isLoading, setIsLoading] = useState(true);
-    const [review, setReview] = useState<TReview['review'] | null>(null);
+    const [review, setReview] = useState<UserReviewType | null>(null);
 
     const user = useAppSelector(state => state.user.docData);
 
@@ -31,16 +32,19 @@ export default function ReviewPubButton({ pub }: ReviewPubButtonProps) {
     useFocusEffect(
         useCallback(() => {
             const checkIfReviewed = async () => {
+                if (!user) {
+                    return;
+                }
+
                 const { data } = await supabase
-                    .from('reviews')
+                    .from('user_reviews')
                     .select()
                     .eq('pub_id', pub.id)
-                    .eq('user_id', user?.id)
-                    .limit(1)
-                    .single();
+                    .eq('user_id', user.id)
+                    .limit(1);
 
-                if (data) {
-                    setReview(data);
+                if (data && data.length) {
+                    setReview(convertUserReviewsToNonNullable(data)[0]);
                 } else {
                     setReview(null);
                 }
@@ -57,7 +61,7 @@ export default function ReviewPubButton({ pub }: ReviewPubButtonProps) {
             if (review) {
                 navigation.navigate('ViewReview', {
                     pub: pub,
-                    review: { review: review, createdBy: user },
+                    review: review,
                 });
             } else {
                 navigation.navigate('CreateReview', { pub });
@@ -76,7 +80,7 @@ export default function ReviewPubButton({ pub }: ReviewPubButtonProps) {
     return (
         <View style={styles.container}>
             {review ? (
-                <Review pub={pub} review={{ review, createdBy: user }} />
+                <Review pub={pub} review={review} />
             ) : (
                 <View style={styles.reviewButtonContainer}>
                     <TouchableOpacity

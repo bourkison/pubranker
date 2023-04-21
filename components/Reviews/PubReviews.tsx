@@ -1,5 +1,4 @@
 import { supabase } from '@/services/supabase';
-import { Database } from '@/types/schema';
 import React, { useEffect, useState } from 'react';
 
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
@@ -9,11 +8,7 @@ import OverallRatings from '@/components/Ratings/OverallRatings';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setReviews } from '@/store/slices/pub';
 import ReviewPubButton from '@/components/Reviews/ReviewPubButton';
-
-type Review = {
-    review: Database['public']['Tables']['reviews']['Row'];
-    createdBy: Database['public']['Tables']['users_public']['Row'];
-};
+import { convertUserReviewsToNonNullable } from '@/services';
 
 type PubReviewsProps = {
     pub: SelectedPub;
@@ -32,7 +27,7 @@ export default function PubReviews({ pub }: PubReviewsProps) {
             setIsLoading(true);
 
             const { data, error } = await supabase
-                .from('reviews')
+                .from('user_reviews')
                 .select()
                 .eq('pub_id', pub.id)
                 .neq('content', null)
@@ -45,38 +40,9 @@ export default function PubReviews({ pub }: PubReviewsProps) {
                 return;
             }
 
-            let promises: Promise<Review['createdBy']>[] = [];
+            const convertedData = convertUserReviewsToNonNullable(data);
 
-            data.forEach(d => {
-                promises.push(
-                    new Promise(async (resolve, reject) => {
-                        const public_user = await supabase
-                            .from('users_public')
-                            .select()
-                            .eq('id', d.user_id)
-                            .limit(1)
-                            .single();
-
-                        if (public_user.error) {
-                            console.error(public_user.error);
-                            return reject(public_user.error);
-                        }
-
-                        resolve(public_user.data);
-                    }),
-                );
-            });
-
-            let res: Review[] = [];
-            const response = await Promise.allSettled(promises);
-
-            response.forEach((a, index) => {
-                if (a.status === 'fulfilled') {
-                    res.push({ review: data[index], createdBy: a.value });
-                }
-            });
-
-            dispatch(setReviews(res));
+            dispatch(setReviews(convertedData));
             setIsLoading(false);
         };
 
@@ -100,11 +66,7 @@ export default function PubReviews({ pub }: PubReviewsProps) {
             {!isLoading ? (
                 <View>
                     {reviews.map(review => (
-                        <Review
-                            review={review}
-                            key={review.review.id}
-                            pub={pub}
-                        />
+                        <Review review={review} key={review.id} pub={pub} />
                     ))}
                 </View>
             ) : (

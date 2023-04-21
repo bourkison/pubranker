@@ -21,12 +21,12 @@ export default function ViewReview({
         const { data } = await supabase
             .from('reviews')
             .delete({})
-            .eq('id', route.params.review.review.id)
+            .eq('id', route.params.review.id)
             .select();
 
         if (data && data.length > 0) {
             // Success
-            dispatch(deleteReviewStore(route.params.review.review.id));
+            dispatch(deleteReviewStore(route.params.review.id));
             navigation.goBack();
         }
     };
@@ -40,20 +40,20 @@ export default function ViewReview({
         const { count } = await supabase
             .from('review_helpfuls')
             .select('', { head: true, count: 'exact' })
-            .eq('review_id', route.params.review.review.id)
+            .eq('review_id', route.params.review.id)
             .eq('user_id', user.id)
             .eq('is_helpful', !isHelpful);
 
         if (count === 0) {
             await supabase.from('review_helpfuls').insert({
-                review_id: route.params.review.review.id,
+                review_id: route.params.review.id,
                 is_helpful: false,
             });
         } else {
             await supabase
                 .from('review_helpfuls')
                 .update({ is_helpful: isHelpful })
-                .eq('review_id', route.params.review.review.id)
+                .eq('review_id', route.params.review.id)
                 .eq('user_id', user.id)
                 .eq('is_helpful', !isHelpful);
         }
@@ -63,19 +63,19 @@ export default function ViewReview({
         <BottomSheetScrollView>
             <View style={styles.ratingsContainer}>
                 <OverallRatings
-                    beer={route.params.review.review.beer}
-                    location={route.params.review.review.location}
-                    service={route.params.review.review.service}
-                    vibe={route.params.review.review.vibe}
-                    music={route.params.review.review.music}
-                    food={route.params.review.review.food}
+                    beer={route.params.review.beer}
+                    location={route.params.review.location}
+                    service={route.params.review.service}
+                    vibe={route.params.review.vibe}
+                    music={route.params.review.music}
+                    food={route.params.review.food}
                     headerText="Overall"
                 />
             </View>
             <View style={styles.contentContainer}>
-                <Text>{route.params.review.review.content}</Text>
+                <Text>{route.params.review.content}</Text>
             </View>
-            {user && user.id === route.params.review.createdBy.id ? (
+            {user && user.id === route.params.review.user_id ? (
                 <View style={styles.buttonsContainer}>
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity

@@ -1,6 +1,5 @@
-import { TReview } from '@/components/Reviews/Review';
 import { supabase } from '@/services/supabase';
-import { RejectWithValueType } from '@/types';
+import { RejectWithValueType, UserReviewType } from '@/types';
 import { Database } from '@/types/schema';
 import {
     createAsyncThunk,
@@ -19,7 +18,7 @@ export type SelectedPub =
 const initialState = pubAdapter.getInitialState({
     isLoading: 0, // Set to ID of pub we're loading.
     selectedPub: null as SelectedPub | null,
-    selectedPubReviews: [] as TReview[],
+    selectedPubReviews: [] as UserReviewType[],
 });
 
 export const setPub = createAsyncThunk<
@@ -58,20 +57,20 @@ const pubSlice = createSlice({
             state.selectedPub = null;
             state.selectedPubReviews = [];
         },
-        setReviews(state, action: PayloadAction<TReview[]>) {
+        setReviews(state, action: PayloadAction<UserReviewType[]>) {
             state.selectedPubReviews = action.payload;
         },
-        addReview(state, action: PayloadAction<TReview>) {
+        addReview(state, action: PayloadAction<UserReviewType>) {
             state.selectedPubReviews.unshift(action.payload);
         },
         deleteReview(state, action: PayloadAction<number>) {
             state.selectedPubReviews = state.selectedPubReviews.filter(
-                r => r.review.id !== action.payload,
+                r => r.id !== action.payload,
             );
         },
-        editReview(state, action: PayloadAction<TReview>) {
+        editReview(state, action: PayloadAction<UserReviewType>) {
             const index = state.selectedPubReviews.findIndex(
-                r => r.review.id === action.payload.review.id,
+                r => r.id === action.payload.id,
             );
 
             if (index > -1) {

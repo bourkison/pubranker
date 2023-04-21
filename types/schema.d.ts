@@ -303,17 +303,17 @@ export interface Database {
                 Row: {
                     created_at: string | null;
                     id: string;
-                    name: string | null;
+                    name: string;
                 };
                 Insert: {
                     created_at?: string | null;
                     id: string;
-                    name?: string | null;
+                    name: string;
                 };
                 Update: {
                     created_at?: string | null;
                     id?: string;
-                    name?: string | null;
+                    name?: string;
                 };
             };
         };
@@ -325,6 +325,7 @@ export interface Database {
                     created_at: string | null;
                     editors_review: boolean | null;
                     food: number | null;
+                    helpfuls: number | null;
                     id: number | null;
                     location: number | null;
                     music: number | null;

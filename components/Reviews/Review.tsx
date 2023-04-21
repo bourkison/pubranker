@@ -7,21 +7,16 @@ import {
     NativeSyntheticEvent,
     TouchableOpacity,
 } from 'react-native';
-import { Database } from '@/types/schema';
 import { Ionicons } from '@expo/vector-icons';
 import { averageReviews, fromNowString, roundToNearest } from '@/services';
 import { useNavigation } from '@react-navigation/native';
 import { BottomSheetStackParamList } from '@/nav/BottomSheetNavigator';
 import { SelectedPub } from '@/store/slices/pub';
 import { StackNavigationProp } from '@react-navigation/stack';
-
-export type TReview = {
-    review: Database['public']['Tables']['reviews']['Row'];
-    createdBy: Database['public']['Tables']['users_public']['Row'];
-};
+import { UserReviewType } from '@/types';
 
 type ReviewProps = {
-    review: TReview;
+    review: UserReviewType;
     pub: SelectedPub;
 };
 
@@ -34,7 +29,6 @@ export default function Review({ pub, review }: ReviewProps) {
     const onTextLayout = useCallback(
         (e: NativeSyntheticEvent<TextLayoutEventData>) => {
             setLengthMore(e.nativeEvent.lines.length >= MAX_LINES_LENGTH);
-            console.log('EVENT', e.nativeEvent.lines);
         },
         [],
     );
@@ -49,12 +43,12 @@ export default function Review({ pub, review }: ReviewProps) {
 
     const averageReview = useMemo(() => {
         const r = averageReviews(
-            review.review.beer,
-            review.review.food,
-            review.review.location,
-            review.review.music,
-            review.review.service,
-            review.review.vibe,
+            review.beer,
+            review.food,
+            review.location,
+            review.music,
+            review.service,
+            review.vibe,
         );
         return roundToNearest(r, 0.1).toFixed(1);
     }, [review]);
@@ -75,7 +69,7 @@ export default function Review({ pub, review }: ReviewProps) {
                     <Text
                         numberOfLines={textShown ? undefined : MAX_LINES_LENGTH}
                         onTextLayout={onTextLayout}>
-                        {review.review.content}
+                        {review.content}
                     </Text>
                 </TouchableOpacity>
                 {lengthMore ? (
@@ -94,8 +88,7 @@ export default function Review({ pub, review }: ReviewProps) {
             </View>
             <View style={styles.nameContainer}>
                 <Text style={styles.nameText}>
-                    {review.createdBy.name},{' '}
-                    {fromNowString(review.review.created_at)}
+                    {review.user_name}, {fromNowString(review.created_at)}
                 </Text>
             </View>
         </View>

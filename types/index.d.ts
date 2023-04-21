@@ -63,3 +63,11 @@ export type RejectWithValueType = {
 };
 
 export type UserType = Database['public']['Tables']['users_public']['Row'];
+
+type NonNullableFields<T> = {
+    [P in keyof T]: NonNullable<T[P]>;
+};
+
+type tempURT = Database['public']['Views']['user_reviews']['Row'];
+
+export type UserReviewType = NonNullableFields<tempURT>;

@@ -1,4 +1,4 @@
-import { OpeningHoursType, PubFilters } from '@/types';
+import { OpeningHoursType, PubFilters, UserReviewType } from '@/types';
 import { Database } from '@/types/schema';
 import { PostgrestFilterBuilder } from '@supabase/postgrest-js';
 import * as turf from '@turf/turf';
@@ -310,4 +310,43 @@ export const checkIfOpen = (
 
     // @ts-ignore
     return { isOpen: false, nextHours: nextOpeningHours };
+};
+
+export const convertUserReviewsToNonNullable = (
+    userReviews: Database['public']['Views']['user_reviews']['Row'][],
+): UserReviewType[] => {
+    let response: UserReviewType[] = [];
+
+    userReviews.forEach(review => {
+        const keys = Object.keys(review) as (keyof typeof review)[];
+        let hasNull = false;
+
+        for (let i = 0; i < keys.length; i++) {
+            const key = keys[i];
+            if (review[key] === null && key !== 'content') {
+                hasNull = true;
+            } else if (review[key] === null && key === 'content') {
+                review[key] = '';
+            }
+        }
+
+        if (!hasNull) {
+            const nonNull = review as UserReviewType;
+            response.push(nonNull);
+        }
+    });
+
+    return response;
+};
+
+export const editUserReview = (
+    review: Database['public']['Tables']['reviews']['Row'],
+    userReview: UserReviewType,
+): UserReviewType => {
+    return {
+        ...userReview,
+        ...review,
+        content: review.content || '',
+        updated_at: review.updated_at || '',
+    };
 };

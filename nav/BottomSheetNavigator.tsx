@@ -9,16 +9,16 @@ import PubHome from '@/screens/BottomSheet/PubView/PubHome';
 import CreateReview from '@/screens/BottomSheet/PubView/CreateReview';
 import ViewReview from '@/screens/BottomSheet/PubView/ViewReview';
 import EditReview from '@/screens/BottomSheet/PubView/EditReview';
-import { TReview } from '@/components/Reviews/Review';
 import PubHomeHeader from './Headers/PubHomeHeader';
 import ViewReviewHeader from './Headers/ViewReviewHeader';
+import { UserReviewType } from '@/types';
 
 export type BottomSheetStackParamList = {
     Discover: undefined;
     PubHome: { pubId: number };
     CreateReview: { pub: SelectedPub };
-    ViewReview: { pub: SelectedPub; review: TReview };
-    EditReview: { pub: SelectedPub; review: TReview };
+    ViewReview: { pub: SelectedPub; review: UserReviewType };
+    EditReview: { pub: SelectedPub; review: UserReviewType };
 };
 
 const Stack = createStackNavigator<BottomSheetStackParamList>();

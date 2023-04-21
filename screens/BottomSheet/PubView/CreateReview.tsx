@@ -13,8 +13,7 @@ import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { BottomSheetStackParamList } from '@/nav/BottomSheetNavigator';
 import { StackScreenProps } from '@react-navigation/stack';
 import { supabase } from '@/services/supabase';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { addReview } from '@/store/slices/pub';
+import { useAppSelector } from '@/store/hooks';
 import Spinner from '@/components/Utility/Spinner';
 
 export default function CreateReview({
@@ -31,13 +30,12 @@ export default function CreateReview({
 
     const [isLoading, setIsLoading] = useState(false);
 
-    const dispatch = useAppDispatch();
     const user = useAppSelector(state => state.user.docData);
 
     const postReview = async () => {
         setIsLoading(true);
 
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from('reviews')
             .insert({
                 content,
@@ -67,7 +65,6 @@ export default function CreateReview({
             return;
         }
 
-        dispatch(addReview({ review: data, createdBy: user }));
         navigation.goBack();
     };
 
