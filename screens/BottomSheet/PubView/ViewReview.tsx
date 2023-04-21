@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 import { BottomSheetStackParamList } from '@/nav/BottomSheetNavigator';
@@ -6,7 +6,10 @@ import { StackScreenProps } from '@react-navigation/stack';
 import OverallRatings from '@/components/Ratings/OverallRatings';
 import { supabase } from '@/services/supabase';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { deleteReview as deleteReviewStore } from '@/store/slices/pub';
+import {
+    deleteReview as deleteReviewStore,
+    editReview,
+} from '@/store/slices/pub';
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { Feather } from '@expo/vector-icons';
 
@@ -16,6 +19,14 @@ export default function ViewReview({
 }: StackScreenProps<BottomSheetStackParamList, 'ViewReview'>) {
     const dispatch = useAppDispatch();
     const user = useAppSelector(state => state.user.docData);
+
+    const [isCreatingHelpful, setIsCreatingHelpful] = useState(false);
+    const [isHelpfuls, setIsHelpfuls] = useState(
+        route.params.review.is_helpfuls,
+    );
+    const [totalHelpfuls, setTotalHelpfuls] = useState(
+        route.params.review.total_helpfuls,
+    );
 
     const deleteReview = async () => {
         const { data } = await supabase
@@ -32,31 +43,92 @@ export default function ViewReview({
     };
 
     const createHelpful = async (isHelpful: boolean) => {
-        if (!user) {
+        if (!user || isCreatingHelpful) {
             return;
         }
 
+        setIsCreatingHelpful(true);
+
         // Check if already created opposite and thus have to update/toggle already created.
-        const { count } = await supabase
+        const { data, error } = await supabase
             .from('review_helpfuls')
-            .select('', { head: true, count: 'exact' })
+            .select()
             .eq('review_id', route.params.review.id)
             .eq('user_id', user.id)
-            .eq('is_helpful', !isHelpful);
+            .limit(1);
 
-        if (count === 0) {
+        if (error) {
+            return;
+        }
+
+        if (data.length === 0) {
             await supabase.from('review_helpfuls').insert({
                 review_id: route.params.review.id,
-                is_helpful: false,
+                is_helpful: isHelpful,
             });
-        } else {
+
+            dispatch(
+                editReview({
+                    ...route.params.review,
+                    total_helpfuls: route.params.review.total_helpfuls + 1,
+                    is_helpfuls: isHelpful
+                        ? route.params.review.is_helpfuls + 1
+                        : route.params.review.is_helpfuls,
+                }),
+            );
+
+            if (isHelpful) {
+                setIsHelpfuls(isHelpfuls + 1);
+            }
+
+            setTotalHelpfuls(totalHelpfuls + 1);
+        } else if (data.length === 1 && data[0].is_helpful === !isHelpful) {
             await supabase
                 .from('review_helpfuls')
                 .update({ is_helpful: isHelpful })
                 .eq('review_id', route.params.review.id)
                 .eq('user_id', user.id)
                 .eq('is_helpful', !isHelpful);
+
+            dispatch(
+                editReview({
+                    ...route.params.review,
+                    is_helpfuls: isHelpful
+                        ? route.params.review.is_helpfuls + 1
+                        : route.params.review.is_helpfuls - 1,
+                }),
+            );
+
+            if (isHelpful) {
+                setIsHelpfuls(isHelpfuls + 1);
+            } else {
+                setIsHelpfuls(isHelpfuls - 1);
+            }
+        } else {
+            await supabase
+                .from('review_helpfuls')
+                .delete()
+                .eq('review_id', route.params.review.id)
+                .eq('user_id', user.id);
+
+            dispatch(
+                editReview({
+                    ...route.params.review,
+                    total_helpfuls: route.params.review.total_helpfuls - 1,
+                    is_helpfuls: isHelpful
+                        ? route.params.review.is_helpfuls - 1
+                        : route.params.review.is_helpfuls,
+                }),
+            );
+
+            if (isHelpful) {
+                setIsHelpfuls(isHelpfuls - 1);
+            }
+
+            setTotalHelpfuls(totalHelpfuls - 1);
         }
+
+        setIsCreatingHelpful(false);
     };
 
     return (
@@ -98,10 +170,24 @@ export default function ViewReview({
                     </View>
                 </View>
             ) : (
-                <View>
-                    <TouchableOpacity onPress={() => createHelpful(true)}>
-                        <Feather name="thumbs-up" />
+                <View style={styles.helpfulContainer}>
+                    <TouchableOpacity
+                        onPress={() => createHelpful(true)}
+                        style={styles.helpfulButton}>
+                        <Feather name="thumbs-up" size={16} color="#A3A3A3" />
                     </TouchableOpacity>
+
+                    <TouchableOpacity
+                        onPress={() => createHelpful(false)}
+                        style={styles.helpfulButton}>
+                        <Feather name="thumbs-down" size={16} color="#A3A3A3" />
+                    </TouchableOpacity>
+
+                    <View>
+                        <Text style={styles.helpfulText}>
+                            {isHelpfuls} of {totalHelpfuls} found this helpful
+                        </Text>
+                    </View>
                 </View>
             )}
         </BottomSheetScrollView>
@@ -143,5 +229,17 @@ const styles = StyleSheet.create({
     editButtonText: {
         color: '#FAFAFA',
         fontWeight: '600',
+    },
+    helpfulContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 7,
+        justifyContent: 'flex-end',
+    },
+    helpfulButton: {
+        marginHorizontal: 2,
+    },
+    helpfulText: {
+        color: '#a3a3a3',
     },
 });

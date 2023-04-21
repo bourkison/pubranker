@@ -25,6 +25,7 @@ export default function DraughtBeersList({ pub }: DraughtBeersListProps) {
         const fetchBeers = async () => {
             setIsLoading(true);
 
+            // TODO: Could do server side using views.
             // First load relationships.
             const { data: relationships, error: relationshipsError } =
                 await supabase

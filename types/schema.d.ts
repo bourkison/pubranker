@@ -464,12 +464,13 @@ export interface Database {
                     created_at: string | null;
                     editors_review: boolean | null;
                     food: number | null;
-                    helpfuls: number | null;
                     id: number | null;
+                    is_helpfuls: number | null;
                     location: number | null;
                     music: number | null;
                     pub_id: number | null;
                     service: number | null;
+                    total_helpfuls: number | null;
                     updated_at: string | null;
                     user_id: string | null;
                     user_name: string | null;
