@@ -1,14 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 import { BottomSheetStackParamList } from '@/nav/BottomSheetNavigator';
 import { StackScreenProps } from '@react-navigation/stack';
 import OverallRatings from '@/components/Ratings/OverallRatings';
 import { supabase } from '@/services/supabase';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { deleteReview as deleteReviewStore } from '@/store/slices/pub';
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import { Feather } from '@expo/vector-icons';
 
 export default function ViewReview({
     route,
@@ -28,6 +28,34 @@ export default function ViewReview({
             // Success
             dispatch(deleteReviewStore(route.params.review.review.id));
             navigation.goBack();
+        }
+    };
+
+    const createHelpful = async (isHelpful: boolean) => {
+        if (!user) {
+            return;
+        }
+
+        // Check if already created opposite and thus have to update/toggle already created.
+        const { count } = await supabase
+            .from('review_helpfuls')
+            .select('', { head: true, count: 'exact' })
+            .eq('review_id', route.params.review.review.id)
+            .eq('user_id', user.id)
+            .eq('is_helpful', !isHelpful);
+
+        if (count === 0) {
+            await supabase.from('review_helpfuls').insert({
+                review_id: route.params.review.review.id,
+                is_helpful: false,
+            });
+        } else {
+            await supabase
+                .from('review_helpfuls')
+                .update({ is_helpful: isHelpful })
+                .eq('review_id', route.params.review.review.id)
+                .eq('user_id', user.id)
+                .eq('is_helpful', !isHelpful);
         }
     };
 
@@ -69,7 +97,13 @@ export default function ViewReview({
                         </TouchableOpacity>
                     </View>
                 </View>
-            ) : undefined}
+            ) : (
+                <View>
+                    <TouchableOpacity onPress={() => createHelpful(true)}>
+                        <Feather name="thumbs-up" />
+                    </TouchableOpacity>
+                </View>
+            )}
         </BottomSheetScrollView>
     );
 }

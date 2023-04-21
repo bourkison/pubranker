@@ -209,6 +209,29 @@ export interface Database {
                     wheelchair_accessible?: boolean | null;
                 };
             };
+            review_helpfuls: {
+                Row: {
+                    created_at: string | null;
+                    id: number;
+                    is_helpful: boolean;
+                    review_id: number;
+                    user_id: string;
+                };
+                Insert: {
+                    created_at?: string | null;
+                    id?: number;
+                    is_helpful: boolean;
+                    review_id: number;
+                    user_id?: string;
+                };
+                Update: {
+                    created_at?: string | null;
+                    id?: number;
+                    is_helpful?: boolean;
+                    review_id?: number;
+                    user_id?: string;
+                };
+            };
             reviews: {
                 Row: {
                     beer: number;
@@ -295,7 +318,24 @@ export interface Database {
             };
         };
         Views: {
-            [_ in never]: never;
+            user_reviews: {
+                Row: {
+                    beer: number | null;
+                    content: string | null;
+                    created_at: string | null;
+                    editors_review: boolean | null;
+                    food: number | null;
+                    id: number | null;
+                    location: number | null;
+                    music: number | null;
+                    pub_id: number | null;
+                    service: number | null;
+                    updated_at: string | null;
+                    user_id: string | null;
+                    user_name: string | null;
+                    vibe: number | null;
+                };
+            };
         };
         Functions: {
             get_pub: {
