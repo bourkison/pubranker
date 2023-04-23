@@ -5,11 +5,11 @@ import {
     StyleSheet,
     FlatList,
     ActivityIndicator,
+    ScrollView,
 } from 'react-native';
 import { BottomSheetStackParamList } from '@/nav/BottomSheetNavigator';
 import { StackScreenProps } from '@react-navigation/stack';
 import PubReviews from '@/components/Reviews/PubReviews';
-import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import ImageScroller from '@/components/Utility/ImageScroller';
 import { supabase } from '@/services/supabase';
 import PubTopBar from '@/components/Pubs/PubTopBar';
@@ -90,7 +90,7 @@ export default function PubHome({
     }
 
     return (
-        <BottomSheetScrollView>
+        <ScrollView>
             <View style={styles.contentContainer}>
                 <View style={styles.descriptionContainer}>
                     <Text>{pub.google_overview}</Text>
@@ -125,7 +125,7 @@ export default function PubHome({
                     <PubDetails pub={pub} />
                 </View>
             </View>
-        </BottomSheetScrollView>
+        </ScrollView>
     );
 }
 const styles = StyleSheet.create({

@@ -1,11 +1,10 @@
-import React, { RefObject, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import MapView, { Marker, Region } from 'react-native-maps';
 import * as Location from 'expo-location';
 import MapStyle from '../../json/map_style.json';
 import { Keyboard, StyleSheet } from 'react-native';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import BottomSheet from '@gorhom/bottom-sheet';
 import { fetchMapPubs } from '@/store/slices/map';
 import DebugPolygons from './DebugPolygons';
 import { parseLocation } from '@/services';
@@ -17,13 +16,9 @@ const INITIAL_DELTA = 0.01;
 
 type HomeMapProps = {
     bottomPadding: number;
-    bottomSheetRef: RefObject<BottomSheet>;
 };
 
-export default function HomeMap({
-    bottomPadding,
-    bottomSheetRef,
-}: HomeMapProps) {
+export default function HomeMap({ bottomPadding }: HomeMapProps) {
     const [location, setLocation] = useState<
         Location.LocationObject | undefined
     >(undefined);
@@ -123,10 +118,6 @@ export default function HomeMap({
     }, [selectedPubLocation, MapRef]);
 
     const panDrag = () => {
-        if (bottomSheetRef && bottomSheetRef.current) {
-            bottomSheetRef.current.collapse();
-        }
-
         Keyboard.dismiss();
     };
 
@@ -142,10 +133,6 @@ export default function HomeMap({
         navigation.dispatch(
             CommonActions.navigate('PubHome', { pubId: pub.id }),
         );
-
-        if (bottomSheetRef && bottomSheetRef.current) {
-            bottomSheetRef.current.snapToIndex(1);
-        }
     };
 
     return (

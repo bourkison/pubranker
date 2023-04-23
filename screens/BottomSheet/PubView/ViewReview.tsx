@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import {
+    View,
+    Text,
+    StyleSheet,
+    TouchableOpacity,
+    ScrollView,
+} from 'react-native';
 
 import { BottomSheetStackParamList } from '@/nav/BottomSheetNavigator';
 import { StackScreenProps } from '@react-navigation/stack';
@@ -10,7 +16,6 @@ import {
     deleteReview as deleteReviewStore,
     editReview,
 } from '@/store/slices/pub';
-import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { Feather } from '@expo/vector-icons';
 import CommentSection from '@/components/Comments/CommentSection';
 import { fromNowString } from '@/services';
@@ -134,7 +139,7 @@ export default function ViewReview({
     };
 
     return (
-        <BottomSheetScrollView>
+        <ScrollView>
             <View style={styles.ratingsContainer}>
                 <OverallRatings
                     beer={route.params.review.beer}
@@ -197,7 +202,7 @@ export default function ViewReview({
                 </View>
             ) : undefined}
             <CommentSection review={route.params.review} />
-        </BottomSheetScrollView>
+        </ScrollView>
     );
 }
 

@@ -7,12 +7,11 @@ import React, { useCallback, useEffect } from 'react';
 import { View, StyleSheet, Text, ActivityIndicator } from 'react-native';
 import DiscoverPub from '@/components/Pubs/DiscoverPub';
 import FilterScroller from '@/components/Utility/FilterScroller';
-import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { useNavigation } from '@react-navigation/native';
 import { BottomSheetStackParamList } from '@/nav/BottomSheetNavigator';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useBottomSheet } from '@gorhom/bottom-sheet';
 import { DiscoveredPub } from '@/types';
+import { FlatList } from 'react-native-gesture-handler';
 
 const LOAD_AMOUNT = 5;
 
@@ -26,8 +25,6 @@ export default function Discover() {
 
     const navigation =
         useNavigation<StackNavigationProp<BottomSheetStackParamList>>();
-
-    const { expand } = useBottomSheet();
 
     const search = useCallback(async () => {
         await dispatch(fetchDiscoverPubs({ amount: LOAD_AMOUNT }));
@@ -45,11 +42,10 @@ export default function Discover() {
 
     const selectPub = (pub: DiscoveredPub) => {
         navigation.navigate('PubHome', { pubId: pub.id });
-        expand();
     };
 
     return (
-        <BottomSheetFlatList
+        <FlatList
             ListEmptyComponent={() =>
                 isLoading ? <ActivityIndicator /> : <View />
             }

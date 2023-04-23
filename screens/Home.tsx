@@ -1,57 +1,22 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import HomeMap from '@/components/Maps/HomeMap';
-import BottomSheet, {
-    BottomSheetBackdrop,
-    useBottomSheetSpringConfigs,
-} from '@gorhom/bottom-sheet';
 import BottomSheetNavigator from '@/nav/BottomSheetNavigator';
 import FiltersContainer from '@/components/Filters/FiltersContainer';
+import BottomSheet from '@/components/BottomSheet/BottomSheet';
 
 export default function Home() {
     const { height } = useWindowDimensions();
-    const bottomSheetRef = useRef<BottomSheet>(null);
 
-    const snapPoints = useMemo(() => ['10%', '40%', '90%'], []);
-
-    const animationConfigs = useBottomSheetSpringConfigs({
-        damping: 10,
-        stiffness: 100,
-        mass: 0.6,
-    });
+    const snapPoints = useMemo(() => [0.1, 0.4, 0.9], []);
 
     return (
         <View style={styles.container}>
             <View style={styles.filtersContainer}>
                 <FiltersContainer />
             </View>
-            <HomeMap
-                bottomPadding={height * 0.1 - 10}
-                bottomSheetRef={bottomSheetRef}
-            />
-            <BottomSheet
-                ref={bottomSheetRef}
-                snapPoints={snapPoints}
-                index={-1}
-                onAnimate={(from, to) => {
-                    console.log('change', from, to);
-                }}
-                overDragResistanceFactor={0.1}
-                backdropComponent={props => (
-                    <BottomSheetBackdrop
-                        {...props}
-                        appearsOnIndex={2}
-                        disappearsOnIndex={1}
-                        pressBehavior="collapse"
-                    />
-                )}
-                enableOverDrag={true}
-                animationConfigs={animationConfigs}
-                handleComponent={() => (
-                    <View style={styles.handleContainer}>
-                        <View style={styles.handle} />
-                    </View>
-                )}>
+            <HomeMap bottomPadding={height * 0.1 - 10} />
+            <BottomSheet snapPoints={snapPoints} initialIndex={0}>
                 <BottomSheetNavigator />
             </BottomSheet>
         </View>
