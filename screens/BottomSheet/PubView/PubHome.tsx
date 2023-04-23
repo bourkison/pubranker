@@ -5,7 +5,6 @@ import {
     StyleSheet,
     FlatList,
     ActivityIndicator,
-    ScrollView,
 } from 'react-native';
 import { BottomSheetStackParamList } from '@/nav/BottomSheetNavigator';
 import { StackScreenProps } from '@react-navigation/stack';
@@ -19,6 +18,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { SelectedPub, setPub } from '@/store/slices/pub';
 import DraughtBeersList from '@/components/Beers/DraughtBeersList';
 import PubDetails from '@/components/Pubs/PubDetails';
+import BottomSheetScrollView from '@/components/BottomSheet/BottomSheetScrollView';
 
 export default function PubHome({
     route,
@@ -90,7 +90,7 @@ export default function PubHome({
     }
 
     return (
-        <ScrollView>
+        <BottomSheetScrollView>
             <View style={styles.contentContainer}>
                 <View style={styles.descriptionContainer}>
                     <Text>{pub.google_overview}</Text>
@@ -125,7 +125,7 @@ export default function PubHome({
                     <PubDetails pub={pub} />
                 </View>
             </View>
-        </ScrollView>
+        </BottomSheetScrollView>
     );
 }
 const styles = StyleSheet.create({

@@ -1,3 +1,5 @@
+// https://www.youtube.com/watch?v=KvRqsRwpwhY
+
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import React, {
     useEffect,
@@ -5,10 +7,15 @@ import React, {
     useCallback,
     useImperativeHandle,
     useMemo,
+    useRef,
 } from 'react';
 import { View } from 'react-native';
 import { StyleSheet, useWindowDimensions } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import {
+    Gesture,
+    GestureDetector,
+    ScrollView,
+} from 'react-native-gesture-handler';
 import Animated, {
     Extrapolate,
     interpolate,
@@ -16,6 +23,7 @@ import Animated, {
     useSharedValue,
     withSpring,
 } from 'react-native-reanimated';
+import { BottomSheetContext } from '@/components/BottomSheet/context';
 
 type BottomSheetProps = {
     snapPoints: number[];
@@ -42,6 +50,12 @@ const BottomSheet = forwardRef<BottomSheetRefProps, BottomSheetProps>(
         const context = useSharedValue({ y: 0 });
 
         const translateY = useSharedValue(0);
+        const scrollY = useSharedValue(0);
+        const moving = useSharedValue(false);
+        const isExpanded = useSharedValue(false);
+
+        const scrollableRef = useRef<ScrollView>(null);
+
         const MAX_TRANSLATE_Y =
             snapPoints[snapPoints.length - 1] * -AVAILABLE_HEIGHT;
         const snapTo = useCallback(
@@ -53,8 +67,14 @@ const BottomSheet = forwardRef<BottomSheetRefProps, BottomSheetProps>(
                         damping: 50,
                     },
                 );
+
+                if (n === snapPoints.length - 1) {
+                    isExpanded.value = true;
+                } else {
+                    isExpanded.value = false;
+                }
             },
-            [snapPoints, translateY, AVAILABLE_HEIGHT],
+            [snapPoints, translateY, AVAILABLE_HEIGHT, isExpanded],
         );
 
         const open = useCallback(() => {
@@ -91,10 +111,19 @@ const BottomSheet = forwardRef<BottomSheetRefProps, BottomSheetProps>(
         const gesture = Gesture.Pan()
             .onStart(() => {
                 context.value = { y: translateY.value };
+                moving.value = true;
             })
             .onUpdate(event => {
-                translateY.value = event.translationY + context.value.y;
-                translateY.value = Math.max(translateY.value, MAX_TRANSLATE_Y);
+                // Move sheet if top of scroll view or not expanded.
+                if (scrollY.value === 0 || !isExpanded.value) {
+                    translateY.value = event.translationY + context.value.y;
+                    translateY.value = Math.max(
+                        translateY.value,
+                        MAX_TRANSLATE_Y,
+                    );
+                }
+
+                isExpanded.value = translateY.value === MAX_TRANSLATE_Y;
             })
             .onEnd(() => {
                 const amount = Math.max(
@@ -106,7 +135,9 @@ const BottomSheet = forwardRef<BottomSheetRefProps, BottomSheetProps>(
                 );
 
                 snapTo(amount);
-            });
+                moving.value = false;
+            })
+            .simultaneousWithExternalGesture(scrollableRef);
 
         const rBottomSheetStyle = useAnimatedStyle(() => {
             const borderRadius = interpolate(
@@ -127,26 +158,35 @@ const BottomSheet = forwardRef<BottomSheetRefProps, BottomSheetProps>(
         }, [initialIndex, snapTo]);
 
         return (
-            <GestureDetector gesture={gesture}>
-                <Animated.View
-                    style={[
-                        styles.container,
-                        {
-                            height: AVAILABLE_HEIGHT,
-                            top: AVAILABLE_HEIGHT,
-                        },
-                        rBottomSheetStyle,
-                    ]}>
-                    <View style={styles.handle} />
-                    <View
+            <BottomSheetContext.Provider
+                value={{
+                    translateY,
+                    moving,
+                    isExpanded,
+                    scrollY,
+                    scrollableRef,
+                }}>
+                <GestureDetector gesture={gesture}>
+                    <Animated.View
                         style={[
-                            styles.contentContainer,
-                            { paddingBottom: bottomTabBarHeight },
+                            styles.container,
+                            {
+                                height: AVAILABLE_HEIGHT,
+                                top: AVAILABLE_HEIGHT,
+                            },
+                            rBottomSheetStyle,
                         ]}>
-                        {children}
-                    </View>
-                </Animated.View>
-            </GestureDetector>
+                        <View style={styles.handle} />
+                        <View
+                            style={[
+                                styles.contentContainer,
+                                { paddingBottom: bottomTabBarHeight },
+                            ]}>
+                            {children}
+                        </View>
+                    </Animated.View>
+                </GestureDetector>
+            </BottomSheetContext.Provider>
         );
     },
 );
