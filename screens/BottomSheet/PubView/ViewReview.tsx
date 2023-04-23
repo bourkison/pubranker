@@ -13,6 +13,7 @@ import {
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { Feather } from '@expo/vector-icons';
 import CommentSection from '@/components/Comments/CommentSection';
+import { fromNowString } from '@/services';
 
 export default function ViewReview({
     route,
@@ -148,20 +149,25 @@ export default function ViewReview({
             <View style={styles.contentContainer}>
                 <Text>{route.params.review.content}</Text>
             </View>
-            <View style={styles.helpfulContainer}>
-                <TouchableOpacity
-                    onPress={() => createHelpful(true)}
-                    style={styles.helpfulButton}>
-                    <Feather name="thumbs-up" size={16} color="#A3A3A3" />
-                </TouchableOpacity>
+            <View style={styles.bottomSection}>
+                <View style={styles.createdAtContainer}>
+                    <Text style={styles.createdAtText}>
+                        {fromNowString(route.params.review.created_at)}
+                    </Text>
+                </View>
+                <View style={styles.helpfulContainer}>
+                    <TouchableOpacity
+                        onPress={() => createHelpful(true)}
+                        style={styles.helpfulButton}>
+                        <Feather name="thumbs-up" size={16} color="#A3A3A3" />
+                    </TouchableOpacity>
 
-                <TouchableOpacity
-                    onPress={() => createHelpful(false)}
-                    style={styles.helpfulButton}>
-                    <Feather name="thumbs-down" size={16} color="#A3A3A3" />
-                </TouchableOpacity>
+                    <TouchableOpacity
+                        onPress={() => createHelpful(false)}
+                        style={styles.helpfulButton}>
+                        <Feather name="thumbs-down" size={16} color="#A3A3A3" />
+                    </TouchableOpacity>
 
-                <View>
                     <Text style={styles.helpfulText}>
                         {isHelpfuls} of {totalHelpfuls} found this helpful
                     </Text>
@@ -231,10 +237,19 @@ const styles = StyleSheet.create({
         color: '#FAFAFA',
         fontWeight: '600',
     },
+    bottomSection: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 10,
+        paddingHorizontal: 7,
+    },
+    createdAtContainer: {},
+    createdAtText: {
+        color: '#a3a3a3',
+    },
     helpfulContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 7,
         justifyContent: 'flex-end',
     },
     helpfulButton: {

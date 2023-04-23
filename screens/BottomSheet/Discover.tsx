@@ -8,7 +8,6 @@ import { View, StyleSheet, Text, ActivityIndicator } from 'react-native';
 import DiscoverPub from '@/components/Pubs/DiscoverPub';
 import FilterScroller from '@/components/Utility/FilterScroller';
 import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
-import SearchBar from '@/components/Utility/SearchBar';
 import { useNavigation } from '@react-navigation/native';
 import { BottomSheetStackParamList } from '@/nav/BottomSheetNavigator';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -56,7 +55,6 @@ export default function Discover() {
             }
             ListHeaderComponent={() => (
                 <View>
-                    <SearchBar search={search} />
                     <View>
                         <Text style={styles.subHeading}>Filters</Text>
                         <FilterScroller pubLoadAmount={LOAD_AMOUNT} rows={3} />

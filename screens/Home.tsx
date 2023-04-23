@@ -6,6 +6,7 @@ import BottomSheet, {
     useBottomSheetSpringConfigs,
 } from '@gorhom/bottom-sheet';
 import BottomSheetNavigator from '@/nav/BottomSheetNavigator';
+import FiltersContainer from '@/components/Filters/FiltersContainer';
 
 export default function Home() {
     const { height } = useWindowDimensions();
@@ -21,6 +22,9 @@ export default function Home() {
 
     return (
         <View style={styles.container}>
+            <View style={styles.filtersContainer}>
+                <FiltersContainer />
+            </View>
             <HomeMap
                 bottomPadding={height * 0.1 - 10}
                 bottomSheetRef={bottomSheetRef}
@@ -29,6 +33,9 @@ export default function Home() {
                 ref={bottomSheetRef}
                 snapPoints={snapPoints}
                 index={-1}
+                onAnimate={(from, to) => {
+                    console.log('change', from, to);
+                }}
                 overDragResistanceFactor={0.1}
                 backdropComponent={props => (
                     <BottomSheetBackdrop
@@ -58,6 +65,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         overflow: 'visible',
         backgroundColor: 'transparent',
+    },
+    filtersContainer: {
+        position: 'absolute',
+        top: 0,
+        zIndex: 10,
+        width: '100%',
     },
     handleContainer: {
         height: 4,

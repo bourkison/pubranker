@@ -7,7 +7,7 @@ import { getBorough } from '@/services/geo';
 import { useNavigation } from '@react-navigation/native';
 import { BottomSheetStackParamList } from '../BottomSheetNavigator';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { deselectPub, toggleSave as toggleMapSave } from '@/store/slices/pub';
+import { toggleSave as toggleMapSave } from '@/store/slices/pub';
 import { toggleSave } from '@/store/slices/saved';
 import { toggleSave as toggleDiscoverSave } from '@/store/slices/discover';
 
@@ -74,7 +74,6 @@ export default function PubHomeHeader({}: StackHeaderProps) {
 
                 <TouchableOpacity
                     onPress={() => {
-                        dispatch(deselectPub());
                         navigation.navigate('Discover');
                     }}
                     style={styles.closeButton}>
