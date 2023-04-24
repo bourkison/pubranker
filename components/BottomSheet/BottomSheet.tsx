@@ -7,7 +7,8 @@ import React, {
     useCallback,
     useImperativeHandle,
     useMemo,
-    useRef,
+    useState,
+    RefObject,
 } from 'react';
 import { View } from 'react-native';
 import { StyleSheet, useWindowDimensions } from 'react-native';
@@ -22,6 +23,7 @@ import Animated, {
     useAnimatedStyle,
     useSharedValue,
     withSpring,
+    scrollTo,
 } from 'react-native-reanimated';
 import { BottomSheetContext } from '@/components/BottomSheet/context';
 
@@ -47,14 +49,17 @@ const BottomSheet = forwardRef<BottomSheetRefProps, BottomSheetProps>(
             [sHeight, bottomTabBarHeight],
         );
 
-        const context = useSharedValue({ y: 0 });
+        const context = useSharedValue({ y: 0, scrollY: 0 });
 
         const translateY = useSharedValue(0);
+        const previousY = useSharedValue(0);
         const scrollY = useSharedValue(0);
         const moving = useSharedValue(false);
         const isExpanded = useSharedValue(false);
 
-        const scrollableRef = useRef<ScrollView>(null);
+        const [scrollableRefs, setScrollableRefs] = useState<
+            RefObject<ScrollView>[]
+        >([]);
 
         const MAX_TRANSLATE_Y =
             snapPoints[snapPoints.length - 1] * -AVAILABLE_HEIGHT;
@@ -108,9 +113,9 @@ const BottomSheet = forwardRef<BottomSheetRefProps, BottomSheetProps>(
             return arr.length - 1;
         };
 
-        const gesture = Gesture.Pan()
+        let gesture = Gesture.Pan()
             .onStart(() => {
-                context.value = { y: translateY.value };
+                context.value = { y: translateY.value, scrollY: scrollY.value };
                 moving.value = true;
             })
             .onUpdate(event => {
@@ -121,9 +126,35 @@ const BottomSheet = forwardRef<BottomSheetRefProps, BottomSheetProps>(
                         translateY.value,
                         MAX_TRANSLATE_Y,
                     );
+                } else if (event.translationY >= context.value.scrollY) {
+                    scrollTo(
+                        scrollableRefs[scrollableRefs.length - 1],
+                        0,
+                        0,
+                        false,
+                    );
+                    scrollY.value = 0;
+                    translateY.value = event.translationY + context.value.y;
+                    translateY.value = Math.max(
+                        translateY.value,
+                        MAX_TRANSLATE_Y,
+                    );
+                }
+
+                const overshoot =
+                    MAX_TRANSLATE_Y - (event.translationY + context.value.y);
+
+                if (overshoot > 0) {
+                    scrollTo(
+                        scrollableRefs[scrollableRefs.length - 1],
+                        0,
+                        context.value.scrollY + overshoot,
+                        false,
+                    );
                 }
 
                 isExpanded.value = translateY.value === MAX_TRANSLATE_Y;
+                previousY.value = event.translationY;
             })
             .onEnd(() => {
                 const amount = Math.max(
@@ -136,8 +167,13 @@ const BottomSheet = forwardRef<BottomSheetRefProps, BottomSheetProps>(
 
                 snapTo(amount);
                 moving.value = false;
-            })
-            .simultaneousWithExternalGesture(scrollableRef);
+            });
+
+        if (scrollableRefs.length) {
+            gesture = gesture.simultaneousWithExternalGesture(
+                scrollableRefs[scrollableRefs.length - 1],
+            );
+        }
 
         const rBottomSheetStyle = useAnimatedStyle(() => {
             const borderRadius = interpolate(
@@ -164,7 +200,8 @@ const BottomSheet = forwardRef<BottomSheetRefProps, BottomSheetProps>(
                     moving,
                     isExpanded,
                     scrollY,
-                    scrollableRef,
+                    scrollableRefs,
+                    setScrollableRefs,
                 }}>
                 <GestureDetector gesture={gesture}>
                     <Animated.View

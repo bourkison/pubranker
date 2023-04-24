@@ -1,11 +1,5 @@
 import React, { useState } from 'react';
-import {
-    View,
-    Text,
-    StyleSheet,
-    TouchableOpacity,
-    ScrollView,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 import { BottomSheetStackParamList } from '@/nav/BottomSheetNavigator';
 import { StackScreenProps } from '@react-navigation/stack';
@@ -19,6 +13,7 @@ import {
 import { Feather } from '@expo/vector-icons';
 import CommentSection from '@/components/Comments/CommentSection';
 import { fromNowString } from '@/services';
+import BottomSheetScrollView from '@/components/BottomSheet/BottomSheetScrollView';
 
 export default function ViewReview({
     route,
@@ -139,70 +134,82 @@ export default function ViewReview({
     };
 
     return (
-        <ScrollView>
-            <View style={styles.ratingsContainer}>
-                <OverallRatings
-                    beer={route.params.review.beer}
-                    location={route.params.review.location}
-                    service={route.params.review.service}
-                    vibe={route.params.review.vibe}
-                    music={route.params.review.music}
-                    food={route.params.review.food}
-                    headerText="Overall"
-                />
-            </View>
-            <View style={styles.contentContainer}>
-                <Text>{route.params.review.content}</Text>
-            </View>
-            <View style={styles.bottomSection}>
-                <View style={styles.createdAtContainer}>
-                    <Text style={styles.createdAtText}>
-                        {fromNowString(route.params.review.created_at)}
-                    </Text>
+        <BottomSheetScrollView>
+            <View>
+                <View style={styles.ratingsContainer}>
+                    <OverallRatings
+                        beer={route.params.review.beer}
+                        location={route.params.review.location}
+                        service={route.params.review.service}
+                        vibe={route.params.review.vibe}
+                        music={route.params.review.music}
+                        food={route.params.review.food}
+                        headerText="Overall"
+                    />
                 </View>
-                <View style={styles.helpfulContainer}>
-                    <TouchableOpacity
-                        onPress={() => createHelpful(true)}
-                        style={styles.helpfulButton}>
-                        <Feather name="thumbs-up" size={16} color="#A3A3A3" />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        onPress={() => createHelpful(false)}
-                        style={styles.helpfulButton}>
-                        <Feather name="thumbs-down" size={16} color="#A3A3A3" />
-                    </TouchableOpacity>
-
-                    <Text style={styles.helpfulText}>
-                        {isHelpfuls} of {totalHelpfuls} found this helpful
-                    </Text>
+                <View style={styles.contentContainer}>
+                    <Text>{route.params.review.content}</Text>
                 </View>
-            </View>
-            {user && user.id === route.params.review.user_id ? (
-                <View style={styles.buttonsContainer}>
-                    <View style={styles.buttonContainer}>
-                        <TouchableOpacity
-                            style={styles.deleteButton}
-                            onPress={deleteReview}>
-                            <Text style={styles.deleteButtonText}>Delete</Text>
-                        </TouchableOpacity>
+                <View style={styles.bottomSection}>
+                    <View style={styles.createdAtContainer}>
+                        <Text style={styles.createdAtText}>
+                            {fromNowString(route.params.review.created_at)}
+                        </Text>
                     </View>
-                    <View style={styles.buttonContainer}>
+                    <View style={styles.helpfulContainer}>
                         <TouchableOpacity
-                            style={styles.editButton}
-                            onPress={() =>
-                                navigation.navigate('EditReview', {
-                                    pub: route.params.pub,
-                                    review: route.params.review,
-                                })
-                            }>
-                            <Text style={styles.editButtonText}>Edit</Text>
+                            onPress={() => createHelpful(true)}
+                            style={styles.helpfulButton}>
+                            <Feather
+                                name="thumbs-up"
+                                size={16}
+                                color="#A3A3A3"
+                            />
                         </TouchableOpacity>
+
+                        <TouchableOpacity
+                            onPress={() => createHelpful(false)}
+                            style={styles.helpfulButton}>
+                            <Feather
+                                name="thumbs-down"
+                                size={16}
+                                color="#A3A3A3"
+                            />
+                        </TouchableOpacity>
+
+                        <Text style={styles.helpfulText}>
+                            {isHelpfuls} of {totalHelpfuls} found this helpful
+                        </Text>
                     </View>
                 </View>
-            ) : undefined}
-            <CommentSection review={route.params.review} />
-        </ScrollView>
+                {user && user.id === route.params.review.user_id ? (
+                    <View style={styles.buttonsContainer}>
+                        <View style={styles.buttonContainer}>
+                            <TouchableOpacity
+                                style={styles.deleteButton}
+                                onPress={deleteReview}>
+                                <Text style={styles.deleteButtonText}>
+                                    Delete
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.buttonContainer}>
+                            <TouchableOpacity
+                                style={styles.editButton}
+                                onPress={() =>
+                                    navigation.navigate('EditReview', {
+                                        pub: route.params.pub,
+                                        review: route.params.review,
+                                    })
+                                }>
+                                <Text style={styles.editButtonText}>Edit</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                ) : undefined}
+                <CommentSection review={route.params.review} />
+            </View>
+        </BottomSheetScrollView>
     );
 }
 

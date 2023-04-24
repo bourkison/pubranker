@@ -1,4 +1,10 @@
-import { RefObject, createContext, useContext } from 'react';
+import {
+    Dispatch,
+    SetStateAction,
+    RefObject,
+    createContext,
+    useContext,
+} from 'react';
 import { ScrollView } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 
@@ -7,7 +13,8 @@ interface BottomSheetContextType {
     moving: Animated.SharedValue<boolean>;
     isExpanded: Animated.SharedValue<boolean>;
     scrollY: Animated.SharedValue<number>;
-    scrollableRef: RefObject<ScrollView>;
+    scrollableRefs: RefObject<ScrollView>[];
+    setScrollableRefs: Dispatch<SetStateAction<RefObject<ScrollView>[]>>;
 }
 
 export const BottomSheetContext = createContext<BottomSheetContextType | null>(
