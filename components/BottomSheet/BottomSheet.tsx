@@ -144,7 +144,10 @@ const BottomSheet = forwardRef<BottomSheetRefProps, BottomSheetProps>(
                 const overshoot =
                     MAX_TRANSLATE_Y - (event.translationY + context.value.y);
 
-                if (overshoot > 0) {
+                if (
+                    context.value.y !== MAX_TRANSLATE_Y &&
+                    scrollableRefs[scrollableRefs.length - 1]
+                ) {
                     scrollTo(
                         scrollableRefs[scrollableRefs.length - 1],
                         0,
