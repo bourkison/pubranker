@@ -8,14 +8,16 @@ import BottomSheet from '@/components/BottomSheet/BottomSheet';
 export default function Home() {
     const { height } = useWindowDimensions();
 
-    const snapPoints = useMemo(() => [0.1, 0.4, 0.9], []);
+    const snapPoints = useMemo(() => [0.1, 0.35, 0.85], []);
 
     return (
         <View style={styles.container}>
             <View style={styles.filtersContainer}>
-                <FiltersContainer />
+                <FiltersContainer
+                    heightPercentage={1 - snapPoints[snapPoints.length - 1]}
+                />
             </View>
-            <HomeMap bottomPadding={height * 0.1 - 10} />
+            <HomeMap bottomPadding={height * snapPoints[0] - 10} />
             <BottomSheet snapPoints={snapPoints} initialIndex={0}>
                 <BottomSheetNavigator />
             </BottomSheet>

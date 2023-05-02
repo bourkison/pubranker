@@ -1,22 +1,44 @@
 import React from 'react';
-import { View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import SearchBar from '@/components/Filters/SearchBar';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import FiltersScrollable from '@/components/Filters/FiltersScrollable';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
-export default function FiltersContainer() {
-    const insets = useSafeAreaInsets();
+type FiltersContainerProps = {
+    heightPercentage: number;
+};
+
+export default function FiltersContainer({
+    heightPercentage,
+}: FiltersContainerProps) {
     const { height } = useWindowDimensions();
+    const bottomTabBarHeight = useBottomTabBarHeight();
 
     return (
         <View>
             <View
-                style={{
-                    height: height * 0.1 - 8,
-                    justifyContent: 'flex-end',
-                    width: '100%',
-                }}>
+                style={[
+                    styles.container,
+                    {
+                        height:
+                            (height - bottomTabBarHeight) * heightPercentage,
+                    },
+                ]}>
                 <SearchBar />
+                <View style={styles.scrollableContainer}>
+                    <FiltersScrollable />
+                </View>
             </View>
         </View>
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        justifyContent: 'flex-end',
+        width: '100%',
+    },
+    scrollableContainer: {
+        marginTop: 10,
+    },
+});

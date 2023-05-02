@@ -135,16 +135,12 @@ const BottomSheet = forwardRef<BottomSheetRefProps, BottomSheetProps>(
 
                 // If our translationY is greater than our initial scrollY
                 // Scroll to top so we can begin moving sheet next update.
+                // TODO: Should also include check here for the bug where start not expanded
+                // expand, scroll down, then try to collapse again.
                 if (
                     event.translationY >= context.value.scrollY &&
                     scrollY.value !== 0
                 ) {
-                    console.log(
-                        'event:',
-                        event.translationY,
-                        context.value.scrollY,
-                    );
-
                     shouldManuallyScrollTo = 0;
                     scrollY.value = 0;
                     context.value = { y: context.value.y, scrollY: 0 };
@@ -257,17 +253,15 @@ const BottomSheet = forwardRef<BottomSheetRefProps, BottomSheetProps>(
                         style={[
                             styles.container,
                             {
-                                height: AVAILABLE_HEIGHT,
+                                height:
+                                    AVAILABLE_HEIGHT *
+                                    snapPoints[snapPoints.length - 1],
                                 top: AVAILABLE_HEIGHT,
                             },
                             rBottomSheetStyle,
                         ]}>
                         <View style={styles.handle} />
-                        <View
-                            style={[
-                                styles.contentContainer,
-                                { paddingBottom: bottomTabBarHeight },
-                            ]}>
+                        <View style={[styles.contentContainer]}>
                             {children}
                         </View>
                     </Animated.View>
