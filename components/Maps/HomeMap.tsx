@@ -140,6 +140,7 @@ export default function HomeMap({ bottomPadding }: HomeMapProps) {
             provider="google"
             ref={MapRef}
             showsUserLocation={true}
+            showsMyLocationButton={false}
             style={styles.map}
             onPanDrag={panDrag}
             customMapStyle={MapStyle}
