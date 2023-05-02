@@ -22,7 +22,7 @@ type BottomSheetScrollViewProps = {
 export default function BottomSheetScrollView({
     children,
 }: BottomSheetScrollViewProps) {
-    const { isExpanded, scrollY, setScrollableRefs } =
+    const { isExpanded, scrollY, setScrollableRefs, scrollViewIsAnimating } =
         useSharedBottomSheetContext();
 
     const localScrollY = useSharedValue(0);
@@ -37,7 +37,7 @@ export default function BottomSheetScrollView({
     });
 
     const scrollProps = useAnimatedProps(() => {
-        console.log(localScrollY.value, !(localScrollY.value <= 0));
+        // console.log(localScrollY.value, !(localScrollY.value <= 0));
 
         return {
             // only scroll if sheet is open
@@ -70,6 +70,8 @@ export default function BottomSheetScrollView({
         <AnimatedScrollView
             scrollEventThrottle={1}
             ref={localRef}
+            onScrollBeginDrag={() => (scrollViewIsAnimating.value = true)}
+            onScrollEndDrag={() => (scrollViewIsAnimating.value = false)}
             onScroll={scrollHandler}
             animatedProps={scrollProps}>
             {children}

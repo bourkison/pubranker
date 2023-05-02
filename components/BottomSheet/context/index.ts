@@ -10,8 +10,8 @@ import Animated from 'react-native-reanimated';
 
 interface BottomSheetContextType {
     translateY: Animated.SharedValue<number>;
-    moving: Animated.SharedValue<boolean>;
     isExpanded: Animated.SharedValue<boolean>;
+    scrollViewIsAnimating: Animated.SharedValue<boolean>;
     scrollY: Animated.SharedValue<number>;
     scrollableRefs: RefObject<ScrollView>[];
     setScrollableRefs: Dispatch<SetStateAction<RefObject<ScrollView>[]>>;

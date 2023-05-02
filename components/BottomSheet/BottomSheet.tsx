@@ -52,10 +52,10 @@ const BottomSheet = forwardRef<BottomSheetRefProps, BottomSheetProps>(
         const context = useSharedValue({ y: 0, scrollY: 0 });
 
         const translateY = useSharedValue(0);
-        const previousY = useSharedValue(0);
         const scrollY = useSharedValue(0);
-        const moving = useSharedValue(false);
         const isExpanded = useSharedValue(false);
+        const hasCollapsed = useSharedValue(false);
+        const scrollViewIsAnimating = useSharedValue(false);
 
         const [scrollableRefs, setScrollableRefs] = useState<
             RefObject<ScrollView>[]
@@ -116,7 +116,7 @@ const BottomSheet = forwardRef<BottomSheetRefProps, BottomSheetProps>(
         let gesture = Gesture.Pan()
             .onStart(() => {
                 context.value = { y: translateY.value, scrollY: scrollY.value };
-                moving.value = true;
+                hasCollapsed.value = false;
             })
             .onUpdate(event => {
                 // Move sheet if top of scroll view or not expanded.
@@ -126,38 +126,85 @@ const BottomSheet = forwardRef<BottomSheetRefProps, BottomSheetProps>(
                         translateY.value,
                         MAX_TRANSLATE_Y,
                     );
-                } else if (event.translationY >= context.value.scrollY) {
-                    scrollTo(
-                        scrollableRefs[scrollableRefs.length - 1],
-                        0,
-                        0,
-                        false,
+                }
+
+                let shouldManuallyScrollTo = -1;
+
+                const initiallyExpanded = context.value.y === MAX_TRANSLATE_Y;
+                const nowExpanded = translateY.value === MAX_TRANSLATE_Y;
+
+                // If our translationY is greater than our initial scrollY
+                // Scroll to top so we can begin moving sheet next update.
+                if (
+                    event.translationY >= context.value.scrollY &&
+                    scrollY.value !== 0
+                ) {
+                    console.log(
+                        'event:',
+                        event.translationY,
+                        context.value.scrollY,
                     );
+
+                    shouldManuallyScrollTo = 0;
                     scrollY.value = 0;
+                    context.value = { y: context.value.y, scrollY: 0 };
                     translateY.value = event.translationY + context.value.y;
                     translateY.value = Math.max(
                         translateY.value,
                         MAX_TRANSLATE_Y,
                     );
                 }
+                // If we weren't initially expanded
+                // AND we're now expanded
+                // Manually scroll.
+                else if (!initiallyExpanded && nowExpanded) {
+                    const overshoot =
+                        MAX_TRANSLATE_Y -
+                        (event.translationY + context.value.y);
 
-                const overshoot =
-                    MAX_TRANSLATE_Y - (event.translationY + context.value.y);
+                    shouldManuallyScrollTo = context.value.scrollY + overshoot;
+                }
+                // If we're initially expanded
+                // AND we have collapsed at one point
+                // AND we're again expanded
+                // Manually scroll
+                else if (
+                    initiallyExpanded &&
+                    hasCollapsed.value &&
+                    nowExpanded
+                ) {
+                    const overshoot =
+                        MAX_TRANSLATE_Y -
+                        (event.translationY + context.value.y);
 
+                    shouldManuallyScrollTo = Math.max(
+                        context.value.scrollY + overshoot,
+                        0,
+                    );
+                }
+
+                // Only apply above if there exists a ref and that ref is not already animating.
                 if (
-                    context.value.y !== MAX_TRANSLATE_Y &&
-                    scrollableRefs[scrollableRefs.length - 1]
+                    shouldManuallyScrollTo > -1 &&
+                    scrollableRefs[scrollableRefs.length - 1] &&
+                    !scrollViewIsAnimating.value
                 ) {
                     scrollTo(
                         scrollableRefs[scrollableRefs.length - 1],
                         0,
-                        context.value.scrollY + overshoot,
+                        shouldManuallyScrollTo,
                         false,
                     );
                 }
 
+                if (
+                    !hasCollapsed.value &&
+                    translateY.value !== MAX_TRANSLATE_Y
+                ) {
+                    hasCollapsed.value = true;
+                }
+
                 isExpanded.value = translateY.value === MAX_TRANSLATE_Y;
-                previousY.value = event.translationY;
             })
             .onEnd(() => {
                 const amount = Math.max(
@@ -169,7 +216,6 @@ const BottomSheet = forwardRef<BottomSheetRefProps, BottomSheetProps>(
                 );
 
                 snapTo(amount);
-                moving.value = false;
             });
 
         if (scrollableRefs.length) {
@@ -200,11 +246,11 @@ const BottomSheet = forwardRef<BottomSheetRefProps, BottomSheetProps>(
             <BottomSheetContext.Provider
                 value={{
                     translateY,
-                    moving,
                     isExpanded,
                     scrollY,
                     scrollableRefs,
                     setScrollableRefs,
+                    scrollViewIsAnimating,
                 }}>
                 <GestureDetector gesture={gesture}>
                     <Animated.View
