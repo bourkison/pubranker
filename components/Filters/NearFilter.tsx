@@ -1,11 +1,17 @@
 import React from 'react';
 import { View, StyleSheet, Text } from 'react-native';
+import FilterItem from '@/components/Filters/FilterItem';
 
 export default function NearFilter() {
     return (
-        <View style={styles.container}>
-            <Text style={styles.filterText}>Nearby</Text>
-        </View>
+        <FilterItem
+            ButtonContent={
+                <View style={styles.container}>
+                    <Text style={styles.filterText}>Nearby</Text>
+                </View>
+            }
+            ModalContent={<View />}
+        />
     );
 }
 
