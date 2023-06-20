@@ -1,6 +1,6 @@
 import { supabase } from '@/services/supabase';
 import { Database } from '@/types/schema';
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 
 type Beer = Database['public']['Tables']['beers']['Row'];
@@ -10,15 +10,13 @@ type BeerPillProps = {
 };
 
 export default function BeerPill({ beer }: BeerPillProps) {
-    const [imageUrl, setImageUrl] = useState('');
-
-    useEffect(() => {
+    const imageUrl = useMemo(() => {
         if (beer.logo) {
-            setImageUrl(
-                supabase.storage.from('beers').getPublicUrl(beer.logo).data
-                    .publicUrl,
-            );
+            return supabase.storage.from('beers').getPublicUrl(beer.logo).data
+                .publicUrl;
         }
+
+        return '';
     }, [beer]);
 
     return (

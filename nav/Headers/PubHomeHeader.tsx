@@ -1,13 +1,13 @@
 import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Ionicons, Octicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { StackHeaderProps, StackNavigationProp } from '@react-navigation/stack';
 import { parseLocation } from '@/services';
 import { getBorough } from '@/services/geo';
 import { useNavigation } from '@react-navigation/native';
 import { BottomSheetStackParamList } from '../BottomSheetNavigator';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { deselectPub, toggleSave as toggleMapSave } from '@/store/slices/pub';
+import { toggleSave as toggleMapSave } from '@/store/slices/pub';
 import { toggleSave } from '@/store/slices/saved';
 import { toggleSave as toggleDiscoverSave } from '@/store/slices/discover';
 
@@ -70,15 +70,6 @@ export default function PubHomeHeader({}: StackHeaderProps) {
                             color="#dc2626"
                         />
                     )}
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    onPress={() => {
-                        dispatch(deselectPub());
-                        navigation.navigate('Discover');
-                    }}
-                    style={styles.closeButton}>
-                    <Octicons name="x" color="#A3A3A3" size={18} />
                 </TouchableOpacity>
             </View>
         </View>

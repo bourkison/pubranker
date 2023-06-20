@@ -34,7 +34,6 @@ export default function Review({ pub, review }: ReviewProps) {
     );
 
     const toggleText = () => {
-        console.log('TOGGLE');
         setTextShown(!textShown);
     };
 

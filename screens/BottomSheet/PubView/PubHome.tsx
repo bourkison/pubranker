@@ -9,7 +9,6 @@ import {
 import { BottomSheetStackParamList } from '@/nav/BottomSheetNavigator';
 import { StackScreenProps } from '@react-navigation/stack';
 import PubReviews from '@/components/Reviews/PubReviews';
-import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import ImageScroller from '@/components/Utility/ImageScroller';
 import { supabase } from '@/services/supabase';
 import PubTopBar from '@/components/Pubs/PubTopBar';
@@ -19,6 +18,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { SelectedPub, setPub } from '@/store/slices/pub';
 import DraughtBeersList from '@/components/Beers/DraughtBeersList';
 import PubDetails from '@/components/Pubs/PubDetails';
+import BottomSheetScrollView from '@/components/BottomSheet/BottomSheetScrollView';
 
 export default function PubHome({
     route,

@@ -74,6 +74,26 @@ export interface Database {
                     type?: string;
                 };
             };
+            comment_likes: {
+                Row: {
+                    comment_id: number;
+                    created_at: string;
+                    id: number;
+                    user_id: string;
+                };
+                Insert: {
+                    comment_id: number;
+                    created_at?: string;
+                    id?: number;
+                    user_id?: string;
+                };
+                Update: {
+                    comment_id?: number;
+                    created_at?: string;
+                    id?: number;
+                    user_id?: string;
+                };
+            };
             comments: {
                 Row: {
                     content: string;
@@ -488,6 +508,8 @@ export interface Database {
                     content: string | null;
                     created_at: string | null;
                     id: number | null;
+                    liked: boolean | null;
+                    likes_amount: number | null;
                     review_id: number | null;
                     updated_at: string | null;
                     user_id: string | null;

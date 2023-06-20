@@ -6,7 +6,7 @@ import {
     Text,
     TouchableOpacity,
 } from 'react-native';
-import Spinner from '../Utility/Spinner';
+import Spinner from '@/components/Utility/Spinner';
 import { supabase } from '@/services/supabase';
 import { UserCommentType, UserReviewType } from '@/types';
 import { useAppSelector } from '@/store/hooks';
@@ -50,7 +50,12 @@ export default function CreateComment({
         setContent('');
 
         if (onCreate) {
-            onCreate({ ...data, user_name: user.name });
+            onCreate({
+                ...data,
+                user_name: user.name,
+                liked: false,
+                likes_amount: 0,
+            });
         }
     };
 

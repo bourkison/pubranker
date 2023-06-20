@@ -15,7 +15,7 @@ export default function HoursCollapsible({
     openingHours,
 }: HoursCollapsibleProps) {
     const [collapsed, setCollapsed] = useState(true);
-    const { isOpen, nextHours } = checkIfOpen(openingHours);
+    const { isOpen } = checkIfOpen(openingHours);
 
     const todaysHours = openingHours.filter(
         oh => oh.open_day === dayjs().day(),
@@ -36,9 +36,7 @@ export default function HoursCollapsible({
                                 ? `${timeString(
                                       todaysHours[0].open_hour,
                                   )} - ${timeString(todaysHours[0].close_hour)}`
-                                : `Closed All Day. Next Open ${nextHours.format(
-                                      'DDD',
-                                  )} ${timeString(nextHours.format('HHmm'))}`}
+                                : 'Closed All Day'}
                         </Text>
                     </View>
                     <View>

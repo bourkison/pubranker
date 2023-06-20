@@ -7,8 +7,8 @@ import {
     TextInput,
     TouchableOpacity,
     View,
+    ScrollView,
 } from 'react-native';
-import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 
 import { BottomSheetStackParamList } from '@/nav/BottomSheetNavigator';
 import { StackScreenProps } from '@react-navigation/stack';
@@ -69,7 +69,7 @@ export default function CreateReview({
     };
 
     return (
-        <BottomSheetScrollView keyboardDismissMode="on-drag">
+        <ScrollView keyboardDismissMode="on-drag">
             <KeyboardAvoidingView behavior="position">
                 <View style={styles.titleContainer}>
                     <Text style={styles.title}>{route.params.pub.name}</Text>
@@ -186,7 +186,7 @@ export default function CreateReview({
                     )}
                 </TouchableOpacity>
             </View>
-        </BottomSheetScrollView>
+        </ScrollView>
     );
 }
 
