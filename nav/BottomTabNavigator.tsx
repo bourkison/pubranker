@@ -14,7 +14,10 @@ export default function BottomTabNavigator() {
         <Tab.Navigator
             screenOptions={{
                 headerShown: false,
-                tabBarActiveTintColor: 'rgb(229, 130, 68)',
+                tabBarActiveTintColor: '#721121',
+                tabBarStyle: {
+                    backgroundColor: '#D8D4D5',
+                },
             }}>
             <Tab.Screen
                 name="Explore"
@@ -24,7 +27,7 @@ export default function BottomTabNavigator() {
                         <Ionicons
                             name={focused ? 'search' : 'search-outline'}
                             size={size}
-                            color={focused ? 'rgb(229, 130, 68)' : undefined}
+                            color={focused ? '#721121' : undefined}
                         />
                     ),
                 }}
@@ -37,7 +40,7 @@ export default function BottomTabNavigator() {
                         <Ionicons
                             name={focused ? 'heart' : 'heart-outline'}
                             size={size}
-                            color={focused ? 'rgb(229, 130, 68)' : undefined}
+                            color={focused ? '#721121' : undefined}
                         />
                     ),
                 }}
@@ -50,7 +53,7 @@ export default function BottomTabNavigator() {
                         <Ionicons
                             name={focused ? 'cog' : 'cog-outline'}
                             size={size}
-                            color={focused ? 'rgb(229, 130, 68)' : undefined}
+                            color={focused ? '#721121' : undefined}
                         />
                     ),
                 }}

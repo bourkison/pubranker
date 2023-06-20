@@ -78,6 +78,7 @@ export default function Explore() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#D8D4D5',
     },
     filtersContainer: {
         marginBottom: 10,
@@ -92,5 +93,6 @@ const styles = StyleSheet.create({
     subheading: {
         fontSize: 24,
         fontWeight: '500',
+        color: '#292935',
     },
 });

@@ -20,7 +20,7 @@ export default function RatingsCategory({
                     <Text style={styles.individualRatingHeader}>{title}</Text>
                 </View>
                 <View style={styles.ratingContainer}>
-                    <Ionicons name="star" size={12} color="#FFD700" />
+                    <Ionicons name="star" size={12} color="#384D48" />
                     <Text style={styles.individualRatingText}>
                         {roundToNearest(rating, 0.1).toFixed(1)}
                     </Text>

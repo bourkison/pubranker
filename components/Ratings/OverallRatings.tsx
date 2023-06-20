@@ -32,7 +32,7 @@ export default function OverallRatings({
                     <Text style={styles.headerText}>{headerText}</Text>
                 </View>
                 <View style={styles.overallRatingsContainer}>
-                    <Ionicons name="star" size={12} color="#FFD700" />
+                    <Ionicons name="star" size={12} color="#384D48" />
                     <Text style={styles.headerText}>
                         {roundToNearest(
                             averageReviews(

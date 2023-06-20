@@ -18,7 +18,7 @@ type RatingsBarProps = {
 export default function RatingsBar({
     height = 10,
     backgroundColor = '#E5E7EB',
-    progressColor = '#FFD700',
+    progressColor = '#384D48',
     borderRadius = 3,
     current,
     max,

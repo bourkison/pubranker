@@ -16,6 +16,7 @@ import PubFeatures from '@/components/Pubs/PubFeatures';
 import DraughtBeersList from '@/components/Beers/DraughtBeersList';
 import PubDetails from '@/components/Pubs/PubDetails';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
+import PubViewHeader from '@/components/Pubs/PubViewHeader';
 
 export default function PubHome({
     route,
@@ -39,6 +40,7 @@ export default function PubHome({
     return (
         <SafeAreaView>
             <ScrollView>
+                <PubViewHeader />
                 <View style={styles.contentContainer}>
                     <View style={styles.descriptionContainer}>
                         <Text>{route.params.pub.google_overview}</Text>

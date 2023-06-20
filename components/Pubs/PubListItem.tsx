@@ -105,10 +105,12 @@ const styles = StyleSheet.create({
     },
     ratingText: {
         marginLeft: 3,
+        color: '#292935',
         fontWeight: '500',
     },
     numReviewsText: {
         marginLeft: 3,
+        color: '#292935',
         fontWeight: '200',
     },
     titleContainer: {
@@ -116,6 +118,7 @@ const styles = StyleSheet.create({
     },
     titleText: {
         fontSize: 16,
+        color: '#292935',
         fontWeight: '600',
     },
     addressContainer: {
@@ -123,6 +126,7 @@ const styles = StyleSheet.create({
     },
     addressText: {
         fontSize: 10,
+        color: '#292935',
         fontWeight: '300',
     },
     distanceContainer: {
@@ -130,6 +134,7 @@ const styles = StyleSheet.create({
     },
     distanceText: {
         fontSize: 10,
+        color: '#292935',
         fontWeight: '300',
     },
 });

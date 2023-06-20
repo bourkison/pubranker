@@ -26,10 +26,11 @@ const styles = StyleSheet.create({
             height: 0,
             width: 0,
         },
-        backgroundColor: '#fff',
+        backgroundColor: '#384D48',
         marginHorizontal: 5,
     },
     filterText: {
         fontWeight: '500',
+        color: '#D8D4D5',
     },
 });
