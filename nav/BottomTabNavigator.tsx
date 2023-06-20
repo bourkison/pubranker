@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Home from '@/screens/Home';
 import Saved from '@/screens/Saved';
 import { Ionicons } from '@expo/vector-icons';
 import { requestBackgroundPermissionsAsync } from 'expo-location';
@@ -10,7 +9,7 @@ import Explore from '@/screens/Explore';
 
 const Tab = createBottomTabNavigator();
 
-export default function Navigator() {
+export default function BottomTabNavigator() {
     return (
         <Tab.Navigator
             screenOptions={{
@@ -24,19 +23,6 @@ export default function Navigator() {
                     tabBarIcon: ({ size, focused }) => (
                         <Ionicons
                             name={focused ? 'search' : 'search-outline'}
-                            size={size}
-                            color={focused ? 'rgb(229, 130, 68)' : undefined}
-                        />
-                    ),
-                }}
-            />
-            <Tab.Screen
-                name="Home"
-                component={Home}
-                options={{
-                    tabBarIcon: ({ size, focused }) => (
-                        <Ionicons
-                            name={focused ? 'home' : 'home-outline'}
                             size={size}
                             color={focused ? 'rgb(229, 130, 68)' : undefined}
                         />

@@ -19,10 +19,15 @@ export default function SearchBar() {
 
     return (
         <View style={styles.searchBar}>
-            <Ionicons name="search" color="#A3A3A3" style={styles.searchIcon} />
+            <Ionicons
+                name="search"
+                color="#A3A3A3"
+                style={styles.searchIcon}
+                size={16}
+            />
             <TextInput
                 style={styles.searchInput}
-                placeholder="Search"
+                placeholder="Find pubs"
                 placeholderTextColor="#A3A3A3"
                 value={searchText}
                 returnKeyType="search"
@@ -46,10 +51,11 @@ export default function SearchBar() {
 
 const styles = StyleSheet.create({
     searchBar: {
-        borderRadius: 10,
+        borderRadius: 25,
         backgroundColor: '#FFF',
-        paddingHorizontal: 10,
-        marginHorizontal: 15,
+        paddingLeft: 17,
+        paddingRight: 10,
+        marginHorizontal: 20,
         flexDirection: 'row',
         alignItems: 'center',
         shadowColor: '#000',

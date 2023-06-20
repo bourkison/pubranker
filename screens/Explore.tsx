@@ -2,11 +2,12 @@ import PubList from '@/components/Pubs/PubList';
 import { supabase } from '@/services/supabase';
 import { DiscoveredPub } from '@/types';
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, Text } from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import * as Location from 'expo-location';
+import FiltersContainer from '@/components/Filters/FiltersContainer_v2';
 
 const METERS_WITHIN = 1000;
-const INITIAL_AMOUNT = 3;
+const INITIAL_AMOUNT = 10;
 
 export default function Explore() {
     // TODO: Move this into a separate component.
@@ -42,9 +43,54 @@ export default function Explore() {
     }, []);
 
     return (
-        <SafeAreaView>
-            <Text>Explore</Text>
-            <PubList pubs={pubs} isLoading={isLoading} />
+        <SafeAreaView style={styles.container}>
+            <View style={styles.filtersContainer}>
+                <FiltersContainer />
+            </View>
+            <ScrollView style={styles.container}>
+                <View style={styles.sectionContainer}>
+                    <View style={styles.subheadingContainer}>
+                        <Text style={styles.subheading}>Top pubs nearby</Text>
+                    </View>
+                    <PubList pubs={pubs} isLoading={isLoading} />
+                </View>
+                <View style={styles.sectionContainer}>
+                    <View style={styles.subheadingContainer}>
+                        <Text style={styles.subheading}>
+                            Top pubs in London
+                        </Text>
+                    </View>
+                    <PubList pubs={pubs} isLoading={isLoading} />
+                </View>
+                <View style={styles.sectionContainer}>
+                    <View style={styles.subheadingContainer}>
+                        <Text style={styles.subheading}>
+                            Top rated pubs by vibe nearby
+                        </Text>
+                    </View>
+                    <PubList pubs={pubs} isLoading={isLoading} />
+                </View>
+            </ScrollView>
         </SafeAreaView>
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+    filtersContainer: {
+        marginBottom: 10,
+    },
+    sectionContainer: {
+        marginBottom: 20,
+    },
+    subheadingContainer: {
+        marginBottom: 15,
+        paddingHorizontal: 10,
+    },
+    subheading: {
+        fontSize: 24,
+        fontWeight: '500',
+    },
+});

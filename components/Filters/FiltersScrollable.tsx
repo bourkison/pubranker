@@ -4,7 +4,14 @@ import NearFilter from '@/components/Filters/NearFilter';
 
 export default function FiltersScrollable() {
     return (
-        <ScrollView horizontal={true} style={styles.container}>
+        <ScrollView
+            horizontal={true}
+            bounces={false}
+            style={styles.container}
+            showsHorizontalScrollIndicator={false}>
+            <NearFilter />
+            <NearFilter />
+            <NearFilter />
             <NearFilter />
             <NearFilter />
         </ScrollView>

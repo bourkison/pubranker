@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { NavigationContainer } from '@react-navigation/native';
-import Navigator from '@/nav/Navigator';
+import Navigator from '@/nav/MainNavigator';
 import AuthContainer from '@/components/Auth/AuthContainer';
 import { Provider } from 'react-redux';
 import store from '@/store';
