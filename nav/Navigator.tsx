@@ -6,6 +6,7 @@ import Saved from '@/screens/Saved';
 import { Ionicons } from '@expo/vector-icons';
 import { requestBackgroundPermissionsAsync } from 'expo-location';
 import Settings from '@/screens/Settings';
+import Explore from '@/screens/Explore';
 
 const Tab = createBottomTabNavigator();
 
@@ -16,6 +17,19 @@ export default function Navigator() {
                 headerShown: false,
                 tabBarActiveTintColor: 'rgb(229, 130, 68)',
             }}>
+            <Tab.Screen
+                name="Explore"
+                component={Explore}
+                options={{
+                    tabBarIcon: ({ size, focused }) => (
+                        <Ionicons
+                            name={focused ? 'search' : 'search-outline'}
+                            size={size}
+                            color={focused ? 'rgb(229, 130, 68)' : undefined}
+                        />
+                    ),
+                }}
+            />
             <Tab.Screen
                 name="Home"
                 component={Home}
