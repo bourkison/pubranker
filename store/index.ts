@@ -4,6 +4,7 @@ import pubReducer from '@/store/slices/pub';
 import discoverReducer from '@/store/slices/discover';
 import savedReducer from '@/store/slices/saved';
 import mapReducer from '@/store/slices/map';
+import exploreReducer from '@/store/slices/explore';
 
 const store = configureStore({
     reducer: {
@@ -12,6 +13,7 @@ const store = configureStore({
         discover: discoverReducer,
         saved: savedReducer,
         map: mapReducer,
+        explore: exploreReducer,
     },
 });
 

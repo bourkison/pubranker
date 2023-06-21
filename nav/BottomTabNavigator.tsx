@@ -46,12 +46,12 @@ export default function BottomTabNavigator() {
                 }}
             />
             <Tab.Screen
-                name="Settings"
+                name="Profile"
                 component={Settings}
                 options={{
                     tabBarIcon: ({ size, focused }) => (
                         <Ionicons
-                            name={focused ? 'cog' : 'cog-outline'}
+                            name={focused ? 'person' : 'person-outline'}
                             size={size}
                             color={focused ? '#721121' : undefined}
                         />

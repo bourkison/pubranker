@@ -5,6 +5,8 @@ import React, { useEffect, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import * as Location from 'expo-location';
 import FiltersContainer from '@/components/Filters/FiltersContainer_v2';
+import { useAppSelector } from '@/store/hooks';
+import SearchSuggestions from '@/components/Filters/SearchSuggestions';
 
 const METERS_WITHIN = 1000;
 const INITIAL_AMOUNT = 10;
@@ -13,6 +15,8 @@ export default function Explore() {
     // TODO: Move this into a separate component.
     const [isLoading, setIsLoading] = useState(false);
     const [pubs, setPubs] = useState<DiscoveredPub[]>([]);
+
+    const exploreState = useAppSelector(state => state.explore.exploreState);
 
     useEffect(() => {
         const initialLoad = async () => {
@@ -47,6 +51,11 @@ export default function Explore() {
             <View style={styles.filtersContainer}>
                 <FiltersContainer />
             </View>
+            {exploreState === 'search' ? (
+                <View style={styles.suggestionsContainer}>
+                    <SearchSuggestions />
+                </View>
+            ) : undefined}
             <ScrollView style={styles.container}>
                 <View style={styles.sectionContainer}>
                     <View style={styles.subheadingContainer}>
@@ -78,10 +87,14 @@ export default function Explore() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#D8D4D5',
     },
     filtersContainer: {
         marginBottom: 10,
+    },
+    suggestionsContainer: {
+        width: '100%',
+        height: '100%',
+        zIndex: 2,
     },
     sectionContainer: {
         marginBottom: 20,

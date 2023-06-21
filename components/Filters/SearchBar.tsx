@@ -1,12 +1,21 @@
-import React from 'react';
-import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useRef } from 'react';
+import {
+    View,
+    TextInput,
+    TouchableOpacity,
+    StyleSheet,
+    Pressable,
+} from 'react-native';
 import { Ionicons, Feather } from '@expo/vector-icons';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { setSearchText } from '@/store/slices/discover';
+import { setSearchText, setState } from '@/store/slices/explore';
 
 export default function SearchBar() {
     const dispatch = useAppDispatch();
-    const searchText = useAppSelector(state => state.discover.searchText);
+    const exploreState = useAppSelector(state => state.explore.exploreState);
+    const searchText = useAppSelector(state => state.explore.searchText);
+
+    const inputRef = useRef<TextInput>(null);
 
     const search = () => {
         console.log('search');
@@ -17,15 +26,38 @@ export default function SearchBar() {
         search();
     };
 
+    const goToSuggestions = () => {
+        dispatch(setSearchText(''));
+        dispatch(setState('explore'));
+
+        if (inputRef && inputRef.current) {
+            inputRef.current.blur();
+        }
+    };
+
     return (
         <View style={styles.searchBar}>
-            <Ionicons
-                name="search"
-                color="#A3A3A3"
-                style={styles.searchIcon}
-                size={16}
-            />
+            {exploreState === 'explore' ? (
+                <Ionicons
+                    name="search"
+                    color="#A3A3A3"
+                    style={styles.searchIcon}
+                    size={16}
+                />
+            ) : (
+                <Pressable onPress={goToSuggestions}>
+                    <Ionicons
+                        name="arrow-back"
+                        color="#A3A3A3"
+                        style={styles.searchIcon}
+                        size={16}
+                    />
+                </Pressable>
+            )}
+
             <TextInput
+                onFocus={() => dispatch(setState('search'))}
+                ref={inputRef}
                 style={styles.searchInput}
                 placeholder="Find pubs"
                 placeholderTextColor="#A3A3A3"
