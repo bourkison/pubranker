@@ -9,10 +9,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { averageReviews, fromNowString, roundToNearest } from '@/services';
-import { useNavigation } from '@react-navigation/native';
-import { BottomSheetStackParamList } from '@/nav/BottomSheetNavigator';
 import { SelectedPub } from '@/store/slices/pub';
-import { StackNavigationProp } from '@react-navigation/stack';
 import { UserReviewType } from '@/types';
 
 type ReviewProps = {
@@ -22,7 +19,7 @@ type ReviewProps = {
 
 const MAX_LINES_LENGTH = 4;
 
-export default function Review({ pub, review }: ReviewProps) {
+export default function Review({ review }: ReviewProps) {
     const [textShown, setTextShown] = useState(false);
     const [lengthMore, setLengthMore] = useState(false);
 
@@ -36,9 +33,6 @@ export default function Review({ pub, review }: ReviewProps) {
     const toggleText = () => {
         setTextShown(!textShown);
     };
-
-    const navigation =
-        useNavigation<StackNavigationProp<BottomSheetStackParamList>>();
 
     const averageReview = useMemo(() => {
         const r = averageReviews(
@@ -61,10 +55,7 @@ export default function Review({ pub, review }: ReviewProps) {
                         {averageReview}
                     </Text>
                 </View>
-                <TouchableOpacity
-                    onPress={() =>
-                        navigation.navigate('ViewReview', { pub, review })
-                    }>
+                <TouchableOpacity onPress={() => console.log('REVIEW')}>
                     <Text
                         numberOfLines={textShown ? undefined : MAX_LINES_LENGTH}
                         onTextLayout={onTextLayout}>

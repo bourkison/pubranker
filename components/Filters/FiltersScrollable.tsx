@@ -8,7 +8,6 @@ export default function FiltersScrollable() {
     return (
         <ScrollView
             horizontal={true}
-            bounces={false}
             style={styles.container}
             showsHorizontalScrollIndicator={false}>
             <NearFilter />

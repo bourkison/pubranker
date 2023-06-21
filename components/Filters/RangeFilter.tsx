@@ -3,7 +3,7 @@ import FilterItem from '@/components/Filters/FilterItem';
 import { StyleSheet, Text, View } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { setWithinRange } from '@/store/slices/explore';
+import { setState, setWithinRange } from '@/store/slices/explore';
 import { MAX_WITHIN_RANGE, MIN_WITHIN_RANGE } from '@/constants';
 
 export default function RangeFilter() {
@@ -19,6 +19,7 @@ export default function RangeFilter() {
 
     const onSearch = () => {
         dispatch(setWithinRange(range));
+        dispatch(setState('map'));
     };
 
     return (

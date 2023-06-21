@@ -1,8 +1,6 @@
-import { BottomSheetStackParamList } from '@/nav/BottomSheetNavigator';
 import { supabase } from '@/services/supabase';
 import { useAppSelector } from '@/store/hooks';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { useFocusEffect } from '@react-navigation/native';
 import React, { useCallback, useState } from 'react';
 import {
     View,
@@ -25,9 +23,6 @@ export default function ReviewPubButton({ pub }: ReviewPubButtonProps) {
     const [review, setReview] = useState<UserReviewType | null>(null);
 
     const user = useAppSelector(state => state.user.docData);
-
-    const navigation =
-        useNavigation<StackNavigationProp<BottomSheetStackParamList>>();
 
     useFocusEffect(
         useCallback(() => {
@@ -58,14 +53,7 @@ export default function ReviewPubButton({ pub }: ReviewPubButtonProps) {
 
     const buttonPress = () => {
         if (!isLoading && user) {
-            if (review) {
-                navigation.navigate('ViewReview', {
-                    pub: pub,
-                    review: review,
-                });
-            } else {
-                navigation.navigate('CreateReview', { pub });
-            }
+            console.log('button press');
         }
     };
 

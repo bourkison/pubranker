@@ -22,7 +22,7 @@ export default function SearchBar() {
 
     const goToSuggestions = () => {
         dispatch(setSearchText(''));
-        dispatch(setState('explore'));
+        dispatch(setState('suggestions'));
         dispatch(resetPubs());
 
         if (inputRef && inputRef.current) {
@@ -32,7 +32,7 @@ export default function SearchBar() {
 
     return (
         <View style={styles.searchBar}>
-            {exploreState === 'explore' ? (
+            {exploreState === 'suggestions' ? (
                 <Ionicons
                     name="search"
                     color="#A3A3A3"

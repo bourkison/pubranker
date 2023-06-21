@@ -41,7 +41,7 @@ const initialState = discoverAdapter.getInitialState({
         foosball: 'unset',
         wheelchairAccessible: 'unset',
     } as PubFilters,
-    exploreState: 'suggestions' as 'suggestions' | 'search' | 'explore', // suggestions is home, search is search suggestions, explore is map.
+    exploreState: 'suggestions' as 'suggestions' | 'search' | 'map',
 });
 
 const queryDb = async (
@@ -151,7 +151,7 @@ const exploreSlice = createSlice({
         },
         setState(
             state,
-            action: PayloadAction<'suggestions' | 'search' | 'explore'>,
+            action: PayloadAction<'suggestions' | 'search' | 'map'>,
         ) {
             state.exploreState = action.payload;
         },

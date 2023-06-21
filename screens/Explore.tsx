@@ -7,6 +7,7 @@ import * as Location from 'expo-location';
 import FiltersContainer from '@/components/Filters/FiltersContainer';
 import { useAppSelector } from '@/store/hooks';
 import SearchSuggestionList from '@/components/Filters/SearchSuggestionList';
+import HomeMap from '@/components/Maps/HomeMap';
 
 const METERS_WITHIN = 1000;
 const INITIAL_AMOUNT = 10;
@@ -56,6 +57,11 @@ export default function Explore() {
                     <SearchSuggestionList />
                 </View>
             ) : undefined}
+            {exploreState === 'map' ? (
+                <View style={styles.mapContainer}>
+                    <HomeMap />
+                </View>
+            ) : undefined}
             <ScrollView style={styles.container}>
                 <View style={styles.sectionContainer}>
                     <View style={styles.subheadingContainer}>
@@ -92,6 +98,11 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     suggestionsContainer: {
+        width: '100%',
+        height: '100%',
+        zIndex: 2,
+    },
+    mapContainer: {
         width: '100%',
         height: '100%',
         zIndex: 2,

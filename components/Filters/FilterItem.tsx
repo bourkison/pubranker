@@ -66,7 +66,6 @@ export default function FilterItem({
             </TouchableOpacity>
             <BottomSheetModal
                 ref={bottomSheetRef}
-                index={0}
                 snapPoints={snapPoints}
                 backdropComponent={props => (
                     <BottomSheetBackdrop
