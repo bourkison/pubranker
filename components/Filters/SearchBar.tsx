@@ -8,6 +8,7 @@ import {
     setState,
     resetPubs,
 } from '@/store/slices/explore';
+import { INITIAL_SEARCH_AMOUNT } from '@/constants';
 
 export default function SearchBar() {
     const dispatch = useAppDispatch();
@@ -17,7 +18,7 @@ export default function SearchBar() {
     const inputRef = useRef<TextInput>(null);
 
     const search = () => {
-        dispatch(fetchExplorePubs({ amount: 10 }));
+        dispatch(fetchExplorePubs({ amount: INITIAL_SEARCH_AMOUNT }));
     };
 
     const goToSuggestions = () => {

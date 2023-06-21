@@ -24,7 +24,13 @@ export default function RangeFilter() {
 
     return (
         <FilterItem
-            buttonContent="Within"
+            buttonContent={
+                withinRange === MAX_WITHIN_RANGE
+                    ? 'Anywhere'
+                    : withinRange < 1000
+                    ? `Within ${withinRange.toLocaleString()}m`
+                    : `Within ${(withinRange / 1000).toFixed(1)}km`
+            }
             snapPoints={[240]}
             withBottomBar={true}
             onSearchPress={onSearch}

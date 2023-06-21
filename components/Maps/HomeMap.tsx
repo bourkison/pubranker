@@ -144,7 +144,7 @@ export default function HomeMap() {
                 ref={bottomSheetRef}
                 backgroundStyle={styles.bottomSheetBackground}
                 animateOnMount={true}>
-                <View style={{ flex: 1 }}>
+                <View style={styles.listContainer}>
                     <BottomSheetPubList pubs={pubs} />
                 </View>
             </BottomSheet>
@@ -159,4 +159,5 @@ const styles = StyleSheet.create({
     bottomSheetBackground: {
         backgroundColor: 'rgb(242, 242, 242)',
     },
+    listContainer: { flex: 1 },
 });

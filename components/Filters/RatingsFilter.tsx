@@ -25,7 +25,23 @@ export default function RangeFilter() {
 
     return (
         <FilterItem
-            buttonContent="Rating"
+            buttonContent={
+                storeOverallRating === 0 ? (
+                    'Any Rating'
+                ) : (
+                    <View style={styles.filterButtonContent}>
+                        <Ionicons
+                            style={styles.ratingIcon}
+                            name="star"
+                            size={12}
+                            color="#D8D4D5"
+                        />
+                        <Text style={styles.filterText}>
+                            {storeOverallRating}+
+                        </Text>
+                    </View>
+                )
+            }
             snapPoints={[240]}
             withBottomBar={true}
             onSearchPress={onSearch}
@@ -107,4 +123,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     ratingIcon: { marginRight: 3 },
+    filterButtonContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    filterText: {
+        color: '#D8D4D5',
+        fontSize: 12,
+    },
 });

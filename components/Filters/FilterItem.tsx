@@ -56,13 +56,13 @@ export default function FilterItem({
     return (
         <>
             <TouchableOpacity onPress={expandBottomSheet}>
-                {typeof buttonContent === 'string' ? (
-                    <View style={styles.container}>
+                <View style={styles.container}>
+                    {typeof buttonContent === 'string' ? (
                         <Text style={styles.filterText}>{buttonContent}</Text>
-                    </View>
-                ) : (
-                    buttonContent
-                )}
+                    ) : (
+                        buttonContent
+                    )}
+                </View>
             </TouchableOpacity>
             <BottomSheetModal
                 ref={bottomSheetRef}
@@ -99,7 +99,7 @@ export default function FilterItem({
 const styles = StyleSheet.create({
     container: {
         paddingVertical: 5,
-        paddingHorizontal: 20,
+        paddingHorizontal: 15,
         borderRadius: 25,
         shadowColor: '#000',
         shadowOpacity: 0.2,
@@ -111,8 +111,8 @@ const styles = StyleSheet.create({
         marginHorizontal: 5,
     },
     filterText: {
-        fontWeight: '500',
         color: '#D8D4D5',
+        fontSize: 12,
     },
     bottomSheetContentContainer: {
         justifyContent: 'space-between',

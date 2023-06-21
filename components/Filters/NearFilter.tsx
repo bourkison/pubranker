@@ -8,7 +8,7 @@ import SearchSuggestionItem from '@/components/Filters/SearchSuggestionItem';
 export default function NearFilter() {
     return (
         <FilterItem
-            buttonContent="Nearby"
+            buttonContent="Near you"
             withBottomBar={true}
             bottomSheetContent={
                 <View style={styles.bottomSheetContainer}>
