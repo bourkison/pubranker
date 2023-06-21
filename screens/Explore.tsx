@@ -6,7 +6,7 @@ import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import * as Location from 'expo-location';
 import FiltersContainer from '@/components/Filters/FiltersContainer_v2';
 import { useAppSelector } from '@/store/hooks';
-import SearchSuggestions from '@/components/Filters/SearchSuggestions';
+import SearchSuggestionList from '@/components/Filters/SearchSuggestionList';
 
 const METERS_WITHIN = 1000;
 const INITIAL_AMOUNT = 10;
@@ -53,7 +53,7 @@ export default function Explore() {
             </View>
             {exploreState === 'search' ? (
                 <View style={styles.suggestionsContainer}>
-                    <SearchSuggestions />
+                    <SearchSuggestionList />
                 </View>
             ) : undefined}
             <ScrollView style={styles.container}>
@@ -95,6 +95,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         zIndex: 2,
+        marginTop: 10,
     },
     sectionContainer: {
         marginBottom: 20,

@@ -1,12 +1,6 @@
 import React, { useRef } from 'react';
-import {
-    View,
-    TextInput,
-    TouchableOpacity,
-    StyleSheet,
-    Pressable,
-} from 'react-native';
-import { Ionicons, Feather } from '@expo/vector-icons';
+import { View, TextInput, StyleSheet, Pressable } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setSearchText, setState } from '@/store/slices/explore';
 
@@ -19,11 +13,6 @@ export default function SearchBar() {
 
     const search = () => {
         console.log('search');
-    };
-
-    const clearSearch = () => {
-        dispatch(setSearchText(''));
-        search();
     };
 
     const goToSuggestions = () => {
@@ -67,16 +56,6 @@ export default function SearchBar() {
                 onChangeText={s => dispatch(setSearchText(s))}
                 selectTextOnFocus={true}
             />
-            {searchText.length > 0 ? (
-                <TouchableOpacity onPress={clearSearch}>
-                    <Feather
-                        name="x-circle"
-                        color="#A3A3A3"
-                        style={styles.xIcon}
-                        size={13}
-                    />
-                </TouchableOpacity>
-            ) : undefined}
         </View>
     );
 }
