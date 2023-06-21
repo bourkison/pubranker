@@ -14,7 +14,7 @@ export default function NearFilter() {
                 <View style={styles.bottomSheetContainer}>
                     <View>
                         <Text style={styles.bottomSheetHeader}>Close to</Text>
-                        <SearchSuggestionItem type="nearby" title="Nearby" />
+                        <SearchSuggestionItem type="nearby" title="You" />
 
                         <SearchSuggestionItem
                             type="park"

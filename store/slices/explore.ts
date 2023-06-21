@@ -25,6 +25,7 @@ const initialState = discoverAdapter.getInitialState({
     isLoadingMore: false,
     searchText: '',
     withinRange: MAX_WITHIN_RANGE,
+    overallRating: 0,
     filters: {
         dogFriendly: 'unset',
         liveSport: 'unset',
@@ -163,6 +164,9 @@ const exploreSlice = createSlice({
         setWithinRange(state, action: PayloadAction<number>) {
             state.withinRange = action.payload;
         },
+        setOverallRating(state, action: PayloadAction<number>) {
+            state.overallRating = action.payload;
+        },
     },
     extraReducers: builder => {
         builder
@@ -215,5 +219,6 @@ export const {
     setState,
     resetPubs,
     setWithinRange,
+    setOverallRating,
 } = exploreSlice.actions;
 export default exploreSlice.reducer;
