@@ -50,6 +50,8 @@ const queryDb = async (
     amount: number,
     filters: PubFilters,
     searchText: string,
+    withinRange: number,
+    overallRating: number,
     skip?: number,
 ): Promise<DiscoveredPub[]> => {
     const currentLocation = await Location.getCurrentPositionAsync();
@@ -62,6 +64,14 @@ const queryDb = async (
     });
 
     query = applyFilters(query, filters, searchText);
+
+    if (withinRange < MAX_WITHIN_RANGE) {
+        query = query.lte('dist_meters', withinRange);
+    }
+
+    if (overallRating > 0) {
+        // TODO: Overall rating
+    }
 
     const from = skip || 0;
     const to = amount + from;
@@ -89,6 +99,7 @@ export const fetchExplorePubs = createAsyncThunk<
                 amount,
                 state.explore.filters,
                 state.explore.searchText,
+                state.explore.withinRange,
                 0,
             );
 
@@ -118,6 +129,7 @@ export const fetchMoreExplorePubs = createAsyncThunk<
                 amount,
                 state.explore.filters,
                 state.explore.searchText,
+                state.explore.overallRating,
                 state.explore.pubs.length,
             );
 

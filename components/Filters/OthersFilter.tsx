@@ -1,10 +1,16 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import FilterItem from '@/components/Filters/FilterItem';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import FilterToggleItem from './FilterToggleItem';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { BoolOrUnset } from '@/types';
-import { resetFilters, setAllFilters } from '@/store/slices/explore';
+import {
+    fetchExplorePubs,
+    resetFilters,
+    setAllFilters,
+    setState,
+} from '@/store/slices/explore';
+import { INITIAL_SEARCH_AMOUNT } from '@/constants';
 
 export default function OthersFilter() {
     const dispatch = useAppDispatch();
@@ -35,23 +41,15 @@ export default function OthersFilter() {
         return Object.values(storeFilters).filter(f => f !== 'unset').length;
     }, [storeFilters]);
 
-    const clear = () => {
-        dispatch(resetFilters());
-        setFilters({
-            dogFriendly: 'unset',
-            liveSport: 'unset',
-            darts: 'unset',
-            pool: 'unset',
-            sundayRoast: 'unset',
-            garden: 'unset',
-            kidFriendly: 'unset',
-            liveMusic: 'unset',
-            boardGames: 'unset',
-            freeWifi: 'unset',
-            roof: 'unset',
-            foosball: 'unset',
-            wheelchairAccessible: 'unset',
-        });
+    // Keep local in sync with store.
+    useEffect(() => {
+        setFilters(storeFilters);
+    }, [storeFilters]);
+
+    const onSearch = () => {
+        dispatch(setAllFilters(filters));
+        dispatch(fetchExplorePubs({ amount: INITIAL_SEARCH_AMOUNT }));
+        dispatch(setState('map'));
     };
 
     return (
@@ -63,8 +61,8 @@ export default function OthersFilter() {
                       } selected`
                     : 'Filters'
             }
-            onSearchPress={() => dispatch(setAllFilters(filters))}
-            onClearPress={clear}
+            onSearchPress={onSearch}
+            onClearPress={() => dispatch(resetFilters())}
             withBottomBar={true}
             bottomSheetContent={
                 <ScrollView style={styles.bottomSheetContainer}>

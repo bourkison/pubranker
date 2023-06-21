@@ -1,12 +1,13 @@
 import { supabase } from '@/services/supabase';
 import { DiscoveredPub } from '@/types';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
     View,
     useWindowDimensions,
     Image,
     FlatList,
     StyleSheet,
+    ViewStyle,
 } from 'react-native';
 import PubInfo from './PubInfo';
 
@@ -16,6 +17,46 @@ type BottomSheetPubItemProps = {
 
 const HORIZONTAL_PADDING = 30;
 const IMAGE_RATIO = 1.33333;
+
+type ImageItemProps = {
+    imageWidth: number;
+    index: number;
+    imagesLength: number;
+    item: string;
+};
+
+function ImageItem({ imageWidth, index, imagesLength, item }: ImageItemProps) {
+    const borderRadiusStyle = useMemo<ViewStyle>(() => {
+        return {
+            borderTopLeftRadius:
+                index === 0 ? styles.carouselList.borderRadius : 0,
+            borderBottomLeftRadius:
+                index === 0 ? styles.carouselList.borderRadius : 0,
+            borderTopRightRadius:
+                index === imagesLength - 1
+                    ? styles.carouselList.borderRadius
+                    : 0,
+            borderBottomRightRadius:
+                index === imagesLength - 1
+                    ? styles.carouselList.borderRadius
+                    : 0,
+        };
+    }, [index, imagesLength]);
+
+    return (
+        <Image
+            source={{ uri: item }}
+            style={[
+                styles.image,
+                {
+                    width: imageWidth,
+                    height: imageWidth / IMAGE_RATIO,
+                },
+                borderRadiusStyle,
+            ]}
+        />
+    );
+}
 
 export default function BottomSheetPubItem({ pub }: BottomSheetPubItemProps) {
     const [imageUrls, setImageUrls] = useState<string[]>([]);
@@ -48,16 +89,12 @@ export default function BottomSheetPubItem({ pub }: BottomSheetPubItemProps) {
                         pagingEnabled={true}
                         style={styles.carouselList}
                         showsHorizontalScrollIndicator={false}
-                        renderItem={({ item }) => (
-                            <Image
-                                source={{ uri: item }}
-                                style={[
-                                    styles.image,
-                                    {
-                                        width: IMAGE_WIDTH,
-                                        height: IMAGE_WIDTH / IMAGE_RATIO,
-                                    },
-                                ]}
+                        renderItem={({ item, index }) => (
+                            <ImageItem
+                                item={item}
+                                index={index}
+                                imageWidth={IMAGE_WIDTH}
+                                imagesLength={imageUrls.length}
                             />
                         )}
                     />

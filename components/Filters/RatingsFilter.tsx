@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import FilterItem from '@/components/Filters/FilterItem';
 import { StyleSheet, Text, View } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { setOverallRating as setStoreOverallRating } from '@/store/slices/explore';
+import {
+    fetchExplorePubs,
+    setState,
+    setOverallRating as setStoreOverallRating,
+} from '@/store/slices/explore';
 import { Ionicons } from '@expo/vector-icons';
+import { INITIAL_SEARCH_AMOUNT } from '@/constants';
 
 export default function RangeFilter() {
     const storeOverallRating = useAppSelector(
@@ -14,13 +19,15 @@ export default function RangeFilter() {
 
     const dispatch = useAppDispatch();
 
-    const onClear = () => {
-        dispatch(setStoreOverallRating(0));
-        setOverallRating(0);
-    };
+    // Keep local in sync with store.
+    useEffect(() => {
+        setOverallRating(storeOverallRating);
+    }, [storeOverallRating]);
 
     const onSearch = () => {
         dispatch(setStoreOverallRating(overallRating));
+        dispatch(fetchExplorePubs({ amount: INITIAL_SEARCH_AMOUNT }));
+        dispatch(setState('map'));
     };
 
     return (
@@ -45,7 +52,7 @@ export default function RangeFilter() {
             snapPoints={[240]}
             withBottomBar={true}
             onSearchPress={onSearch}
-            onClearPress={onClear}
+            onClearPress={() => dispatch(setStoreOverallRating(0))}
             bottomSheetContent={
                 <View style={styles.bottomSheetContainer}>
                     <View style={styles.headerContainer}>

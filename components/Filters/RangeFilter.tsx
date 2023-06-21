@@ -1,10 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import FilterItem from '@/components/Filters/FilterItem';
 import { StyleSheet, Text, View } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { setState, setWithinRange } from '@/store/slices/explore';
-import { MAX_WITHIN_RANGE, MIN_WITHIN_RANGE } from '@/constants';
+import {
+    fetchExplorePubs,
+    setState,
+    setWithinRange,
+} from '@/store/slices/explore';
+import {
+    INITIAL_SEARCH_AMOUNT,
+    MAX_WITHIN_RANGE,
+    MIN_WITHIN_RANGE,
+} from '@/constants';
 
 export default function RangeFilter() {
     const withinRange = useAppSelector(state => state.explore.withinRange);
@@ -12,13 +20,14 @@ export default function RangeFilter() {
 
     const dispatch = useAppDispatch();
 
-    const onClear = () => {
-        dispatch(setWithinRange(MAX_WITHIN_RANGE));
-        setRange(MAX_WITHIN_RANGE);
-    };
+    // Keep local in sync with store.
+    useEffect(() => {
+        setRange(withinRange);
+    }, [withinRange]);
 
     const onSearch = () => {
         dispatch(setWithinRange(range));
+        dispatch(fetchExplorePubs({ amount: INITIAL_SEARCH_AMOUNT }));
         dispatch(setState('map'));
     };
 
@@ -34,7 +43,7 @@ export default function RangeFilter() {
             snapPoints={[240]}
             withBottomBar={true}
             onSearchPress={onSearch}
-            onClearPress={onClear}
+            onClearPress={() => dispatch(setWithinRange(MAX_WITHIN_RANGE))}
             bottomSheetContent={
                 <View style={styles.bottomSheetContainer}>
                     <View style={styles.headerContainer}>
