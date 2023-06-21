@@ -2,7 +2,12 @@ import React, { useRef } from 'react';
 import { View, TextInput, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { setSearchText, setState } from '@/store/slices/explore';
+import {
+    fetchExplorePubs,
+    setSearchText,
+    setState,
+    resetPubs,
+} from '@/store/slices/explore';
 
 export default function SearchBar() {
     const dispatch = useAppDispatch();
@@ -12,12 +17,13 @@ export default function SearchBar() {
     const inputRef = useRef<TextInput>(null);
 
     const search = () => {
-        console.log('search');
+        dispatch(fetchExplorePubs({ amount: 10 }));
     };
 
     const goToSuggestions = () => {
         dispatch(setSearchText(''));
         dispatch(setState('explore'));
+        dispatch(resetPubs());
 
         if (inputRef && inputRef.current) {
             inputRef.current.blur();

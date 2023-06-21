@@ -95,7 +95,6 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         zIndex: 2,
-        marginTop: 10,
     },
     sectionContainer: {
         marginBottom: 20,

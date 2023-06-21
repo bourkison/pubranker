@@ -87,6 +87,8 @@ export const fetchExplorePubs = createAsyncThunk<
                 0,
             );
 
+            console.log('PUBS:', pubs);
+
             return pubs;
         } catch (err: any) {
             return rejectWithValue({
@@ -150,6 +152,12 @@ const exploreSlice = createSlice({
         ) {
             state.exploreState = action.payload;
         },
+        resetPubs(state) {
+            state.pubs = [];
+            state.isLoading = false;
+            state.isLoadingMore = false;
+            state.moreToLoad = true;
+        },
     },
     extraReducers: builder => {
         builder
@@ -195,6 +203,6 @@ const exploreSlice = createSlice({
     },
 });
 
-export const { setSearchText, setFilter, toggleSave, setState } =
+export const { setSearchText, setFilter, toggleSave, setState, resetPubs } =
     exploreSlice.actions;
 export default exploreSlice.reducer;

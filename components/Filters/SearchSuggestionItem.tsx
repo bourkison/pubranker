@@ -38,7 +38,7 @@ export default function SearchSuggestionItem({
                     />
                 );
             case 'nearby':
-                return <Feather color="#6E7271" size={28} name="navigation" />;
+                return <Feather color="#6E7271" size={24} name="navigation" />;
             case 'park':
                 return (
                     <Ionicons color="#6E7271" size={28} name="leaf-outline" />
@@ -67,6 +67,7 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
         paddingHorizontal: 15,
+        paddingVertical: 10,
         alignItems: 'center',
     },
     imageContainer: {
