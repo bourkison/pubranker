@@ -4,14 +4,16 @@ import MapView, { Marker, Region } from 'react-native-maps';
 import * as Location from 'expo-location';
 import MapStyle from '../../json/map_style.json';
 import { Keyboard, StyleSheet, View } from 'react-native';
-import { /*useAppDispatch,*/ useAppSelector } from '@/store/hooks';
+import { useAppSelector } from '@/store/hooks';
 import DebugPolygons from './DebugPolygons';
 import { parseLocation } from '@/services';
 import { DiscoveredPub } from '@/types';
 import BottomSheet from '@gorhom/bottom-sheet';
+import BottomSheetPubList from '../Pubs/BottomSheetPubList';
 
 const ANIMATE_DELTA = 0.0075;
 const INITIAL_DELTA = 0.01;
+
 export default function HomeMap() {
     const [location, setLocation] = useState<
         Location.LocationObject | undefined
@@ -20,7 +22,6 @@ export default function HomeMap() {
 
     const [hasLoaded, setHasLoaded] = useState(false);
 
-    // const dispatch = useAppDispatch();
     const [selectedPub, setSelectedPub] = useState<DiscoveredPub | undefined>();
     const pubs = useAppSelector(state => state.explore.pubs);
 
@@ -52,31 +53,6 @@ export default function HomeMap() {
             return null;
         }
     }, [selectedPub]);
-
-    // const buildBoundingBox = (region: Region) => {
-    //     return {
-    //         minLat:
-    //             region.latitude -
-    //             region.latitudeDelta / 2 +
-    //             region.latitudeDelta * 0.01,
-    //         minLong:
-    //             region.longitude -
-    //             region.longitudeDelta / 2 +
-    //             region.longitudeDelta * 0.01,
-    //         maxLat:
-    //             region.latitude +
-    //             region.latitudeDelta / 2 +
-    //             region.latitudeDelta * 0.01,
-    //         maxLong:
-    //             region.longitude +
-    //             region.longitudeDelta / 2 +
-    //             region.longitudeDelta * 0.01,
-    //     };
-    // };
-
-    // const fetchPubs = (region: Region) => {
-    //     dispatch(fetchMapPubs(buildBoundingBox(region)));
-    // };
 
     const initialRegion = useMemo(() => {
         return location
@@ -163,12 +139,14 @@ export default function HomeMap() {
                 <DebugPolygons />
             </MapView>
             <BottomSheet
-                snapPoints={['20%', '100%']}
-                index={0}
+                snapPoints={['20%', '35%', '100%']}
+                index={1}
                 ref={bottomSheetRef}
                 backgroundStyle={styles.bottomSheetBackground}
                 animateOnMount={true}>
-                <View />
+                <View style={{ flex: 1 }}>
+                    <BottomSheetPubList pubs={pubs} />
+                </View>
             </BottomSheet>
         </>
     );
