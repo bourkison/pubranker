@@ -4,11 +4,10 @@ import MapView, { Marker, Region } from 'react-native-maps';
 import * as Location from 'expo-location';
 import MapStyle from '../../json/map_style.json';
 import { Keyboard, StyleSheet, View } from 'react-native';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { fetchMapPubs } from '@/store/slices/map';
+import { /*useAppDispatch,*/ useAppSelector } from '@/store/hooks';
 import DebugPolygons from './DebugPolygons';
 import { parseLocation } from '@/services';
-import { NearbyPub } from '@/types';
+import { DiscoveredPub } from '@/types';
 import BottomSheet from '@gorhom/bottom-sheet';
 
 const ANIMATE_DELTA = 0.0075;
@@ -21,9 +20,9 @@ export default function HomeMap() {
 
     const [hasLoaded, setHasLoaded] = useState(false);
 
-    const dispatch = useAppDispatch();
-    const selectedPub = useAppSelector(state => state.pub.selectedPub);
-    const pubs = useAppSelector(state => state.map.pubs);
+    // const dispatch = useAppDispatch();
+    const [selectedPub, setSelectedPub] = useState<DiscoveredPub | undefined>();
+    const pubs = useAppSelector(state => state.explore.pubs);
 
     const bottomSheetRef = useRef<BottomSheet>(null);
 
@@ -54,30 +53,30 @@ export default function HomeMap() {
         }
     }, [selectedPub]);
 
-    const buildBoundingBox = (region: Region) => {
-        return {
-            minLat:
-                region.latitude -
-                region.latitudeDelta / 2 +
-                region.latitudeDelta * 0.01,
-            minLong:
-                region.longitude -
-                region.longitudeDelta / 2 +
-                region.longitudeDelta * 0.01,
-            maxLat:
-                region.latitude +
-                region.latitudeDelta / 2 +
-                region.latitudeDelta * 0.01,
-            maxLong:
-                region.longitude +
-                region.longitudeDelta / 2 +
-                region.longitudeDelta * 0.01,
-        };
-    };
+    // const buildBoundingBox = (region: Region) => {
+    //     return {
+    //         minLat:
+    //             region.latitude -
+    //             region.latitudeDelta / 2 +
+    //             region.latitudeDelta * 0.01,
+    //         minLong:
+    //             region.longitude -
+    //             region.longitudeDelta / 2 +
+    //             region.longitudeDelta * 0.01,
+    //         maxLat:
+    //             region.latitude +
+    //             region.latitudeDelta / 2 +
+    //             region.latitudeDelta * 0.01,
+    //         maxLong:
+    //             region.longitude +
+    //             region.longitudeDelta / 2 +
+    //             region.longitudeDelta * 0.01,
+    //     };
+    // };
 
-    const fetchPubs = (region: Region) => {
-        dispatch(fetchMapPubs(buildBoundingBox(region)));
-    };
+    // const fetchPubs = (region: Region) => {
+    //     dispatch(fetchMapPubs(buildBoundingBox(region)));
+    // };
 
     const initialRegion = useMemo(() => {
         return location
@@ -118,14 +117,15 @@ export default function HomeMap() {
 
     const mapDragFinished = (region: Region) => {
         if (location !== undefined && !hasLoaded) {
-            fetchPubs(region);
+            // fetchPubs(region);
+            console.log('region', region);
         } else {
             setHasLoaded(true);
         }
     };
 
-    const selectPub = (pub: NearbyPub) => {
-        console.log('pub', pub);
+    const selectPub = (pub: DiscoveredPub) => {
+        setSelectedPub(pub);
     };
 
     return (

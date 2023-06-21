@@ -1,4 +1,3 @@
-import { SelectedPub } from '@/store/slices/pub';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
@@ -13,9 +12,10 @@ import {
 import { timeString } from '@/services';
 import * as Location from 'expo-location';
 import { showLocation } from 'react-native-map-link';
+import { DiscoveredPub } from '@/types';
 
 type TopBarPubProps = {
-    pub: SelectedPub;
+    pub: DiscoveredPub;
 };
 
 export default function PubTopBar({ pub }: TopBarPubProps) {

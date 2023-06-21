@@ -1,12 +1,12 @@
-import { SelectedPub } from '@/store/slices/pub';
 import { createStackNavigator } from '@react-navigation/stack';
 import BottomTabNavigator from '@/nav/BottomTabNavigator';
 import React from 'react';
 import PubHome from '@/screens/PubHome';
+import { DiscoveredPub } from '@/types';
 
 export type MainNavigatorStackParamList = {
     Home: undefined;
-    PubView: { pub: SelectedPub };
+    PubView: { pub: DiscoveredPub };
 };
 
 const Stack = createStackNavigator<MainNavigatorStackParamList>();

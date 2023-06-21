@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Octicons } from '@expo/vector-icons';
-import { SelectedPub } from '@/store/slices/pub';
+import { DiscoveredPub } from '@/types';
 
 type PubFeaturesProps = {
-    pub: SelectedPub;
+    pub: DiscoveredPub;
 };
 
 type FeatureProps = {

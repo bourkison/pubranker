@@ -1,5 +1,4 @@
 import { supabase } from '@/services/supabase';
-import { SelectedPub } from '@/store/slices/pub';
 import { Database } from '@/types/schema';
 import React, { useEffect, useState } from 'react';
 import {
@@ -10,9 +9,10 @@ import {
     ActivityIndicator,
 } from 'react-native';
 import BeerPill from '@/components/Beers/BeerPill';
+import { DiscoveredPub } from '@/types';
 
 type DraughtBeersListProps = {
-    pub: SelectedPub;
+    pub: DiscoveredPub;
 };
 
 type Beer = Database['public']['Tables']['beers']['Row'];

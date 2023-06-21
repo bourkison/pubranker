@@ -2,16 +2,16 @@ import React, { useMemo } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native';
 import SearchSuggestionItem from '@/components/Filters/SearchSuggestionItem';
 import { useAppSelector } from '@/store/hooks';
-import { SelectedPub } from '@/store/slices/pub';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
+import { DiscoveredPub } from '@/types';
 
 type Suggestion = {
     title: string;
     subtitle?: string;
     type: 'pub' | 'station' | 'park' | 'landmark' | 'area' | 'nearby';
-    pub?: SelectedPub;
+    pub?: DiscoveredPub;
     onPress?: () => void;
 };
 

@@ -9,12 +9,11 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { averageReviews, fromNowString, roundToNearest } from '@/services';
-import { SelectedPub } from '@/store/slices/pub';
-import { UserReviewType } from '@/types';
+import { DiscoveredPub, UserReviewType } from '@/types';
 
 type ReviewProps = {
     review: UserReviewType;
-    pub: SelectedPub;
+    pub: DiscoveredPub;
 };
 
 const MAX_LINES_LENGTH = 4;

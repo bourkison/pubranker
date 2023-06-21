@@ -1,4 +1,3 @@
-import { SelectedPub } from '@/store/slices/pub';
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import * as Linking from 'expo-linking';
@@ -7,9 +6,10 @@ import { parseLocation, parseOpeningHours } from '@/services';
 import HoursCollapsible from '@/components/Utility/HoursCollapsible';
 import url from 'url';
 import { showLocation } from 'react-native-map-link';
+import { DiscoveredPub } from '@/types';
 
 type PubDetailsProps = {
-    pub: SelectedPub;
+    pub: DiscoveredPub;
 };
 
 export default function PubDetails({ pub }: PubDetailsProps) {

@@ -3,21 +3,20 @@ import React, { useEffect, useState } from 'react';
 
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import Review from '@/components/Reviews/Review';
-import { SelectedPub } from '@/store/slices/pub';
 import OverallRatings from '@/components/Ratings/OverallRatings';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { setReviews } from '@/store/slices/pub';
 import ReviewPubButton from '@/components/Reviews/ReviewPubButton';
 import { convertUserReviewsToNonNullable } from '@/services';
+import { DiscoveredPub, UserReviewType } from '@/types';
 
 type PubReviewsProps = {
-    pub: SelectedPub;
+    pub: DiscoveredPub;
 };
 
 export default function PubReviews({ pub }: PubReviewsProps) {
     const dispatch = useAppDispatch();
 
-    const reviews = useAppSelector(state => state.pub.selectedPubReviews);
+    const [reviews, setReviews] = useState<UserReviewType[]>([]);
     const user = useAppSelector(state => state.user.docData);
 
     const [isLoading, setIsLoading] = useState(false);
@@ -42,7 +41,7 @@ export default function PubReviews({ pub }: PubReviewsProps) {
 
             const convertedData = convertUserReviewsToNonNullable(data);
 
-            dispatch(setReviews(convertedData));
+            setReviews(convertedData);
             setIsLoading(false);
         };
 
