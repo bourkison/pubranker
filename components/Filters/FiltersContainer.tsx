@@ -22,5 +22,6 @@ const styles = StyleSheet.create({
     },
     scrollableContainer: {
         marginTop: 15,
+        marginHorizontal: 10,
     },
 });

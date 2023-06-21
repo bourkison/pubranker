@@ -37,7 +37,7 @@ export default function RangeFilter() {
                             color="#D8D4D5"
                         />
                         <Text style={styles.filterText}>
-                            {storeOverallRating}+
+                            {storeOverallRating.toFixed(1)}+
                         </Text>
                     </View>
                 )

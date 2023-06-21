@@ -18,6 +18,22 @@ import { MAX_WITHIN_RANGE } from '@/constants';
 
 const discoverAdapter = createEntityAdapter();
 
+const INITIAL_FILTERS = {
+    dogFriendly: 'unset',
+    liveSport: 'unset',
+    darts: 'unset',
+    pool: 'unset',
+    sundayRoast: 'unset',
+    garden: 'unset',
+    kidFriendly: 'unset',
+    liveMusic: 'unset',
+    boardGames: 'unset',
+    freeWifi: 'unset',
+    roof: 'unset',
+    foosball: 'unset',
+    wheelchairAccessible: 'unset',
+} as PubFilters;
+
 const initialState = discoverAdapter.getInitialState({
     pubs: [] as DiscoveredPub[],
     isLoading: false,
@@ -26,21 +42,7 @@ const initialState = discoverAdapter.getInitialState({
     searchText: '',
     withinRange: MAX_WITHIN_RANGE,
     overallRating: 0,
-    filters: {
-        dogFriendly: 'unset',
-        liveSport: 'unset',
-        darts: 'unset',
-        pool: 'unset',
-        sundayRoast: 'unset',
-        garden: 'unset',
-        kidFriendly: 'unset',
-        liveMusic: 'unset',
-        boardGames: 'unset',
-        freeWifi: 'unset',
-        roof: 'unset',
-        foosball: 'unset',
-        wheelchairAccessible: 'unset',
-    } as PubFilters,
+    filters: INITIAL_FILTERS as PubFilters,
     exploreState: 'suggestions' as 'suggestions' | 'search' | 'map',
 });
 
@@ -142,6 +144,12 @@ const exploreSlice = createSlice({
         ) {
             state.filters[action.payload.key] = action.payload.val;
         },
+        setAllFilters(state, action: PayloadAction<PubFilters>) {
+            state.filters = action.payload;
+        },
+        resetFilters(state) {
+            state.filters = INITIAL_FILTERS;
+        },
         toggleSave(state, action: PayloadAction<{ id: number }>) {
             const index = state.pubs.findIndex(x => x.id === action.payload.id);
 
@@ -220,5 +228,7 @@ export const {
     resetPubs,
     setWithinRange,
     setOverallRating,
+    resetFilters,
+    setAllFilters,
 } = exploreSlice.actions;
 export default exploreSlice.reducer;
