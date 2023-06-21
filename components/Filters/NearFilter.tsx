@@ -1,36 +1,47 @@
 import React from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import FilterItem from '@/components/Filters/FilterItem';
+import SearchSuggestionItem from '@/components/Filters/SearchSuggestionItem';
+
+// TODO: Load in landmarks and list them out.
 
 export default function NearFilter() {
     return (
         <FilterItem
-            ButtonContent={
-                <View style={styles.container}>
-                    <Text style={styles.filterText}>Nearby</Text>
+            buttonContent="Nearby"
+            withBottomBar={true}
+            bottomSheetContent={
+                <View style={styles.bottomSheetContainer}>
+                    <View>
+                        <Text style={styles.bottomSheetHeader}>Close to</Text>
+                        <SearchSuggestionItem type="nearby" title="Nearby" />
+
+                        <SearchSuggestionItem
+                            type="park"
+                            title="Hackney Downs"
+                        />
+                        <SearchSuggestionItem
+                            type="station"
+                            title="Hackney Central"
+                        />
+                        <SearchSuggestionItem
+                            type="station"
+                            title="Hackney Downs"
+                        />
+                    </View>
                 </View>
             }
-            ModalContent={<View />}
+            snapPoints={['80%']}
         />
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        paddingVertical: 5,
-        paddingHorizontal: 20,
-        borderRadius: 25,
-        shadowColor: '#000',
-        shadowOpacity: 0.2,
-        shadowOffset: {
-            height: 0,
-            width: 0,
-        },
-        backgroundColor: '#384D48',
-        marginHorizontal: 5,
+    bottomSheetContainer: {
+        paddingHorizontal: 15,
     },
-    filterText: {
-        fontWeight: '500',
-        color: '#D8D4D5',
+    bottomSheetHeader: {
+        fontSize: 22,
+        fontWeight: '600',
     },
 });

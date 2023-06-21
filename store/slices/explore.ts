@@ -14,6 +14,7 @@ import {
 } from '@reduxjs/toolkit';
 import * as Location from 'expo-location';
 import { RootState } from '@/store';
+import { MAX_WITHIN_RANGE } from '@/constants';
 
 const discoverAdapter = createEntityAdapter();
 
@@ -23,6 +24,7 @@ const initialState = discoverAdapter.getInitialState({
     moreToLoad: true,
     isLoadingMore: false,
     searchText: '',
+    withinRange: MAX_WITHIN_RANGE,
     filters: {
         dogFriendly: 'unset',
         liveSport: 'unset',
@@ -158,6 +160,9 @@ const exploreSlice = createSlice({
             state.isLoadingMore = false;
             state.moreToLoad = true;
         },
+        setWithinRange(state, action: PayloadAction<number>) {
+            state.withinRange = action.payload;
+        },
     },
     extraReducers: builder => {
         builder
@@ -203,6 +208,12 @@ const exploreSlice = createSlice({
     },
 });
 
-export const { setSearchText, setFilter, toggleSave, setState, resetPubs } =
-    exploreSlice.actions;
+export const {
+    setSearchText,
+    setFilter,
+    toggleSave,
+    setState,
+    resetPubs,
+    setWithinRange,
+} = exploreSlice.actions;
 export default exploreSlice.reducer;

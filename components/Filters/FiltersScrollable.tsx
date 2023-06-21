@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, ScrollView } from 'react-native';
 import NearFilter from '@/components/Filters/NearFilter';
+import RangeFilter from '@/components/Filters/RangeFilter';
 
 export default function FiltersScrollable() {
     return (
@@ -10,10 +11,7 @@ export default function FiltersScrollable() {
             style={styles.container}
             showsHorizontalScrollIndicator={false}>
             <NearFilter />
-            <NearFilter />
-            <NearFilter />
-            <NearFilter />
-            <NearFilter />
+            <RangeFilter />
         </ScrollView>
     );
 }

@@ -52,15 +52,18 @@ export default function SearchSuggestionList() {
             ) : (
                 <FlatList
                     data={suggestions}
+                    contentContainerStyle={styles.contentContainer}
                     keyboardDismissMode="on-drag"
                     keyExtractor={(item, index) => index.toString()}
                     renderItem={({ item }) => (
-                        <SearchSuggestionItem
-                            title={item.title}
-                            subtitle={item.subtitle}
-                            type={item.type}
-                            onPress={item.onPress}
-                        />
+                        <View>
+                            <SearchSuggestionItem
+                                title={item.title}
+                                subtitle={item.subtitle}
+                                type={item.type}
+                                onPress={item.onPress}
+                            />
+                        </View>
                     )}
                 />
             )}
@@ -70,4 +73,7 @@ export default function SearchSuggestionList() {
 
 const styles = StyleSheet.create({
     container: { flex: 1 },
+    contentContainer: {
+        paddingHorizontal: 15,
+    },
 });

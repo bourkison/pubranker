@@ -4,7 +4,7 @@ import { DiscoveredPub } from '@/types';
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import * as Location from 'expo-location';
-import FiltersContainer from '@/components/Filters/FiltersContainer_v2';
+import FiltersContainer from '@/components/Filters/FiltersContainer';
 import { useAppSelector } from '@/store/hooks';
 import SearchSuggestionList from '@/components/Filters/SearchSuggestionList';
 

@@ -66,7 +66,6 @@ export default function SearchSuggestionItem({
 const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
-        paddingHorizontal: 15,
         paddingVertical: 10,
         alignItems: 'center',
     },
