@@ -34,7 +34,7 @@ export default function RangeFilter() {
         <FilterItem
             buttonContent={
                 storeOverallRating === 0 ? (
-                    'Any Rating'
+                    'Any rating'
                 ) : (
                     <View style={styles.filterButtonContent}>
                         <Ionicons

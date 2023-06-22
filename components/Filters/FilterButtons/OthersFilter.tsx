@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import FilterItem from '@/components/Filters/FilterItem';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import FilterToggleItem from './FilterToggleItem';
+import FilterToggleItem from '../FilterToggleItem';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { BoolOrUnset } from '@/types';
 import {
@@ -59,7 +59,7 @@ export default function OthersFilter() {
                     ? `${amountFilters} filter${
                           amountFilters > 1 ? 's' : ''
                       } selected`
-                    : 'Filters'
+                    : 'No filters'
             }
             onSearchPress={onSearch}
             onClearPress={() => dispatch(resetFilters())}

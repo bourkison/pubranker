@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { DiscoveredPub } from '@/types';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 type Suggestion = {
     title: string;
@@ -18,6 +19,8 @@ type Suggestion = {
 export default function SearchSuggestionList() {
     const isLoadingPubs = useAppSelector(state => state.explore.isLoading);
     const pubs = useAppSelector(state => state.explore.pubs);
+
+    const bottomTabBarHeight = useBottomTabBarHeight();
 
     const navigation =
         useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
@@ -52,7 +55,10 @@ export default function SearchSuggestionList() {
             ) : (
                 <FlatList
                     data={suggestions}
-                    contentContainerStyle={styles.contentContainer}
+                    contentContainerStyle={[
+                        styles.contentContainer,
+                        { paddingBottom: bottomTabBarHeight },
+                    ]}
                     keyboardDismissMode="on-drag"
                     keyExtractor={(item, index) => index.toString()}
                     renderItem={({ item }) => (

@@ -8,6 +8,7 @@ import FiltersContainer from '@/components/Filters/FiltersContainer';
 import { useAppSelector } from '@/store/hooks';
 import SearchSuggestionList from '@/components/Filters/SearchSuggestionList';
 import HomeMap from '@/components/Maps/HomeMap';
+// import { Ionicons } from '@expo/vector-icons';
 
 const METERS_WITHIN = 1000;
 const INITIAL_AMOUNT = 10;
@@ -86,6 +87,16 @@ export default function Explore() {
                     <PubList pubs={pubs} isLoading={isLoading} />
                 </View>
             </ScrollView>
+            {/* {exploreState !== 'map' ? (
+                <View style={styles.mapButtonContainer}>
+                    <View>
+                        <Ionicons name="map-outline" size={18} />
+                    </View>
+                    <View>
+                        <Text>Map</Text>
+                    </View>
+                </View>
+            ) : undefined} */}
         </SafeAreaView>
     );
 }
@@ -118,5 +129,18 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: '500',
         color: '#292935',
+    },
+    mapButtonContainer: {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        bottom: 0,
+        top: 0,
+        flexDirection: 'row',
+        zIndex: 11,
+        backgroundColor: 'white',
+        height: 60,
+        width: 100,
+        alignItems: 'center',
     },
 });

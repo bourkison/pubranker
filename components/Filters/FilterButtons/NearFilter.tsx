@@ -13,7 +13,7 @@ export default function NearFilter() {
             bottomSheetContent={
                 <View style={styles.bottomSheetContainer}>
                     <View>
-                        <Text style={styles.bottomSheetHeader}>Close to</Text>
+                        <Text style={styles.bottomSheetHeader}>Near</Text>
                         <SearchSuggestionItem type="nearby" title="You" />
 
                         <SearchSuggestionItem

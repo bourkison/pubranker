@@ -42,6 +42,7 @@ const initialState = discoverAdapter.getInitialState({
     searchText: '',
     withinRange: MAX_WITHIN_RANGE,
     overallRating: 0,
+    sortBy: 'distance' as 'distance' | 'ratings',
     filters: INITIAL_FILTERS as PubFilters,
     exploreState: 'suggestions' as 'suggestions' | 'search' | 'map',
 });
