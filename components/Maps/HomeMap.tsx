@@ -2,14 +2,16 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import MapView, { Marker, Region } from 'react-native-maps';
 import * as Location from 'expo-location';
-import MapStyle from '../../json/map_style.json';
+import MapStyle from '@/json/map_style.json';
 import { Keyboard, StyleSheet, View } from 'react-native';
-import { useAppSelector } from '@/store/hooks';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import DebugPolygons from './DebugPolygons';
 import { parseLocation } from '@/services';
-import { PubSchema } from '@/types';
 import BottomSheet from '@gorhom/bottom-sheet';
-import BottomSheetPubList from '../Pubs/BottomSheetPubList';
+import BottomSheetPubList from '@/components/Pubs/BottomSheetPubList';
+import { selectPub } from '@/store/slices/map';
+import SelectedPub from './SelectedPub';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 const ANIMATE_DELTA = 0.0075;
 const INITIAL_DELTA = 0.01;
@@ -22,8 +24,12 @@ export default function HomeMap() {
 
     const [hasLoaded, setHasLoaded] = useState(false);
 
-    const [selectedPub, setSelectedPub] = useState<PubSchema | undefined>();
+    const selectedPub = useAppSelector(state => state.map.selected);
     const pubs = useAppSelector(state => state.explore.pubs);
+
+    const bottomBarHeight = useBottomTabBarHeight();
+
+    const dispatch = useAppDispatch();
 
     const bottomSheetRef = useRef<BottomSheet>(null);
 
@@ -100,10 +106,6 @@ export default function HomeMap() {
         }
     };
 
-    const selectPub = (pub: PubSchema) => {
-        setSelectedPub(pub);
-    };
-
     return (
         <>
             <MapView
@@ -111,10 +113,10 @@ export default function HomeMap() {
                 ref={MapRef}
                 showsUserLocation={true}
                 showsMyLocationButton={false}
-                style={styles.map}
+                style={[styles.map, { marginBottom: bottomBarHeight }]}
                 onPanDrag={panDrag}
                 customMapStyle={MapStyle}
-                mapPadding={{ bottom: 100, top: 0, right: 0, left: 0 }}
+                mapPadding={{ bottom: 5, top: 0, right: 0, left: 0 }}
                 onRegionChangeComplete={mapDragFinished}
                 initialRegion={initialRegion}>
                 {pubs.map(pub => {
@@ -123,7 +125,7 @@ export default function HomeMap() {
                     if (pubLocation) {
                         return (
                             <Marker
-                                onPress={() => selectPub(pub)}
+                                onPress={() => dispatch(selectPub(pub))}
                                 key={pub.id}
                                 coordinate={{
                                     latitude: pubLocation.coordinates[1],
@@ -138,9 +140,15 @@ export default function HomeMap() {
                 })}
                 <DebugPolygons />
             </MapView>
+            {selectedPub !== undefined ? (
+                <View>
+                    <SelectedPub pub={selectedPub} />
+                </View>
+            ) : undefined}
             <BottomSheet
-                snapPoints={['20%', '35%', '100%']}
+                snapPoints={['15%', '35%', '100%']}
                 index={1}
+                bottomInset={bottomBarHeight}
                 ref={bottomSheetRef}
                 backgroundStyle={styles.bottomSheetBackground}
                 animateOnMount={true}>

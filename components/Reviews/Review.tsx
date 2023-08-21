@@ -41,11 +41,11 @@ export default function Review({ review }: ReviewProps) {
 
     const averageReview = useMemo(() => {
         const r =
-            (review.beer *
-                review.food *
-                review.location *
-                review.music *
-                review.service *
+            (review.beer +
+                review.food +
+                review.location +
+                review.music +
+                review.service +
                 review.vibe) /
             6;
         return roundToNearest(r, 0.1).toFixed(1);
