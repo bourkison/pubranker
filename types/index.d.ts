@@ -5,29 +5,7 @@ export type OpeningHoursObject = {
     time: string;
 };
 
-export type PubType = {
-    id: number;
-    name: string;
-    address: string;
-    location: { lng: number; lat: number };
-    opening_hours: { open: OpeningHoursObject; close: OpeningHoursObject }[];
-    phone_number: string;
-    google_overview: string;
-    google_rating: number;
-    google_ratings_amount: number;
-    google_id: string;
-    reservable: boolean;
-    website: string;
-    dist_meters: number;
-    photos: string[];
-};
-
-export type NearbyPub =
-    Database['public']['Functions']['nearby_pubs']['Returns'][number];
-export type DiscoveredPub =
-    Database['public']['Functions']['pubs_in_polygon']['Returns'][number];
-export type SavedPub =
-    Database['public']['Functions']['saved_pubs']['Returns'][number];
+export type PubSchema = Database['public']['Tables']['pub_schema']['Row'];
 
 export type OpeningHoursType =
     Database['public']['Tables']['opening_hours']['Row'];

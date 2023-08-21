@@ -1,11 +1,11 @@
 import React from 'react';
 import { ActivityIndicator, FlatList, View } from 'react-native';
-import { DiscoveredPub } from '@/types';
+import { PubSchema } from '@/types';
 import PubListItem from './PubListItem';
 
 type PubListProps = {
     isLoading: boolean;
-    pubs: DiscoveredPub[];
+    pubs: PubSchema[];
 };
 
 export default function PubList({ pubs, isLoading }: PubListProps) {

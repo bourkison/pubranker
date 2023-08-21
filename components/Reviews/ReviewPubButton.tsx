@@ -10,11 +10,11 @@ import {
     ActivityIndicator,
 } from 'react-native';
 import Review from './Review';
-import { DiscoveredPub, UserReviewType } from '@/types';
+import { PubSchema, UserReviewType } from '@/types';
 import { convertUserReviewsToNonNullable } from '@/services';
 
 type ReviewPubButtonProps = {
-    pub: DiscoveredPub;
+    pub: PubSchema;
 };
 
 export default function ReviewPubButton({ pub }: ReviewPubButtonProps) {

@@ -1,6 +1,6 @@
 import PubList from '@/components/Pubs/PubList';
 import { supabase } from '@/services/supabase';
-import { DiscoveredPub } from '@/types';
+import { PubSchema } from '@/types';
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import * as Location from 'expo-location';
@@ -17,7 +17,7 @@ const INITIAL_AMOUNT = 10;
 export default function Explore() {
     // TODO: Move this into a separate component.
     const [isLoading, setIsLoading] = useState(false);
-    const [pubs, setPubs] = useState<DiscoveredPub[]>([]);
+    const [pubs, setPubs] = useState<PubSchema[]>([]);
 
     const exploreState = useAppSelector(state => state.explore.exploreState);
 

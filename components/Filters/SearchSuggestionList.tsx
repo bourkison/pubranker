@@ -5,14 +5,14 @@ import { useAppSelector } from '@/store/hooks';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
-import { DiscoveredPub } from '@/types';
+import { PubSchema } from '@/types';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 type Suggestion = {
     title: string;
     subtitle?: string;
     type: 'pub' | 'station' | 'park' | 'landmark' | 'area' | 'nearby';
-    pub?: DiscoveredPub;
+    pub?: PubSchema;
     onPress?: () => void;
 };
 

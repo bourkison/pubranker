@@ -3,11 +3,11 @@ import BottomTabNavigator from '@/nav/BottomTabNavigator';
 import React from 'react';
 import PubHome from '@/screens/PubView/PubHome';
 import ViewReview from '@/screens/PubView/ViewReview';
-import { DiscoveredPub, UserReviewType } from '@/types';
+import { PubSchema, UserReviewType } from '@/types';
 
 export type MainNavigatorStackParamList = {
     Home: undefined;
-    PubView: { pub: DiscoveredPub };
+    PubView: { pub: PubSchema };
     ViewReview: {
         review: UserReviewType;
         onDelete: () => void;

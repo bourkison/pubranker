@@ -1,4 +1,4 @@
-import { DiscoveredPub } from '@/types';
+import { PubSchema } from '@/types';
 import React from 'react';
 import BottomSheetPubItem from '@/components/Pubs/BottomSheetPubItem';
 import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
@@ -6,7 +6,7 @@ import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { StyleSheet, Text, View } from 'react-native';
 
 type BottomSheetPubListProps = {
-    pubs: DiscoveredPub[];
+    pubs: PubSchema[];
 };
 
 export default function BottomSheetPubList({ pubs }: BottomSheetPubListProps) {

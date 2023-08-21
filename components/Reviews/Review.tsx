@@ -8,15 +8,15 @@ import {
     TouchableOpacity,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { averageReviews, fromNowString, roundToNearest } from '@/services';
-import { DiscoveredPub, UserReviewType } from '@/types';
+import { fromNowString, roundToNearest } from '@/services';
+import { PubSchema, UserReviewType } from '@/types';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 
 type ReviewProps = {
     review: UserReviewType;
-    pub: DiscoveredPub;
+    pub: PubSchema;
 };
 
 const MAX_LINES_LENGTH = 4;
@@ -40,14 +40,14 @@ export default function Review({ review }: ReviewProps) {
     };
 
     const averageReview = useMemo(() => {
-        const r = averageReviews(
-            review.beer,
-            review.food,
-            review.location,
-            review.music,
-            review.service,
-            review.vibe,
-        );
+        const r =
+            (review.beer *
+                review.food *
+                review.location *
+                review.music *
+                review.service *
+                review.vibe) /
+            6;
         return roundToNearest(r, 0.1).toFixed(1);
     }, [review]);
 

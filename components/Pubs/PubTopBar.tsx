@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import {
-    averageReviews,
     checkIfOpen,
     distanceString,
     parseLocation,
@@ -12,10 +11,10 @@ import {
 import { timeString } from '@/services';
 import * as Location from 'expo-location';
 import { showLocation } from 'react-native-map-link';
-import { DiscoveredPub } from '@/types';
+import { PubSchema } from '@/types';
 
 type TopBarPubProps = {
-    pub: DiscoveredPub;
+    pub: PubSchema;
 };
 
 export default function PubTopBar({ pub }: TopBarPubProps) {
@@ -68,18 +67,8 @@ export default function PubTopBar({ pub }: TopBarPubProps) {
                 <View style={styles.reviewColumnContainer}>
                     <Ionicons name="star" />
                     <Text style={styles.reviewText}>
-                        {roundToNearest(
-                            averageReviews(
-                                pub.review_beer,
-                                pub.review_food,
-                                pub.review_location,
-                                pub.review_music,
-                                pub.review_service,
-                                pub.review_vibe,
-                            ),
-                            0.1,
-                        ).toFixed(1)}{' '}
-                        ({pub.num_reviews})
+                        {roundToNearest(pub.overall_reviews, 0.1).toFixed(1)} (
+                        {pub.num_reviews})
                     </Text>
                 </View>
             </TouchableOpacity>

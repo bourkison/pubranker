@@ -1,5 +1,5 @@
 import { supabase } from '@/services/supabase';
-import { DiscoveredPub } from '@/types';
+import { PubSchema } from '@/types';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
     View,
@@ -12,7 +12,7 @@ import {
 import PubInfo from './PubInfo';
 
 type BottomSheetPubItemProps = {
-    pub: DiscoveredPub;
+    pub: PubSchema;
 };
 
 const HORIZONTAL_PADDING = 30;

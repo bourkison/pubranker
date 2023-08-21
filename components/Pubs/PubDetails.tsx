@@ -6,10 +6,10 @@ import { parseLocation, parseOpeningHours } from '@/services';
 import HoursCollapsible from '@/components/Utility/HoursCollapsible';
 import url from 'url';
 import { showLocation } from 'react-native-map-link';
-import { DiscoveredPub } from '@/types';
+import { PubSchema } from '@/types';
 
 type PubDetailsProps = {
-    pub: DiscoveredPub;
+    pub: PubSchema;
 };
 
 export default function PubDetails({ pub }: PubDetailsProps) {

@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { DiscoveredPub } from '@/types';
-import { averageReviews, distanceString, roundToNearest } from '@/services';
+import { PubSchema } from '@/types';
+import { distanceString, roundToNearest } from '@/services';
 
 type PubInfoProps = {
-    pub: DiscoveredPub;
+    pub: PubSchema;
 };
 
 export default function PubInfo({ pub }: PubInfoProps) {
@@ -14,17 +14,7 @@ export default function PubInfo({ pub }: PubInfoProps) {
             <View style={styles.reviewContainer}>
                 <Ionicons name="star" size={12} color="#FFD700" />
                 <Text style={styles.ratingText}>
-                    {roundToNearest(
-                        averageReviews(
-                            pub.review_beer,
-                            pub.review_food,
-                            pub.review_location,
-                            pub.review_music,
-                            pub.review_service,
-                            pub.review_vibe,
-                        ),
-                        0.1,
-                    ).toFixed(1)}
+                    {roundToNearest(pub.overall_reviews, 0.1).toFixed(1)}
                 </Text>
                 <Text style={styles.numReviewsText}>({pub.num_reviews})</Text>
             </View>

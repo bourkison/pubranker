@@ -1,5 +1,5 @@
 import { supabase } from '@/services/supabase';
-import { DiscoveredPub } from '@/types';
+import { PubSchema } from '@/types';
 import React, { useEffect, useState } from 'react';
 import {
     Pressable,
@@ -17,7 +17,7 @@ const WIDTH_PERCENTAGE = 0.8;
 const ASPECT_RATIO = 1.3333; // 4:3
 
 type PubListItemProps = {
-    pub: DiscoveredPub;
+    pub: PubSchema;
 };
 
 export default function PubListItem({ pub }: PubListItemProps) {

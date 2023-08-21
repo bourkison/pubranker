@@ -9,10 +9,10 @@ import {
     ActivityIndicator,
 } from 'react-native';
 import BeerPill from '@/components/Beers/BeerPill';
-import { DiscoveredPub } from '@/types';
+import { PubSchema } from '@/types';
 
 type DraughtBeersListProps = {
-    pub: DiscoveredPub;
+    pub: PubSchema;
 };
 
 type Beer = Database['public']['Tables']['beers']['Row'];

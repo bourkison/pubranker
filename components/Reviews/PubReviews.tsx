@@ -7,10 +7,10 @@ import OverallRatings from '@/components/Ratings/OverallRatings';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import ReviewPubButton from '@/components/Reviews/ReviewPubButton';
 import { convertUserReviewsToNonNullable } from '@/services';
-import { DiscoveredPub, UserReviewType } from '@/types';
+import { PubSchema, UserReviewType } from '@/types';
 
 type PubReviewsProps = {
-    pub: DiscoveredPub;
+    pub: PubSchema;
 };
 
 export default function PubReviews({ pub }: PubReviewsProps) {
@@ -59,6 +59,7 @@ export default function PubReviews({ pub }: PubReviewsProps) {
                 music={pub.review_music}
                 service={pub.review_service}
                 vibe={pub.review_vibe}
+                overallReviews={pub.overall_reviews}
                 headerText="Ratings"
             />
             <ReviewPubButton pub={pub} />

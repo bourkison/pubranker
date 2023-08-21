@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import RatingsBar from '@/components/Utility/RatingsBar';
-import { averageReviews, roundToNearest } from '@/services';
+import { roundToNearest } from '@/services';
 import { Ionicons } from '@expo/vector-icons';
 import RatingsCategory from '@/components/Ratings/RatingsCategory';
 
@@ -12,7 +12,7 @@ type OverallRatingsProp = {
     music: number;
     service: number;
     vibe: number;
-
+    overallReviews: number;
     headerText: string;
 };
 
@@ -23,6 +23,7 @@ export default function OverallRatings({
     music,
     service,
     vibe,
+    overallReviews,
     headerText,
 }: OverallRatingsProp) {
     return (
@@ -34,17 +35,7 @@ export default function OverallRatings({
                 <View style={styles.overallRatingsContainer}>
                     <Ionicons name="star" size={12} color="#384D48" />
                     <Text style={styles.headerText}>
-                        {roundToNearest(
-                            averageReviews(
-                                beer,
-                                food,
-                                location,
-                                music,
-                                service,
-                                vibe,
-                            ),
-                            0.1,
-                        ).toFixed(1)}
+                        {roundToNearest(overallReviews, 0.1).toFixed(1)}
                     </Text>
                 </View>
             </View>

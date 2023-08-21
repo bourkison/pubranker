@@ -192,6 +192,7 @@ export interface Database {
                     name: string;
                     num_reviews: number;
                     opening_hours: Json;
+                    overall_reviews: number;
                     phone_number: string;
                     photos: string[];
                     pool_table: boolean | null;
@@ -226,6 +227,7 @@ export interface Database {
                     name: string;
                     num_reviews: number;
                     opening_hours: Json;
+                    overall_reviews: number;
                     phone_number: string;
                     photos: string[];
                     pool_table?: boolean | null;
@@ -260,6 +262,7 @@ export interface Database {
                     name?: string;
                     num_reviews?: number;
                     opening_hours?: Json;
+                    overall_reviews?: number;
                     phone_number?: string;
                     photos?: string[];
                     pool_table?: boolean | null;
@@ -487,6 +490,7 @@ export interface Database {
                     name: string | null;
                     num_reviews: number | null;
                     opening_hours: Json | null;
+                    overall_reviews: number | null;
                     phone_number: string | null;
                     photos: string[] | null;
                     pool_table: boolean | null;
@@ -562,6 +566,7 @@ export interface Database {
                     name: string;
                     num_reviews: number;
                     opening_hours: Json;
+                    overall_reviews: number;
                     phone_number: string;
                     photos: string[];
                     pool_table: boolean | null;
@@ -604,6 +609,7 @@ export interface Database {
                     name: string;
                     num_reviews: number;
                     opening_hours: Json;
+                    overall_reviews: number;
                     phone_number: string;
                     photos: string[];
                     pool_table: boolean | null;
@@ -645,6 +651,7 @@ export interface Database {
                     name: string;
                     num_reviews: number;
                     opening_hours: Json;
+                    overall_reviews: number;
                     phone_number: string;
                     photos: string[];
                     pool_table: boolean | null;

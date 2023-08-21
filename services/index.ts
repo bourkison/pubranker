@@ -236,17 +236,6 @@ export const fromNowString = (dateString: string) => {
     return dayjs(dateString).fromNow();
 };
 
-export const averageReviews = (
-    beer: number,
-    food: number,
-    location: number,
-    music: number,
-    service: number,
-    vibe: number,
-) => {
-    return (beer + food + location + music + service + vibe) / 6;
-};
-
 export const checkIfOpen = (
     openingHours: OpeningHoursType[],
 ): { isOpen: boolean; nextHours: dayjs.Dayjs } => {

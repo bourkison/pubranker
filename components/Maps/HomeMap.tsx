@@ -7,7 +7,7 @@ import { Keyboard, StyleSheet, View } from 'react-native';
 import { useAppSelector } from '@/store/hooks';
 import DebugPolygons from './DebugPolygons';
 import { parseLocation } from '@/services';
-import { DiscoveredPub } from '@/types';
+import { PubSchema } from '@/types';
 import BottomSheet from '@gorhom/bottom-sheet';
 import BottomSheetPubList from '../Pubs/BottomSheetPubList';
 
@@ -22,7 +22,7 @@ export default function HomeMap() {
 
     const [hasLoaded, setHasLoaded] = useState(false);
 
-    const [selectedPub, setSelectedPub] = useState<DiscoveredPub | undefined>();
+    const [selectedPub, setSelectedPub] = useState<PubSchema | undefined>();
     const pubs = useAppSelector(state => state.explore.pubs);
 
     const bottomSheetRef = useRef<BottomSheet>(null);
@@ -100,7 +100,7 @@ export default function HomeMap() {
         }
     };
 
-    const selectPub = (pub: DiscoveredPub) => {
+    const selectPub = (pub: PubSchema) => {
         setSelectedPub(pub);
     };
 

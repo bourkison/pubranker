@@ -3,7 +3,7 @@ import {
     createEntityAdapter,
     createSlice,
 } from '@reduxjs/toolkit';
-import { RejectWithValueType, SavedPub } from '@/types';
+import { RejectWithValueType, PubSchema } from '@/types';
 import * as Location from 'expo-location';
 import { supabase } from '@/services/supabase';
 import { RootState } from '..';
@@ -11,7 +11,7 @@ import { RootState } from '..';
 const savedAdapter = createEntityAdapter();
 
 const initialState = savedAdapter.getInitialState({
-    pubs: [] as SavedPub[],
+    pubs: [] as PubSchema[],
     isLoading: false,
     moreToLoad: true,
     isLoadingMore: false,
@@ -19,7 +19,7 @@ const initialState = savedAdapter.getInitialState({
 });
 
 export const fetchSavedPubs = createAsyncThunk<
-    SavedPub[],
+    PubSchema[],
     { amount: number; id: string; refreshing: boolean },
     { rejectValue: RejectWithValueType }
 >('saved/fetchSavedPubs', async ({ amount, id }, { rejectWithValue }) => {

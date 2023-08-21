@@ -2,7 +2,7 @@ import { applyFilters } from '@/services';
 import { supabase } from '@/services/supabase';
 import {
     BoolOrUnset,
-    DiscoveredPub,
+    PubSchema,
     PubFilters,
     RejectWithValueType,
 } from '@/types';
@@ -35,7 +35,7 @@ const INITIAL_FILTERS = {
 } as PubFilters;
 
 const initialState = discoverAdapter.getInitialState({
-    pubs: [] as DiscoveredPub[],
+    pubs: [] as PubSchema[],
     isLoading: false,
     moreToLoad: true,
     isLoadingMore: false,
@@ -54,7 +54,7 @@ const queryDb = async (
     withinRange: number,
     overallRating: number,
     skip?: number,
-): Promise<DiscoveredPub[]> => {
+): Promise<PubSchema[]> => {
     const currentLocation = await Location.getCurrentPositionAsync();
 
     let query = supabase.rpc('nearby_pubs', {
@@ -72,6 +72,7 @@ const queryDb = async (
 
     if (overallRating > 0) {
         // TODO: Overall rating
+        query = query.gte('overall_reviews', overallRating);
     }
 
     const from = skip || 0;
@@ -87,7 +88,7 @@ const queryDb = async (
 };
 
 export const fetchExplorePubs = createAsyncThunk<
-    DiscoveredPub[],
+    PubSchema[],
     { amount: number },
     { rejectValue: RejectWithValueType }
 >(
@@ -101,7 +102,7 @@ export const fetchExplorePubs = createAsyncThunk<
                 state.explore.filters,
                 state.explore.searchText,
                 state.explore.withinRange,
-                0,
+                state.explore.overallRating,
             );
 
             console.log('PUBS:', pubs);
@@ -117,7 +118,7 @@ export const fetchExplorePubs = createAsyncThunk<
 );
 
 export const fetchMoreExplorePubs = createAsyncThunk<
-    DiscoveredPub[],
+    PubSchema[],
     { amount: number },
     { rejectValue: RejectWithValueType }
 >(

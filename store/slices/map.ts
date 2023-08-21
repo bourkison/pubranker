@@ -4,7 +4,7 @@ import {
     convertBoxToCoordinates,
 } from '@/services/geo';
 import { supabase } from '@/services/supabase';
-import { BoundingBox, NearbyPub, RejectWithValueType } from '@/types';
+import { BoundingBox, PubSchema, RejectWithValueType } from '@/types';
 import {
     createAsyncThunk,
     createEntityAdapter,
@@ -17,7 +17,7 @@ import * as turf from '@turf/turf';
 const mapAdapter = createEntityAdapter();
 
 const initialState = mapAdapter.getInitialState({
-    pubs: [] as NearbyPub[],
+    pubs: [] as PubSchema[],
     isLoading: false,
     isLoadingMore: false,
     previouslyFetched: null as turf.helpers.Feature<
@@ -27,7 +27,7 @@ const initialState = mapAdapter.getInitialState({
 });
 
 export const fetchMapPubs = createAsyncThunk<
-    { pubs: NearbyPub[]; requestedBox: BoundingBox[] },
+    { pubs: PubSchema[]; requestedBox: BoundingBox[] },
     BoundingBox,
     { rejectValue: RejectWithValueType }
 >('map/fetchMapPubs', async (boundingBox, { getState, rejectWithValue }) => {
