@@ -12,6 +12,7 @@ import BottomSheetPubList from '@/components/Pubs/BottomSheetPubList';
 import { selectPub } from '@/store/slices/map';
 import SelectedPub from './SelectedPub';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { PubSchema } from '@/types';
 
 const ANIMATE_DELTA = 0.0075;
 const INITIAL_DELTA = 0.01;
@@ -50,19 +51,6 @@ export default function HomeMap() {
 
     const snapPoints = useMemo(() => ['10%', '35%', '100%'], []);
 
-    const selectedPubLocation = useMemo(() => {
-        if (!selectedPub?.location) {
-            return null;
-        }
-
-        try {
-            return parseLocation(selectedPub.location);
-        } catch (err) {
-            console.warn(err);
-            return null;
-        }
-    }, [selectedPub]);
-
     const initialRegion = useMemo(() => {
         return location
             ? {
@@ -79,23 +67,6 @@ export default function HomeMap() {
               };
     }, [location]);
 
-    useEffect(() => {
-        if (
-            selectedPubLocation &&
-            selectedPubLocation.coordinates &&
-            MapRef &&
-            MapRef.current
-        ) {
-            MapRef.current.animateToRegion({
-                latitude:
-                    selectedPubLocation.coordinates[1] - 0.15 * ANIMATE_DELTA,
-                longitude: selectedPubLocation.coordinates[0],
-                latitudeDelta: ANIMATE_DELTA,
-                longitudeDelta: ANIMATE_DELTA,
-            });
-        }
-    }, [selectedPubLocation, MapRef]);
-
     const panDrag = () => {
         Keyboard.dismiss();
     };
@@ -107,6 +78,20 @@ export default function HomeMap() {
         } else {
             setHasLoaded(true);
         }
+    };
+
+    const pubSelectedOnMap = (pub: PubSchema) => {
+        const pubLocation = parseLocation(pub.location);
+
+        MapRef.current?.animateToRegion({
+            latitude: pubLocation.coordinates[1] - 0.15 * ANIMATE_DELTA,
+            longitude: pubLocation.coordinates[0],
+            latitudeDelta: ANIMATE_DELTA,
+            longitudeDelta: ANIMATE_DELTA,
+        });
+
+        dispatch(selectPub(pub));
+        bottomSheetRef.current?.collapse();
     };
 
     return (
@@ -139,13 +124,12 @@ export default function HomeMap() {
                     if (pubLocation) {
                         return (
                             <Marker
-                                onPress={() => dispatch(selectPub(pub))}
+                                onPress={() => pubSelectedOnMap(pub)}
                                 key={pub.id}
                                 coordinate={{
                                     latitude: pubLocation.coordinates[1],
                                     longitude: pubLocation.coordinates[0],
                                 }}
-                                title={pub.name}
                             />
                         );
                     } else {
@@ -155,7 +139,11 @@ export default function HomeMap() {
                 <DebugPolygons />
             </MapView>
             {selectedPub !== undefined ? (
-                <View>
+                <View
+                    style={[
+                        styles.selectedPubContainer,
+                        { marginBottom: bottomMapPadding + bottomBarHeight },
+                    ]}>
                     <SelectedPub pub={selectedPub} />
                 </View>
             ) : undefined}
@@ -180,6 +168,16 @@ const styles = StyleSheet.create({
     },
     bottomSheetBackground: {
         backgroundColor: 'rgb(242, 242, 242)',
+    },
+    selectedPubContainer: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingBottom: 10,
+        paddingHorizontal: 30,
     },
     listContainer: { flex: 1 },
 });
