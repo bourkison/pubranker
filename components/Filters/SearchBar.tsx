@@ -6,7 +6,7 @@ import {
     fetchExplorePubs,
     setSearchText,
     setState,
-    resetPubs,
+    // resetPubs,
 } from '@/store/slices/explore';
 import { INITIAL_SEARCH_AMOUNT } from '@/constants';
 
@@ -22,9 +22,9 @@ export default function SearchBar() {
     };
 
     const goToSuggestions = () => {
-        dispatch(setSearchText(''));
+        // dispatch(setSearchText(''));
+        // dispatch(resetPubs());
         dispatch(setState('suggestions'));
-        dispatch(resetPubs());
 
         if (inputRef && inputRef.current) {
             inputRef.current.blur();
@@ -52,7 +52,17 @@ export default function SearchBar() {
             )}
 
             <TextInput
-                onFocus={() => dispatch(setState('search'))}
+                onFocus={e => {
+                    dispatch(setState('search'));
+                    // Work around for selectTextOnFocus={true} not working
+                    // https://github.com/facebook/react-native/issues/30585#issuecomment-1330928411
+                    e.currentTarget.setNativeProps({
+                        selection: {
+                            start: 0,
+                            end: searchText.length,
+                        },
+                    });
+                }}
                 ref={inputRef}
                 style={styles.searchInput}
                 placeholder="Find pubs"
