@@ -18,7 +18,7 @@ export default function BottomTabNavigator() {
                     headerShown: false,
                     tabBarActiveTintColor: '#721121',
                     tabBarStyle: {
-                        backgroundColor: '#D8D4D5',
+                        backgroundColor: '#fff',
                     },
                 }}>
                 <Tab.Screen

@@ -10,6 +10,9 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { averageReviews, fromNowString, roundToNearest } from '@/services';
 import { DiscoveredPub, UserReviewType } from '@/types';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 
 type ReviewProps = {
     review: UserReviewType;
@@ -19,6 +22,9 @@ type ReviewProps = {
 const MAX_LINES_LENGTH = 4;
 
 export default function Review({ review }: ReviewProps) {
+    const navigation =
+        useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
+
     const [textShown, setTextShown] = useState(false);
     const [lengthMore, setLengthMore] = useState(false);
 
@@ -54,7 +60,18 @@ export default function Review({ review }: ReviewProps) {
                         {averageReview}
                     </Text>
                 </View>
-                <TouchableOpacity onPress={() => console.log('REVIEW')}>
+                <TouchableOpacity
+                    onPress={() =>
+                        navigation.navigate('ViewReview', {
+                            review: review,
+                            onEdit(edit) {
+                                console.log('edit', edit);
+                            },
+                            onDelete() {
+                                console.log('delete');
+                            },
+                        })
+                    }>
                     <Text
                         numberOfLines={textShown ? undefined : MAX_LINES_LENGTH}
                         onTextLayout={onTextLayout}>
