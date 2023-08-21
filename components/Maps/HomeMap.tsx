@@ -23,6 +23,7 @@ export default function HomeMap() {
     const MapRef = useRef<MapView>(null);
 
     const [hasLoaded, setHasLoaded] = useState(false);
+    const [bottomMapPadding, setBottomMapPadding] = useState(0);
 
     const selectedPub = useAppSelector(state => state.map.selected);
     const pubs = useAppSelector(state => state.explore.pubs);
@@ -46,6 +47,8 @@ export default function HomeMap() {
             setLocation(l);
         })();
     }, []);
+
+    const snapPoints = useMemo(() => ['10%', '35%', '100%'], []);
 
     const selectedPubLocation = useMemo(() => {
         if (!selectedPub?.location) {
@@ -113,10 +116,21 @@ export default function HomeMap() {
                 ref={MapRef}
                 showsUserLocation={true}
                 showsMyLocationButton={false}
+                onLayout={e => {
+                    setBottomMapPadding(
+                        e.nativeEvent.layout.height *
+                            (parseFloat(snapPoints[0]) / 100),
+                    );
+                }}
                 style={[styles.map, { marginBottom: bottomBarHeight }]}
                 onPanDrag={panDrag}
                 customMapStyle={MapStyle}
-                mapPadding={{ bottom: 5, top: 0, right: 0, left: 0 }}
+                mapPadding={{
+                    bottom: bottomMapPadding,
+                    top: 0,
+                    right: 0,
+                    left: 0,
+                }}
                 onRegionChangeComplete={mapDragFinished}
                 initialRegion={initialRegion}>
                 {pubs.map(pub => {
@@ -146,7 +160,7 @@ export default function HomeMap() {
                 </View>
             ) : undefined}
             <BottomSheet
-                snapPoints={['15%', '35%', '100%']}
+                snapPoints={snapPoints}
                 index={1}
                 bottomInset={bottomBarHeight}
                 ref={bottomSheetRef}
