@@ -1,8 +1,8 @@
 import React, { MutableRefObject, useEffect } from 'react';
 import { View, StyleSheet, Pressable, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useAppDispatch } from '@/store/hooks';
-import { setState } from '@/store/slices/explore';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { fetchExplorePubs, setState } from '@/store/slices/explore';
 import Animated, {
     SharedValue,
     useAnimatedStyle,
@@ -23,6 +23,7 @@ export default function ViewMapButton({
     expandTimeout,
 }: ViewMapButtonProps) {
     const dispatch = useAppDispatch();
+    const numPubsLoaded = useAppSelector(state => state.explore.pubs.length);
 
     const rStyle = useAnimatedStyle(() => ({
         width: animatedWidth.value,
@@ -42,7 +43,10 @@ export default function ViewMapButton({
     }, [expand, collapse, expandTimeout]);
 
     const openMap = () => {
-        // TODO: Load pubs in if no pubs loaded in yet.
+        if (numPubsLoaded === 0) {
+            dispatch(fetchExplorePubs({ amount: 25 }));
+        }
+
         dispatch(setState('map'));
     };
 
