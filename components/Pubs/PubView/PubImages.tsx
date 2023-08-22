@@ -1,12 +1,14 @@
 import ImageScroller from '@/components/Utility/ImageScroller';
-import { usePubRPIContext } from '@/nav/context/context';
 import { supabase } from '@/services/supabase';
+import { PubSchema } from '@/types';
 import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 
-export default function PubImages() {
-    const { pub } = usePubRPIContext();
+type PubImagesProps = {
+    pub: PubSchema;
+};
 
+export default function PubImages({ pub }: PubImagesProps) {
     const imageFlatListRef = useRef<FlatList>(null);
     const [imageUrls, setImageUrls] = useState<string[]>([]);
 

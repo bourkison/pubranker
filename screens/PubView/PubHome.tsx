@@ -29,10 +29,14 @@ import PubDescription from '@/components/Pubs/PubView/PubDescription';
 import PubFeatures from '@/components/Pubs/PubView/PubFeatures';
 import DraughtBeersList from '@/components/Beers/DraughtBeersList';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import TopTabNavigator from '@/nav/TopTabNavigator';
+import TopTabs from '@/components/Utility/TopTabs';
+import PubReviews from '@/components/Reviews/PubReviews';
+import PubImages from '../../components/Pubs/PubView/PubImages';
+import PubDetails from '@/components/Pubs/PubView/PubDetails';
 
 export default function PubHome({
     route,
+    navigation,
 }: StackScreenProps<MainNavigatorStackParamList, 'PubView'>) {
     const [headerImageUrl, setHeaderImageUrl] = useState('');
 
@@ -114,7 +118,9 @@ export default function PubHome({
                             styles.buttonsContainer,
                             { paddingTop: insets.top + 5 },
                         ]}>
-                        <Pressable style={styles.button}>
+                        <Pressable
+                            style={styles.button}
+                            onPress={() => navigation.goBack()}>
                             <Ionicons
                                 name="arrow-back-outline"
                                 color="#384D48"
@@ -195,8 +201,33 @@ export default function PubHome({
                             <DraughtBeersList pub={route.params.pub} />
                         </View>
 
-                        <View style={{ flex: 1 }}>
-                            <TopTabNavigator />
+                        <View>
+                            <TopTabs
+                                data={[
+                                    {
+                                        title: `Reviews (${route.params.pub.num_reviews})`,
+                                        component: (
+                                            <PubReviews
+                                                pub={route.params.pub}
+                                            />
+                                        ),
+                                    },
+                                    {
+                                        title: `User Photos (${route.params.pub.photos.length})`,
+                                        component: (
+                                            <PubImages pub={route.params.pub} />
+                                        ),
+                                    },
+                                    {
+                                        title: 'Additional Information',
+                                        component: (
+                                            <PubDetails
+                                                pub={route.params.pub}
+                                            />
+                                        ),
+                                    },
+                                ]}
+                            />
                         </View>
                     </Animated.View>
                 </View>

@@ -6,11 +6,13 @@ import { parseLocation, parseOpeningHours } from '@/services';
 import HoursCollapsible from '@/components/Utility/HoursCollapsible';
 import url from 'url';
 import { showLocation } from 'react-native-map-link';
-import { usePubRPIContext } from '@/nav/context/context';
+import { PubSchema } from '@/types';
 
-export default function PubDetails() {
-    const { pub } = usePubRPIContext();
+type PubDetailsProps = {
+    pub: PubSchema;
+};
 
+export default function PubDetails({ pub }: PubDetailsProps) {
     const openingHours = parseOpeningHours(pub.opening_hours);
 
     const pubLocation = parseLocation(pub.location);
