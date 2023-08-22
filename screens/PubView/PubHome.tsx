@@ -22,6 +22,8 @@ import Animated, {
 import { LinearGradient } from 'expo-linear-gradient';
 import { distanceString, roundToNearest } from '@/services';
 import { Ionicons } from '@expo/vector-icons';
+import PubTopBar from '@/components/Pubs/PubTopBar';
+import PubDescription from '@/components/Pubs/PubDescription';
 
 export default function PubHome({
     route,
@@ -137,7 +139,12 @@ export default function PubHome({
                             styles.contentContainer,
                             rContentContainerStyle,
                         ]}>
-                        <Text>Test</Text>
+                        <View>
+                            <PubTopBar pub={route.params.pub} />
+                        </View>
+                        <View>
+                            <PubDescription pub={route.params.pub} />
+                        </View>
                     </Animated.View>
                 </View>
             </GestureDetector>

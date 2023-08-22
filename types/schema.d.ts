@@ -177,6 +177,7 @@ export interface Database {
                     address: string;
                     beer_garden: boolean | null;
                     dart_board: boolean | null;
+                    description: string;
                     dist_meters: number;
                     dog_friendly: boolean | null;
                     foosball_table: boolean | null;
@@ -212,6 +213,7 @@ export interface Database {
                     address: string;
                     beer_garden?: boolean | null;
                     dart_board?: boolean | null;
+                    description: string;
                     dist_meters: number;
                     dog_friendly?: boolean | null;
                     foosball_table?: boolean | null;
@@ -247,6 +249,7 @@ export interface Database {
                     address?: string;
                     beer_garden?: boolean | null;
                     dart_board?: boolean | null;
+                    description?: string;
                     dist_meters?: number;
                     dog_friendly?: boolean | null;
                     foosball_table?: boolean | null;
@@ -286,6 +289,7 @@ export interface Database {
                     brewery: boolean | null;
                     created_at: string | null;
                     dart_board: boolean | null;
+                    description: string;
                     dog_friendly: boolean | null;
                     foosball_table: boolean | null;
                     free_wifi: boolean | null;
@@ -313,6 +317,7 @@ export interface Database {
                     brewery?: boolean | null;
                     created_at?: string | null;
                     dart_board?: boolean | null;
+                    description?: string;
                     dog_friendly?: boolean | null;
                     foosball_table?: boolean | null;
                     free_wifi?: boolean | null;
@@ -340,6 +345,7 @@ export interface Database {
                     brewery?: boolean | null;
                     created_at?: string | null;
                     dart_board?: boolean | null;
+                    description?: string;
                     dog_friendly?: boolean | null;
                     foosball_table?: boolean | null;
                     free_wifi?: boolean | null;
@@ -476,6 +482,7 @@ export interface Database {
                     address: string | null;
                     beer_garden: boolean | null;
                     dart_board: boolean | null;
+                    description: string | null;
                     dog_friendly: boolean | null;
                     foosball_table: boolean | null;
                     free_wifi: boolean | null;
@@ -551,6 +558,7 @@ export interface Database {
                     address: string;
                     beer_garden: boolean | null;
                     dart_board: boolean | null;
+                    description: string;
                     dist_meters: number;
                     dog_friendly: boolean | null;
                     foosball_table: boolean | null;
@@ -594,6 +602,7 @@ export interface Database {
                     address: string;
                     beer_garden: boolean | null;
                     dart_board: boolean | null;
+                    description: string;
                     dist_meters: number;
                     dog_friendly: boolean | null;
                     foosball_table: boolean | null;
@@ -636,6 +645,7 @@ export interface Database {
                     address: string;
                     beer_garden: boolean | null;
                     dart_board: boolean | null;
+                    description: string;
                     dist_meters: number;
                     dog_friendly: boolean | null;
                     foosball_table: boolean | null;
