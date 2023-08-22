@@ -34,7 +34,8 @@ export default function PubImages({ pub }: PubImagesProps) {
                 <ImageScroller
                     imageFlatListRef={imageFlatListRef}
                     images={imageUrls || []}
-                    rows={[{ width: 0.7, aspectRatio: 1 }]}
+                    percentageWidth={0.6}
+                    aspectRatio={1.33}
                 />
             ) : undefined}
         </View>

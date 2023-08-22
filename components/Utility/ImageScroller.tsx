@@ -5,50 +5,80 @@ import {
     FlatList,
     Platform,
     useWindowDimensions,
-    ScrollView,
 } from 'react-native';
 
 type ImageScrollerImages = {
     images: string[];
     margin?: number;
     imageFlatListRef?: Ref<FlatList>;
-    rows: { width: number; aspectRatio: number }[]; // Each number is how wide the image should be on that row
+    percentageWidth: number;
+    aspectRatio: number;
 };
 
 export default function ImageScroller({
     images,
     margin = 5,
+    percentageWidth,
+    aspectRatio,
     imageFlatListRef,
-    rows,
 }: ImageScrollerImages) {
     const { width } = useWindowDimensions();
 
-    const rowsAmount = useMemo(() => rows.length, [rows]);
-
-    return (
-        <ScrollView>
-            <FlatList
-                contentContainerStyle={{ alignSelf: 'flex-start' }}
-                numColumns={Math.ceil(images.length / rowsAmount)}
-                showsVerticalScrollIndicator={false}
-                showsHorizontalScrollIndicator={false}
-                data={images}
-                renderItem={({ item, index }) => {
-                    return (
-                        <Image
-                            source={{ uri: item }}
-                            style={{
-                                width: rows[0].width * width,
-                                height:
-                                    (rows[0].width * width) /
-                                    rows[0].aspectRatio,
-                            }}
-                        />
-                    );
-                }}
-            />
-        </ScrollView>
+    const imageWidth = useMemo(
+        () => width * percentageWidth,
+        [width, percentageWidth],
     );
+    const imageHeight = useMemo(
+        () => imageWidth / aspectRatio,
+        [imageWidth, aspectRatio],
+    );
+
+    const comp =
+        Platform.OS === 'ios' ? (
+            <FlatList
+                ref={imageFlatListRef}
+                horizontal={true}
+                data={images}
+                showsHorizontalScrollIndicator={false}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item }) => (
+                    <Image
+                        source={{ uri: item }}
+                        style={[
+                            styles.image,
+                            {
+                                width: imageWidth,
+                                height: imageHeight,
+                                marginHorizontal: margin,
+                            },
+                        ]}
+                    />
+                )}
+            />
+        ) : (
+            <FlatList
+                ref={imageFlatListRef}
+                horizontal={true}
+                data={images}
+                showsHorizontalScrollIndicator={false}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item }) => (
+                    <Image
+                        source={{ uri: item }}
+                        style={[
+                            styles.image,
+                            {
+                                width: imageWidth,
+                                height: imageHeight,
+                                marginHorizontal: margin,
+                            },
+                        ]}
+                    />
+                )}
+            />
+        );
+
+    return comp;
 }
 
 const styles = StyleSheet.create({

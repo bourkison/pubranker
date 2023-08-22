@@ -95,11 +95,45 @@ export default function TopTabs({ data }: TopTabsProps) {
 
         sIndicatorTranslateX.value = withTiming(inputData[index].xPos, {
             duration: 300,
+            easing: Easing.inOut(Easing.quad),
         });
 
         sIndicatorWidth.value = withTiming(inputData[index].textWidth, {
             duration: 350,
+            easing: Easing.inOut(Easing.quad),
         });
+
+        // Scroll movements.
+        console.log(
+            'SWITCH',
+            inputData[index].xPos,
+            sScrollTranslateX.value,
+            width,
+            width + sScrollTranslateX.value,
+        );
+
+        if (inputData[index].xPos < -sScrollTranslateX.value) {
+            sScrollTranslateX.value = withTiming(-inputData[index].xPos, {
+                duration: 300,
+                easing: Easing.inOut(Easing.quad),
+            });
+        }
+        // Else if full text is not in view (xPos + width) is not within our
+        else if (
+            inputData[index].xPos + inputData[index].textWidth >
+            width - sScrollTranslateX.value
+        ) {
+            const endOfTextPosition =
+                inputData[index].xPos +
+                inputData[index].textWidth +
+                styles.container.marginHorizontal * 2;
+            const endOfTextOffset = endOfTextPosition - width;
+
+            sScrollTranslateX.value = withTiming(-endOfTextOffset, {
+                duration: 300,
+                easing: Easing.inOut(Easing.quad),
+            });
+        }
     };
 
     const panGesture = Gesture.Pan()
@@ -150,8 +184,16 @@ export default function TopTabs({ data }: TopTabsProps) {
             <Animated.View
                 style={[styles.container, rScrollStyle]}
                 onLayout={e => {
+                    console.log(
+                        'LAYOUT',
+                        width,
+                        e.nativeEvent.layout.width,
+                        Math.max(width - e.nativeEvent.layout.width, 0),
+                    );
                     sScrollOffset.value = Math.max(
-                        e.nativeEvent.layout.width - width,
+                        width -
+                            e.nativeEvent.layout.width +
+                            styles.container.marginHorizontal,
                         0,
                     );
                 }}>
@@ -202,7 +244,7 @@ export default function TopTabs({ data }: TopTabsProps) {
 const styles = StyleSheet.create({
     container: {
         paddingTop: 25,
-        marginHorizontal: 10,
+        marginHorizontal: 20,
     },
     itemsContainer: {
         flexDirection: 'row',

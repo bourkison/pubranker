@@ -227,6 +227,14 @@ export default function PubHome({
                                             />
                                         ),
                                     },
+                                    {
+                                        title: 'Similar',
+                                        component: (
+                                            <View>
+                                                <Text>Test</Text>
+                                            </View>
+                                        ),
+                                    },
                                 ]}
                             />
                         </View>
