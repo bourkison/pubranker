@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { NavigationContainer } from '@react-navigation/native';
 import Navigator from '@/nav/MainNavigator';
@@ -9,8 +9,18 @@ import store from '@/store';
 import 'react-native-gesture-handler';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StyleSheet } from 'react-native';
+import { useFonts } from 'expo-font';
 
 export default function App() {
+    const [fontsLoaded] = useFonts({
+        Jost: require('@/assets/fonts/Jost-Regular.ttf'),
+        JostLight: require('@/assets/fonts/Jost-Light.ttf'),
+    });
+
+    useEffect(() => {
+        console.log('Fonts loaded:', fontsLoaded);
+    }, [fontsLoaded]);
+
     return (
         <GestureHandlerRootView style={styles.flexOne}>
             <Provider store={store}>
