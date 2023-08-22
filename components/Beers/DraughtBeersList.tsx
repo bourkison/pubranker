@@ -64,31 +64,28 @@ export default function DraughtBeersList({ pub }: DraughtBeersListProps) {
     }, [pub]);
 
     return (
-        <View style={styles.container}>
-            <View>
-                <Text style={styles.header}>Draught</Text>
+        <>
+            <View style={styles.container}>
+                {!isLoading ? (
+                    <FlatList
+                        contentContainerStyle={styles.listContainer}
+                        horizontal={true}
+                        data={beers}
+                        showsHorizontalScrollIndicator={false}
+                        keyExtractor={item => item.id.toString()}
+                        renderItem={({ item }) => <BeerPill beer={item} />}
+                    />
+                ) : (
+                    <ActivityIndicator />
+                )}
             </View>
-            {!isLoading ? (
-                <FlatList
-                    contentContainerStyle={styles.listContainer}
-                    horizontal={true}
-                    data={beers}
-                    showsHorizontalScrollIndicator={false}
-                    keyExtractor={item => item.id.toString()}
-                    renderItem={({ item }) => <BeerPill beer={item} />}
-                />
-            ) : (
-                <ActivityIndicator />
-            )}
-        </View>
+        </>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        borderTopWidth: 1,
-        borderColor: '#E5E7EB',
-        paddingTop: 10,
+        paddingTop: 25,
     },
     listContainer: {
         paddingRight: 10,
@@ -98,5 +95,10 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginBottom: 10,
         paddingHorizontal: 15,
+    },
+    separator: {
+        marginHorizontal: 30,
+        borderTopWidth: 1,
+        borderColor: '#E5E7EB',
     },
 });

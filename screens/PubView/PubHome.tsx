@@ -23,11 +23,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { distanceString, roundToNearest } from '@/services';
 import { Ionicons } from '@expo/vector-icons';
 import PubTopBar from '@/components/Pubs/PubTopBar';
-import PubDescription from '@/components/Pubs/PubDescription';
+import PubDescription from '@/components/Pubs/PubView/PubDescription';
+import PubFeatures from '@/components/Pubs/PubView/PubFeatures';
+import DraughtBeersList from '@/components/Beers/DraughtBeersList';
 
 export default function PubHome({
     route,
-    navigation,
 }: StackScreenProps<MainNavigatorStackParamList, 'PubView'>) {
     const [headerImageUrl, setHeaderImageUrl] = useState('');
 
@@ -64,12 +65,10 @@ export default function PubHome({
             contextY.value = sTranslateY.value;
         })
         .onUpdate(e => {
-            console.log(e.translationY + contextY.value, initTranslateY);
-
             sTranslateY.value = interpolate(
                 e.translationY + contextY.value,
-                [0, -initTranslateY * 0.8, -initTranslateY * 2],
-                [0, -initTranslateY / 2, -initTranslateY],
+                [-1, 0, -initTranslateY * 0.8, -initTranslateY * 2],
+                [-1, 0, -initTranslateY / 2, -initTranslateY],
                 {
                     extrapolateLeft: Extrapolation.EXTEND,
                     extrapolateRight: Extrapolation.CLAMP,
@@ -144,6 +143,12 @@ export default function PubHome({
                         </View>
                         <View>
                             <PubDescription pub={route.params.pub} />
+                        </View>
+                        <View>
+                            <DraughtBeersList pub={route.params.pub} />
+                        </View>
+                        <View>
+                            <PubFeatures pub={route.params.pub} />
                         </View>
                     </Animated.View>
                 </View>

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
-import MapView, { Marker, Region } from 'react-native-maps';
+import MapView, { MapMarker, Region } from 'react-native-maps';
 import * as Location from 'expo-location';
 import MapStyle from '@/json/map_style.json';
 import { Keyboard, StyleSheet, View } from 'react-native';
@@ -123,7 +123,7 @@ export default function HomeMap() {
 
                     if (pubLocation) {
                         return (
-                            <Marker
+                            <MapMarker
                                 onPress={() => pubSelectedOnMap(pub)}
                                 key={pub.id}
                                 coordinate={{

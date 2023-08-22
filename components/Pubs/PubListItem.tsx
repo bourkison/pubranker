@@ -10,7 +10,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { StackNavigationProp } from '@react-navigation/stack';
-import PubInfo from './PubInfo';
+import PubInfo from './PubView/PubInfo';
 
 const NO_IMAGE = require('@/assets/noimage.png');
 const WIDTH_PERCENTAGE = 0.8;

@@ -2,7 +2,7 @@ import { OpeningHoursType } from '@/types';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import Collapsible from 'react-native-collapsible';
-import OpeningHoursComponent from '@/components/Pubs/OpeningHoursComponent';
+import OpeningHoursComponent from '@/components/Pubs/PubView/OpeningHoursComponent';
 import { checkIfOpen, timeString } from '@/services';
 import dayjs from 'dayjs';
 import { Entypo } from '@expo/vector-icons';

@@ -10,7 +10,7 @@ import {
     ViewStyle,
     Pressable,
 } from 'react-native';
-import PubInfo from './PubInfo';
+import PubInfo from './PubView/PubInfo';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
