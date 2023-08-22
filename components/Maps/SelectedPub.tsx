@@ -9,6 +9,7 @@ import { useAppDispatch } from '@/store/hooks';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
+import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 
 type SelectedPubProps = {
     pub: PubSchema;
@@ -43,40 +44,43 @@ export default function SelectedPub({ pub }: SelectedPubProps) {
     };
 
     return (
-        <Pressable
-            style={styles.container}
-            onPress={() => navigation.navigate('PubView', { pub })}>
-            {imageUrl ? (
-                <Image source={{ uri: imageUrl }} style={styles.image} />
-            ) : undefined}
+        <Animated.View entering={FadeInDown} exiting={FadeOutDown}>
+            <Pressable
+                style={styles.container}
+                onPress={() => navigation.navigate('PubView', { pub })}>
+                {imageUrl ? (
+                    <Image source={{ uri: imageUrl }} style={styles.image} />
+                ) : undefined}
 
-            <View style={styles.contentContainer}>
-                <View>
-                    <Text style={styles.titleText}>{pub.name}</Text>
-                    <Text style={styles.addressText}>{pub.address}</Text>
-                </View>
-                <View style={styles.bottomContentRowContainer}>
-                    <Text style={styles.distText}>
-                        {distanceString(pub.dist_meters)}
-                    </Text>
-                    <View style={styles.ratingsContainer}>
-                        <Ionicons name="star" size={10} color="#FFD700" />
-                        <Text style={styles.ratingsText}>
-                            {roundToNearest(pub.overall_reviews, 0.1).toFixed(
-                                1,
-                            )}{' '}
-                            ({pub.num_reviews})
+                <View style={styles.contentContainer}>
+                    <View>
+                        <Text style={styles.titleText}>{pub.name}</Text>
+                        <Text style={styles.addressText}>{pub.address}</Text>
+                    </View>
+                    <View style={styles.bottomContentRowContainer}>
+                        <Text style={styles.distText}>
+                            {distanceString(pub.dist_meters)}
                         </Text>
+                        <View style={styles.ratingsContainer}>
+                            <Ionicons name="star" size={10} color="#FFD700" />
+                            <Text style={styles.ratingsText}>
+                                {roundToNearest(
+                                    pub.overall_reviews,
+                                    0.1,
+                                ).toFixed(1)}{' '}
+                                ({pub.num_reviews})
+                            </Text>
+                        </View>
                     </View>
                 </View>
-            </View>
 
-            <Pressable
-                style={styles.closeButtonContainer}
-                onPress={deselectPub}>
-                <Text style={styles.closeButtonText}>x</Text>
+                <Pressable
+                    style={styles.closeButtonContainer}
+                    onPress={deselectPub}>
+                    <Text style={styles.closeButtonText}>x</Text>
+                </Pressable>
             </Pressable>
-        </Pressable>
+        </Animated.View>
     );
 }
 
