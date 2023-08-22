@@ -44,6 +44,7 @@ export default function ViewMapButton({
 
     const openMap = () => {
         if (numPubsLoaded === 0) {
+            // TODO: Instead fetch pubs within map object itself.
             dispatch(fetchExplorePubs({ amount: 25 }));
         }
 

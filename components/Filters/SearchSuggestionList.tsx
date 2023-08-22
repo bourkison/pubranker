@@ -16,7 +16,9 @@ type Suggestion = {
     onPress?: () => void;
 };
 
-export default function SearchSuggestionList() {
+type SearchSuggestionListProps = {};
+
+export default function SearchSuggestionList({}: SearchSuggestionListProps) {
     const isLoadingPubs = useAppSelector(state => state.explore.isLoading);
     const pubs = useAppSelector(state => state.explore.pubs);
 
