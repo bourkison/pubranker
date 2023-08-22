@@ -54,7 +54,7 @@ const queryDb = async (
     searchText: string,
     withinRange: number,
     overallRating: number,
-    skip?: number,
+    idsToExclude: number[] = [],
 ): Promise<{ pubs: PubSchema[]; count: number }> => {
     const currentLocation = await Location.getCurrentPositionAsync();
 
@@ -76,14 +76,14 @@ const queryDb = async (
     }
 
     if (overallRating > 0) {
-        // TODO: Overall rating
         query = query.gte('overall_reviews', overallRating);
     }
 
-    const from = skip || 0;
-    const to = amount + from;
+    if (idsToExclude.length) {
+        query = query.not('id', 'in', `(${idsToExclude.join(',')})`);
+    }
 
-    const { data, count, error } = await query.range(from, to);
+    const { data, count, error } = await query.limit(amount);
 
     if (!data) {
         throw new Error(error.message);
@@ -110,8 +110,6 @@ export const fetchExplorePubs = createAsyncThunk<
                 state.explore.overallRating,
             );
 
-            console.log('PUBS:', pubs);
-
             return { pubs, count };
         } catch (err: any) {
             return rejectWithValue({
@@ -123,7 +121,7 @@ export const fetchExplorePubs = createAsyncThunk<
 );
 
 export const fetchMoreExplorePubs = createAsyncThunk<
-    { pubs: PubSchema[]; count: number },
+    { pubs: PubSchema[] },
     { amount: number },
     { rejectValue: RejectWithValueType }
 >(
@@ -132,15 +130,16 @@ export const fetchMoreExplorePubs = createAsyncThunk<
         const state = getState() as RootState;
 
         try {
-            const { pubs, count } = await queryDb(
+            const { pubs } = await queryDb(
                 amount,
                 state.explore.filters,
                 state.explore.searchText,
+                state.explore.withinRange,
                 state.explore.overallRating,
-                state.explore.pubs.length,
+                state.explore.pubs.map(pub => pub.id),
             );
 
-            return { pubs, count };
+            return { pubs };
         } catch (err: any) {
             return rejectWithValue({
                 message: err?.message,
@@ -225,7 +224,6 @@ const exploreSlice = createSlice({
             })
             .addCase(fetchMoreExplorePubs.fulfilled, (state, action) => {
                 state.pubs = [...state.pubs, ...action.payload.pubs];
-                state.resultsAmount = action.payload.count;
                 state.isLoadingMore = false;
                 state.moreToLoad = true;
 
@@ -233,11 +231,16 @@ const exploreSlice = createSlice({
                     state.moreToLoad = false;
                 }
             })
-            .addCase(fetchMoreExplorePubs.rejected, state => {
-                state.moreToLoad = false;
-                state.isLoadingMore = false;
-                state.isLoading = false;
-            });
+            .addCase(
+                fetchMoreExplorePubs.rejected,
+                (state, { meta, payload }) => {
+                    // TODO: handle errors.
+                    console.error('Error fetching pubs', meta, payload);
+                    state.moreToLoad = false;
+                    state.isLoadingMore = false;
+                    state.isLoading = false;
+                },
+            );
     },
 });
 

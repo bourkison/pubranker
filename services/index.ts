@@ -176,7 +176,9 @@ export const applyFilters = (
     searchText: string,
 ): PostgrestFilterBuilder<any, any, any> => {
     if (searchText) {
-        query = query.textSearch('name', `'${searchText.toLowerCase()}'`);
+        query = query.textSearch('name', `'${searchText.toLowerCase()}'`, {
+            type: 'websearch',
+        });
     }
 
     if (filters.dogFriendly !== 'unset') {

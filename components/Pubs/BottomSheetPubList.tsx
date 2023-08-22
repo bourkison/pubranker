@@ -1,10 +1,11 @@
 import { PubSchema } from '@/types';
-import React from 'react';
+import React, { useCallback } from 'react';
 import BottomSheetPubItem from '@/components/Pubs/BottomSheetPubItem';
 import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { StyleSheet, Text, View } from 'react-native';
-import { useAppSelector } from '@/store/hooks';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { fetchMoreExplorePubs } from '@/store/slices/explore';
 
 type BottomSheetPubListProps = {
     pubs: PubSchema[];
@@ -13,6 +14,20 @@ type BottomSheetPubListProps = {
 export default function BottomSheetPubList({ pubs }: BottomSheetPubListProps) {
     const bottomTabBarHeight = useBottomTabBarHeight();
     const resultsAmount = useAppSelector(state => state.explore.resultsAmount);
+
+    const isLoadingMore = useAppSelector(state => state.explore.isLoadingMore);
+    const moreToLoad = useAppSelector(state => state.explore.moreToLoad);
+    const isLoading = useAppSelector(state => state.explore.isLoading);
+
+    const dispatch = useAppDispatch();
+
+    const loadMorePubs = useCallback(() => {
+        if (isLoading || isLoadingMore || !moreToLoad) {
+            return;
+        }
+
+        dispatch(fetchMoreExplorePubs({ amount: 25 }));
+    }, [isLoading, isLoadingMore, moreToLoad, dispatch]);
 
     return (
         <BottomSheetFlatList
@@ -27,6 +42,10 @@ export default function BottomSheetPubList({ pubs }: BottomSheetPubListProps) {
             data={pubs}
             keyExtractor={item => item.id.toString()}
             renderItem={({ item }) => <BottomSheetPubItem pub={item} />}
+            onEndReached={loadMorePubs}
+            ListFooterComponent={
+                isLoadingMore ? <ActivityIndicator /> : undefined
+            }
         />
     );
 }
