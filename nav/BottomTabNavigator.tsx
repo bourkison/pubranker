@@ -8,7 +8,13 @@ import Settings from '@/screens/Settings';
 import Explore from '@/screens/Explore';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
-const Tab = createBottomTabNavigator();
+export type BottomTabNavigatorParamList = {
+    Explore: undefined;
+    Saved: undefined;
+    Profile: undefined;
+};
+
+const Tab = createBottomTabNavigator<BottomTabNavigatorParamList>();
 
 export default function BottomTabNavigator() {
     return (

@@ -7,6 +7,7 @@ import {
     Image,
     StyleSheet,
     useWindowDimensions,
+    Pressable,
 } from 'react-native';
 import { supabase } from '@/services/supabase';
 import { PUB_HOME_IMAGE_ASPECT_RATIO } from '@/constants';
@@ -15,17 +16,20 @@ import Animated, {
     Easing,
     Extrapolation,
     interpolate,
+    interpolateColor,
     useAnimatedStyle,
     useSharedValue,
     withTiming,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { distanceString, roundToNearest } from '@/services';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, SimpleLineIcons } from '@expo/vector-icons';
 import PubTopBar from '@/components/Pubs/PubTopBar';
 import PubDescription from '@/components/Pubs/PubView/PubDescription';
 import PubFeatures from '@/components/Pubs/PubView/PubFeatures';
 import DraughtBeersList from '@/components/Beers/DraughtBeersList';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import TopTabNavigator from '@/nav/TopTabNavigator';
 
 export default function PubHome({
     route,
@@ -40,6 +44,8 @@ export default function PubHome({
             .getPublicUrl(route.params.pub.photos[0]);
         setHeaderImageUrl(url.data.publicUrl);
     }, [route.params.pub]);
+
+    const insets = useSafeAreaInsets();
 
     // We want initial image height to be 4:3, but 1:1 underneath.
     // Render 1:1 but than move the translateY by the difference between heights.
@@ -58,6 +64,20 @@ export default function PubHome({
     const rOverlayStyle = useAnimatedStyle(() => ({
         transform: [{ translateY: sTranslateY.value + initTranslateY }],
     }));
+
+    const rButtonStyle = useAnimatedStyle(() => {
+        const imageHeight = -(width / PUB_HOME_IMAGE_ASPECT_RATIO);
+        const crossOverPoint = imageHeight + insets.top + styles.button.height;
+
+        return {
+            backgroundColor: interpolateColor(
+                sTranslateY.value,
+                [crossOverPoint - 25, crossOverPoint + 50],
+                ['rgba(255, 255, 255, 0.99)', 'rgba(255, 255, 255, 0)'],
+                'RGB',
+            ),
+        };
+    });
 
     const panGesture = Gesture.Pan()
         .activeOffsetY([-5, 5])
@@ -88,6 +108,27 @@ export default function PubHome({
         <View style={styles.container}>
             <GestureDetector gesture={panGesture}>
                 <View>
+                    <Animated.View
+                        style={[
+                            rButtonStyle,
+                            styles.buttonsContainer,
+                            { paddingTop: insets.top + 5 },
+                        ]}>
+                        <Pressable style={styles.button}>
+                            <Ionicons
+                                name="arrow-back-outline"
+                                color="#384D48"
+                                size={14}
+                            />
+                        </Pressable>
+                        <Pressable style={styles.button}>
+                            <SimpleLineIcons
+                                name="options"
+                                color="#384D48"
+                                size={14}
+                            />
+                        </Pressable>
+                    </Animated.View>
                     <View style={styles.imageContainer}>
                         <Image
                             source={{ uri: headerImageUrl }}
@@ -96,6 +137,7 @@ export default function PubHome({
                                 height: width,
                             }}
                         />
+
                         <Animated.View
                             style={[styles.imageOverlay, rOverlayStyle]}>
                             <LinearGradient
@@ -144,11 +186,17 @@ export default function PubHome({
                         <View>
                             <PubDescription pub={route.params.pub} />
                         </View>
+
+                        <View>
+                            <PubFeatures pub={route.params.pub} />
+                        </View>
+
                         <View>
                             <DraughtBeersList pub={route.params.pub} />
                         </View>
-                        <View>
-                            <PubFeatures pub={route.params.pub} />
+
+                        <View style={{ flex: 1 }}>
+                            <TopTabNavigator />
                         </View>
                     </Animated.View>
                 </View>
@@ -166,6 +214,25 @@ const styles = StyleSheet.create({
     contentContainer: {
         backgroundColor: '#FFF',
         height: '100%',
+    },
+    buttonsContainer: {
+        position: 'absolute',
+        justifyContent: 'space-between',
+        flexDirection: 'row',
+        width: '100%',
+        paddingHorizontal: 20,
+        zIndex: 100,
+        top: 0,
+        paddingBottom: 5,
+    },
+    button: {
+        height: 28,
+        width: 28,
+        borderRadius: 14,
+        backgroundColor: '#fff',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 100,
     },
     imageContainer: {
         position: 'relative',

@@ -3,7 +3,7 @@ import { PubSchema } from '@/types';
 import React, { useEffect, useMemo, useRef } from 'react';
 import MapView, { MapMarker } from 'react-native-maps';
 import MapStyle from '@/json/map_style.json';
-import { StyleSheet, useWindowDimensions } from 'react-native';
+import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import * as Location from 'expo-location';
 
 type PubMapProps = {
@@ -48,39 +48,48 @@ export default function PubMap({ pub }: PubMapProps) {
     }, [pubLocation, mapRef]);
 
     return (
-        <MapView
-            provider="google"
-            ref={mapRef}
-            initialRegion={{
-                latitude: pubLocation.coordinates[1],
-                longitude: pubLocation.coordinates[0],
-                latitudeDelta: 0.022,
-                longitudeDelta: 0.021,
-            }}
-            rotateEnabled={false}
-            showsUserLocation={true}
-            showsMyLocationButton={false}
-            style={[
-                styles.map,
-                {
-                    width: width - MAP_PADDING * 2,
-                    height: (width - MAP_PADDING * 2) / 1.3333,
-                    marginHorizontal: MAP_PADDING,
-                },
-            ]}
-            customMapStyle={MapStyle}>
-            <MapMarker
-                coordinate={{
+        <>
+            <MapView
+                provider="google"
+                ref={mapRef}
+                initialRegion={{
                     latitude: pubLocation.coordinates[1],
                     longitude: pubLocation.coordinates[0],
+                    latitudeDelta: 0.022,
+                    longitudeDelta: 0.021,
                 }}
-            />
-        </MapView>
+                rotateEnabled={false}
+                showsUserLocation={true}
+                showsMyLocationButton={false}
+                style={[
+                    styles.map,
+                    {
+                        width: width - MAP_PADDING * 2,
+                        height: (width - MAP_PADDING * 2) / 1.3333,
+                        marginHorizontal: MAP_PADDING,
+                    },
+                ]}
+                customMapStyle={MapStyle}>
+                <MapMarker
+                    coordinate={{
+                        latitude: pubLocation.coordinates[1],
+                        longitude: pubLocation.coordinates[0],
+                    }}
+                />
+            </MapView>
+            <View style={styles.separator} />
+        </>
     );
 }
 
 const styles = StyleSheet.create({
     map: {
         borderRadius: 5,
+        marginBottom: 25,
+    },
+    separator: {
+        marginHorizontal: 30,
+        borderTopWidth: 1,
+        borderColor: '#E5E7EB',
     },
 });
