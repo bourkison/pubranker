@@ -85,9 +85,7 @@ export default function BottomSheetPubItem({ pub }: BottomSheetPubItemProps) {
     }, [pub, imageUrls]);
 
     return (
-        <Pressable
-            style={[styles.container, { width: IMAGE_WIDTH }]}
-            onPress={() => navigation.navigate('PubView', { pub })}>
+        <View style={[styles.container, { width: IMAGE_WIDTH }]}>
             <View>
                 {imageUrls.length ? (
                     <FlatList
@@ -107,10 +105,10 @@ export default function BottomSheetPubItem({ pub }: BottomSheetPubItemProps) {
                     />
                 ) : undefined}
             </View>
-            <View>
+            <Pressable onPress={() => navigation.navigate('PubView', { pub })}>
                 <PubInfo pub={pub} />
-            </View>
-        </Pressable>
+            </Pressable>
+        </View>
     );
 }
 
@@ -119,10 +117,12 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         paddingBottom: 25,
         flex: 1,
+        zIndex: 1,
     },
     carouselList: {
         flex: 1,
         borderRadius: 10,
+        zIndex: 2,
     },
     image: {},
 });

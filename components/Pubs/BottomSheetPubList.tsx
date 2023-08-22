@@ -4,6 +4,7 @@ import BottomSheetPubItem from '@/components/Pubs/BottomSheetPubItem';
 import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { StyleSheet, Text, View } from 'react-native';
+import { useAppSelector } from '@/store/hooks';
 
 type BottomSheetPubListProps = {
     pubs: PubSchema[];
@@ -11,13 +12,16 @@ type BottomSheetPubListProps = {
 
 export default function BottomSheetPubList({ pubs }: BottomSheetPubListProps) {
     const bottomTabBarHeight = useBottomTabBarHeight();
+    const resultsAmount = useAppSelector(state => state.explore.resultsAmount);
 
     return (
         <BottomSheetFlatList
             contentContainerStyle={{ paddingBottom: bottomTabBarHeight }}
             ListHeaderComponent={
                 <View style={styles.headerContainer}>
-                    <Text style={styles.headerText}>Pub Results</Text>
+                    <Text style={styles.headerText}>
+                        {resultsAmount} Results
+                    </Text>
                 </View>
             }
             data={pubs}
@@ -31,6 +35,8 @@ const styles = StyleSheet.create({
     headerContainer: {
         paddingHorizontal: 25,
         paddingBottom: 15,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     headerText: {
         fontSize: 20,

@@ -36,6 +36,7 @@ const INITIAL_FILTERS = {
 
 const initialState = discoverAdapter.getInitialState({
     pubs: [] as PubSchema[],
+    resultsAmount: 0,
     isLoading: false,
     moreToLoad: true,
     isLoadingMore: false,
@@ -54,15 +55,19 @@ const queryDb = async (
     withinRange: number,
     overallRating: number,
     skip?: number,
-): Promise<PubSchema[]> => {
+): Promise<{ pubs: PubSchema[]; count: number }> => {
     const currentLocation = await Location.getCurrentPositionAsync();
 
-    let query = supabase.rpc('nearby_pubs', {
-        order_lat: currentLocation.coords.latitude,
-        order_long: currentLocation.coords.longitude,
-        dist_lat: currentLocation.coords.latitude,
-        dist_long: currentLocation.coords.longitude,
-    });
+    let query = supabase.rpc(
+        'nearby_pubs',
+        {
+            order_lat: currentLocation.coords.latitude,
+            order_long: currentLocation.coords.longitude,
+            dist_lat: currentLocation.coords.latitude,
+            dist_long: currentLocation.coords.longitude,
+        },
+        { count: 'exact' },
+    );
 
     query = applyFilters(query, filters, searchText);
 
@@ -78,17 +83,17 @@ const queryDb = async (
     const from = skip || 0;
     const to = amount + from;
 
-    const { data, error } = await query.range(from, to);
+    const { data, count, error } = await query.range(from, to);
 
     if (!data) {
         throw new Error(error.message);
     }
 
-    return data;
+    return { pubs: data, count: count || 0 };
 };
 
 export const fetchExplorePubs = createAsyncThunk<
-    PubSchema[],
+    { pubs: PubSchema[]; count: number },
     { amount: number },
     { rejectValue: RejectWithValueType }
 >(
@@ -97,7 +102,7 @@ export const fetchExplorePubs = createAsyncThunk<
         const state = getState() as RootState;
 
         try {
-            const pubs = await queryDb(
+            const { pubs, count } = await queryDb(
                 amount,
                 state.explore.filters,
                 state.explore.searchText,
@@ -107,7 +112,7 @@ export const fetchExplorePubs = createAsyncThunk<
 
             console.log('PUBS:', pubs);
 
-            return pubs;
+            return { pubs, count };
         } catch (err: any) {
             return rejectWithValue({
                 message: err?.message,
@@ -118,7 +123,7 @@ export const fetchExplorePubs = createAsyncThunk<
 );
 
 export const fetchMoreExplorePubs = createAsyncThunk<
-    PubSchema[],
+    { pubs: PubSchema[]; count: number },
     { amount: number },
     { rejectValue: RejectWithValueType }
 >(
@@ -127,7 +132,7 @@ export const fetchMoreExplorePubs = createAsyncThunk<
         const state = getState() as RootState;
 
         try {
-            const pubs = await queryDb(
+            const { pubs, count } = await queryDb(
                 amount,
                 state.explore.filters,
                 state.explore.searchText,
@@ -135,7 +140,7 @@ export const fetchMoreExplorePubs = createAsyncThunk<
                 state.explore.pubs.length,
             );
 
-            return pubs;
+            return { pubs, count };
         } catch (err: any) {
             return rejectWithValue({
                 message: err?.message,
@@ -199,11 +204,12 @@ const exploreSlice = createSlice({
                 state.pubs = [];
             })
             .addCase(fetchExplorePubs.fulfilled, (state, action) => {
-                state.pubs = action.payload;
+                state.pubs = action.payload.pubs;
+                state.resultsAmount = action.payload.count;
                 state.isLoading = false;
                 state.isLoadingMore = false;
 
-                if (action.payload.length < action.meta.arg.amount) {
+                if (action.payload.pubs.length < action.meta.arg.amount) {
                     state.moreToLoad = false;
                 }
             })
@@ -218,11 +224,12 @@ const exploreSlice = createSlice({
                 state.isLoadingMore = true;
             })
             .addCase(fetchMoreExplorePubs.fulfilled, (state, action) => {
-                state.pubs = [...state.pubs, ...action.payload];
+                state.pubs = [...state.pubs, ...action.payload.pubs];
+                state.resultsAmount = action.payload.count;
                 state.isLoadingMore = false;
                 state.moreToLoad = true;
 
-                if (action.payload.length < action.meta.arg.amount) {
+                if (action.payload.pubs.length < action.meta.arg.amount) {
                     state.moreToLoad = false;
                 }
             })
