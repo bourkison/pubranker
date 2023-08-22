@@ -153,7 +153,13 @@ export default function HomeMap() {
                 bottomInset={bottomBarHeight}
                 ref={bottomSheetRef}
                 backgroundStyle={styles.bottomSheetBackground}
-                animateOnMount={true}>
+                animateOnMount={true}
+                onChange={index => {
+                    // Deselect pub if user expands bottom sheet
+                    if (selectedPub && index !== 0) {
+                        dispatch(selectPub(undefined));
+                    }
+                }}>
                 <View style={styles.listContainer}>
                     <BottomSheetPubList pubs={pubs} />
                 </View>

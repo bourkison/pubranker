@@ -9,6 +9,7 @@ import {
     // resetPubs,
 } from '@/store/slices/explore';
 import { INITIAL_SEARCH_AMOUNT } from '@/constants';
+import { selectPub } from '@/store/slices/map';
 
 export default function SearchBar() {
     const dispatch = useAppDispatch();
@@ -25,6 +26,7 @@ export default function SearchBar() {
         // dispatch(setSearchText(''));
         // dispatch(resetPubs());
         dispatch(setState('suggestions'));
+        dispatch(selectPub(undefined));
 
         if (inputRef && inputRef.current) {
             inputRef.current.blur();

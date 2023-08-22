@@ -62,8 +62,10 @@ export default function SelectedPub({ pub }: SelectedPubProps) {
                     <View style={styles.ratingsContainer}>
                         <Ionicons name="star" size={10} color="#FFD700" />
                         <Text style={styles.ratingsText}>
-                            {roundToNearest(pub.overall_reviews, 0.1)} (
-                            {pub.num_reviews})
+                            {roundToNearest(pub.overall_reviews, 0.1).toFixed(
+                                1,
+                            )}{' '}
+                            ({pub.num_reviews})
                         </Text>
                     </View>
                 </View>

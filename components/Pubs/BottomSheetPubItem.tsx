@@ -8,8 +8,12 @@ import {
     FlatList,
     StyleSheet,
     ViewStyle,
+    Pressable,
 } from 'react-native';
 import PubInfo from './PubInfo';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 
 type BottomSheetPubItemProps = {
     pub: PubSchema;
@@ -60,8 +64,9 @@ function ImageItem({ imageWidth, index, imagesLength, item }: ImageItemProps) {
 
 export default function BottomSheetPubItem({ pub }: BottomSheetPubItemProps) {
     const [imageUrls, setImageUrls] = useState<string[]>([]);
-
     const { width } = useWindowDimensions();
+    const navigation =
+        useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
 
     const IMAGE_WIDTH = width - HORIZONTAL_PADDING * 2;
 
@@ -80,7 +85,9 @@ export default function BottomSheetPubItem({ pub }: BottomSheetPubItemProps) {
     }, [pub, imageUrls]);
 
     return (
-        <View style={[styles.container, { width: IMAGE_WIDTH }]}>
+        <Pressable
+            style={[styles.container, { width: IMAGE_WIDTH }]}
+            onPress={() => navigation.navigate('PubView', { pub })}>
             <View>
                 {imageUrls.length ? (
                     <FlatList
@@ -103,7 +110,7 @@ export default function BottomSheetPubItem({ pub }: BottomSheetPubItemProps) {
             <View>
                 <PubInfo pub={pub} />
             </View>
-        </View>
+        </Pressable>
     );
 }
 

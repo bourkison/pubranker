@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
     View,
     Text,
     StyleSheet,
     FlatList,
     ScrollView,
-    SafeAreaView,
+    TouchableOpacity,
 } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 import PubReviews from '@/components/Reviews/PubReviews';
@@ -16,13 +16,25 @@ import PubFeatures from '@/components/Pubs/PubFeatures';
 import DraughtBeersList from '@/components/Beers/DraughtBeersList';
 import PubDetails from '@/components/Pubs/PubDetails';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
+import { getBorough } from '@/services/geo';
+import { parseLocation } from '@/services';
+import { useAppDispatch } from '@/store/hooks';
+import { toggleSave } from '@/store/slices/saved';
+import { toggleSave as toggleExploreSave } from '@/store/slices/explore';
+import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function PubHome({
     route,
+    navigation,
 }: StackScreenProps<MainNavigatorStackParamList, 'PubView'>) {
     const [imageUrls, setImageUrls] = useState<string[]>([]);
 
     const imageFlatListRef = useRef<FlatList>(null);
+
+    const dispatch = useAppDispatch();
+
+    const safeAreaInsets = useSafeAreaInsets();
 
     useEffect(() => {
         let urls: string[] = [];
@@ -36,9 +48,63 @@ export default function PubHome({
         setImageUrls(urls);
     }, [route]);
 
+    const displayAddress = useMemo(() => {
+        return `${route.params.pub.address.split(', ')[0]}, ${getBorough(
+            parseLocation(route.params.pub.location),
+        )}`;
+    }, [route.params.pub]);
+
+    const save = async () => {
+        navigation.setParams({
+            pub: {
+                ...route.params.pub,
+                saved: !route.params.pub.saved,
+            },
+        });
+
+        dispatch(
+            toggleSave({
+                id: route.params.pub.id,
+                saved: route.params.pub.saved,
+            }),
+        );
+        dispatch(toggleExploreSave({ id: route.params.pub.id }));
+    };
+
     return (
-        <SafeAreaView>
+        <View>
             <ScrollView>
+                <View
+                    style={[
+                        styles.headerContainer,
+                        { paddingTop: safeAreaInsets.top },
+                    ]}>
+                    <View style={styles.titleSubTitleContainer}>
+                        <Text style={styles.title}>
+                            {route.params.pub.name}
+                        </Text>
+                        <Text style={styles.subtitle}>{displayAddress}</Text>
+                    </View>
+                    <View style={styles.buttonsContainer}>
+                        <TouchableOpacity
+                            style={styles.likeButton}
+                            onPress={save}>
+                            {route.params.pub.saved ? (
+                                <Ionicons
+                                    name="heart"
+                                    size={18}
+                                    color="#dc2626"
+                                />
+                            ) : (
+                                <Ionicons
+                                    name="heart-outline"
+                                    size={18}
+                                    color="#dc2626"
+                                />
+                            )}
+                        </TouchableOpacity>
+                    </View>
+                </View>
                 <View style={styles.contentContainer}>
                     <View style={styles.descriptionContainer}>
                         <Text>{route.params.pub.google_overview}</Text>
@@ -74,7 +140,7 @@ export default function PubHome({
                     </View>
                 </View>
             </ScrollView>
-        </SafeAreaView>
+        </View>
     );
 }
 const styles = StyleSheet.create({
@@ -96,5 +162,46 @@ const styles = StyleSheet.create({
     },
     reviewsContainer: {
         marginTop: 25,
+    },
+    headerContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingBottom: 10,
+        backgroundColor: 'white',
+    },
+    titleSubTitleContainer: {
+        marginLeft: 10,
+        flexDirection: 'column',
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: '600',
+    },
+    subtitle: {
+        fontSize: 12,
+        color: '#A3A3A3',
+    },
+    buttonsContainer: {
+        marginRight: 10,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: -10,
+    },
+    likeButton: {
+        marginRight: 4,
+    },
+    closeButton: {
+        width: 28,
+        height: 28,
+        borderRadius: 14,
+        backgroundColor: '#F5F5F5',
+        alignItems: 'center',
+        justifyContent: 'center',
+        shadowOpacity: 0.1,
+        shadowOffset: {
+            width: 0,
+            height: 0,
+        },
     },
 });
