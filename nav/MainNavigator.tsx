@@ -28,7 +28,7 @@ export default function MainNavigator() {
             <Stack.Screen
                 name="PubView"
                 component={PubHome}
-                options={{ headerShown: false, presentation: 'card' }}
+                options={{ headerShown: false }}
             />
             <Stack.Screen
                 name="ViewReview"

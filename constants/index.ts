@@ -8,3 +8,5 @@ export const INITIAL_SEARCH_AMOUNT = 25;
 export const MIN_MAP_BUTTON_WIDTH = 40;
 export const MAX_MAP_BUTTON_WIDTH = 88;
 export const COLLAPSE_MAP_BUTTON_TIMEOUT = 3_000;
+
+export const PUB_HOME_IMAGE_ASPECT_RATIO = 1.3333; // 4:3
