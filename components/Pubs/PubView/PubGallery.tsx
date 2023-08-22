@@ -2,7 +2,7 @@ import ImageScroller from '@/components/Utility/ImageScroller';
 import { supabase } from '@/services/supabase';
 import { PubSchema } from '@/types';
 import React, { useEffect, useRef, useState } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, StyleSheet, View, Text } from 'react-native';
 
 type PubImagesProps = {
     pub: PubSchema;
@@ -26,19 +26,29 @@ export default function PubImages({ pub }: PubImagesProps) {
 
     return (
         <View style={styles.container}>
-            <ImageScroller
-                imageFlatListRef={imageFlatListRef}
-                images={imageUrls || []}
-                height={220}
-                width={220}
-                margin={5}
-            />
+            <View style={styles.headerContainer}>
+                <Text style={styles.headerText}>Gallery</Text>
+            </View>
+
+            {imageUrls.length ? (
+                <ImageScroller
+                    imageFlatListRef={imageFlatListRef}
+                    images={imageUrls || []}
+                    rows={[{ width: 0.7, aspectRatio: 1 }]}
+                />
+            ) : undefined}
         </View>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        marginTop: 25,
+        marginTop: 15,
+        marginBottom: 25,
     },
+    headerContainer: {
+        paddingHorizontal: 15,
+        paddingBottom: 15,
+    },
+    headerText: { fontSize: 16, fontFamily: 'Jost' },
 });

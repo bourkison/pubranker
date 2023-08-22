@@ -45,10 +45,10 @@ export default function SearchBar() {
             ) : (
                 <Pressable onPress={goToSuggestions}>
                     <Ionicons
-                        name="arrow-back"
+                        name="arrow-back-outline"
                         color="#A3A3A3"
                         style={styles.searchIcon}
-                        size={16}
+                        size={14}
                     />
                 </Pressable>
             )}

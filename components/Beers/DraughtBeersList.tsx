@@ -1,13 +1,7 @@
 import { supabase } from '@/services/supabase';
 import { Database } from '@/types/schema';
 import React, { useEffect, useState } from 'react';
-import {
-    View,
-    StyleSheet,
-    FlatList,
-    Text,
-    ActivityIndicator,
-} from 'react-native';
+import { View, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
 import BeerPill from '@/components/Beers/BeerPill';
 import { PubSchema } from '@/types';
 
@@ -66,9 +60,9 @@ export default function DraughtBeersList({ pub }: DraughtBeersListProps) {
     return (
         <>
             <View style={styles.container}>
-                <View>
+                {/* <View>
                     <Text style={styles.header}>Draught</Text>
-                </View>
+                </View> */}
                 {!isLoading ? (
                     <FlatList
                         contentContainerStyle={styles.listContainer}

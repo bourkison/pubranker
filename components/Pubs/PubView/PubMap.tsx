@@ -3,7 +3,7 @@ import { PubSchema } from '@/types';
 import React, { useEffect, useMemo, useRef } from 'react';
 import MapView, { MapMarker } from 'react-native-maps';
 import MapStyle from '@/json/map_style.json';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, useWindowDimensions } from 'react-native';
 import * as Location from 'expo-location';
 
 type PubMapProps = {
@@ -77,7 +77,6 @@ export default function PubMap({ pub }: PubMapProps) {
                     }}
                 />
             </MapView>
-            <View style={styles.separator} />
         </>
     );
 }
@@ -85,7 +84,7 @@ export default function PubMap({ pub }: PubMapProps) {
 const styles = StyleSheet.create({
     map: {
         borderRadius: 5,
-        marginBottom: 25,
+        marginBottom: 10,
     },
     separator: {
         marginHorizontal: 30,

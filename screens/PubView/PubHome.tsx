@@ -27,11 +27,10 @@ import { Ionicons, SimpleLineIcons } from '@expo/vector-icons';
 import PubTopBar from '@/components/Pubs/PubTopBar';
 import PubDescription from '@/components/Pubs/PubView/PubDescription';
 import PubFeatures from '@/components/Pubs/PubView/PubFeatures';
-import DraughtBeersList from '@/components/Beers/DraughtBeersList';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import TopTabs from '@/components/Utility/TopTabs';
 import PubReviews from '@/components/Reviews/PubReviews';
-import PubImages from '../../components/Pubs/PubView/PubImages';
+import PubGallery from '../../components/Pubs/PubView/PubGallery';
 import PubDetails from '@/components/Pubs/PubView/PubDetails';
 
 export default function PubHome({
@@ -198,7 +197,7 @@ export default function PubHome({
                         </View>
 
                         <View>
-                            <DraughtBeersList pub={route.params.pub} />
+                            <PubGallery pub={route.params.pub} />
                         </View>
 
                         <View>
@@ -215,7 +214,9 @@ export default function PubHome({
                                     {
                                         title: `User Photos (${route.params.pub.photos.length})`,
                                         component: (
-                                            <PubImages pub={route.params.pub} />
+                                            <PubGallery
+                                                pub={route.params.pub}
+                                            />
                                         ),
                                     },
                                     {

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Octicons } from '@expo/vector-icons';
 import { PubSchema } from '@/types';
 import PubMap from '@/components/Pubs/PubView/PubMap';
+import DraughtBeersList from '@/components/Beers/DraughtBeersList';
 
 type PubFeaturesProps = {
     pub: PubSchema;
@@ -48,6 +49,10 @@ function Feature({ input, title }: FeatureProps) {
 export default function PubFeatures({ pub }: PubFeaturesProps) {
     return (
         <>
+            <View style={styles.headerContainer}>
+                <Text style={styles.headerText}>Features</Text>
+            </View>
+
             <View style={styles.featureList}>
                 <Feature title="Reservable" input={pub.reservable} />
                 <Feature title="Free Wifi" input={pub.free_wifi} />
@@ -65,6 +70,8 @@ export default function PubFeatures({ pub }: PubFeaturesProps) {
                 />
             </View>
 
+            <DraughtBeersList pub={pub} />
+
             <PubMap pub={pub} />
 
             <View style={styles.separator} />
@@ -72,11 +79,11 @@ export default function PubFeatures({ pub }: PubFeaturesProps) {
     );
 }
 const styles = StyleSheet.create({
-    section: {
+    headerContainer: {
         paddingHorizontal: 15,
-        paddingTop: 20,
-        paddingBottom: 25,
+        paddingTop: 15,
     },
+    headerText: { fontSize: 16, fontFamily: 'Jost' },
     featureContainer: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -108,9 +115,10 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         paddingHorizontal: 20,
-        marginTop: 25,
+        marginTop: 10,
     },
     separator: {
+        marginTop: 20,
         marginHorizontal: 30,
         borderTopWidth: 1,
         borderColor: '#E5E7EB',
