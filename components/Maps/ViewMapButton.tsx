@@ -1,11 +1,45 @@
-import React from 'react';
-import { View, StyleSheet, Pressable } from 'react-native';
+import React, { MutableRefObject, useEffect } from 'react';
+import { View, StyleSheet, Pressable, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppDispatch } from '@/store/hooks';
 import { setState } from '@/store/slices/explore';
+import Animated, {
+    SharedValue,
+    useAnimatedStyle,
+} from 'react-native-reanimated';
+import { COLLAPSE_MAP_BUTTON_TIMEOUT, MIN_MAP_BUTTON_WIDTH } from '@/constants';
 
-export default function ViewMapButton() {
+type ViewMapButtonProps = {
+    expand: () => void;
+    collapse: () => void;
+    animatedWidth: SharedValue<number>;
+    expandTimeout: MutableRefObject<NodeJS.Timeout | undefined>;
+};
+
+export default function ViewMapButton({
+    expand,
+    collapse,
+    animatedWidth,
+    expandTimeout,
+}: ViewMapButtonProps) {
     const dispatch = useAppDispatch();
+
+    const rStyle = useAnimatedStyle(() => ({
+        width: animatedWidth.value,
+    }));
+
+    useEffect(() => {
+        expand();
+
+        expandTimeout.current = setTimeout(() => {
+            collapse();
+        }, COLLAPSE_MAP_BUTTON_TIMEOUT);
+
+        return () => {
+            collapse();
+            clearTimeout(expandTimeout.current);
+        };
+    }, [expand, collapse, expandTimeout]);
 
     const openMap = () => {
         // TODO: Load pubs in if no pubs loaded in yet.
@@ -13,21 +47,23 @@ export default function ViewMapButton() {
     };
 
     return (
-        <Pressable style={styles.container} onPress={openMap}>
-            <View>
-                <Ionicons name="map-outline" size={18} color="#FFF" />
-            </View>
-        </Pressable>
+        <Animated.View style={[rStyle, styles.container]}>
+            <Pressable onPress={openMap} style={styles.pressableContainer}>
+                <View style={styles.textContainer}>
+                    <Text style={styles.text}>Map</Text>
+                </View>
+                <View style={styles.iconContainer}>
+                    <Ionicons name="map-outline" size={18} color="#FFF" />
+                </View>
+            </Pressable>
+        </Animated.View>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flexDirection: 'row',
         backgroundColor: '#384D48',
-        height: '100%',
-        width: '100%',
-        justifyContent: 'center',
+        justifyContent: 'flex-end',
         alignItems: 'center',
         borderRadius: 20,
         shadowColor: '#000',
@@ -36,6 +72,14 @@ const styles = StyleSheet.create({
             height: 0,
         },
         shadowOpacity: 0.4,
+        overflow: 'hidden',
+        height: MIN_MAP_BUTTON_WIDTH,
+    },
+    pressableContainer: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+        width: '100%',
     },
     textContainer: {
         marginLeft: 2,
@@ -44,5 +88,11 @@ const styles = StyleSheet.create({
         color: '#FFF',
         fontSize: 14,
         fontWeight: '600',
+    },
+    iconContainer: {
+        width: 40,
+        height: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });
