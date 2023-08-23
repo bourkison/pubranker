@@ -137,6 +137,7 @@ export default function TopTabs({ data }: TopTabsProps) {
     };
 
     const panGesture = Gesture.Pan()
+        .activeOffsetX([-5, 5])
         .onStart(() => {
             contextX.value = sScrollTranslateX.value;
         })

@@ -6,7 +6,6 @@ import Review from '@/components/Reviews/Review';
 import OverallRatings from '@/components/Ratings/OverallRatings';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import ReviewPubButton from '@/components/Reviews/ReviewPubButton';
-import { convertUserReviewsToNonNullable } from '@/services';
 import { PubSchema, UserReviewType } from '@/types';
 
 type PubReviewsProps = {
@@ -39,28 +38,31 @@ export default function PubReviews({ pub }: PubReviewsProps) {
                 return;
             }
 
-            const convertedData = convertUserReviewsToNonNullable(data);
+            console.log('reviews', data.length, reviews.length);
 
-            setReviews(convertedData);
+            setReviews(data as UserReviewType[]);
             setIsLoading(false);
         };
 
         if (!reviews.length) {
             fetchReviews();
         }
+
+        // console.log(pub.review_stars_one, pub.review_stars_two);
     }, [pub, reviews, dispatch, user]);
 
     return (
         <View>
             <OverallRatings
-                beer={1}
-                food={1}
-                location={1}
-                music={1}
-                service={1}
-                vibe={1}
-                overallReviews={1}
-                headerText="Ratings"
+                rating={pub.rating}
+                amountByRating={[
+                    pub.review_stars_one,
+                    pub.review_stars_two,
+                    pub.review_stars_three,
+                    pub.review_stars_four,
+                    pub.review_stars_five,
+                ]}
+                ratingsAmount={pub.num_reviews}
             />
             <ReviewPubButton pub={pub} />
             {!isLoading ? (

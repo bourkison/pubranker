@@ -13,6 +13,7 @@ import { PubSchema, UserReviewType } from '@/types';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
+import { GOLD_RATINGS_COLOR } from '@/constants';
 
 type ReviewProps = {
     review: UserReviewType;
@@ -43,7 +44,11 @@ export default function Review({ review }: ReviewProps) {
         <View style={styles.container}>
             <View style={styles.contentContainer}>
                 <View style={styles.averageReviewContainer}>
-                    <Ionicons name="star" size={12} color="#FFD700" />
+                    <Ionicons
+                        name="star"
+                        size={12}
+                        color={GOLD_RATINGS_COLOR}
+                    />
                     <Text style={styles.averageReviewText}>
                         {review.rating}
                     </Text>

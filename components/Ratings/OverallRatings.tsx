@@ -1,114 +1,104 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import RatingsBar from '@/components/Utility/RatingsBar';
-import { roundToNearest } from '@/services';
 import { Ionicons } from '@expo/vector-icons';
-import RatingsCategory from '@/components/Ratings/RatingsCategory';
+import { GOLD_RATINGS_COLOR } from '@/constants';
+import StarsDisplayer from './StarsDisplayer';
 
 type OverallRatingsProp = {
-    beer: number;
-    food: number;
-    location: number;
-    music: number;
-    service: number;
-    vibe: number;
-    overallReviews: number;
-    headerText: string;
+    amountByRating: [number, number, number, number, number];
+    rating: number;
+    ratingsAmount: number;
 };
 
 export default function OverallRatings({
-    beer,
-    food,
-    location,
-    music,
-    service,
-    vibe,
-    overallReviews,
-    headerText,
+    rating,
+    amountByRating,
+    ratingsAmount,
 }: OverallRatingsProp) {
+    const highestRatingsAmount = useMemo(
+        () => Math.max(...amountByRating),
+        [amountByRating],
+    );
+
     return (
-        <>
-            <View style={styles.headerContainer}>
-                <View>
-                    <Text style={styles.headerText}>{headerText}</Text>
-                </View>
-                <View style={styles.overallRatingsContainer}>
-                    <Ionicons name="star" size={12} color="#384D48" />
-                    <Text style={styles.headerText}>
-                        {roundToNearest(overallReviews, 0.1).toFixed(1)}
-                    </Text>
-                </View>
+        <View style={styles.container}>
+            <View style={styles.numberedRatingsBarsContainer}>
+                {amountByRating
+                    .slice()
+                    .reverse()
+                    .map((numberedRating, index) => (
+                        <View
+                            style={styles.numberedRatingContainer}
+                            key={index}>
+                            <Text style={styles.numberText}>{5 - index}</Text>
+                            <View style={styles.iconContainer}>
+                                <Ionicons
+                                    name="star"
+                                    size={18}
+                                    color={GOLD_RATINGS_COLOR}
+                                />
+                            </View>
+                            <RatingsBar
+                                current={numberedRating}
+                                max={highestRatingsAmount}
+                            />
+                        </View>
+                    ))}
             </View>
-            <View style={styles.overallBarContainer}>
-                <RatingsBar
-                    current={beer + food + location + music + service + vibe}
-                    max={30}
-                />
-            </View>
-            <View>
-                <View style={styles.ratingsRow}>
-                    <View style={[styles.ratingsColumn, styles.rightBorder]}>
-                        <RatingsCategory rating={beer} title="Beer" />
-                    </View>
-                    <View style={[styles.ratingsColumn, styles.rightBorder]}>
-                        <RatingsCategory rating={food} title="Food" />
-                    </View>
-                    <View style={styles.ratingsColumn}>
-                        <RatingsCategory rating={location} title="Location" />
-                    </View>
+            <View style={styles.totalRatingsContainer}>
+                <Text style={styles.ratingText}>{rating}</Text>
+                <View style={styles.starsDisplayerContainer}>
+                    <StarsDisplayer size={20} rating={rating} />
                 </View>
-                <View style={styles.ratingsRow}>
-                    <View style={[styles.ratingsColumn, styles.rightBorder]}>
-                        <RatingsCategory rating={music} title="Music" />
-                    </View>
-                    <View style={[styles.ratingsColumn, styles.rightBorder]}>
-                        <RatingsCategory rating={service} title="Service" />
-                    </View>
-                    <View style={styles.ratingsColumn}>
-                        <RatingsCategory rating={vibe} title="Vibe" />
-                    </View>
-                </View>
+                <Text style={styles.ratingsAmountText}>
+                    {ratingsAmount} reviews
+                </Text>
             </View>
-        </>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
-    ratingsRow: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderColor: '#E5E7EB',
-        borderBottomWidth: 1,
-    },
-    ratingsColumn: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingVertical: 10,
-        flex: 1,
-    },
-    rightBorder: {
-        borderRightWidth: 1,
-        borderRightColor: '#E5E7EB',
-    },
-    headerContainer: {
-        paddingHorizontal: 29,
+    container: {
+        paddingVertical: 15,
+        paddingHorizontal: 10,
         flexDirection: 'row',
         justifyContent: 'space-between',
     },
-    headerText: {
-        fontSize: 16,
-        fontWeight: '500',
+    numberedRatingsBarsContainer: {
+        flexDirection: 'column',
+        position: 'relative',
+        flex: 2,
     },
-
-    overallRatingsContainer: {
+    numberedRatingContainer: {
         flexDirection: 'row',
         alignItems: 'center',
+        paddingBottom: 5,
     },
-    overallBarContainer: {
-        paddingHorizontal: 25,
-        paddingBottom: 10,
-        borderBottomWidth: 1,
-        borderColor: '#E5E7EB',
+    totalRatingsContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'flex-end',
+    },
+    numberText: {
+        fontFamily: 'Jost',
+        fontSize: 14,
+    },
+    iconContainer: {
+        marginHorizontal: 5,
+    },
+    ratingText: {
+        fontSize: 42,
+        fontFamily: 'Jost',
+        marginBottom: -5,
+    },
+    starsDisplayerContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+    },
+    ratingsAmountText: {
+        fontFamily: 'Jost',
+        paddingTop: 3,
     },
 });

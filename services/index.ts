@@ -308,32 +308,32 @@ export const checkIfOpen = (
     return { isOpen: false, nextHours: nextOpeningHours };
 };
 
-export const convertUserReviewsToNonNullable = (
-    userReviews: Database['public']['Views']['user_reviews']['Row'][],
-): UserReviewType[] => {
-    let response: UserReviewType[] = [];
+// export const convertUserReviewsToNonNullable = (
+//     userReviews: Database['public']['Views']['user_reviews']['Row'][],
+// ): UserReviewType[] => {
+//     let response: UserReviewType[] = [];
 
-    userReviews.forEach(review => {
-        const keys = Object.keys(review) as (keyof typeof review)[];
-        let hasNull = false;
+//     userReviews.forEach(review => {
+//         const keys = Object.keys(review) as (keyof typeof review)[];
+//         let hasNull = false;
 
-        for (let i = 0; i < keys.length; i++) {
-            const key = keys[i];
-            if (review[key] === null && key !== 'content') {
-                hasNull = true;
-            } else if (review[key] === null && key === 'content') {
-                review[key] = '';
-            }
-        }
+//         for (let i = 0; i < keys.length; i++) {
+//             const key = keys[i];
+//             if (review[key] === null && key !== 'content') {
+//                 hasNull = true;
+//             } else if (review[key] === null && key === 'content') {
+//                 review[key] = '';
+//             }
+//         }
 
-        if (!hasNull) {
-            const nonNull = review as UserReviewType;
-            response.push(nonNull);
-        }
-    });
+//         if (!hasNull) {
+//             const nonNull = review as UserReviewType;
+//             response.push(nonNull);
+//         }
+//     });
 
-    return response;
-};
+//     return response;
+// };
 
 export const convertUserCommentsToNonNullable = (
     userComments: Database['public']['Views']['user_comments']['Row'][],
@@ -361,7 +361,7 @@ export const convertUserCommentsToNonNullable = (
 };
 
 export const editUserReview = (
-    review: Database['public']['Tables']['reviews']['Row'],
+    review: UserReviewType,
     userReview: UserReviewType,
 ): UserReviewType => {
     return {

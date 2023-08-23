@@ -1,3 +1,4 @@
+import { GOLD_RATINGS_COLOR } from '@/constants';
 import React, { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import Animated, {
@@ -17,8 +18,8 @@ type RatingsBarProps = {
 
 export default function RatingsBar({
     height = 10,
-    backgroundColor = '#E5E7EB',
-    progressColor = '#384D48',
+    backgroundColor = 'transparent',
+    progressColor = GOLD_RATINGS_COLOR,
     borderRadius = 3,
     current,
     max,

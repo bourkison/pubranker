@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { GOLD_RATINGS_COLOR } from '@/constants';
 
 type StarRankerProps = {
     selected: number;
@@ -21,13 +22,13 @@ export default function StarRanker({ selected, setSelected }: StarRankerProps) {
                         <Ionicons
                             name="star"
                             size={STAR_SIZE}
-                            color="#FFD700"
+                            color={GOLD_RATINGS_COLOR}
                         />
                     ) : (
                         <Ionicons
                             name="star-outline"
                             size={STAR_SIZE}
-                            color="#FFD700"
+                            color={GOLD_RATINGS_COLOR}
                         />
                     )}
                 </Pressable>

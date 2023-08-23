@@ -10,7 +10,7 @@ import {
     Pressable,
 } from 'react-native';
 import { supabase } from '@/services/supabase';
-import { PUB_HOME_IMAGE_ASPECT_RATIO } from '@/constants';
+import { GOLD_RATINGS_COLOR, PUB_HOME_IMAGE_ASPECT_RATIO } from '@/constants';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
     Easing,
@@ -178,7 +178,7 @@ export default function PubHome({
                                         <Ionicons
                                             name="star"
                                             size={10}
-                                            color="#FFD700"
+                                            color={GOLD_RATINGS_COLOR}
                                         />
                                         <Text style={styles.ratingsText}>
                                             {roundToNearest(

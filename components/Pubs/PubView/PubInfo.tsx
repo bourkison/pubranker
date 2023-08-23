@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { PubSchema } from '@/types';
 import { distanceString, roundToNearest } from '@/services';
+import { GOLD_RATINGS_COLOR } from '@/constants';
 
 type PubInfoProps = {
     pub: PubSchema;
@@ -12,7 +13,7 @@ export default function PubInfo({ pub }: PubInfoProps) {
     return (
         <View style={styles.infoContainer}>
             <View style={styles.reviewContainer}>
-                <Ionicons name="star" size={12} color="#FFD700" />
+                <Ionicons name="star" size={12} color={GOLD_RATINGS_COLOR} />
                 <Text style={styles.ratingText}>
                     {roundToNearest(pub.rating, 0.1).toFixed(1)}
                 </Text>

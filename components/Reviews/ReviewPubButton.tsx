@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import Review from './Review';
 import { PubSchema, UserReviewType } from '@/types';
-import { convertUserReviewsToNonNullable } from '@/services';
 
 type ReviewPubButtonProps = {
     pub: PubSchema;
@@ -38,7 +37,7 @@ export default function ReviewPubButton({ pub }: ReviewPubButtonProps) {
                     .limit(1);
 
                 if (data && data.length) {
-                    setReview(convertUserReviewsToNonNullable(data)[0]);
+                    setReview(data[0] as UserReviewType);
                 } else {
                     setReview(null);
                 }

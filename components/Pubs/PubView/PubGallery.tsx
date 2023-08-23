@@ -2,7 +2,7 @@ import ImageScroller from '@/components/Utility/ImageScroller';
 import { supabase } from '@/services/supabase';
 import { PubSchema } from '@/types';
 import React, { useEffect, useRef, useState } from 'react';
-import { FlatList, StyleSheet, View, Text } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
 
 type PubImagesProps = {
     pub: PubSchema;

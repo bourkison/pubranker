@@ -25,6 +25,7 @@ import Animated, {
     withTiming,
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { GOLD_RATINGS_COLOR } from '@/constants';
 
 type SelectedPubProps = {
     pub: PubSchema;
@@ -155,7 +156,7 @@ export default function SelectedPub({ pub }: SelectedPubProps) {
                                 <Ionicons
                                     name="star"
                                     size={10}
-                                    color="#FFD700"
+                                    color={GOLD_RATINGS_COLOR}
                                 />
                                 <Text style={styles.ratingsText}>
                                     {roundToNearest(pub.rating, 0.1).toFixed(1)}{' '}
