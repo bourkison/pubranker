@@ -67,6 +67,10 @@ export default function TopTabs({ data }: TopTabsProps) {
     }));
 
     useEffect(() => {
+        if (inputData.length) {
+            return;
+        }
+
         let arr: InputData[] = [];
 
         data.forEach(t => {
@@ -79,7 +83,7 @@ export default function TopTabs({ data }: TopTabsProps) {
         });
 
         setInputData(arr);
-    }, [data]);
+    }, [data, inputData]);
 
     const calculateXPos = (index: number, x: number) => {
         if (index === 0) {
@@ -87,6 +91,8 @@ export default function TopTabs({ data }: TopTabsProps) {
         } else if (index === data.length - 1) {
             sLastElementXPos.value = x;
         }
+
+        console.log('calculate x', inputData);
 
         setInputData(d => {
             d[index].xPos = x;
