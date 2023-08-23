@@ -73,7 +73,7 @@ export default function ReviewPubButton({ pub }: ReviewPubButtonProps) {
                         style={styles.reviewButton}
                         onPress={buttonPress}>
                         <Text style={styles.reviewButtonText}>
-                            Review This Pub
+                            Write Review
                         </Text>
                     </TouchableOpacity>
                 </View>
@@ -85,21 +85,22 @@ export default function ReviewPubButton({ pub }: ReviewPubButtonProps) {
 const styles = StyleSheet.create({
     container: {},
     reviewButtonContainer: {
-        paddingHorizontal: 100,
-        paddingVertical: 10,
+        paddingHorizontal: 25,
+        paddingBottom: 10,
         borderBottomWidth: 1,
         borderColor: '#E5E7EB',
     },
     reviewButton: {
         backgroundColor: '#2B5256',
-        paddingVertical: 5,
-        borderRadius: 5,
+        paddingVertical: 3,
+        borderRadius: 40,
         alignItems: 'center',
     },
     reviewButtonText: {
-        color: '#F5F5F5',
+        color: '#FFF',
         fontWeight: 'bold',
-        fontSize: 12,
+        fontSize: 16,
+        fontFamily: 'Jost',
         textAlign: 'center',
     },
 });

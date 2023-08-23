@@ -32,13 +32,7 @@ export default function RatingsBar({
             return -width;
         }
 
-        let res = current;
-
-        if (res > max) {
-            res = max;
-        }
-
-        res = res / max;
+        const res = Math.min(current, max) / max;
 
         return (1 - res) * elementWidth;
     }, [current, max, elementWidth, width]);

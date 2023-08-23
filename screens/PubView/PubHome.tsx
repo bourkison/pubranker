@@ -228,14 +228,6 @@ export default function PubHome({
                                             />
                                         ),
                                     },
-                                    {
-                                        title: 'Menu',
-                                        component: (
-                                            <View>
-                                                <Text>Menu</Text>
-                                            </View>
-                                        ),
-                                    },
                                 ]}
                             />
                         </View>
@@ -257,6 +249,14 @@ export default function PubHome({
                                             <PubGallery
                                                 pub={route.params.pub}
                                             />
+                                        ),
+                                    },
+                                    {
+                                        title: 'Menu',
+                                        component: (
+                                            <View>
+                                                <Text>Menu</Text>
+                                            </View>
                                         ),
                                     },
                                     {

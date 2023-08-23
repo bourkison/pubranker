@@ -4,6 +4,7 @@ import RatingsBar from '@/components/Utility/RatingsBar';
 import { Ionicons } from '@expo/vector-icons';
 import { GOLD_RATINGS_COLOR } from '@/constants';
 import StarsDisplayer from './StarsDisplayer';
+import { roundToNearest } from '@/services';
 
 type OverallRatingsProp = {
     amountByRating: [number, number, number, number, number];
@@ -47,12 +48,14 @@ export default function OverallRatings({
                     ))}
             </View>
             <View style={styles.totalRatingsContainer}>
-                <Text style={styles.ratingText}>{rating}</Text>
+                <Text style={styles.ratingText}>
+                    {roundToNearest(rating, 0.1).toFixed(1)}
+                </Text>
                 <View style={styles.starsDisplayerContainer}>
                     <StarsDisplayer size={20} rating={rating} />
                 </View>
                 <Text style={styles.ratingsAmountText}>
-                    {ratingsAmount} reviews
+                    {ratingsAmount} review{ratingsAmount === 1 ? '' : 's'}
                 </Text>
             </View>
         </View>
