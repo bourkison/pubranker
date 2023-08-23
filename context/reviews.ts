@@ -1,17 +1,11 @@
 import { UserReviewType } from '@/types';
-import {
-    Dispatch,
-    SetStateAction,
-    RefObject,
-    createContext,
-    useContext,
-} from 'react';
+import { Dispatch, SetStateAction, createContext, useContext } from 'react';
 
 interface ReviewContextType {
-    reviews: RefObject<UserReviewType>[];
-    setReviews: Dispatch<SetStateAction<RefObject<UserReviewType>[]>>;
-    isLoading: RefObject<boolean>;
-    setIsLoading: Dispatch<SetStateAction<RefObject<boolean>>>;
+    reviews: UserReviewType[];
+    setReviews: Dispatch<SetStateAction<UserReviewType[]>>;
+    isLoading: boolean;
+    setIsLoading: Dispatch<SetStateAction<boolean>>;
 }
 
 export const ReviewContext = createContext<ReviewContextType | null>(null);

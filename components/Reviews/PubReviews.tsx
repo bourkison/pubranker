@@ -1,5 +1,5 @@
 import { supabase } from '@/services/supabase';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import Review from '@/components/Reviews/Review';
@@ -7,6 +7,7 @@ import OverallRatings from '@/components/Ratings/OverallRatings';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import ReviewPubButton from '@/components/Reviews/ReviewPubButton';
 import { PubSchema, UserReviewType } from '@/types';
+import { useSharedReviewContext } from '@/context/reviews';
 
 type PubReviewsProps = {
     pub: PubSchema;
@@ -14,11 +15,10 @@ type PubReviewsProps = {
 
 export default function PubReviews({ pub }: PubReviewsProps) {
     const dispatch = useAppDispatch();
-
-    const [reviews, setReviews] = useState<UserReviewType[]>([]);
     const user = useAppSelector(state => state.user.docData);
 
-    const [isLoading, setIsLoading] = useState(false);
+    const { isLoading, setIsLoading, reviews, setReviews } =
+        useSharedReviewContext();
 
     useEffect(() => {
         const fetchReviews = async () => {
@@ -49,7 +49,7 @@ export default function PubReviews({ pub }: PubReviewsProps) {
         }
 
         // console.log(pub.review_stars_one, pub.review_stars_two);
-    }, [pub, reviews, dispatch, user]);
+    }, [pub, reviews, dispatch, user, setIsLoading, setReviews]);
 
     return (
         <View>

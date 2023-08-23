@@ -35,12 +35,17 @@ import PubReviews from '@/components/Reviews/PubReviews';
 import PubGallery from '../../components/Pubs/PubView/PubGallery';
 import PubDetails from '@/components/Pubs/PubView/PubDetails';
 import { useActionSheet } from '@expo/react-native-action-sheet';
+import { ReviewContext } from '@/context/reviews';
+import { UserReviewType } from '@/types';
 
 export default function PubHome({
     route,
     navigation,
 }: StackScreenProps<MainNavigatorStackParamList, 'PubView'>) {
     const [headerImageUrl, setHeaderImageUrl] = useState('');
+
+    const [reviews, setReviews] = useState<UserReviewType[]>([]);
+    const [isLoadingReviews, setIsLoadingReviews] = useState(false);
 
     const { width, height } = useWindowDimensions();
 
@@ -280,50 +285,58 @@ export default function PubHome({
                         </View>
 
                         <View>
-                            <TopTabs
-                                data={[
-                                    {
-                                        title: `Reviews (${route.params.pub.num_reviews})`,
-                                        component: (
-                                            <PubReviews
-                                                pub={route.params.pub}
-                                            />
-                                        ),
-                                    },
-                                    {
-                                        title: `User Photos (${route.params.pub.photos.length})`,
-                                        component: (
-                                            <PubGallery
-                                                pub={route.params.pub}
-                                            />
-                                        ),
-                                    },
-                                    {
-                                        title: 'Menu',
-                                        component: (
-                                            <View>
-                                                <Text>Menu</Text>
-                                            </View>
-                                        ),
-                                    },
-                                    {
-                                        title: 'Additional Information',
-                                        component: (
-                                            <PubDetails
-                                                pub={route.params.pub}
-                                            />
-                                        ),
-                                    },
-                                    {
-                                        title: 'Similar Pubs',
-                                        component: (
-                                            <View>
-                                                <Text>Test</Text>
-                                            </View>
-                                        ),
-                                    },
-                                ]}
-                            />
+                            <ReviewContext.Provider
+                                value={{
+                                    reviews,
+                                    setReviews,
+                                    isLoading: isLoadingReviews,
+                                    setIsLoading: setIsLoadingReviews,
+                                }}>
+                                <TopTabs
+                                    data={[
+                                        {
+                                            title: `Reviews (${route.params.pub.num_reviews})`,
+                                            component: (
+                                                <PubReviews
+                                                    pub={route.params.pub}
+                                                />
+                                            ),
+                                        },
+                                        {
+                                            title: `User Photos (${route.params.pub.photos.length})`,
+                                            component: (
+                                                <PubGallery
+                                                    pub={route.params.pub}
+                                                />
+                                            ),
+                                        },
+                                        {
+                                            title: 'Menu',
+                                            component: (
+                                                <View>
+                                                    <Text>Menu</Text>
+                                                </View>
+                                            ),
+                                        },
+                                        {
+                                            title: 'Additional Information',
+                                            component: (
+                                                <PubDetails
+                                                    pub={route.params.pub}
+                                                />
+                                            ),
+                                        },
+                                        {
+                                            title: 'Similar Pubs',
+                                            component: (
+                                                <View>
+                                                    <Text>Test</Text>
+                                                </View>
+                                            ),
+                                        },
+                                    ]}
+                                />
+                            </ReviewContext.Provider>
                         </View>
                     </Animated.View>
                 </View>
