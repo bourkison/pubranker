@@ -1,3 +1,4 @@
+import { useSharedPubHomeContext } from '@/context/pubHome';
 import React, { useEffect, useState } from 'react';
 import {
     View,
@@ -36,6 +37,8 @@ export default function TopTabs({ data }: TopTabsProps) {
     const [selectedPage, setSelectedPage] = useState(0);
 
     const { width } = useWindowDimensions();
+
+    const { calculateWithinScrollBounds } = useSharedPubHomeContext();
 
     const sIndicatorTranslateX = useSharedValue(0);
     const sIndicatorWidth = useSharedValue(1);
@@ -240,9 +243,11 @@ export default function TopTabs({ data }: TopTabsProps) {
                 </GestureDetector>
             </Animated.View>
             <View style={styles.separator} />
-            {inputData[selectedPage]
-                ? inputData[selectedPage].component
-                : undefined}
+            <View onLayout={() => calculateWithinScrollBounds(true)}>
+                {inputData[selectedPage]
+                    ? inputData[selectedPage].component
+                    : undefined}
+            </View>
         </>
     );
 }

@@ -179,8 +179,8 @@ export default function PubHome({
         });
 
     // Height change is a negative number indicating difference in height on the next frame to take into account.
-    const calculateWithinScrollBounds = () => {
-        runOnUI(withinScrollBoundsWorklet)(false);
+    const calculateWithinScrollBounds = (withAnimation: boolean) => {
+        runOnUI(withinScrollBoundsWorklet)(withAnimation);
     };
 
     return (

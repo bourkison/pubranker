@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react';
 
 type PubHomeContextType = {
-    calculateWithinScrollBounds: () => void; // A function to ensure changes in layout haven't meant we are now viewing outside of the viewport (i.e. see less on comments)
+    calculateWithinScrollBounds: (withAnimation: boolean) => void; // A function to ensure changes in layout haven't meant we are now viewing outside of the viewport (i.e. see less on comments)
 };
 
 export const PubHomeContext = createContext<PubHomeContextType | null>(null);
