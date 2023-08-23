@@ -138,7 +138,7 @@ export default function PubHome({
                 return;
             }
 
-            const screenHeightBeingUsed = height - width; // Height of pixels being used if not translation (and not including overflow)
+            const screenHeightBeingUsed = height - width; // Height of content container if no translation and not including overflow
             const screenOverflow =
                 contentContainerHeight - screenHeightBeingUsed + initTranslateY; // Height of pixels off screen.
 
