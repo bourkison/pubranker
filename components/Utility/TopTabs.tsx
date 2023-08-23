@@ -88,11 +88,9 @@ export default function TopTabs({ data }: TopTabsProps) {
     const calculateXPos = (index: number, x: number) => {
         if (index === 0) {
             sIndicatorTranslateX.value = x;
-        } else if (index === data.length - 1) {
+        } else if (index === inputData.length - 1) {
             sLastElementXPos.value = x;
         }
-
-        console.log('calculate x', inputData);
 
         setInputData(d => {
             d[index].xPos = x;
@@ -103,7 +101,7 @@ export default function TopTabs({ data }: TopTabsProps) {
     const calculateTextWidth = (index: number, w: number) => {
         if (index === 0) {
             sIndicatorWidth.value = w;
-        } else if (index === data.length - 1) {
+        } else if (index === inputData.length - 1) {
             sLastElementWidth.value = w;
         }
 
