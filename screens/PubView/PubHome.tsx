@@ -18,6 +18,7 @@ import Animated, {
     interpolate,
     interpolateColor,
     measure,
+    runOnUI,
     useAnimatedRef,
     useAnimatedStyle,
     useSharedValue,
@@ -37,6 +38,7 @@ import PubDetails from '@/components/Pubs/PubView/PubDetails';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import { ReviewContext } from '@/context/reviews';
 import { UserReviewType } from '@/types';
+import { PubHomeContext } from '@/context/pubHome';
 
 export default function PubHome({
     route,
@@ -94,6 +96,43 @@ export default function PubHome({
         };
     });
 
+    // Height change is a negative number indicating difference in height on the next frame to take into account.
+    const withinScrollBoundsWorklet = (
+        withAnimation: boolean,
+        heightChange = 0,
+    ) => {
+        'worklet';
+        const { height: contentContainerHeight }: { height: number } =
+            measure(animatedContainerRef);
+
+        if (!contentContainerHeight) {
+            return;
+        }
+
+        const screenHeightBeingUsed = height - width; // Height of content container if no translation and not including overflow
+        const screenOverflow =
+            contentContainerHeight -
+            screenHeightBeingUsed +
+            initTranslateY +
+            heightChange; // Height of pixels off screen.
+
+        if (sTranslateY.value > 0) {
+            sTranslateY.value = withAnimation
+                ? withTiming(0, {
+                      duration: 300,
+                      easing: Easing.inOut(Easing.quad),
+                  })
+                : 0;
+        } else if (sTranslateY.value < -screenOverflow) {
+            sTranslateY.value = withAnimation
+                ? withTiming(-screenOverflow - heightChange, {
+                      duration: 300,
+                      easing: Easing.inOut(Easing.quad),
+                  })
+                : -screenOverflow;
+        }
+    };
+
     const panGesture = Gesture.Pan()
         .activeOffsetY([-5, 5])
         .onStart(() => {
@@ -136,212 +175,202 @@ export default function PubHome({
             );
         })
         .onFinalize(() => {
-            const { height: contentContainerHeight }: { height: number } =
-                measure(animatedContainerRef);
-
-            if (!contentContainerHeight) {
-                return;
-            }
-
-            const screenHeightBeingUsed = height - width; // Height of content container if no translation and not including overflow
-            const screenOverflow =
-                contentContainerHeight - screenHeightBeingUsed + initTranslateY; // Height of pixels off screen.
-
-            if (sTranslateY.value > 0) {
-                sTranslateY.value = withTiming(0, {
-                    duration: 300,
-                    easing: Easing.inOut(Easing.quad),
-                });
-            } else if (sTranslateY.value < -screenOverflow) {
-                sTranslateY.value = withTiming(-screenOverflow, {
-                    duration: 300,
-                    easing: Easing.inOut(Easing.quad),
-                });
-            }
+            withinScrollBoundsWorklet(true);
         });
 
+    // Height change is a negative number indicating difference in height on the next frame to take into account.
+    const calculateWithinScrollBounds = (heightChange = 0) => {
+        runOnUI(withinScrollBoundsWorklet)(false, heightChange);
+    };
+
     return (
-        <View style={styles.container}>
-            <GestureDetector gesture={panGesture}>
-                <View>
-                    <Animated.View
-                        style={[
-                            rButtonStyle,
-                            styles.buttonsContainer,
-                            { paddingTop: insets.top + 5 },
-                        ]}>
-                        <Pressable
-                            style={styles.button}
-                            onPress={() => navigation.goBack()}>
-                            <Ionicons
-                                name="arrow-back-outline"
-                                color="#384D48"
-                                size={14}
-                            />
-                        </Pressable>
-                        <Pressable
-                            style={styles.button}
-                            onPress={() =>
-                                showActionSheetWithOptions(
-                                    {
-                                        options: [
-                                            'Save',
-                                            'Write Review',
-                                            'Suggest an edit',
-                                            'Cancel',
-                                        ],
-                                        cancelButtonIndex: 3,
-                                        tintColor: '#384D48',
-                                        cancelButtonTintColor: '#384D48',
-                                    },
-                                    selected => {
-                                        console.log('select', selected);
-                                    },
-                                )
-                            }>
-                            <SimpleLineIcons
-                                name="options"
-                                color="#384D48"
-                                size={14}
-                            />
-                        </Pressable>
-                    </Animated.View>
-                    <View style={styles.imageContainer}>
-                        <Image
-                            source={{ uri: headerImageUrl }}
-                            style={{
-                                width: width,
-                                height: width,
-                            }}
-                        />
-
+        <PubHomeContext.Provider value={{ calculateWithinScrollBounds }}>
+            <View style={styles.container}>
+                <GestureDetector gesture={panGesture}>
+                    <View>
                         <Animated.View
-                            style={[styles.imageOverlay, rOverlayStyle]}>
-                            <LinearGradient
-                                colors={['transparent', 'rgba(0, 0, 0, 0.4)']}
-                                style={styles.gradient}>
-                                <Text style={styles.titleText}>
-                                    {route.params.pub.name}
-                                </Text>
-                                <View style={styles.bottomRowContainer}>
-                                    <View style={styles.ratingsContainer}>
-                                        <Ionicons
-                                            name="star"
-                                            size={10}
-                                            color={GOLD_RATINGS_COLOR}
-                                        />
-                                        <Text style={styles.ratingsText}>
-                                            {roundToNearest(
-                                                route.params.pub.rating,
-                                                0.1,
-                                            ).toFixed(1)}{' '}
-                                            ({route.params.pub.num_reviews})
-                                        </Text>
-                                    </View>
-                                    <View style={styles.distanceContainer}>
-                                        <Text
-                                            numberOfLines={1}
-                                            style={styles.distanceText}>
-                                            {distanceString(
-                                                route.params.pub.dist_meters,
-                                            )}
-                                        </Text>
-                                    </View>
-                                </View>
-                            </LinearGradient>
+                            style={[
+                                rButtonStyle,
+                                styles.buttonsContainer,
+                                { paddingTop: insets.top + 5 },
+                            ]}>
+                            <Pressable
+                                style={styles.button}
+                                onPress={() => navigation.goBack()}>
+                                <Ionicons
+                                    name="arrow-back-outline"
+                                    color="#384D48"
+                                    size={14}
+                                />
+                            </Pressable>
+                            <Pressable
+                                style={styles.button}
+                                onPress={() =>
+                                    showActionSheetWithOptions(
+                                        {
+                                            options: [
+                                                'Save',
+                                                'Write Review',
+                                                'Suggest an edit',
+                                                'Cancel',
+                                            ],
+                                            cancelButtonIndex: 3,
+                                            tintColor: '#384D48',
+                                            cancelButtonTintColor: '#384D48',
+                                        },
+                                        selected => {
+                                            console.log('select', selected);
+                                        },
+                                    )
+                                }>
+                                <SimpleLineIcons
+                                    name="options"
+                                    color="#384D48"
+                                    size={14}
+                                />
+                            </Pressable>
                         </Animated.View>
-                    </View>
-                    <Animated.View
-                        // @ts-ignore
-                        ref={animatedContainerRef}
-                        style={[
-                            styles.contentContainer,
-                            rContentContainerStyle,
-                        ]}>
-                        <View>
-                            <PubTopBar pub={route.params.pub} />
-                        </View>
-                        <View>
-                            <PubDescription pub={route.params.pub} />
-                        </View>
-
-                        <View>
-                            <PubFeatures pub={route.params.pub} />
-                        </View>
-
-                        <View>
-                            <TopTabs
-                                data={[
-                                    {
-                                        title: 'Gallery',
-                                        component: (
-                                            <PubGallery
-                                                pub={route.params.pub}
-                                            />
-                                        ),
-                                    },
-                                ]}
+                        <View style={styles.imageContainer}>
+                            <Image
+                                source={{ uri: headerImageUrl }}
+                                style={{
+                                    width: width,
+                                    height: width,
+                                }}
                             />
-                        </View>
 
-                        <View>
-                            <ReviewContext.Provider
-                                value={{
-                                    reviews,
-                                    setReviews,
-                                    isLoading: isLoadingReviews,
-                                    setIsLoading: setIsLoadingReviews,
-                                }}>
+                            <Animated.View
+                                style={[styles.imageOverlay, rOverlayStyle]}>
+                                <LinearGradient
+                                    colors={[
+                                        'transparent',
+                                        'rgba(0, 0, 0, 0.4)',
+                                    ]}
+                                    style={styles.gradient}>
+                                    <Text style={styles.titleText}>
+                                        {route.params.pub.name}
+                                    </Text>
+                                    <View style={styles.bottomRowContainer}>
+                                        <View style={styles.ratingsContainer}>
+                                            <Ionicons
+                                                name="star"
+                                                size={10}
+                                                color={GOLD_RATINGS_COLOR}
+                                            />
+                                            <Text style={styles.ratingsText}>
+                                                {roundToNearest(
+                                                    route.params.pub.rating,
+                                                    0.1,
+                                                ).toFixed(1)}{' '}
+                                                ({route.params.pub.num_reviews})
+                                            </Text>
+                                        </View>
+                                        <View style={styles.distanceContainer}>
+                                            <Text
+                                                numberOfLines={1}
+                                                style={styles.distanceText}>
+                                                {distanceString(
+                                                    route.params.pub
+                                                        .dist_meters,
+                                                )}
+                                            </Text>
+                                        </View>
+                                    </View>
+                                </LinearGradient>
+                            </Animated.View>
+                        </View>
+                        <Animated.View
+                            // @ts-ignore
+                            ref={animatedContainerRef}
+                            style={[
+                                styles.contentContainer,
+                                rContentContainerStyle,
+                            ]}>
+                            <View>
+                                <PubTopBar pub={route.params.pub} />
+                            </View>
+                            <View>
+                                <PubDescription pub={route.params.pub} />
+                            </View>
+
+                            <View>
+                                <PubFeatures pub={route.params.pub} />
+                            </View>
+
+                            <View>
                                 <TopTabs
                                     data={[
                                         {
-                                            title: `Reviews (${route.params.pub.num_reviews})`,
-                                            component: (
-                                                <PubReviews
-                                                    pub={route.params.pub}
-                                                />
-                                            ),
-                                        },
-                                        {
-                                            title: `User Photos (${route.params.pub.photos.length})`,
+                                            title: 'Gallery',
                                             component: (
                                                 <PubGallery
                                                     pub={route.params.pub}
                                                 />
                                             ),
                                         },
-                                        {
-                                            title: 'Menu',
-                                            component: (
-                                                <View>
-                                                    <Text>Menu</Text>
-                                                </View>
-                                            ),
-                                        },
-                                        {
-                                            title: 'Additional Information',
-                                            component: (
-                                                <PubDetails
-                                                    pub={route.params.pub}
-                                                />
-                                            ),
-                                        },
-                                        {
-                                            title: 'Similar Pubs',
-                                            component: (
-                                                <View>
-                                                    <Text>Test</Text>
-                                                </View>
-                                            ),
-                                        },
                                     ]}
                                 />
-                            </ReviewContext.Provider>
-                        </View>
-                    </Animated.View>
-                </View>
-            </GestureDetector>
-        </View>
+                            </View>
+
+                            <View>
+                                <ReviewContext.Provider
+                                    value={{
+                                        reviews,
+                                        setReviews,
+                                        isLoading: isLoadingReviews,
+                                        setIsLoading: setIsLoadingReviews,
+                                    }}>
+                                    <TopTabs
+                                        data={[
+                                            {
+                                                title: `Reviews (${route.params.pub.num_reviews})`,
+                                                component: (
+                                                    <PubReviews
+                                                        pub={route.params.pub}
+                                                    />
+                                                ),
+                                            },
+                                            {
+                                                title: `User Photos (${route.params.pub.photos.length})`,
+                                                component: (
+                                                    <PubGallery
+                                                        pub={route.params.pub}
+                                                    />
+                                                ),
+                                            },
+                                            {
+                                                title: 'Menu',
+                                                component: (
+                                                    <View>
+                                                        <Text>Menu</Text>
+                                                    </View>
+                                                ),
+                                            },
+                                            {
+                                                title: 'Additional Information',
+                                                component: (
+                                                    <PubDetails
+                                                        pub={route.params.pub}
+                                                    />
+                                                ),
+                                            },
+                                            {
+                                                title: 'Similar Pubs',
+                                                component: (
+                                                    <View>
+                                                        <Text>Test</Text>
+                                                    </View>
+                                                ),
+                                            },
+                                        ]}
+                                    />
+                                </ReviewContext.Provider>
+                            </View>
+                        </Animated.View>
+                    </View>
+                </GestureDetector>
+            </View>
+        </PubHomeContext.Provider>
     );
 }
 
