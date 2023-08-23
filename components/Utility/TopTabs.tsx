@@ -12,6 +12,7 @@ import Animated, {
     Extrapolation,
     interpolate,
     useAnimatedStyle,
+    useDerivedValue,
     useSharedValue,
     withTiming,
 } from 'react-native-reanimated';
@@ -40,7 +41,19 @@ export default function TopTabs({ data }: TopTabsProps) {
     const sIndicatorWidth = useSharedValue(1);
 
     const sScrollTranslateX = useSharedValue(0);
-    const sScrollOffset = useSharedValue(0); // How far the scroll bar goes off the screen to the right.
+
+    const sLastElementXPos = useSharedValue(0);
+    const sLastElementWidth = useSharedValue(0);
+
+    const derivedScrollOffset = useDerivedValue(() =>
+        Math.max(
+            sLastElementXPos.value +
+                sLastElementWidth.value -
+                width +
+                styles.container.marginHorizontal * 2,
+            0,
+        ),
+    );
 
     const contextX = useSharedValue(0);
 
@@ -71,6 +84,8 @@ export default function TopTabs({ data }: TopTabsProps) {
     const calculateXPos = (index: number, x: number) => {
         if (index === 0) {
             sIndicatorTranslateX.value = x;
+        } else if (index === data.length - 1) {
+            sLastElementXPos.value = x;
         }
 
         setInputData(d => {
@@ -82,6 +97,8 @@ export default function TopTabs({ data }: TopTabsProps) {
     const calculateTextWidth = (index: number, w: number) => {
         if (index === 0) {
             sIndicatorWidth.value = w;
+        } else if (index === data.length - 1) {
+            sLastElementWidth.value = w;
         }
 
         setInputData(d => {
@@ -99,18 +116,9 @@ export default function TopTabs({ data }: TopTabsProps) {
         });
 
         sIndicatorWidth.value = withTiming(inputData[index].textWidth, {
-            duration: 350,
+            duration: 300,
             easing: Easing.inOut(Easing.quad),
         });
-
-        // Scroll movements.
-        console.log(
-            'SWITCH',
-            inputData[index].xPos,
-            sScrollTranslateX.value,
-            width,
-            width + sScrollTranslateX.value,
-        );
 
         if (inputData[index].xPos < -sScrollTranslateX.value) {
             sScrollTranslateX.value = withTiming(-inputData[index].xPos, {
@@ -142,20 +150,25 @@ export default function TopTabs({ data }: TopTabsProps) {
             contextX.value = sScrollTranslateX.value;
         })
         .onUpdate(e => {
+            // Disable scroll if no need for it.
+            if (derivedScrollOffset.value === 0) {
+                return;
+            }
+
             sScrollTranslateX.value = interpolate(
                 e.translationX + contextX.value,
                 [
-                    -sScrollOffset.value - 100,
-                    -sScrollOffset.value - 50,
-                    -sScrollOffset.value,
+                    -derivedScrollOffset.value - 100,
+                    -derivedScrollOffset.value - 50,
+                    -derivedScrollOffset.value,
                     0,
                     50,
                     100,
                 ],
                 [
-                    -sScrollOffset.value - 40,
-                    -sScrollOffset.value - 25,
-                    -sScrollOffset.value,
+                    -derivedScrollOffset.value - 40,
+                    -derivedScrollOffset.value - 25,
+                    -derivedScrollOffset.value,
                     0,
                     25,
                     40,
@@ -172,32 +185,20 @@ export default function TopTabs({ data }: TopTabsProps) {
                     duration: 300,
                     easing: Easing.inOut(Easing.quad),
                 });
-            } else if (sScrollTranslateX.value < -sScrollOffset.value) {
-                sScrollTranslateX.value = withTiming(-sScrollOffset.value, {
-                    duration: 300,
-                    easing: Easing.inOut(Easing.quad),
-                });
+            } else if (sScrollTranslateX.value < -derivedScrollOffset.value) {
+                sScrollTranslateX.value = withTiming(
+                    -derivedScrollOffset.value,
+                    {
+                        duration: 300,
+                        easing: Easing.inOut(Easing.quad),
+                    },
+                );
             }
         });
 
     return (
         <>
-            <Animated.View
-                style={[styles.container, rScrollStyle]}
-                onLayout={e => {
-                    console.log(
-                        'LAYOUT',
-                        width,
-                        e.nativeEvent.layout.width,
-                        Math.max(width - e.nativeEvent.layout.width, 0),
-                    );
-                    sScrollOffset.value = Math.max(
-                        width -
-                            e.nativeEvent.layout.width +
-                            styles.container.marginHorizontal,
-                        0,
-                    );
-                }}>
+            <Animated.View style={[styles.container, rScrollStyle]}>
                 <GestureDetector gesture={panGesture}>
                     <View>
                         <View style={styles.itemsContainer}>

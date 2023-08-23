@@ -17,6 +17,8 @@ import Animated, {
     Extrapolation,
     interpolate,
     interpolateColor,
+    measure,
+    useAnimatedRef,
     useAnimatedStyle,
     useSharedValue,
     withTiming,
@@ -40,9 +42,11 @@ export default function PubHome({
 }: StackScreenProps<MainNavigatorStackParamList, 'PubView'>) {
     const [headerImageUrl, setHeaderImageUrl] = useState('');
 
-    const { width } = useWindowDimensions();
+    const { width, height } = useWindowDimensions();
 
     const { showActionSheetWithOptions } = useActionSheet();
+
+    const animatedContainerRef = useAnimatedRef();
 
     useEffect(() => {
         const url = supabase.storage
@@ -91,19 +95,60 @@ export default function PubHome({
             contextY.value = sTranslateY.value;
         })
         .onUpdate(e => {
+            const { height: contentContainerHeight }: { height: number } =
+                measure(animatedContainerRef);
+
+            if (!contentContainerHeight) {
+                return;
+            }
+
+            const screenHeightBeingUsed = height - width; // Height of pixels being used if not translation (and not including overflow)
+            const screenOverflow =
+                contentContainerHeight - screenHeightBeingUsed + initTranslateY; // Height of pixels off screen.
+
             sTranslateY.value = interpolate(
                 e.translationY + contextY.value,
-                [-1, 0, -initTranslateY * 0.8, -initTranslateY * 2],
-                [-1, 0, -initTranslateY / 2, -initTranslateY],
+                [
+                    -screenOverflow - 70,
+                    -screenOverflow - 50,
+                    -screenOverflow,
+                    0,
+                    -initTranslateY * 0.8,
+                    -initTranslateY * 2,
+                ],
+                [
+                    -screenOverflow - 50,
+                    -screenOverflow - 40,
+                    -screenOverflow,
+                    0,
+                    -initTranslateY / 2,
+                    -initTranslateY,
+                ],
                 {
-                    extrapolateLeft: Extrapolation.EXTEND,
+                    extrapolateLeft: Extrapolation.CLAMP,
                     extrapolateRight: Extrapolation.CLAMP,
                 },
             );
         })
         .onFinalize(() => {
+            const { height: contentContainerHeight }: { height: number } =
+                measure(animatedContainerRef);
+
+            if (!contentContainerHeight) {
+                return;
+            }
+
+            const screenHeightBeingUsed = height - width; // Height of pixels being used if not translation (and not including overflow)
+            const screenOverflow =
+                contentContainerHeight - screenHeightBeingUsed + initTranslateY; // Height of pixels off screen.
+
             if (sTranslateY.value > 0) {
                 sTranslateY.value = withTiming(0, {
+                    duration: 300,
+                    easing: Easing.inOut(Easing.quad),
+                });
+            } else if (sTranslateY.value < -screenOverflow) {
+                sTranslateY.value = withTiming(-screenOverflow, {
                     duration: 300,
                     easing: Easing.inOut(Easing.quad),
                 });
@@ -202,6 +247,8 @@ export default function PubHome({
                         </Animated.View>
                     </View>
                     <Animated.View
+                        // @ts-ignore
+                        ref={animatedContainerRef}
                         style={[
                             styles.contentContainer,
                             rContentContainerStyle,
@@ -292,8 +339,8 @@ const styles = StyleSheet.create({
         height: '100%',
     },
     contentContainer: {
-        backgroundColor: '#FFF',
-        height: '100%',
+        backgroundColor: '#fff',
+        paddingBottom: 25,
     },
     buttonsContainer: {
         position: 'absolute',
