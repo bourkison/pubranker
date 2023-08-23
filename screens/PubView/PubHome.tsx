@@ -218,7 +218,26 @@ export default function PubHome({
                         </View>
 
                         <View>
-                            <PubGallery pub={route.params.pub} />
+                            <TopTabs
+                                data={[
+                                    {
+                                        title: 'Gallery',
+                                        component: (
+                                            <PubGallery
+                                                pub={route.params.pub}
+                                            />
+                                        ),
+                                    },
+                                    {
+                                        title: 'Menu',
+                                        component: (
+                                            <View>
+                                                <Text>Menu</Text>
+                                            </View>
+                                        ),
+                                    },
+                                ]}
+                            />
                         </View>
 
                         <View>

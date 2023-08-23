@@ -26,10 +26,6 @@ export default function PubImages({ pub }: PubImagesProps) {
 
     return (
         <View style={styles.container}>
-            <View style={styles.headerContainer}>
-                <Text style={styles.headerText}>Gallery</Text>
-            </View>
-
             {imageUrls.length ? (
                 <ImageScroller
                     imageFlatListRef={imageFlatListRef}
@@ -44,12 +40,7 @@ export default function PubImages({ pub }: PubImagesProps) {
 
 const styles = StyleSheet.create({
     container: {
-        marginTop: 15,
-        marginBottom: 25,
+        marginTop: 25,
+        marginBottom: 40,
     },
-    headerContainer: {
-        paddingHorizontal: 15,
-        paddingBottom: 15,
-    },
-    headerText: { fontSize: 16, fontFamily: 'Jost' },
 });

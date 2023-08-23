@@ -73,8 +73,6 @@ export default function PubFeatures({ pub }: PubFeaturesProps) {
             <DraughtBeersList pub={pub} />
 
             <PubMap pub={pub} />
-
-            <View style={styles.separator} />
         </>
     );
 }
