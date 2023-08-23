@@ -32,6 +32,7 @@ import TopTabs from '@/components/Utility/TopTabs';
 import PubReviews from '@/components/Reviews/PubReviews';
 import PubGallery from '../../components/Pubs/PubView/PubGallery';
 import PubDetails from '@/components/Pubs/PubView/PubDetails';
+import { useActionSheet } from '@expo/react-native-action-sheet';
 
 export default function PubHome({
     route,
@@ -40,6 +41,8 @@ export default function PubHome({
     const [headerImageUrl, setHeaderImageUrl] = useState('');
 
     const { width } = useWindowDimensions();
+
+    const { showActionSheetWithOptions } = useActionSheet();
 
     useEffect(() => {
         const url = supabase.storage
@@ -126,7 +129,26 @@ export default function PubHome({
                                 size={14}
                             />
                         </Pressable>
-                        <Pressable style={styles.button}>
+                        <Pressable
+                            style={styles.button}
+                            onPress={() =>
+                                showActionSheetWithOptions(
+                                    {
+                                        options: [
+                                            'Save',
+                                            'Write Review',
+                                            'Suggest an edit',
+                                            'Cancel',
+                                        ],
+                                        cancelButtonIndex: 3,
+                                        tintColor: '#384D48',
+                                        cancelButtonTintColor: '#384D48',
+                                    },
+                                    selected => {
+                                        console.log('select', selected);
+                                    },
+                                )
+                            }>
                             <SimpleLineIcons
                                 name="options"
                                 color="#384D48"
@@ -160,8 +182,7 @@ export default function PubHome({
                                         />
                                         <Text style={styles.ratingsText}>
                                             {roundToNearest(
-                                                route.params.pub
-                                                    .overall_reviews,
+                                                route.params.pub.rating,
                                                 0.1,
                                             ).toFixed(1)}{' '}
                                             ({route.params.pub.num_reviews})
@@ -228,7 +249,7 @@ export default function PubHome({
                                         ),
                                     },
                                     {
-                                        title: 'Similar',
+                                        title: 'Similar Pubs',
                                         component: (
                                             <View>
                                                 <Text>Test</Text>

@@ -158,10 +158,7 @@ export default function SelectedPub({ pub }: SelectedPubProps) {
                                     color="#FFD700"
                                 />
                                 <Text style={styles.ratingsText}>
-                                    {roundToNearest(
-                                        pub.overall_reviews,
-                                        0.1,
-                                    ).toFixed(1)}{' '}
+                                    {roundToNearest(pub.rating, 0.1).toFixed(1)}{' '}
                                     ({pub.num_reviews})
                                 </Text>
                             </View>

@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 5,
     },
     filterText: {
-        color: '#D8D4D5',
+        color: '#fff',
         fontSize: 12,
     },
     bottomSheetContentContainer: {

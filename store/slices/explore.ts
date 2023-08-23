@@ -76,7 +76,7 @@ const queryDb = async (
     }
 
     if (overallRating > 0) {
-        query = query.gte('overall_reviews', overallRating);
+        query = query.gte('rating', overallRating);
     }
 
     if (idsToExclude.length) {

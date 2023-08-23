@@ -53,13 +53,13 @@ export default function PubReviews({ pub }: PubReviewsProps) {
     return (
         <View>
             <OverallRatings
-                beer={pub.review_beer}
-                food={pub.review_food}
-                location={pub.review_location}
-                music={pub.review_music}
-                service={pub.review_service}
-                vibe={pub.review_vibe}
-                overallReviews={pub.overall_reviews}
+                beer={1}
+                food={1}
+                location={1}
+                music={1}
+                service={1}
+                vibe={1}
+                overallReviews={1}
                 headerText="Ratings"
             />
             <ReviewPubButton pub={pub} />

@@ -8,6 +8,7 @@ import store from '@/store';
 
 import 'react-native-gesture-handler';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { StyleSheet } from 'react-native';
 import { useFonts } from 'expo-font';
 
@@ -26,7 +27,9 @@ export default function App() {
             <Provider store={store}>
                 <NavigationContainer>
                     <AuthContainer>
-                        <Navigator />
+                        <ActionSheetProvider>
+                            <Navigator />
+                        </ActionSheetProvider>
                     </AuthContainer>
                 </NavigationContainer>
             </Provider>

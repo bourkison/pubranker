@@ -67,7 +67,7 @@ export default function PubTopBar({ pub }: TopBarPubProps) {
                 <View style={styles.reviewColumnContainer}>
                     <Ionicons name="star" />
                     <Text style={styles.reviewText}>
-                        {roundToNearest(pub.overall_reviews, 0.1).toFixed(1)} (
+                        {roundToNearest(pub.rating, 0.1).toFixed(1)} (
                         {pub.num_reviews})
                     </Text>
                 </View>

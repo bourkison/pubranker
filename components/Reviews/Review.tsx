@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
     View,
     Text,
@@ -8,7 +8,7 @@ import {
     TouchableOpacity,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { fromNowString, roundToNearest } from '@/services';
+import { fromNowString } from '@/services';
 import { PubSchema, UserReviewType } from '@/types';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -39,25 +39,13 @@ export default function Review({ review }: ReviewProps) {
         setTextShown(!textShown);
     };
 
-    const averageReview = useMemo(() => {
-        const r =
-            (review.beer +
-                review.food +
-                review.location +
-                review.music +
-                review.service +
-                review.vibe) /
-            6;
-        return roundToNearest(r, 0.1).toFixed(1);
-    }, [review]);
-
     return (
         <View style={styles.container}>
             <View style={styles.contentContainer}>
                 <View style={styles.averageReviewContainer}>
                     <Ionicons name="star" size={12} color="#FFD700" />
                     <Text style={styles.averageReviewText}>
-                        {averageReview}
+                        {review.rating}
                     </Text>
                 </View>
                 <TouchableOpacity

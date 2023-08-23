@@ -14,7 +14,7 @@ export default function PubInfo({ pub }: PubInfoProps) {
             <View style={styles.reviewContainer}>
                 <Ionicons name="star" size={12} color="#FFD700" />
                 <Text style={styles.ratingText}>
-                    {roundToNearest(pub.overall_reviews, 0.1).toFixed(1)}
+                    {roundToNearest(pub.rating, 0.1).toFixed(1)}
                 </Text>
                 <Text style={styles.numReviewsText}>({pub.num_reviews})</Text>
             </View>

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import {
     View,
     Text,
@@ -127,30 +127,18 @@ export default function ViewReview({
         setIsCreatingHelpful(false);
     };
 
-    const overallReviews = useMemo(
-        () =>
-            (route.params.review.beer +
-                route.params.review.location +
-                route.params.review.service +
-                route.params.review.vibe +
-                route.params.review.music +
-                route.params.review.food) /
-            6,
-        [route.params.review],
-    );
-
     return (
         <ScrollView>
             <View>
                 <View style={styles.ratingsContainer}>
                     <OverallRatings
-                        beer={route.params.review.beer}
-                        location={route.params.review.location}
-                        service={route.params.review.service}
-                        vibe={route.params.review.vibe}
-                        music={route.params.review.music}
-                        food={route.params.review.food}
-                        overallReviews={overallReviews}
+                        beer={1}
+                        location={1}
+                        service={1}
+                        vibe={1}
+                        music={1}
+                        food={1}
+                        overallReviews={route.params.review.rating}
                         headerText="Overall"
                     />
                 </View>

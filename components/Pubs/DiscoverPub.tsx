@@ -44,12 +44,6 @@ export default function DiscoverPub({ pub, onSelect }: DiscoverPubProps) {
                                 style={styles.googleLogo}
                             />
                             <Text style={styles.subtitle}>
-                                {pub.google_rating}
-                                {' ('}
-                                {pub.google_ratings_amount}
-                                {') | '}
-                            </Text>
-                            <Text style={styles.subtitle}>
                                 {distanceString(pub.dist_meters)}
                             </Text>
                         </View>
@@ -68,7 +62,11 @@ export default function DiscoverPub({ pub, onSelect }: DiscoverPubProps) {
                 </View>
             </View>
             <View>
-                <ImageScroller images={imageUrls || []} />
+                <ImageScroller
+                    images={imageUrls || []}
+                    percentageWidth={0.6}
+                    aspectRatio={1.3333}
+                />
             </View>
         </View>
     );
