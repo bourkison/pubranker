@@ -13,6 +13,7 @@ import { PubSchema, UserReviewType } from '@/types';
 import { GOLD_RATINGS_COLOR } from '@/constants';
 import UserAvatar from '../User/UserAvatar';
 import { useSharedPubHomeContext } from '@/context/pubHome';
+import Helpfuls from '@/components/Reviews/Helpfuls';
 
 type ReviewProps = {
     review: UserReviewType;
@@ -90,15 +91,20 @@ export default function Review({ review }: ReviewProps) {
                     </TouchableOpacity>
                 ) : undefined}
             </View>
+
+            <View style={styles.isHelpfulContainer}>
+                <Helpfuls review={review} />
+            </View>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        paddingVertical: 25,
+        paddingTop: 25,
+        paddingBottom: 20,
         marginHorizontal: 25,
-        borderBottomWidth: 1,
+        borderTopWidth: 1,
         borderColor: '#E5E7EB',
     },
     headerContainer: {
@@ -144,5 +150,8 @@ const styles = StyleSheet.create({
     },
     toggleTextText: {
         color: '#A3A3A3',
+    },
+    isHelpfulContainer: {
+        paddingTop: 15,
     },
 });

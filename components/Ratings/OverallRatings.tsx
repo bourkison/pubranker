@@ -64,7 +64,7 @@ export default function OverallRatings({
 
 const styles = StyleSheet.create({
     container: {
-        paddingTop: 15,
+        paddingVertical: 15,
         paddingHorizontal: 10,
         flexDirection: 'row',
         justifyContent: 'space-between',

@@ -2,7 +2,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 import BottomTabNavigator from '@/nav/BottomTabNavigator';
 import React from 'react';
 import PubHome from '@/screens/PubView/PubHome';
-import ViewReview from '@/screens/PubView/ViewReview';
 import { PubSchema, UserReviewType } from '@/types';
 
 export type MainNavigatorStackParamList = {
@@ -28,11 +27,6 @@ export default function MainNavigator() {
             <Stack.Screen
                 name="PubView"
                 component={PubHome}
-                options={{ headerShown: false }}
-            />
-            <Stack.Screen
-                name="ViewReview"
-                component={ViewReview}
                 options={{ headerShown: false }}
             />
         </Stack.Navigator>
