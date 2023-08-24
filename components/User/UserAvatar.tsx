@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { PRIMARY_COLOR } from '@/constants';
 
 type UserAvatarProps = {
     size: number;
@@ -12,7 +13,7 @@ type UserAvatarProps = {
 export default function UserAvatar({
     size,
     photo,
-    backgroundColor = '#384D48',
+    backgroundColor = PRIMARY_COLOR,
     iconColor = '#FFF',
 }: UserAvatarProps) {
     const padding = useMemo(() => size / 1.5, [size]);

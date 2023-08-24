@@ -7,6 +7,7 @@ import {
     Pressable,
 } from 'react-native';
 import { BottomSheetModal, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
+import { PRIMARY_COLOR } from '@/constants';
 
 type FilterItemProps = {
     buttonContent: JSX.Element | string;
@@ -107,7 +108,7 @@ const styles = StyleSheet.create({
             height: 0,
             width: 0,
         },
-        backgroundColor: '#384D48',
+        backgroundColor: PRIMARY_COLOR,
         marginHorizontal: 5,
     },
     filterText: {
@@ -126,8 +127,8 @@ const styles = StyleSheet.create({
         marginBottom: 40,
     },
     clearText: {
-        color: '#384D48',
-        textDecorationColor: '#384D48',
+        color: PRIMARY_COLOR,
+        textDecorationColor: PRIMARY_COLOR,
         textDecorationLine: 'underline',
         fontWeight: '600',
         fontSize: 16,

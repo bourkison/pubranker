@@ -7,7 +7,11 @@ import Animated, {
     SharedValue,
     useAnimatedStyle,
 } from 'react-native-reanimated';
-import { COLLAPSE_MAP_BUTTON_TIMEOUT, MIN_MAP_BUTTON_WIDTH } from '@/constants';
+import {
+    COLLAPSE_MAP_BUTTON_TIMEOUT,
+    MIN_MAP_BUTTON_WIDTH,
+    PRIMARY_COLOR,
+} from '@/constants';
 
 type ViewMapButtonProps = {
     expand: () => void;
@@ -67,7 +71,7 @@ export default function ViewMapButton({
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#384D48',
+        backgroundColor: PRIMARY_COLOR,
         justifyContent: 'flex-end',
         alignItems: 'center',
         borderRadius: 20,

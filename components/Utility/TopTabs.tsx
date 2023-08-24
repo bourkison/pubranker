@@ -1,3 +1,4 @@
+import { SECONDARY_COLOR } from '@/constants';
 import { useSharedPubHomeContext } from '@/context/pubHome';
 import React, { useEffect, useState } from 'react';
 import {
@@ -275,7 +276,7 @@ const styles = StyleSheet.create({
     },
     indicator: {
         borderBottomWidth: 3,
-        borderColor: '#721121',
+        borderColor: SECONDARY_COLOR,
         zIndex: 5,
     },
     separator: {

@@ -12,3 +12,5 @@ export const COLLAPSE_MAP_BUTTON_TIMEOUT = 3_000;
 export const PUB_HOME_IMAGE_ASPECT_RATIO = 1.3333; // 4:3
 
 export const GOLD_RATINGS_COLOR = '#FFD700';
+export const PRIMARY_COLOR = '#384D48';
+export const SECONDARY_COLOR = '#721121';

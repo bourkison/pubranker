@@ -10,7 +10,11 @@ import {
     Pressable,
 } from 'react-native';
 import { supabase } from '@/services/supabase';
-import { GOLD_RATINGS_COLOR, PUB_HOME_IMAGE_ASPECT_RATIO } from '@/constants';
+import {
+    GOLD_RATINGS_COLOR,
+    PRIMARY_COLOR,
+    PUB_HOME_IMAGE_ASPECT_RATIO,
+} from '@/constants';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
     Easing,
@@ -199,7 +203,7 @@ export default function PubHome({
                                 onPress={() => navigation.goBack()}>
                                 <Ionicons
                                     name="arrow-back-outline"
-                                    color="#384D48"
+                                    color={PRIMARY_COLOR}
                                     size={14}
                                 />
                             </Pressable>
@@ -215,8 +219,9 @@ export default function PubHome({
                                                 'Cancel',
                                             ],
                                             cancelButtonIndex: 3,
-                                            tintColor: '#384D48',
-                                            cancelButtonTintColor: '#384D48',
+                                            tintColor: PRIMARY_COLOR,
+                                            cancelButtonTintColor:
+                                                PRIMARY_COLOR,
                                         },
                                         selected => {
                                             console.log('select', selected);
@@ -225,7 +230,7 @@ export default function PubHome({
                                 }>
                                 <SimpleLineIcons
                                     name="options"
-                                    color="#384D48"
+                                    color={PRIMARY_COLOR}
                                     size={14}
                                 />
                             </Pressable>

@@ -7,6 +7,7 @@ import { requestBackgroundPermissionsAsync } from 'expo-location';
 import Settings from '@/screens/Settings';
 import Explore from '@/screens/Explore';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { SECONDARY_COLOR } from '@/constants';
 
 export type BottomTabNavigatorParamList = {
     Explore: undefined;
@@ -22,7 +23,7 @@ export default function BottomTabNavigator() {
             <Tab.Navigator
                 screenOptions={{
                     headerShown: false,
-                    tabBarActiveTintColor: '#721121',
+                    tabBarActiveTintColor: SECONDARY_COLOR,
                     tabBarStyle: {
                         backgroundColor: '#fff',
                     },
@@ -35,7 +36,7 @@ export default function BottomTabNavigator() {
                             <Ionicons
                                 name={focused ? 'search' : 'search-outline'}
                                 size={size}
-                                color={focused ? '#721121' : undefined}
+                                color={focused ? SECONDARY_COLOR : undefined}
                             />
                         ),
                     }}
@@ -48,7 +49,7 @@ export default function BottomTabNavigator() {
                             <Ionicons
                                 name={focused ? 'heart' : 'heart-outline'}
                                 size={size}
-                                color={focused ? '#721121' : undefined}
+                                color={focused ? SECONDARY_COLOR : undefined}
                             />
                         ),
                     }}
@@ -61,7 +62,7 @@ export default function BottomTabNavigator() {
                             <Ionicons
                                 name={focused ? 'person' : 'person-outline'}
                                 size={size}
-                                color={focused ? '#721121' : undefined}
+                                color={focused ? SECONDARY_COLOR : undefined}
                             />
                         ),
                     }}

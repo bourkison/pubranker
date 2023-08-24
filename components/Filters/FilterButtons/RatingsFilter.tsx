@@ -9,7 +9,7 @@ import {
     setOverallRating as setStoreOverallRating,
 } from '@/store/slices/explore';
 import { Ionicons } from '@expo/vector-icons';
-import { INITIAL_SEARCH_AMOUNT } from '@/constants';
+import { INITIAL_SEARCH_AMOUNT, PRIMARY_COLOR } from '@/constants';
 
 export default function RangeFilter() {
     const storeOverallRating = useAppSelector(
@@ -66,7 +66,7 @@ export default function RangeFilter() {
                                         style={styles.ratingIcon}
                                         name="star"
                                         size={12}
-                                        color="#384D48"
+                                        color={PRIMARY_COLOR}
                                     />
                                     <Text style={styles.withinText}>
                                         {overallRating.toFixed(2)}+
