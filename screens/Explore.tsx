@@ -9,6 +9,7 @@ import {
     StyleSheet,
     Text,
     View,
+    useWindowDimensions,
 } from 'react-native';
 import * as Location from 'expo-location';
 import FiltersContainer from '@/components/Filters/FiltersContainer';
@@ -19,6 +20,8 @@ import ViewMapButton from '@/components/Maps/ViewMapButton';
 import Animated, {
     Easing,
     FadeIn,
+    FadeOut,
+    useAnimatedStyle,
     useSharedValue,
     withTiming,
 } from 'react-native-reanimated';
@@ -27,18 +30,28 @@ import {
     MAX_MAP_BUTTON_WIDTH,
     MIN_MAP_BUTTON_WIDTH,
 } from '@/constants';
+import { ExploreContext } from '@/context/exploreContext';
 // import { Ionicons } from '@expo/vector-icons';
 
 const METERS_WITHIN = 1000;
 const INITIAL_AMOUNT = 10;
 const COLLAPSE_ON_SCROLL_AMOUNT = 100;
 
+const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
+
 export default function Explore() {
+    const { height } = useWindowDimensions();
+
+    const [filterBarHeight, setFilterBarHeight] = useState(0);
+
     // TODO: Move this into a separate component.
     const [isLoading, setIsLoading] = useState(false);
     const [pubs, setPubs] = useState<PubSchema[]>([]);
 
     const exploreState = useAppSelector(state => state.explore.exploreState);
+    const previousExploreState = useAppSelector(
+        state => state.explore.previousExploreState,
+    );
 
     // START VARIABLES FOR MAP BUTTON
     const sharedMapButtonWidth = useSharedValue(MAX_MAP_BUTTON_WIDTH);
@@ -122,69 +135,149 @@ export default function Explore() {
         initialLoad();
     }, []);
 
+    // START SCROLLVIEW ANIMATION LOGIC
+    const sScrollViewOpacity = useSharedValue(0);
+    const sScrollViewTranslateY = useSharedValue(0);
+
+    const rScrollViewStyle = useAnimatedStyle(() => ({
+        opacity: sScrollViewOpacity.value,
+        transform: [{ translateY: sScrollViewTranslateY.value }],
+    }));
+
+    // Run animations on ScrollView when changes occur.
+    useEffect(() => {
+        if (exploreState === 'suggestions') {
+            sScrollViewOpacity.value = 1;
+            sScrollViewTranslateY.value = 0;
+        }
+        console.log('EXPLORE STATE UPDATE');
+
+        // FROM SEARCH ANIMATION
+        if (
+            previousExploreState === 'search' &&
+            exploreState === 'suggestions'
+        ) {
+            sScrollViewOpacity.value = 0;
+            sScrollViewTranslateY.value = -50;
+
+            sScrollViewOpacity.value = withTiming(1, {
+                duration: 300,
+                easing: Easing.inOut(Easing.quad),
+            });
+
+            sScrollViewTranslateY.value = withTiming(0, {
+                duration: 300,
+                easing: Easing.inOut(Easing.quad),
+            });
+            sScrollViewTranslateY.value = withTiming(0, {
+                duration: 300,
+                easing: Easing.inOut(Easing.quad),
+            });
+        }
+
+        // TO MAP ANIMATION
+        if (previousExploreState === 'suggestions' && exploreState === 'map') {
+            sScrollViewOpacity.value = withTiming(0, {
+                duration: 500,
+            });
+
+            sScrollViewTranslateY.value = withTiming(height - 200, {
+                duration: 500,
+            });
+        }
+
+        // FROM MAP ANIMATION
+        if (previousExploreState === 'map' && exploreState === 'suggestions') {
+            sScrollViewOpacity.value = 0;
+
+            sScrollViewOpacity.value = withTiming(1, {
+                duration: 300,
+                easing: Easing.inOut(Easing.quad),
+            });
+        }
+    }, [
+        previousExploreState,
+        exploreState,
+        sScrollViewOpacity,
+        sScrollViewTranslateY,
+        height,
+    ]);
+    //END SCROLLVIEW ANIMATION LOGIC
+
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.filtersContainer}>
-                <FiltersContainer />
-            </View>
-            {exploreState === 'search' ? (
-                <Animated.View
-                    style={styles.suggestionsContainer}
-                    entering={FadeIn}>
-                    <SearchSuggestionList />
-                </Animated.View>
-            ) : undefined}
-            {exploreState === 'map' ? (
-                <Animated.View style={styles.mapContainer}>
-                    <HomeMap />
-                </Animated.View>
-            ) : undefined}
-            <ScrollView
-                style={styles.container}
-                onScroll={e => toggleOnScroll(e.nativeEvent.contentOffset.y)}
-                scrollEventThrottle={160}>
-                <View style={styles.sectionContainer}>
-                    <View style={styles.subheadingContainer}>
-                        <Text style={styles.subheading}>Top pubs nearby</Text>
+        <ExploreContext.Provider
+            value={{ filterBarHeight, setFilterBarHeight }}>
+            <SafeAreaView style={styles.container}>
+                <View style={styles.filtersContainer}>
+                    <FiltersContainer />
+                </View>
+
+                <AnimatedScrollView
+                    style={[styles.container, rScrollViewStyle]}
+                    onScroll={e =>
+                        toggleOnScroll(e.nativeEvent.contentOffset.y)
+                    }
+                    scrollEventThrottle={160}>
+                    <View style={styles.sectionContainer}>
+                        <View style={styles.subheadingContainer}>
+                            <Text style={styles.subheading}>
+                                Top pubs nearby
+                            </Text>
+                        </View>
+                        <PubList pubs={pubs} isLoading={isLoading} />
                     </View>
-                    <PubList pubs={pubs} isLoading={isLoading} />
-                </View>
-                <View style={styles.sectionContainer}>
-                    <View style={styles.subheadingContainer}>
-                        <Text style={styles.subheading}>
-                            Top pubs in London
-                        </Text>
+                    <View style={styles.sectionContainer}>
+                        <View style={styles.subheadingContainer}>
+                            <Text style={styles.subheading}>
+                                Top pubs in London
+                            </Text>
+                        </View>
+                        <PubList pubs={pubs} isLoading={isLoading} />
                     </View>
-                    <PubList pubs={pubs} isLoading={isLoading} />
-                </View>
-                <View style={styles.sectionContainer}>
-                    <View style={styles.subheadingContainer}>
-                        <Text style={styles.subheading}>
-                            Top rated pubs by vibe nearby
-                        </Text>
+                    <View style={styles.sectionContainer}>
+                        <View style={styles.subheadingContainer}>
+                            <Text style={styles.subheading}>
+                                Top rated pubs by vibe nearby
+                            </Text>
+                        </View>
+                        <PubList pubs={pubs} isLoading={isLoading} />
                     </View>
-                    <PubList pubs={pubs} isLoading={isLoading} />
-                </View>
-            </ScrollView>
-            {exploreState !== 'map' ? (
-                <View style={styles.mapButtonContainer}>
-                    <KeyboardAvoidingView behavior="position">
-                        <ViewMapButton
-                            expand={expandMapButton}
-                            collapse={collapseMapButton}
-                            animatedWidth={sharedMapButtonWidth}
-                            expandTimeout={expandTimeout}
-                        />
-                    </KeyboardAvoidingView>
-                </View>
-            ) : undefined}
-        </SafeAreaView>
+                </AnimatedScrollView>
+                {exploreState === 'search' ? (
+                    <Animated.View
+                        style={styles.suggestionsContainer}
+                        entering={FadeIn}>
+                        <SearchSuggestionList />
+                    </Animated.View>
+                ) : undefined}
+                {exploreState === 'map' ? (
+                    <Animated.View
+                        style={styles.mapContainer}
+                        exiting={FadeOut}>
+                        <HomeMap />
+                    </Animated.View>
+                ) : undefined}
+                {exploreState !== 'map' ? (
+                    <View style={styles.mapButtonContainer}>
+                        <KeyboardAvoidingView behavior="position">
+                            <ViewMapButton
+                                expand={expandMapButton}
+                                collapse={collapseMapButton}
+                                animatedWidth={sharedMapButtonWidth}
+                                expandTimeout={expandTimeout}
+                            />
+                        </KeyboardAvoidingView>
+                    </View>
+                ) : undefined}
+            </SafeAreaView>
+        </ExploreContext.Provider>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        height: '100%',
     },
     filtersContainer: {
         marginBottom: 10,
@@ -192,12 +285,10 @@ const styles = StyleSheet.create({
     suggestionsContainer: {
         width: '100%',
         height: '100%',
-        zIndex: 2,
     },
     mapContainer: {
-        width: '100%',
-        height: '100%',
-        zIndex: 2,
+        ...StyleSheet.absoluteFillObject,
+        zIndex: -1,
     },
     sectionContainer: {
         marginBottom: 20,

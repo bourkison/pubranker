@@ -80,8 +80,8 @@ export default function SearchBar() {
                     color="#A3A3A3"
                     style={styles.searchIcon}
                     size={14}
-                    entering={FadeInUp}
-                    exiting={FadeOutUp}
+                    entering={FadeInUp.duration(300)}
+                    exiting={FadeOutUp.duration(300)}
                 />
             ) : (
                 <Pressable onPress={goToSuggestions}>
@@ -90,8 +90,8 @@ export default function SearchBar() {
                         color="#A3A3A3"
                         style={styles.searchIcon}
                         size={14}
-                        entering={FadeInDown}
-                        exiting={FadeOutDown}
+                        entering={FadeInDown.duration(300)}
+                        exiting={FadeOutDown.duration(300)}
                     />
                 </Pressable>
             )}

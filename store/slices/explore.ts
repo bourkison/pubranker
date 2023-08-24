@@ -46,6 +46,7 @@ const initialState = discoverAdapter.getInitialState({
     sortBy: 'distance' as 'distance' | 'ratings',
     filters: INITIAL_FILTERS as PubFilters,
     exploreState: 'suggestions' as 'suggestions' | 'search' | 'map',
+    previousExploreState: 'suggestions' as 'suggestions' | 'search' | 'map',
 });
 
 const queryDb = async (
@@ -179,6 +180,7 @@ const exploreSlice = createSlice({
             state,
             action: PayloadAction<'suggestions' | 'search' | 'map'>,
         ) {
+            state.previousExploreState = state.exploreState;
             state.exploreState = action.payload;
         },
         resetPubs(state) {

@@ -11,8 +11,8 @@ import BottomSheet from '@gorhom/bottom-sheet';
 import BottomSheetPubList from '@/components/Pubs/BottomSheetPubList';
 import { selectPub } from '@/store/slices/map';
 import SelectedPub from './SelectedPub';
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { PubSchema } from '@/types';
+import { useSharedExploreContext } from '@/context/exploreContext';
 
 const ANIMATE_DELTA = 0.0075;
 const INITIAL_DELTA = 0.01;
@@ -29,9 +29,9 @@ export default function HomeMap() {
     const selectedPub = useAppSelector(state => state.map.selected);
     const pubs = useAppSelector(state => state.explore.pubs);
 
-    const bottomBarHeight = useBottomTabBarHeight();
-
     const dispatch = useAppDispatch();
+
+    const { filterBarHeight } = useSharedExploreContext();
 
     const bottomSheetRef = useRef<BottomSheet>(null);
 
@@ -107,7 +107,7 @@ export default function HomeMap() {
                             (parseFloat(snapPoints[0]) / 100),
                     );
                 }}
-                style={[styles.map, { marginBottom: bottomBarHeight }]}
+                style={[styles.map]}
                 onPanDrag={panDrag}
                 customMapStyle={MapStyle}
                 mapPadding={{
@@ -142,7 +142,7 @@ export default function HomeMap() {
                 <View
                     style={[
                         styles.selectedPubContainer,
-                        { marginBottom: bottomMapPadding + bottomBarHeight },
+                        { marginBottom: bottomMapPadding },
                     ]}>
                     <SelectedPub pub={selectedPub} />
                 </View>
@@ -150,10 +150,10 @@ export default function HomeMap() {
             <BottomSheet
                 snapPoints={snapPoints}
                 index={1}
-                bottomInset={bottomBarHeight}
                 ref={bottomSheetRef}
                 backgroundStyle={styles.bottomSheetBackground}
                 animateOnMount={true}
+                topInset={filterBarHeight}
                 onChange={index => {
                     // Deselect pub if user expands bottom sheet
                     if (selectedPub && index !== 0) {
@@ -182,7 +182,6 @@ const styles = StyleSheet.create({
         right: 0,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingBottom: 10,
         paddingHorizontal: 30,
     },
     listContainer: { flex: 1 },
