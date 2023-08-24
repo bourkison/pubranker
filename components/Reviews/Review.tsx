@@ -12,7 +12,7 @@ import { fromNowString } from '@/services';
 import { PubSchema, UserReviewType } from '@/types';
 import { GOLD_RATINGS_COLOR } from '@/constants';
 import UserAvatar from '../User/UserAvatar';
-import { useSharedPubHomeContext } from '@/context/pubHome';
+import { useSharedPubHomeContext } from '@/context/pubHomeContext';
 import Helpfuls from '@/components/Reviews/Helpfuls';
 
 type ReviewProps = {

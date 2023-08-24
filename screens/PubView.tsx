@@ -37,12 +37,11 @@ import PubFeatures from '@/components/Pubs/PubView/PubFeatures';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import TopTabs from '@/components/Utility/TopTabs';
 import PubReviews from '@/components/Reviews/PubReviews';
-import PubGallery from '../../components/Pubs/PubView/PubGallery';
+import PubGallery from '../components/Pubs/PubView/PubGallery';
 import PubDetails from '@/components/Pubs/PubView/PubDetails';
 import { useActionSheet } from '@expo/react-native-action-sheet';
-import { ReviewContext } from '@/context/reviews';
 import { UserReviewType } from '@/types';
-import { PubHomeContext } from '@/context/pubHome';
+import { PubHomeContext } from '@/context/pubHomeContext';
 
 export default function PubHome({
     route,
@@ -188,7 +187,14 @@ export default function PubHome({
     };
 
     return (
-        <PubHomeContext.Provider value={{ calculateWithinScrollBounds }}>
+        <PubHomeContext.Provider
+            value={{
+                calculateWithinScrollBounds,
+                reviews,
+                setReviews,
+                isLoadingReviews: isLoadingReviews,
+                setIsLoadingReviews: setIsLoadingReviews,
+            }}>
             <View style={styles.container}>
                 <GestureDetector gesture={panGesture}>
                     <View>
@@ -318,58 +324,50 @@ export default function PubHome({
                             </View>
 
                             <View>
-                                <ReviewContext.Provider
-                                    value={{
-                                        reviews,
-                                        setReviews,
-                                        isLoading: isLoadingReviews,
-                                        setIsLoading: setIsLoadingReviews,
-                                    }}>
-                                    <TopTabs
-                                        data={[
-                                            {
-                                                title: `Reviews (${route.params.pub.num_reviews})`,
-                                                component: (
-                                                    <PubReviews
-                                                        pub={route.params.pub}
-                                                    />
-                                                ),
-                                            },
-                                            {
-                                                title: `User Photos (${route.params.pub.photos.length})`,
-                                                component: (
-                                                    <PubGallery
-                                                        pub={route.params.pub}
-                                                    />
-                                                ),
-                                            },
-                                            {
-                                                title: 'Menu',
-                                                component: (
-                                                    <View>
-                                                        <Text>Menu</Text>
-                                                    </View>
-                                                ),
-                                            },
-                                            {
-                                                title: 'Additional Information',
-                                                component: (
-                                                    <PubDetails
-                                                        pub={route.params.pub}
-                                                    />
-                                                ),
-                                            },
-                                            {
-                                                title: 'Similar Pubs',
-                                                component: (
-                                                    <View>
-                                                        <Text>Test</Text>
-                                                    </View>
-                                                ),
-                                            },
-                                        ]}
-                                    />
-                                </ReviewContext.Provider>
+                                <TopTabs
+                                    data={[
+                                        {
+                                            title: `Reviews (${route.params.pub.num_reviews})`,
+                                            component: (
+                                                <PubReviews
+                                                    pub={route.params.pub}
+                                                />
+                                            ),
+                                        },
+                                        {
+                                            title: `User Photos (${route.params.pub.photos.length})`,
+                                            component: (
+                                                <PubGallery
+                                                    pub={route.params.pub}
+                                                />
+                                            ),
+                                        },
+                                        {
+                                            title: 'Menu',
+                                            component: (
+                                                <View>
+                                                    <Text>Menu</Text>
+                                                </View>
+                                            ),
+                                        },
+                                        {
+                                            title: 'Additional Information',
+                                            component: (
+                                                <PubDetails
+                                                    pub={route.params.pub}
+                                                />
+                                            ),
+                                        },
+                                        {
+                                            title: 'Similar Pubs',
+                                            component: (
+                                                <View>
+                                                    <Text>Test</Text>
+                                                </View>
+                                            ),
+                                        },
+                                    ]}
+                                />
                             </View>
                         </Animated.View>
                     </View>

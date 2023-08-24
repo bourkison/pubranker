@@ -1,5 +1,5 @@
 import { SECONDARY_COLOR } from '@/constants';
-import { useSharedPubHomeContext } from '@/context/pubHome';
+import { useSharedPubHomeContext } from '@/context/pubHomeContext';
 import React, { useEffect, useState } from 'react';
 import {
     View,
