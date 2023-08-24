@@ -99,11 +99,7 @@ export default function PubHome({
         };
     });
 
-    // Height change is a negative number indicating difference in height on the next frame to take into account.
-    const withinScrollBoundsWorklet = (
-        withAnimation: boolean,
-        heightChange = 0,
-    ) => {
+    const withinScrollBoundsWorklet = (withAnimation: boolean) => {
         'worklet';
         const { height: contentContainerHeight }: { height: number } =
             measure(animatedContainerRef);
@@ -114,10 +110,7 @@ export default function PubHome({
 
         const screenHeightBeingUsed = height - width; // Height of content container if no translation and not including overflow
         const screenOverflow =
-            contentContainerHeight -
-            screenHeightBeingUsed +
-            initTranslateY +
-            heightChange; // Height of pixels off screen.
+            contentContainerHeight - screenHeightBeingUsed + initTranslateY;
 
         if (sTranslateY.value > 0) {
             sTranslateY.value = withAnimation
@@ -128,7 +121,7 @@ export default function PubHome({
                 : 0;
         } else if (sTranslateY.value < -screenOverflow) {
             sTranslateY.value = withAnimation
-                ? withTiming(-screenOverflow - heightChange, {
+                ? withTiming(-screenOverflow, {
                       duration: 300,
                       easing: Easing.inOut(Easing.quad),
                   })
@@ -181,7 +174,6 @@ export default function PubHome({
             withinScrollBoundsWorklet(true);
         });
 
-    // Height change is a negative number indicating difference in height on the next frame to take into account.
     const calculateWithinScrollBounds = (withAnimation: boolean) => {
         runOnUI(withinScrollBoundsWorklet)(withAnimation);
     };
@@ -222,9 +214,10 @@ export default function PubHome({
                                                 'Save',
                                                 'Write Review',
                                                 'Suggest an edit',
+                                                'View on map',
                                                 'Cancel',
                                             ],
-                                            cancelButtonIndex: 3,
+                                            cancelButtonIndex: 4,
                                             tintColor: PRIMARY_COLOR,
                                             cancelButtonTintColor:
                                                 PRIMARY_COLOR,

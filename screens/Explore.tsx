@@ -2,14 +2,26 @@ import PubList from '@/components/Pubs/PubList';
 import { supabase } from '@/services/supabase';
 import { PubSchema } from '@/types';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+    KeyboardAvoidingView,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View,
+} from 'react-native';
 import * as Location from 'expo-location';
 import FiltersContainer from '@/components/Filters/FiltersContainer';
 import { useAppSelector } from '@/store/hooks';
 import SearchSuggestionList from '@/components/Filters/SearchSuggestionList';
 import HomeMap from '@/components/Maps/HomeMap';
 import ViewMapButton from '@/components/Maps/ViewMapButton';
-import { Easing, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, {
+    Easing,
+    FadeIn,
+    useSharedValue,
+    withTiming,
+} from 'react-native-reanimated';
 import {
     COLLAPSE_MAP_BUTTON_TIMEOUT,
     MAX_MAP_BUTTON_WIDTH,
@@ -116,14 +128,16 @@ export default function Explore() {
                 <FiltersContainer />
             </View>
             {exploreState === 'search' ? (
-                <View style={styles.suggestionsContainer}>
+                <Animated.View
+                    style={styles.suggestionsContainer}
+                    entering={FadeIn}>
                     <SearchSuggestionList />
-                </View>
+                </Animated.View>
             ) : undefined}
             {exploreState === 'map' ? (
-                <View style={styles.mapContainer}>
+                <Animated.View style={styles.mapContainer}>
                     <HomeMap />
-                </View>
+                </Animated.View>
             ) : undefined}
             <ScrollView
                 style={styles.container}
@@ -154,12 +168,14 @@ export default function Explore() {
             </ScrollView>
             {exploreState !== 'map' ? (
                 <View style={styles.mapButtonContainer}>
-                    <ViewMapButton
-                        expand={expandMapButton}
-                        collapse={collapseMapButton}
-                        animatedWidth={sharedMapButtonWidth}
-                        expandTimeout={expandTimeout}
-                    />
+                    <KeyboardAvoidingView behavior="position">
+                        <ViewMapButton
+                            expand={expandMapButton}
+                            collapse={collapseMapButton}
+                            animatedWidth={sharedMapButtonWidth}
+                            expandTimeout={expandTimeout}
+                        />
+                    </KeyboardAvoidingView>
                 </View>
             ) : undefined}
         </SafeAreaView>
