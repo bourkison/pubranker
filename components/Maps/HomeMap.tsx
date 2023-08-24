@@ -31,7 +31,8 @@ export default function HomeMap() {
 
     const dispatch = useAppDispatch();
 
-    const { filterBarHeight } = useSharedExploreContext();
+    const { filterBarHeight, mapBottomSheetAnimatedValue } =
+        useSharedExploreContext();
 
     const bottomSheetRef = useRef<BottomSheet>(null);
 
@@ -151,6 +152,7 @@ export default function HomeMap() {
                 snapPoints={snapPoints}
                 index={1}
                 ref={bottomSheetRef}
+                animatedPosition={mapBottomSheetAnimatedValue}
                 backgroundStyle={styles.bottomSheetBackground}
                 animateOnMount={true}
                 topInset={filterBarHeight}

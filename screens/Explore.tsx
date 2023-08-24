@@ -4,7 +4,6 @@ import { PubSchema } from '@/types';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
     KeyboardAvoidingView,
-    SafeAreaView,
     ScrollView,
     StyleSheet,
     Text,
@@ -43,6 +42,7 @@ export default function Explore() {
     const { height } = useWindowDimensions();
 
     const [filterBarHeight, setFilterBarHeight] = useState(0);
+    const mapBottomSheetAnimatedValue = useSharedValue(0);
 
     // TODO: Move this into a separate component.
     const [isLoading, setIsLoading] = useState(false);
@@ -206,8 +206,12 @@ export default function Explore() {
 
     return (
         <ExploreContext.Provider
-            value={{ filterBarHeight, setFilterBarHeight }}>
-            <SafeAreaView style={styles.container}>
+            value={{
+                filterBarHeight,
+                setFilterBarHeight,
+                mapBottomSheetAnimatedValue,
+            }}>
+            <View style={styles.container}>
                 <View style={styles.filtersContainer}>
                     <FiltersContainer />
                 </View>
@@ -269,7 +273,7 @@ export default function Explore() {
                         </KeyboardAvoidingView>
                     </View>
                 ) : undefined}
-            </SafeAreaView>
+            </View>
         </ExploreContext.Provider>
     );
 }
