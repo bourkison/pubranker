@@ -50,7 +50,7 @@ export default function Review({ review }: ReviewProps) {
                 <View style={styles.headerTextContainer}>
                     <Text style={styles.nameText}>{review.user_name}</Text>
                     <View style={styles.bottomHeaderRow}>
-                        {[0, 0, 0, 0, 0].map((_, index) => (
+                        {Array.from(Array(5)).map((_, index) => (
                             <View key={index} style={styles.starContainer}>
                                 <Ionicons
                                     name="star"

@@ -11,6 +11,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { StyleSheet } from 'react-native';
 import { useFonts } from 'expo-font';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 export default function App() {
     const [fontsLoaded] = useFonts({
@@ -27,9 +28,11 @@ export default function App() {
             <Provider store={store}>
                 <NavigationContainer>
                     <AuthContainer>
-                        <ActionSheetProvider>
-                            <Navigator />
-                        </ActionSheetProvider>
+                        <BottomSheetModalProvider>
+                            <ActionSheetProvider>
+                                <Navigator />
+                            </ActionSheetProvider>
+                        </BottomSheetModalProvider>
                     </AuthContainer>
                 </NavigationContainer>
             </Provider>

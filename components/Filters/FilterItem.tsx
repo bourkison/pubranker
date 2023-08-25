@@ -108,7 +108,6 @@ export default function FilterItem({
                 </View>
             </TouchableOpacity>
             <BottomSheetModal
-                name="TEST"
                 ref={bottomSheetRef}
                 snapPoints={snapPoints}
                 onDismiss={() => setIsExpanded(false)}

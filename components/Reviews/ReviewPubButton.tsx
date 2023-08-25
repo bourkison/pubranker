@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import Review from './Review';
 import { PubSchema, UserReviewType } from '@/types';
+import CreateReview from './CreateReview';
 
 type ReviewPubButtonProps = {
     pub: PubSchema;
@@ -19,6 +20,7 @@ type ReviewPubButtonProps = {
 export default function ReviewPubButton({ pub }: ReviewPubButtonProps) {
     const [isLoading, setIsLoading] = useState(true);
     const [review, setReview] = useState<UserReviewType | null>(null);
+    const [createReviewExpanded, setCreateReviewExpanded] = useState(false);
 
     const user = useAppSelector(state => state.user.docData);
 
@@ -51,7 +53,7 @@ export default function ReviewPubButton({ pub }: ReviewPubButtonProps) {
 
     const buttonPress = () => {
         if (!isLoading && user) {
-            console.log('button press');
+            setCreateReviewExpanded(true);
         }
     };
 
@@ -78,6 +80,11 @@ export default function ReviewPubButton({ pub }: ReviewPubButtonProps) {
                     </TouchableOpacity>
                 </View>
             )}
+            <CreateReview
+                pubId={pub.id}
+                expanded={createReviewExpanded}
+                onDismiss={() => setCreateReviewExpanded(false)}
+            />
         </View>
     );
 }
@@ -87,11 +94,9 @@ const styles = StyleSheet.create({
     reviewButtonContainer: {
         paddingHorizontal: 25,
         paddingBottom: 10,
-        borderBottomWidth: 1,
-        borderColor: '#E5E7EB',
     },
     reviewButton: {
-        backgroundColor: '#2B5256',
+        backgroundColor: '#292935',
         paddingVertical: 3,
         borderRadius: 40,
         alignItems: 'center',
