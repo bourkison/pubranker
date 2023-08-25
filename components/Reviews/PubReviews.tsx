@@ -7,7 +7,7 @@ import OverallRatings from '@/components/Ratings/OverallRatings';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import ReviewPubButton from '@/components/Reviews/ReviewPubButton';
 import { PubSchema, UserReviewType } from '@/types';
-import { useSharedPubHomeContext } from '@/context/pubHomeContext';
+import { useSharedPuViewContext } from '@/context/pubViewContext';
 
 type PubReviewsProps = {
     pub: PubSchema;
@@ -22,7 +22,7 @@ export default function PubReviews({ pub }: PubReviewsProps) {
         setIsLoadingReviews: setIsLoading,
         reviews,
         setReviews,
-    } = useSharedPubHomeContext();
+    } = useSharedPuViewContext();
 
     useEffect(() => {
         const fetchReviews = async () => {

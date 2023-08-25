@@ -1,7 +1,7 @@
 import { UserReviewType } from '@/types';
 import { Dispatch, SetStateAction, createContext, useContext } from 'react';
 
-type PubHomeContextType = {
+type PubViewContext = {
     calculateWithinScrollBounds: (withAnimation: boolean) => void; // A function to ensure changes in layout haven't meant we are now viewing outside of the viewport (i.e. see less on comments)
 
     reviews: UserReviewType[];
@@ -10,13 +10,13 @@ type PubHomeContextType = {
     setIsLoadingReviews: Dispatch<SetStateAction<boolean>>;
 };
 
-export const PubHomeContext = createContext<PubHomeContextType | null>(null);
+export const PubViewContext = createContext<PubViewContext | null>(null);
 
-export const useSharedPubHomeContext = () => {
-    const context = useContext(PubHomeContext);
+export const useSharedPuViewContext = () => {
+    const context = useContext(PubViewContext);
 
     if (!context) {
-        throw "'useSharedPubHomeContext' must be used within PubHomeContext";
+        throw "'useSharedPubViewContext' must be used within PubViewContext";
     }
     return context;
 };

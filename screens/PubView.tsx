@@ -41,7 +41,7 @@ import PubGallery from '../components/Pubs/PubView/PubGallery';
 import PubDetails from '@/components/Pubs/PubView/PubDetails';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import { UserReviewType } from '@/types';
-import { PubHomeContext } from '@/context/pubHomeContext';
+import { PubViewContext } from '@/context/pubViewContext';
 
 export default function PubHome({
     route,
@@ -103,6 +103,8 @@ export default function PubHome({
         'worklet';
         const { height: contentContainerHeight }: { height: number } =
             measure(animatedContainerRef);
+
+        console.log('content container height', contentContainerHeight);
 
         if (!contentContainerHeight) {
             return;
@@ -179,7 +181,7 @@ export default function PubHome({
     };
 
     return (
-        <PubHomeContext.Provider
+        <PubViewContext.Provider
             value={{
                 calculateWithinScrollBounds,
                 reviews,
@@ -366,7 +368,7 @@ export default function PubHome({
                     </View>
                 </GestureDetector>
             </View>
-        </PubHomeContext.Provider>
+        </PubViewContext.Provider>
     );
 }
 

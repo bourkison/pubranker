@@ -12,7 +12,7 @@ import { fromNowString } from '@/services';
 import { PubSchema, UserReviewType } from '@/types';
 import { GOLD_RATINGS_COLOR } from '@/constants';
 import UserAvatar from '../User/UserAvatar';
-import { useSharedPubHomeContext } from '@/context/pubHomeContext';
+import { useSharedPuViewContext } from '@/context/pubViewContext';
 import Helpfuls from '@/components/Reviews/Helpfuls';
 
 type ReviewProps = {
@@ -26,7 +26,7 @@ export default function Review({ review }: ReviewProps) {
     const [textShown, setTextShown] = useState(false);
     const [lengthMore, setLengthMore] = useState(false);
 
-    const { calculateWithinScrollBounds } = useSharedPubHomeContext();
+    const { calculateWithinScrollBounds } = useSharedPuViewContext();
 
     const onTextLayout = useCallback(
         (e: NativeSyntheticEvent<TextLayoutEventData>) => {

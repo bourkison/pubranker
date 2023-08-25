@@ -146,11 +146,13 @@ export default function Explore() {
 
     // Run animations on ScrollView when changes occur.
     useEffect(() => {
+        console.log('EXPLORE STATE UPDATE', exploreState, previousExploreState);
+
         if (exploreState === 'suggestions') {
+            console.log('setting');
             sScrollViewOpacity.value = 1;
             sScrollViewTranslateY.value = 0;
         }
-        console.log('EXPLORE STATE UPDATE');
 
         // FROM SEARCH ANIMATION
         if (

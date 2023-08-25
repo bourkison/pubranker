@@ -1,5 +1,5 @@
 import { SECONDARY_COLOR } from '@/constants';
-import { useSharedPubHomeContext } from '@/context/pubHomeContext';
+import { useSharedPuViewContext } from '@/context/pubViewContext';
 import React, { useEffect, useState } from 'react';
 import {
     View,
@@ -33,13 +33,29 @@ type TopTabsProps = {
     }[];
 };
 
+type TopTabsPageProps = {
+    component: JSX.Element;
+};
+
+function TopTabsPage({ component }: TopTabsPageProps) {
+    const { calculateWithinScrollBounds } = useSharedPuViewContext();
+
+    // TODO: onLayout still not showing updated height with measure function.
+    return (
+        <Animated.View
+            onLayout={() => {
+                calculateWithinScrollBounds(true);
+            }}>
+            {component}
+        </Animated.View>
+    );
+}
+
 export default function TopTabs({ data }: TopTabsProps) {
     const [inputData, setInputData] = useState<InputData[]>([]);
     const [selectedPage, setSelectedPage] = useState(0);
 
     const { width } = useWindowDimensions();
-
-    const { calculateWithinScrollBounds } = useSharedPubHomeContext();
 
     const sIndicatorTranslateX = useSharedValue(0);
     const sIndicatorWidth = useSharedValue(1);
@@ -244,11 +260,11 @@ export default function TopTabs({ data }: TopTabsProps) {
                 </GestureDetector>
             </Animated.View>
             <View style={styles.separator} />
-            <View onLayout={() => calculateWithinScrollBounds(true)}>
-                {inputData[selectedPage]
-                    ? inputData[selectedPage].component
-                    : undefined}
-            </View>
+            {inputData.map((i, index) =>
+                selectedPage === index ? (
+                    <TopTabsPage component={i.component} />
+                ) : undefined,
+            )}
         </>
     );
 }
