@@ -4,7 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Saved from '@/screens/Saved';
 import { Ionicons } from '@expo/vector-icons';
 import { requestBackgroundPermissionsAsync } from 'expo-location';
-import Settings from '@/screens/Settings';
+import Profile from '@/screens/Profile';
 import Explore from '@/screens/Explore';
 import { SECONDARY_COLOR } from '@/constants';
 
@@ -54,7 +54,7 @@ export default function BottomTabNavigator() {
             />
             <Tab.Screen
                 name="Profile"
-                component={Settings}
+                component={Profile}
                 options={{
                     tabBarIcon: ({ size, focused }) => (
                         <Ionicons
