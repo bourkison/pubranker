@@ -15,6 +15,7 @@ import { PubSchema } from '@/types';
 import { useSharedExploreContext } from '@/context/exploreContext';
 import PubMapMarker from './PubMapMarker';
 import { SECONDARY_COLOR } from '@/constants';
+import DebugEllipse from './DebugEllipse';
 
 const ANIMATE_DELTA = 0.0075;
 const INITIAL_DELTA = 0.01;
@@ -27,6 +28,8 @@ export default function HomeMap() {
 
     const [hasLoaded, setHasLoaded] = useState(false);
     const [bottomMapPadding, setBottomMapPadding] = useState(0);
+
+    const [deltas, setDeltas] = useState({ latitude: 0, longitude: 0 });
 
     const selectedPub = useAppSelector(state => state.map.selected);
     const pubs = useAppSelector(state => state.explore.pubs);
@@ -78,6 +81,10 @@ export default function HomeMap() {
         if (location !== undefined && !hasLoaded) {
             // fetchPubs(region);
             console.log('region', region);
+            setDeltas({
+                longitude: region.longitudeDelta,
+                latitude: region.latitudeDelta,
+            });
         } else {
             setHasLoaded(true);
         }
@@ -149,6 +156,7 @@ export default function HomeMap() {
                     }
                 })}
                 <DebugPolygons />
+                <DebugEllipse pubs={pubs} deltas={deltas} />
             </MapView>
             {selectedPub !== undefined ? (
                 <View
