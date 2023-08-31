@@ -37,7 +37,7 @@ export default function StarsDisplayer({
             {arrayedRating.map((r, index) => {
                 if (index === arrayedRating.length - 1) {
                     return (
-                        <>
+                        <View key={index}>
                             <Ionicons
                                 name="star"
                                 color={GOLD_RATINGS_COLOR}
@@ -52,16 +52,18 @@ export default function StarsDisplayer({
                                     },
                                 ]}
                             />
-                        </>
+                        </View>
                     );
                 }
 
                 return (
-                    <Ionicons
-                        name="star"
-                        color={GOLD_RATINGS_COLOR}
-                        size={size}
-                    />
+                    <View key={index}>
+                        <Ionicons
+                            name="star"
+                            color={GOLD_RATINGS_COLOR}
+                            size={size}
+                        />
+                    </View>
                 );
             })}
         </>
