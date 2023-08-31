@@ -123,6 +123,7 @@ export default function HomeMap() {
                 initialRegion={initialRegion}>
                 {pubs.map(pub => {
                     const pubLocation = parseLocation(pub.location);
+                    const selected = selectedPub?.id === pub.id;
 
                     if (pubLocation) {
                         return (
@@ -134,14 +135,12 @@ export default function HomeMap() {
                                     longitude: pubLocation.coordinates[0],
                                 }}>
                                 <PubMapMarker
-                                    width={32}
-                                    unselectedPinColor={SECONDARY_COLOR}
-                                    unselectedOutlineColor="#FFF"
-                                    unselectedDotColor="#FFF"
-                                    selectedPinColor={'#000'}
-                                    selectedOutlineColor="#FFF"
-                                    selectedDotColor="#FFF"
-                                    selected={selectedPub?.id === pub.id}
+                                    width={selected ? 36 : 32}
+                                    pinColor={
+                                        selected ? '#000' : SECONDARY_COLOR
+                                    }
+                                    outlineColor={selected ? '#000' : '#FFF'}
+                                    dotColor="#FFF"
                                 />
                             </MapMarker>
                         );
