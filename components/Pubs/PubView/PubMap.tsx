@@ -5,6 +5,8 @@ import MapView, { MapMarker } from 'react-native-maps';
 import MapStyle from '@/json/map_style.json';
 import { StyleSheet, useWindowDimensions } from 'react-native';
 import * as Location from 'expo-location';
+import PubMapMarker from '@/components/Maps/PubMapMarker';
+import { SECONDARY_COLOR } from '@/constants';
 
 type PubMapProps = {
     pub: PubSchema;
@@ -74,8 +76,14 @@ export default function PubMap({ pub }: PubMapProps) {
                     coordinate={{
                         latitude: pubLocation.coordinates[1],
                         longitude: pubLocation.coordinates[0],
-                    }}
-                />
+                    }}>
+                    <PubMapMarker
+                        dotColor="#FFF"
+                        pinColor={SECONDARY_COLOR}
+                        outlineColor="#FFF"
+                        width={32}
+                    />
+                </MapMarker>
             </MapView>
         </>
     );
