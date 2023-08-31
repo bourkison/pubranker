@@ -51,3 +51,9 @@ type tempUCT = Database['public']['Views']['user_comments']['Row'];
 
 export type UserReviewType = NonNullableFields<tempURT>;
 export type UserCommentType = NonNullableFields<tempUCT>;
+
+export type RGB = `rgb(${number}, ${number}, ${number})`;
+export type RGBA = `rgba(${number}, ${number}, ${number}, ${number})`;
+export type HEX = `#${string}`;
+
+export type Color = RGB | RGBA | HEX;

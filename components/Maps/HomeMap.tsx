@@ -13,6 +13,8 @@ import { selectPub } from '@/store/slices/map';
 import SelectedPub from './SelectedPub';
 import { PubSchema } from '@/types';
 import { useSharedExploreContext } from '@/context/exploreContext';
+import PubMapMarker from './PubMapMarker';
+import { SECONDARY_COLOR } from '@/constants';
 
 const ANIMATE_DELTA = 0.0075;
 const INITIAL_DELTA = 0.01;
@@ -130,8 +132,18 @@ export default function HomeMap() {
                                 coordinate={{
                                     latitude: pubLocation.coordinates[1],
                                     longitude: pubLocation.coordinates[0],
-                                }}
-                            />
+                                }}>
+                                <PubMapMarker
+                                    width={32}
+                                    unselectedPinColor={SECONDARY_COLOR}
+                                    unselectedOutlineColor="#FFF"
+                                    unselectedDotColor="#FFF"
+                                    selectedPinColor={'#000'}
+                                    selectedOutlineColor="#FFF"
+                                    selectedDotColor="#FFF"
+                                    selected={selectedPub?.id === pub.id}
+                                />
+                            </MapMarker>
                         );
                     } else {
                         return undefined;
