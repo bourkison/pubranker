@@ -121,7 +121,7 @@ export default function HomeMap() {
                 }}
                 onRegionChangeComplete={mapDragFinished}
                 initialRegion={initialRegion}>
-                {pubs.map(pub => {
+                {pubs.map((pub, index) => {
                     const pubLocation = parseLocation(pub.location);
                     const selected = selectedPub?.id === pub.id;
 
@@ -129,7 +129,7 @@ export default function HomeMap() {
                         return (
                             <MapMarker
                                 onPress={() => pubSelectedOnMap(pub)}
-                                key={pub.id}
+                                key={index}
                                 coordinate={{
                                     latitude: pubLocation.coordinates[1],
                                     longitude: pubLocation.coordinates[0],
