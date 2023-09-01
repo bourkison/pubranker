@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
-import MapView, { MapMarker, Region } from 'react-native-maps';
+import MapView, { MapMarker, PanDragEvent, Region } from 'react-native-maps';
 import * as Location from 'expo-location';
 import MapStyle from '@/json/map_style.json';
 import { Keyboard, StyleSheet, View } from 'react-native';
@@ -16,6 +16,7 @@ import { useSharedExploreContext } from '@/context/exploreContext';
 import PubMapMarker from './PubMapMarker';
 import { SECONDARY_COLOR } from '@/constants';
 import DebugEllipse from './DebugEllipse';
+import MapMarkers from './MapMarkers';
 
 const ANIMATE_DELTA = 0.0075;
 const INITIAL_DELTA = 0.01;
@@ -28,8 +29,6 @@ export default function HomeMap() {
 
     const [hasLoaded, setHasLoaded] = useState(false);
     const [bottomMapPadding, setBottomMapPadding] = useState(0);
-
-    const [deltas, setDeltas] = useState({ latitude: 0, longitude: 0 });
 
     const selectedPub = useAppSelector(state => state.map.selected);
     const pubs = useAppSelector(state => state.explore.pubs);
@@ -73,18 +72,20 @@ export default function HomeMap() {
               };
     }, [location]);
 
+    const [region, setRegion] = useState<Region>(initialRegion);
+
     const panDrag = () => {
         Keyboard.dismiss();
     };
 
-    const mapDragFinished = (region: Region) => {
+    const regionChange = (r: Region) => {
+        setRegion(r);
+    };
+
+    const mapDragFinished = (r: Region) => {
         if (location !== undefined && !hasLoaded) {
             // fetchPubs(region);
-            console.log('region', region);
-            setDeltas({
-                longitude: region.longitudeDelta,
-                latitude: region.latitudeDelta,
-            });
+            console.log('region', r);
         } else {
             setHasLoaded(true);
         }
@@ -119,6 +120,7 @@ export default function HomeMap() {
                 }}
                 style={[styles.map]}
                 onPanDrag={panDrag}
+                onRegionChange={regionChange}
                 customMapStyle={MapStyle}
                 mapPadding={{
                     bottom: bottomMapPadding,
@@ -128,7 +130,7 @@ export default function HomeMap() {
                 }}
                 onRegionChangeComplete={mapDragFinished}
                 initialRegion={initialRegion}>
-                {pubs.map(pub => {
+                {/* {pubs.map(pub => {
                     const pubLocation = parseLocation(pub.location);
                     const selected = selectedPub?.id === pub.id;
 
@@ -154,9 +156,16 @@ export default function HomeMap() {
                     } else {
                         return undefined;
                     }
-                })}
-                <DebugPolygons />
-                <DebugEllipse pubs={pubs} deltas={deltas} />
+                })} */}
+                <MapMarkers region={region} pubs={pubs} markerWidth={32} />
+                {/* <DebugPolygons />
+                <DebugEllipse
+                    pubs={pubs}
+                    deltas={{
+                        latitude: region.latitudeDelta,
+                        longitude: region.longitudeDelta,
+                    }}
+                /> */}
             </MapView>
             {selectedPub !== undefined ? (
                 <View
