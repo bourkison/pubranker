@@ -2,18 +2,22 @@ import { parseLocation } from '@/services';
 import { PubSchema } from '@/types';
 import React, { useEffect, useState } from 'react';
 import * as turf from '@turf/turf';
-import { Geojson, MapMarker, Region } from 'react-native-maps';
+import { MapMarker, Region } from 'react-native-maps';
 import { convertBoxToCoordinates } from '@/services/geo';
 import { useWindowDimensions } from 'react-native';
 import PubMapMarker from './PubMapMarker';
 import { SECONDARY_COLOR } from '@/constants';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { selectPub } from '@/store/slices/map';
+import { useAppSelector } from '@/store/hooks';
+import GroupMapMarker from './GroupMapMarker';
 
 type MapMarkersProps = {
     region: Region;
     pubs: PubSchema[];
     markerWidth: number;
+    onPubSelect?: (pub: PubSchema) => void;
+    onGroupSelect?: (
+        locations: { latitude: number; longitude: number }[],
+    ) => void;
 };
 
 const markerAspectRatio = 207 / 263;
@@ -26,6 +30,8 @@ export default function MapMarkers({
     region,
     pubs,
     markerWidth,
+    onPubSelect,
+    onGroupSelect,
 }: MapMarkersProps) {
     const { width, height } = useWindowDimensions();
 
@@ -33,7 +39,6 @@ export default function MapMarkers({
         Array<MapPubType | { pubId: number; location: turf.helpers.Point }[]>
     >([]);
 
-    const dispatch = useAppDispatch();
     const selectedPub = useAppSelector(state => state.map.selected);
 
     useEffect(() => {
@@ -73,7 +78,6 @@ export default function MapMarkers({
             return;
         }
 
-        // Let's build the recursive collision function: we'll be using later.
         // This is taking an input of either 1 polygon (initial ellipsis) or multi polygon (merged ellipsis)
         // As well as the index to check from (to avoid checking over previously checked pubs).
         const recursiveCheckCollision = (
@@ -119,10 +123,8 @@ export default function MapMarkers({
                 if (!collision) {
                     if (output.length === 1) {
                         // No collisions, push entire pub not array
-                        console.log('NO COLLISIONS', pub.name);
                         outputArray.push(pub);
                     } else {
-                        console.log(output.length, 'COLLISIONS', pub.name);
                         outputArray.push(output);
                     }
 
@@ -165,23 +167,58 @@ export default function MapMarkers({
         <>
             {markers.map(marker => {
                 if (Array.isArray(marker)) {
-                    return undefined;
+                    const points = turf.featureCollection(
+                        marker.map(p => turf.feature(p.location)),
+                    );
+                    const center = turf.center(points);
+
+                    return (
+                        <MapMarker
+                            key={marker.reduce(
+                                (acc, curr) => acc + curr.pubId.toString(),
+                                '',
+                            )}
+                            coordinate={{
+                                latitude: center.geometry.coordinates[1],
+                                longitude: center.geometry.coordinates[0],
+                            }}
+                            onPress={() => {
+                                if (onGroupSelect) {
+                                    onGroupSelect(
+                                        marker.map(m => ({
+                                            latitude: m.location.coordinates[1],
+                                            longitude:
+                                                m.location.coordinates[0],
+                                        })),
+                                    );
+                                }
+                            }}>
+                            <GroupMapMarker
+                                group={marker}
+                                width={36}
+                                borderSize={4}
+                                outlineColor="#FFF"
+                                circleColor={SECONDARY_COLOR}
+                                numberColor="#FFF"
+                            />
+                        </MapMarker>
+                    );
                 } else {
                     const selected = selectedPub?.id === marker.id;
 
                     return (
                         <MapMarker
                             onPress={() => {
-                                dispatch(
-                                    selectPub({
+                                if (onPubSelect) {
+                                    onPubSelect({
                                         ...marker,
                                         location: JSON.stringify(
                                             marker.location,
                                         ),
-                                    }),
-                                );
+                                    });
+                                }
                             }}
-                            key={marker.id}
+                            key={marker.id.toString()}
                             coordinate={{
                                 latitude: marker.location.coordinates[1],
                                 longitude: marker.location.coordinates[0],

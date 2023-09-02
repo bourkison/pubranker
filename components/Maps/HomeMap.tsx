@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
-import MapView, { MapMarker, PanDragEvent, Region } from 'react-native-maps';
+import MapView, { Region } from 'react-native-maps';
 import * as Location from 'expo-location';
 import MapStyle from '@/json/map_style.json';
 import { Keyboard, StyleSheet, View } from 'react-native';
@@ -13,10 +13,9 @@ import { selectPub } from '@/store/slices/map';
 import SelectedPub from './SelectedPub';
 import { PubSchema } from '@/types';
 import { useSharedExploreContext } from '@/context/exploreContext';
-import PubMapMarker from './PubMapMarker';
-import { SECONDARY_COLOR } from '@/constants';
 import DebugEllipse from './DebugEllipse';
 import MapMarkers from './MapMarkers';
+import _ from 'lodash';
 
 const ANIMATE_DELTA = 0.0075;
 const INITIAL_DELTA = 0.01;
@@ -78,8 +77,14 @@ export default function HomeMap() {
         Keyboard.dismiss();
     };
 
+    const throttledSetRegion = useMemo(
+        () => _.throttle((r: Region) => setRegion(r), 500),
+        [setRegion],
+    );
+
     const regionChange = (r: Region) => {
-        setRegion(r);
+        throttledSetRegion(r);
+        // setRegion(r);
     };
 
     const mapDragFinished = (r: Region) => {
@@ -89,6 +94,8 @@ export default function HomeMap() {
         } else {
             setHasLoaded(true);
         }
+
+        setRegion(r);
     };
 
     const pubSelectedOnMap = (pub: PubSchema) => {
@@ -102,6 +109,15 @@ export default function HomeMap() {
         });
 
         dispatch(selectPub(pub));
+        bottomSheetRef.current?.collapse();
+    };
+
+    const groupSelectedOnMap = (
+        locations: { latitude: number; longitude: number }[],
+    ) => {
+        MapRef.current?.fitToCoordinates(locations, {
+            edgePadding: { left: 50, right: 50, top: 200, bottom: 200 },
+        });
         bottomSheetRef.current?.collapse();
     };
 
@@ -130,42 +146,21 @@ export default function HomeMap() {
                 }}
                 onRegionChangeComplete={mapDragFinished}
                 initialRegion={initialRegion}>
-                {/* {pubs.map(pub => {
-                    const pubLocation = parseLocation(pub.location);
-                    const selected = selectedPub?.id === pub.id;
-
-                    if (pubLocation) {
-                        return (
-                            <MapMarker
-                                onPress={() => pubSelectedOnMap(pub)}
-                                key={pub.id}
-                                coordinate={{
-                                    latitude: pubLocation.coordinates[1],
-                                    longitude: pubLocation.coordinates[0],
-                                }}>
-                                <PubMapMarker
-                                    width={selected ? 36 : 32}
-                                    pinColor={
-                                        selected ? '#000' : SECONDARY_COLOR
-                                    }
-                                    outlineColor={selected ? '#000' : '#FFF'}
-                                    dotColor="#FFF"
-                                />
-                            </MapMarker>
-                        );
-                    } else {
-                        return undefined;
-                    }
-                })} */}
-                <MapMarkers region={region} pubs={pubs} markerWidth={32} />
-                {/* <DebugPolygons />
+                <MapMarkers
+                    region={region}
+                    pubs={pubs}
+                    markerWidth={32}
+                    onPubSelect={pubSelectedOnMap}
+                    onGroupSelect={groupSelectedOnMap}
+                />
+                <DebugPolygons />
                 <DebugEllipse
                     pubs={pubs}
                     deltas={{
                         latitude: region.latitudeDelta,
                         longitude: region.longitudeDelta,
                     }}
-                /> */}
+                />
             </MapView>
             {selectedPub !== undefined ? (
                 <View
