@@ -9,7 +9,7 @@ import {
     // resetPubs,
 } from '@/store/slices/explore';
 import { INITIAL_SEARCH_AMOUNT, PRIMARY_COLOR } from '@/constants';
-import { selectPub } from '@/store/slices/map';
+import { deselectPub } from '@/store/slices/map';
 import Animated, {
     Easing,
     FadeInDown,
@@ -43,7 +43,7 @@ export default function SearchBar() {
         // dispatch(setSearchText(''));
         // dispatch(resetPubs());
         dispatch(setState('suggestions'));
-        dispatch(selectPub(undefined));
+        dispatch(deselectPub());
 
         if (inputRef && inputRef.current) {
             inputRef.current.blur();

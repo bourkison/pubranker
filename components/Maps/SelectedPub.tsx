@@ -4,7 +4,7 @@ import { PubSchema } from '@/types';
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { selectPub } from '@/store/slices/map';
+import { deselectPub } from '@/store/slices/map';
 import { useAppDispatch } from '@/store/hooks';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -59,8 +59,8 @@ export default function SelectedPub({ pub }: SelectedPubProps) {
         opacity: sOpacity.value,
     }));
 
-    const deselectPub = useCallback(() => {
-        dispatch(selectPub(undefined));
+    const deselect = useCallback(() => {
+        dispatch(deselectPub());
     }, [dispatch]);
 
     const panGesture = Gesture.Pan()
@@ -81,7 +81,7 @@ export default function SelectedPub({ pub }: SelectedPubProps) {
         .onFinalize(() => {
             if (sTranslateY.value > 50) {
                 showExitAnimation.value = false;
-                runOnJS(deselectPub)();
+                runOnJS(deselect)();
                 return;
             }
 
@@ -168,7 +168,7 @@ export default function SelectedPub({ pub }: SelectedPubProps) {
 
                     <Pressable
                         style={styles.closeButtonContainer}
-                        onPress={deselectPub}>
+                        onPress={deselect}>
                         <Text style={styles.closeButtonText}>x</Text>
                     </Pressable>
                 </Pressable>

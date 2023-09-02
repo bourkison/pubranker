@@ -6,15 +6,14 @@ import MapStyle from '@/json/map_style.json';
 import { Keyboard, StyleSheet, View } from 'react-native';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import DebugPolygons from './DebugPolygons';
-import { parseLocation } from '@/services';
 import BottomSheet from '@gorhom/bottom-sheet';
 import BottomSheetPubList from '@/components/Pubs/BottomSheetPubList';
-import { selectPub } from '@/store/slices/map';
+import { deselectPub, selectPub } from '@/store/slices/map';
 import SelectedPub from './SelectedPub';
-import { PubSchema } from '@/types';
 import { useSharedExploreContext } from '@/context/exploreContext';
 import MapMarkers from './MapMarkers';
 import _ from 'lodash';
+import { Point } from '@turf/helpers';
 
 const ANIMATE_DELTA = 0.0075;
 const INITIAL_DELTA = 0.01;
@@ -29,7 +28,8 @@ export default function HomeMap() {
     const [bottomMapPadding, setBottomMapPadding] = useState(0);
 
     const selectedPub = useAppSelector(state => state.map.selected);
-    const pubs = useAppSelector(state => state.explore.pubs);
+    const mapPubs = useAppSelector(state => state.map.pubs);
+    const explorePubs = useAppSelector(state => state.explore.pubs);
 
     const dispatch = useAppDispatch();
 
@@ -97,17 +97,15 @@ export default function HomeMap() {
         setRegion(r);
     };
 
-    const pubSelectedOnMap = (pub: PubSchema) => {
-        const pubLocation = parseLocation(pub.location);
-
+    const pubSelectedOnMap = (pub: { id: number; location: Point }) => {
         MapRef.current?.animateToRegion({
-            latitude: pubLocation.coordinates[1] - 0.15 * ANIMATE_DELTA,
-            longitude: pubLocation.coordinates[0],
+            latitude: pub.location.coordinates[1] - 0.15 * ANIMATE_DELTA,
+            longitude: pub.location.coordinates[0],
             latitudeDelta: ANIMATE_DELTA,
             longitudeDelta: ANIMATE_DELTA,
         });
 
-        dispatch(selectPub(pub));
+        dispatch(selectPub(pub.id));
         bottomSheetRef.current?.collapse();
     };
 
@@ -150,7 +148,7 @@ export default function HomeMap() {
                 initialRegion={initialRegion}>
                 <MapMarkers
                     region={region}
-                    pubs={pubs}
+                    pubs={mapPubs}
                     markerWidth={32}
                     onPubSelect={pubSelectedOnMap}
                     onGroupSelect={groupSelectedOnMap}
@@ -177,11 +175,11 @@ export default function HomeMap() {
                 onChange={index => {
                     // Deselect pub if user expands bottom sheet
                     if (selectedPub && index !== 0) {
-                        dispatch(selectPub(undefined));
+                        dispatch(deselectPub());
                     }
                 }}>
                 <View style={styles.listContainer}>
-                    <BottomSheetPubList pubs={pubs} />
+                    <BottomSheetPubList pubs={explorePubs} />
                 </View>
             </BottomSheet>
         </>

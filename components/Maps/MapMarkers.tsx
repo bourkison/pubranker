@@ -1,7 +1,18 @@
-import { parseLocation } from '@/services';
-import { PubSchema } from '@/types';
 import React, { useEffect, useState } from 'react';
-import * as turf from '@turf/turf';
+import {
+    Point,
+    Feature,
+    Polygon,
+    MultiPolygon,
+    feature,
+    featureCollection,
+    polygon,
+} from '@turf/helpers';
+import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
+import center from '@turf/center';
+import ellipse from '@turf/ellipse';
+import union from '@turf/union';
+
 import { MapMarker, Region } from 'react-native-maps';
 import { convertBoxToCoordinates } from '@/services/geo';
 import { useWindowDimensions } from 'react-native';
@@ -10,20 +21,18 @@ import { SECONDARY_COLOR } from '@/constants';
 import { useAppSelector } from '@/store/hooks';
 import GroupMapMarker from './GroupMapMarker';
 
+const markerAspectRatio = 207 / 263;
+
+type MapPubType = { id: number; location: Point };
+
 type MapMarkersProps = {
     region: Region;
-    pubs: PubSchema[];
+    pubs: { id: number; location: Point }[];
     markerWidth: number;
-    onPubSelect?: (pub: PubSchema) => void;
+    onPubSelect?: (pub: MapPubType) => void;
     onGroupSelect?: (
         locations: { latitude: number; longitude: number }[],
     ) => void;
-};
-
-const markerAspectRatio = 207 / 263;
-
-type MapPubType = Omit<PubSchema, 'location'> & {
-    location: turf.helpers.Point;
 };
 
 // TODO: Minimum delta to just show all pubs and not have any groupings.
@@ -39,7 +48,7 @@ export default function MapMarkers({
     const { width, height } = useWindowDimensions();
 
     const [markers, setMarkers] = useState<
-        Array<MapPubType | { pubId: number; location: turf.helpers.Point }[]>
+        Array<MapPubType | { pubId: number; location: Point }[]>
     >([]);
 
     const selectedPub = useAppSelector(state => state.map.selected);
@@ -59,7 +68,7 @@ export default function MapMarkers({
             return;
         }
 
-        const screenPolygon = turf.polygon([
+        const screenPolygon = polygon([
             convertBoxToCoordinates({
                 minLong: region.longitude - region.longitudeDelta,
                 minLat: region.latitude - region.latitudeDelta,
@@ -68,27 +77,20 @@ export default function MapMarkers({
             }),
         ]);
 
-        const pubsWithinScreen = pubs
-            .map(pub => ({
-                ...pub,
-                location: parseLocation(pub.location),
-            }))
-            .filter(pub => {
-                return turf.booleanPointInPolygon(pub.location, screenPolygon);
-            });
+        const pubsWithinScreen = pubs.filter(pub => {
+            return booleanPointInPolygon(pub.location, screenPolygon);
+        });
 
         let outputArray: Array<
-            MapPubType | { pubId: number; location: turf.helpers.Point }[]
+            MapPubType | { pubId: number; location: Point }[]
         > = [];
 
         // This is taking an input of either 1 polygon (initial ellipsis) or multi polygon (merged ellipsis)
         // As well as the index to check from (to avoid checking over previously checked pubs).
         const recursiveCheckCollision = (
-            inputPolygon: turf.helpers.Feature<
-                turf.helpers.MultiPolygon | turf.helpers.Polygon
-            >,
+            inputPolygon: Feature<MultiPolygon | Polygon>,
             startIndex: number,
-        ): [turf.helpers.Point, number] | undefined => {
+        ): [Point, number] | undefined => {
             for (let i = startIndex; i < pubsWithinScreen.length; i++) {
                 // Don't check for collisions with the selectedPub.
                 if (pubsWithinScreen[i].id === selectedPub?.id) {
@@ -96,7 +98,7 @@ export default function MapMarkers({
                 }
 
                 if (
-                    turf.booleanPointInPolygon(
+                    booleanPointInPolygon(
                         pubsWithinScreen[i].location,
                         inputPolygon,
                     )
@@ -110,11 +112,14 @@ export default function MapMarkers({
             const pub = pubsWithinScreen[i];
 
             // First step, build containing ellipsis around this pub that we will check for collisions within.
-            let ellipsisPolygon: turf.helpers.Feature<
-                turf.helpers.MultiPolygon | turf.helpers.Polygon
-            > = turf.ellipse(pub.location, ellipsisWidth, ellipsisHeight, {
-                units: 'degrees',
-            });
+            let ellipsisPolygon: Feature<MultiPolygon | Polygon> = ellipse(
+                pub.location,
+                ellipsisWidth,
+                ellipsisHeight,
+                {
+                    units: 'degrees',
+                },
+            );
             // Now loop through all other pubs that we haven't already checked in this loop
             // And see if there is a collision.
             // If so, we will merge these 2 pubs into their own array.
@@ -147,24 +152,19 @@ export default function MapMarkers({
                 // If there's a collision, merge the 2 ellipsis polygons, push into output, remove pub from the pubsWithinScreen array, and check again for more collisions
                 const [collisionPoint, collisionPointIndex] = collision;
 
-                const union = turf.union(
+                const u = union(
                     ellipsisPolygon,
-                    turf.ellipse(
-                        collisionPoint,
-                        ellipsisWidth,
-                        ellipsisHeight,
-                        {
-                            units: 'degrees',
-                        },
-                    ),
+                    ellipse(collisionPoint, ellipsisWidth, ellipsisHeight, {
+                        units: 'degrees',
+                    }),
                 );
 
-                if (!union) {
+                if (!u) {
                     console.warn('error in polygon union');
                     continue;
                 }
 
-                ellipsisPolygon = union;
+                ellipsisPolygon = u;
                 output.push({
                     pubId: pubsWithinScreen[collisionPointIndex].id,
                     location: pubsWithinScreen[collisionPointIndex].location,
@@ -180,10 +180,10 @@ export default function MapMarkers({
         <>
             {markers.map(marker => {
                 if (Array.isArray(marker)) {
-                    const points = turf.featureCollection(
-                        marker.map(p => turf.feature(p.location)),
+                    const points = featureCollection(
+                        marker.map(p => feature(p.location)),
                     );
-                    const center = turf.center(points);
+                    const c = center(points);
 
                     return (
                         <MapMarker
@@ -192,8 +192,8 @@ export default function MapMarkers({
                                 '',
                             )}
                             coordinate={{
-                                latitude: center.geometry.coordinates[1],
-                                longitude: center.geometry.coordinates[0],
+                                latitude: c.geometry.coordinates[1],
+                                longitude: c.geometry.coordinates[0],
                             }}
                             onPress={() => {
                                 if (onGroupSelect) {
@@ -223,12 +223,7 @@ export default function MapMarkers({
                         <MapMarker
                             onPress={() => {
                                 if (onPubSelect) {
-                                    onPubSelect({
-                                        ...marker,
-                                        location: JSON.stringify(
-                                            marker.location,
-                                        ),
-                                    });
+                                    onPubSelect(marker);
                                 }
                             }}
                             key={marker.id.toString()}
