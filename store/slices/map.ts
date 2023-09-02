@@ -21,6 +21,8 @@ import {
 } from '@/services/geo';
 import { supabase } from '@/services/supabase';
 import * as Location from 'expo-location';
+import { applyFilters } from '@/services';
+import { MAX_WITHIN_RANGE } from '@/constants';
 
 const mapAdapter = createEntityAdapter();
 
@@ -48,13 +50,40 @@ export const fetchMapPubs = createAsyncThunk<
         return { pubs: [], requestedBox: [] };
     }
 
-    const { data, error } = await supabase
-        .rpc('pubs_in_polygon', {
-            geojson: JSON.stringify(geojson.geometry),
-        })
-        .select('id, location');
+    let query = supabase.rpc('pubs_in_polygon', {
+        geojson: JSON.stringify(geojson.geometry),
+        dist_lat: 0,
+        dist_long: 0,
+    });
+
+    query = applyFilters(
+        query,
+        state.explore.filters,
+        state.explore.searchText,
+    );
+
+    if (state.explore.withinRange < MAX_WITHIN_RANGE) {
+        query = query.lte('dist_meters', state.explore.withinRange);
+    }
+
+    if (state.explore.overallRating > 0) {
+        query = query.gte('rating', state.explore.overallRating);
+    }
+
+    if (state.map.pubs.length) {
+        query = query.not(
+            'id',
+            'in',
+            `(${state.map.pubs.map(p => p.id).join(',')})`,
+        );
+    }
+
+    const { data, error } = await query.select('id, location');
+
+    console.log('pubs pulled', data);
 
     if (error) {
+        console.error('error pulling map pubs', error);
         return rejectWithValue({ message: error.message, code: error.code });
     }
 
@@ -62,8 +91,10 @@ export const fetchMapPubs = createAsyncThunk<
         .filter(d => d.location !== null)
         .map(d => ({
             ...d,
-            location: point(JSON.parse(d.location || '')).geometry,
+            location: point(JSON.parse(d.location || '').coordinates).geometry,
         }));
+
+    console.log('pubs mapped', filteredData);
 
     return {
         pubs: filteredData,
@@ -125,6 +156,9 @@ const mapSlice = createSlice({
                     state.pubs = [...state.pubs, pub];
                 }
             });
+        },
+        resetMapPubs(state) {
+            state.pubs = [];
         },
     },
     extraReducers: builder => {

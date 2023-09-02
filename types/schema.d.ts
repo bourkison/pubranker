@@ -695,15 +695,67 @@ export interface Database {
                     wheelchair_accessible: boolean | null;
                 }[];
             };
-            pubs_in_polygon: {
-                Args: {
-                    geojson: string;
-                };
-                Returns: {
-                    id: number;
-                    location: string | null;
-                }[];
-            };
+            pubs_in_polygon:
+                | {
+                      Args: {
+                          geojson: string;
+                      };
+                      Returns: {
+                          id: number;
+                          location: string | null;
+                      }[];
+                  }
+                | {
+                      Args: {
+                          geojson: string;
+                          dist_long: number;
+                          dist_lat: number;
+                      };
+                      Returns: {
+                          address: string;
+                          beer_garden: boolean | null;
+                          dart_board: boolean | null;
+                          description: string;
+                          dist_meters: number;
+                          dog_friendly: boolean | null;
+                          foosball_table: boolean | null;
+                          free_wifi: boolean | null;
+                          google_id: string;
+                          id: number;
+                          kid_friendly: boolean | null;
+                          live_sport: boolean | null;
+                          location: string;
+                          name: string;
+                          num_reviews: number;
+                          opening_hours: Json;
+                          phone_number: string;
+                          photos: string[];
+                          pool_table: boolean | null;
+                          rating: number;
+                          reservable: boolean | null;
+                          review_beer_amount: number;
+                          review_food_amount: number;
+                          review_location_amount: number;
+                          review_music_amount: number;
+                          review_negative_beer_amount: number;
+                          review_negative_food_amount: number;
+                          review_negative_location_amount: number;
+                          review_negative_music_amount: number;
+                          review_negative_service_amount: number;
+                          review_negative_vibe_amount: number;
+                          review_service_amount: number;
+                          review_stars_five: number;
+                          review_stars_four: number;
+                          review_stars_one: number;
+                          review_stars_three: number;
+                          review_stars_two: number;
+                          review_vibe_amount: number;
+                          rooftop: boolean | null;
+                          saved: boolean;
+                          website: string;
+                          wheelchair_accessible: boolean | null;
+                      }[];
+                  };
         };
         Enums: {
             [_ in never]: never;

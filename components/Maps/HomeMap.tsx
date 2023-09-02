@@ -3,12 +3,12 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import MapView, { Region } from 'react-native-maps';
 import * as Location from 'expo-location';
 import MapStyle from '@/json/map_style.json';
-import { Keyboard, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import DebugPolygons from './DebugPolygons';
 import BottomSheet from '@gorhom/bottom-sheet';
 import BottomSheetPubList from '@/components/Pubs/BottomSheetPubList';
-import { deselectPub, selectPub } from '@/store/slices/map';
+import { deselectPub, fetchMapPubs, selectPub } from '@/store/slices/map';
 import SelectedPub from './SelectedPub';
 import { useSharedExploreContext } from '@/context/exploreContext';
 import MapMarkers from './MapMarkers';
@@ -24,7 +24,6 @@ export default function HomeMap() {
     >(undefined);
     const MapRef = useRef<MapView>(null);
 
-    const [hasLoaded, setHasLoaded] = useState(false);
     const [bottomMapPadding, setBottomMapPadding] = useState(0);
 
     const selectedPub = useAppSelector(state => state.map.selected);
@@ -72,29 +71,18 @@ export default function HomeMap() {
 
     const [region, setRegion] = useState<Region>(initialRegion);
 
-    const panDrag = () => {
-        Keyboard.dismiss();
-    };
-
     const throttledSetRegion = useMemo(
-        () => _.throttle((r: Region) => setRegion(r), 500),
+        () =>
+            _.throttle((r: Region) => setRegion(r), 500, {
+                leading: false,
+                trailing: true,
+            }),
         [setRegion],
     );
 
     const regionChange = (r: Region) => {
         throttledSetRegion(r);
         // setRegion(r);
-    };
-
-    const mapDragFinished = (r: Region) => {
-        if (location !== undefined && !hasLoaded) {
-            // fetchPubs(region);
-            console.log('region', r);
-        } else {
-            setHasLoaded(true);
-        }
-
-        setRegion(r);
     };
 
     const pubSelectedOnMap = (pub: { id: number; location: Point }) => {
@@ -119,7 +107,16 @@ export default function HomeMap() {
     };
 
     // When region changes, get any new pubs that are within this new region.
-    useEffect(() => {}, [region]);
+    useEffect(() => {
+        dispatch(
+            fetchMapPubs({
+                minLat: region.latitude - region.latitudeDelta,
+                minLong: region.longitude - region.longitudeDelta,
+                maxLat: region.latitude + region.latitudeDelta,
+                maxLong: region.longitude + region.longitudeDelta,
+            }),
+        );
+    }, [region, dispatch]);
 
     return (
         <>
@@ -135,7 +132,6 @@ export default function HomeMap() {
                     );
                 }}
                 style={[styles.map]}
-                onPanDrag={panDrag}
                 onRegionChange={regionChange}
                 customMapStyle={MapStyle}
                 mapPadding={{
@@ -144,7 +140,7 @@ export default function HomeMap() {
                     right: 0,
                     left: 0,
                 }}
-                onRegionChangeComplete={mapDragFinished}
+                onRegionChangeComplete={setRegion}
                 initialRegion={initialRegion}>
                 <MapMarkers
                     region={region}

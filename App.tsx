@@ -9,9 +9,10 @@ import store from '@/store';
 import 'react-native-gesture-handler';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useFonts } from 'expo-font';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { StatusBar } from 'expo-status-bar';
 
 export default function App() {
     const [fontsLoaded] = useFonts({
@@ -30,7 +31,10 @@ export default function App() {
                     <AuthContainer>
                         <BottomSheetModalProvider>
                             <ActionSheetProvider>
-                                <Navigator />
+                                <View style={styles.flexOne}>
+                                    <StatusBar style="dark" />
+                                    <Navigator />
+                                </View>
                             </ActionSheetProvider>
                         </BottomSheetModalProvider>
                     </AuthContainer>
