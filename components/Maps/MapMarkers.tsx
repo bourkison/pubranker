@@ -26,6 +26,9 @@ type MapPubType = Omit<PubSchema, 'location'> & {
     location: turf.helpers.Point;
 };
 
+// TODO: Minimum delta to just show all pubs and not have any groupings.
+// TODO: Probably over grouping here. If you have a group with 25 pubs this could easily be split out into 2 or 3 smaller groups that won't overlap each other. look into logic on how to do that.
+
 export default function MapMarkers({
     region,
     pubs,
@@ -44,6 +47,18 @@ export default function MapMarkers({
     useEffect(() => {
         // First let's ensure these pubs are within bounds.
         // TODO: May want to add some padding on the screen.
+        const markerHeight = markerWidth / markerAspectRatio;
+
+        const deltaWidthPerPixel = region.longitudeDelta / width;
+        const deltaHeightPerPixel = region.latitudeDelta / height;
+
+        const ellipsisWidth = deltaWidthPerPixel * markerWidth;
+        const ellipsisHeight = deltaHeightPerPixel * markerHeight;
+
+        if (!ellipsisHeight || !ellipsisWidth) {
+            return;
+        }
+
         const screenPolygon = turf.polygon([
             convertBoxToCoordinates({
                 minLong: region.longitude - region.longitudeDelta,
@@ -66,18 +81,6 @@ export default function MapMarkers({
             MapPubType | { pubId: number; location: turf.helpers.Point }[]
         > = [];
 
-        const markerHeight = markerWidth / markerAspectRatio;
-
-        const deltaWidthPerPixel = region.longitudeDelta / width;
-        const deltaHeightPerPixel = region.latitudeDelta / height;
-
-        const ellipsisWidth = deltaWidthPerPixel * markerWidth;
-        const ellipsisHeight = deltaHeightPerPixel * markerHeight;
-
-        if (!ellipsisHeight || !ellipsisWidth) {
-            return;
-        }
-
         // This is taking an input of either 1 polygon (initial ellipsis) or multi polygon (merged ellipsis)
         // As well as the index to check from (to avoid checking over previously checked pubs).
         const recursiveCheckCollision = (
@@ -87,6 +90,11 @@ export default function MapMarkers({
             startIndex: number,
         ): [turf.helpers.Point, number] | undefined => {
             for (let i = startIndex; i < pubsWithinScreen.length; i++) {
+                // Don't check for collisions with the selectedPub.
+                if (pubsWithinScreen[i].id === selectedPub?.id) {
+                    continue;
+                }
+
                 if (
                     turf.booleanPointInPolygon(
                         pubsWithinScreen[i].location,
@@ -115,6 +123,11 @@ export default function MapMarkers({
             let output = [{ pubId: pub.id, location: pub.location }];
 
             while (true) {
+                if (pub.id === selectedPub?.id) {
+                    outputArray.push(pub);
+                    break;
+                }
+
                 const collision = recursiveCheckCollision(
                     ellipsisPolygon,
                     i + 1,

@@ -262,7 +262,7 @@ export default function TopTabs({ data }: TopTabsProps) {
             <View style={styles.separator} />
             {inputData.map((i, index) =>
                 selectedPage === index ? (
-                    <TopTabsPage component={i.component} />
+                    <TopTabsPage component={i.component} key={index} />
                 ) : undefined,
             )}
         </>
