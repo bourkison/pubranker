@@ -120,6 +120,9 @@ export default function HomeMap() {
         bottomSheetRef.current?.collapse();
     };
 
+    // When region changes, get any new pubs that are within this new region.
+    useEffect(() => {}, [region]);
+
     return (
         <>
             <MapView

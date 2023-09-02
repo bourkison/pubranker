@@ -174,7 +174,7 @@ export default function MapMarkers({
         }
 
         setMarkers(outputArray);
-    }, [region, pubs, height, markerWidth, width]);
+    }, [region, pubs, height, markerWidth, width, selectedPub]);
 
     return (
         <>
@@ -235,7 +235,8 @@ export default function MapMarkers({
                             coordinate={{
                                 latitude: marker.location.coordinates[1],
                                 longitude: marker.location.coordinates[0],
-                            }}>
+                            }}
+                            zIndex={selected ? 3 : 2}>
                             <PubMapMarker
                                 width={selected ? 36 : 32}
                                 pinColor={selected ? '#000' : SECONDARY_COLOR}
