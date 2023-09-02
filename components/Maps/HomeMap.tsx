@@ -13,7 +13,6 @@ import { selectPub } from '@/store/slices/map';
 import SelectedPub from './SelectedPub';
 import { PubSchema } from '@/types';
 import { useSharedExploreContext } from '@/context/exploreContext';
-import DebugEllipse from './DebugEllipse';
 import MapMarkers from './MapMarkers';
 import _ from 'lodash';
 
@@ -154,13 +153,6 @@ export default function HomeMap() {
                     onGroupSelect={groupSelectedOnMap}
                 />
                 <DebugPolygons />
-                <DebugEllipse
-                    pubs={pubs}
-                    deltas={{
-                        latitude: region.latitudeDelta,
-                        longitude: region.longitudeDelta,
-                    }}
-                />
             </MapView>
             {selectedPub !== undefined ? (
                 <View
