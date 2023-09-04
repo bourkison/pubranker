@@ -10,6 +10,7 @@ import {
 } from '@/store/slices/explore';
 import { Ionicons } from '@expo/vector-icons';
 import { INITIAL_SEARCH_AMOUNT, PRIMARY_COLOR } from '@/constants';
+import { resetMapPubs } from '@/store/slices/map';
 
 export default function RangeFilter() {
     const storeOverallRating = useAppSelector(
@@ -25,6 +26,7 @@ export default function RangeFilter() {
     }, [storeOverallRating]);
 
     const onSearch = () => {
+        dispatch(resetMapPubs());
         dispatch(setStoreOverallRating(overallRating));
         dispatch(fetchExplorePubs({ amount: INITIAL_SEARCH_AMOUNT }));
         dispatch(setState('map'));

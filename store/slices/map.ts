@@ -80,7 +80,9 @@ export const fetchMapPubs = createAsyncThunk<
         );
     }
 
-    const { data, error } = await query.select('id, location');
+    const { data, error } = await query.select(
+        'id, location, name, rating, dist_meters',
+    );
 
     console.log('pubs pulled', data);
 
@@ -201,5 +203,5 @@ const mapSlice = createSlice({
     },
 });
 
-export const { deselectPub, addPubsToMap } = mapSlice.actions;
+export const { deselectPub, addPubsToMap, resetMapPubs } = mapSlice.actions;
 export default mapSlice.reducer;

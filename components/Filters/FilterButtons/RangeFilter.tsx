@@ -13,6 +13,7 @@ import {
     MAX_WITHIN_RANGE,
     MIN_WITHIN_RANGE,
 } from '@/constants';
+import { resetMapPubs } from '@/store/slices/map';
 
 export default function RangeFilter() {
     const withinRange = useAppSelector(state => state.explore.withinRange);
@@ -26,6 +27,7 @@ export default function RangeFilter() {
     }, [withinRange]);
 
     const onSearch = () => {
+        dispatch(resetMapPubs());
         dispatch(setWithinRange(range));
         dispatch(fetchExplorePubs({ amount: INITIAL_SEARCH_AMOUNT }));
         dispatch(setState('map'));
