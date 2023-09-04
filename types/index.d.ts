@@ -49,8 +49,32 @@ type NonNullableFields<T> = {
 type tempURT = Database['public']['Views']['user_reviews']['Row'];
 type tempUCT = Database['public']['Views']['user_comments']['Row'];
 
-export type UserReviewType = NonNullableFields<tempURT>;
 export type UserCommentType = NonNullableFields<tempUCT>;
+
+export type UserReviewType = Omit<
+    Database['public']['Views']['user_reviews']['Row'],
+    | 'id'
+    | 'created_at'
+    | 'editors_review'
+    | 'is_helpfuls'
+    | 'total_helpfuls'
+    | 'updated_at'
+    | 'user_id'
+    | 'user_name'
+    | 'pub_id'
+    | 'rating'
+> & {
+    id: number;
+    created_at: string;
+    editors_review: boolean;
+    is_helpfuls: number;
+    total_helpfuls: number;
+    updated_at: string;
+    user_id: string;
+    pub_id: number;
+    user_name: string;
+    rating: number;
+};
 
 export type RGB = `rgb(${number}, ${number}, ${number})`;
 export type RGBA = `rgba(${number}, ${number}, ${number}, ${number})`;

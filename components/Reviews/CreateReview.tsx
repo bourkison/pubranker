@@ -17,6 +17,8 @@ import StarRanker from '@/components/Utility/StarRanker';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { FAIL_COLOR, SECONDARY_COLOR, SUCCESS_COLOR } from '@/constants';
 import { Ionicons } from '@expo/vector-icons';
+import { UserReviewType } from '@/types';
+import { useAppSelector } from '@/store/hooks';
 
 type CategoryRating = null | boolean;
 
@@ -30,7 +32,7 @@ type CategoryProps = {
 type CreateReviewProps = {
     pubId: number;
     expanded: boolean;
-    onCreate?: () => void;
+    onCreate?: (review: UserReviewType) => void;
     onDismiss?: () => void;
 };
 
@@ -96,6 +98,8 @@ export default function CreateReview({
     const [content, setContent] = useState('');
     const [loading, setIsLoading] = useState(false);
 
+    const user = useAppSelector(state => state.user.docData);
+
     const bottomSheetRef = useRef<BottomSheetModal>(null);
 
     const dismissed = useCallback(() => {
@@ -135,7 +139,7 @@ export default function CreateReview({
     const postReview = async () => {
         setIsLoading(true);
 
-        const { error } = await supabase
+        const { error, data } = await supabase
             .from('reviews')
             .insert({
                 content,
@@ -160,9 +164,19 @@ export default function CreateReview({
             return;
         }
 
-        if (onCreate) {
-            onCreate();
+        if (onCreate && user) {
+            onCreate({
+                ...data,
+                is_helpfuls: 0,
+                total_helpfuls: 0,
+                user_name: user.name,
+                user_id: user.id,
+                updated_at: new Date().toISOString(),
+                created_at: new Date().toISOString(),
+            });
         }
+
+        bottomSheetRef.current?.close();
     };
 
     const PageContent = useMemo(() => {

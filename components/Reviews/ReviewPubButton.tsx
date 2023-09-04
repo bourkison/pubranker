@@ -9,9 +9,9 @@ import {
     StyleSheet,
     ActivityIndicator,
 } from 'react-native';
-import Review from './Review';
+import Review from '@/components/Reviews/Review';
 import { PubSchema, UserReviewType } from '@/types';
-import CreateReview from './CreateReview';
+import CreateReview from '@/components/Reviews/CreateReview';
 import { useSharedPubViewContext } from '@/context/pubViewContext';
 
 type ReviewPubButtonProps = {
@@ -87,6 +87,7 @@ export default function ReviewPubButton({ pub }: ReviewPubButtonProps) {
                 pubId={pub.id}
                 expanded={createReviewExpanded}
                 onDismiss={() => setCreateReviewExpanded(false)}
+                onCreate={review => setUserReview(review)}
             />
         </View>
     );
