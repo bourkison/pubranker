@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Octicons } from '@expo/vector-icons';
 import { PubSchema } from '@/types';
 import PubMap from '@/components/Pubs/PubView/PubMap';
@@ -51,6 +51,10 @@ export default function PubFeatures({ pub }: PubFeaturesProps) {
         <>
             <View style={styles.headerContainer}>
                 <Text style={styles.headerText}>Features</Text>
+                <TouchableOpacity style={styles.makeSuggestionContainer}>
+                    <Text style={styles.makeSuggestionText}>Suggest</Text>
+                    <Octicons name="plus" />
+                </TouchableOpacity>
             </View>
 
             <View style={styles.featureList}>
@@ -80,8 +84,21 @@ const styles = StyleSheet.create({
     headerContainer: {
         paddingHorizontal: 15,
         paddingTop: 15,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
     },
     headerText: { fontSize: 16, fontFamily: 'Jost' },
+    makeSuggestionContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    makeSuggestionText: {
+        fontSize: 12,
+        marginRight: 2,
+        fontWeight: '300',
+    },
     featureContainer: {
         flexDirection: 'row',
         alignItems: 'center',
