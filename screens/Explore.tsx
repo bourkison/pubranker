@@ -1,6 +1,4 @@
 import PubList from '@/components/Pubs/PubList';
-import { supabase } from '@/services/supabase';
-import { PubSchema } from '@/types';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
     KeyboardAvoidingView,
@@ -10,7 +8,6 @@ import {
     View,
     useWindowDimensions,
 } from 'react-native';
-import * as Location from 'expo-location';
 import FiltersContainer from '@/components/Filters/FiltersContainer';
 import { useAppSelector } from '@/store/hooks';
 import SearchSuggestionList from '@/components/Filters/SearchSuggestionList';
@@ -32,8 +29,6 @@ import {
 import { ExploreContext } from '@/context/exploreContext';
 // import { Ionicons } from '@expo/vector-icons';
 
-const METERS_WITHIN = 1000;
-const INITIAL_AMOUNT = 10;
 const COLLAPSE_ON_SCROLL_AMOUNT = 100;
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
@@ -43,10 +38,6 @@ export default function Explore() {
 
     const [filterBarHeight, setFilterBarHeight] = useState(0);
     const mapBottomSheetAnimatedValue = useSharedValue(0);
-
-    // TODO: Move this into a separate component.
-    const [isLoading, setIsLoading] = useState(false);
-    const [pubs, setPubs] = useState<PubSchema[]>([]);
 
     const exploreState = useAppSelector(state => state.explore.exploreState);
     const previousExploreState = useAppSelector(
@@ -106,34 +97,6 @@ export default function Explore() {
         }
     };
     // END VARIABLES FOR MAP BUTTON.
-
-    useEffect(() => {
-        const initialLoad = async () => {
-            setIsLoading(true);
-
-            let l = await Location.getCurrentPositionAsync();
-
-            const { data, error } = await supabase
-                .rpc('nearby_pubs', {
-                    order_lat: l.coords.latitude,
-                    order_long: l.coords.longitude,
-                    dist_lat: l.coords.latitude,
-                    dist_long: l.coords.longitude,
-                })
-                .lte('dist_meters', METERS_WITHIN)
-                .limit(INITIAL_AMOUNT);
-
-            if (error) {
-                console.error(error);
-                return;
-            }
-
-            setPubs(data);
-            setIsLoading(false);
-        };
-
-        initialLoad();
-    }, []);
 
     // START SCROLLVIEW ANIMATION LOGIC
     const sScrollViewOpacity = useSharedValue(0);
@@ -232,7 +195,7 @@ export default function Explore() {
                                 Top pubs nearby
                             </Text>
                         </View>
-                        <PubList pubs={pubs} isLoading={isLoading} />
+                        <PubList />
                     </View>
                     <View style={styles.sectionContainer}>
                         <View style={styles.subheadingContainer}>
@@ -240,7 +203,7 @@ export default function Explore() {
                                 Top pubs in London
                             </Text>
                         </View>
-                        <PubList pubs={pubs} isLoading={isLoading} />
+                        <PubList />
                     </View>
                     <View style={styles.sectionContainer}>
                         <View style={styles.subheadingContainer}>
@@ -248,7 +211,7 @@ export default function Explore() {
                                 Top rated pubs by vibe nearby
                             </Text>
                         </View>
-                        <PubList pubs={pubs} isLoading={isLoading} />
+                        <PubList />
                     </View>
                 </AnimatedScrollView>
                 {exploreState === 'search' ? (

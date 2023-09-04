@@ -193,11 +193,14 @@ const exploreSlice = createSlice({
         resetFilters(state) {
             state.filters = INITIAL_FILTERS;
         },
-        toggleSave(state, action: PayloadAction<{ id: number }>) {
+        setPubSave(
+            state,
+            action: PayloadAction<{ id: number; value: boolean }>,
+        ) {
             const index = state.pubs.findIndex(x => x.id === action.payload.id);
 
             if (index > -1) {
-                state.pubs[index].saved = !state.pubs[index].saved;
+                state.pubs[index].saved = action.payload.value;
             }
         },
         setState(
@@ -273,7 +276,7 @@ const exploreSlice = createSlice({
 export const {
     setSearchText,
     setFilter,
-    toggleSave,
+    setPubSave,
     setState,
     resetPubs,
     setWithinRange,

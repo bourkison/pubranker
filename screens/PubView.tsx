@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { StackScreenProps } from '@react-navigation/stack';
 import {
@@ -8,6 +8,7 @@ import {
     StyleSheet,
     useWindowDimensions,
     Pressable,
+    TouchableOpacity,
 } from 'react-native';
 import { supabase } from '@/services/supabase';
 import {
@@ -42,6 +43,8 @@ import PubDetails from '@/components/Pubs/PubView/PubDetails';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import { UserReviewType } from '@/types';
 import { PubViewContext } from '@/context/pubViewContext';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { setPubSave } from '@/store/slices/explore';
 
 export default function PubHome({
     route,
@@ -52,7 +55,13 @@ export default function PubHome({
     const [reviews, setReviews] = useState<UserReviewType[]>([]);
     const [userReview, setUserReview] = useState<UserReviewType | null>(null);
 
+    const [saved, setSaved] = useState(route.params.pub.saved);
+
     const { width, height } = useWindowDimensions();
+
+    const user = useAppSelector(state => state.user.docData);
+    const dispatch = useAppDispatch();
+    const [isSaving, setIsSaving] = useState(false);
 
     const { showActionSheetWithOptions } = useActionSheet();
 
@@ -180,6 +189,57 @@ export default function PubHome({
         runOnUI(withinScrollBoundsWorklet)(withAnimation);
     };
 
+    const toggleLike = useCallback(async () => {
+        if (!user || isSaving) {
+            return;
+        }
+
+        setIsSaving(true);
+
+        if (!route.params.pub.saved) {
+            setSaved(true);
+
+            const { error } = await supabase.from('saves').insert({
+                pub_id: route.params.pub.id,
+            });
+
+            setIsSaving(false);
+
+            if (!error) {
+                dispatch(setPubSave({ id: route.params.pub.id, value: true }));
+
+                if (route.params.onSaveToggle) {
+                    route.params.onSaveToggle(route.params.pub.id, true);
+                }
+            } else {
+                setSaved(false);
+
+                console.error(error);
+            }
+        } else {
+            setSaved(false);
+
+            const { error } = await supabase
+                .from('saves')
+                .delete()
+                .eq('pub_id', route.params.pub.id)
+                .eq('user_id', user.id);
+
+            setIsSaving(false);
+
+            if (!error) {
+                dispatch(setPubSave({ id: route.params.pub.id, value: false }));
+
+                if (route.params.onSaveToggle) {
+                    route.params.onSaveToggle(route.params.pub.id, false);
+                }
+            } else {
+                setSaved(true);
+                console.error(error);
+            }
+        }
+    }, [route.params, user, dispatch, isSaving]);
+
     return (
         <PubViewContext.Provider
             value={{
@@ -253,33 +313,80 @@ export default function PubHome({
                                         'rgba(0, 0, 0, 0.4)',
                                     ]}
                                     style={styles.gradient}>
-                                    <Text style={styles.titleText}>
-                                        {route.params.pub.name}
-                                    </Text>
-                                    <View style={styles.bottomRowContainer}>
-                                        <View style={styles.ratingsContainer}>
-                                            <Ionicons
-                                                name="star"
-                                                size={10}
-                                                color={GOLD_RATINGS_COLOR}
-                                            />
-                                            <Text style={styles.ratingsText}>
-                                                {roundToNearest(
-                                                    route.params.pub.rating,
-                                                    0.1,
-                                                ).toFixed(1)}{' '}
-                                                ({route.params.pub.num_reviews})
+                                    <View style={styles.headerContainer}>
+                                        <View
+                                            style={
+                                                styles.headerContentContainer
+                                            }>
+                                            <Text style={styles.titleText}>
+                                                {route.params.pub.name}
                                             </Text>
+                                            <View
+                                                style={
+                                                    styles.bottomRowContainer
+                                                }>
+                                                <View
+                                                    style={
+                                                        styles.ratingsContainer
+                                                    }>
+                                                    <Ionicons
+                                                        name="star"
+                                                        size={10}
+                                                        color={
+                                                            GOLD_RATINGS_COLOR
+                                                        }
+                                                    />
+                                                    <Text
+                                                        style={
+                                                            styles.ratingsText
+                                                        }>
+                                                        {roundToNearest(
+                                                            route.params.pub
+                                                                .rating,
+                                                            0.1,
+                                                        ).toFixed(1)}{' '}
+                                                        (
+                                                        {
+                                                            route.params.pub
+                                                                .num_reviews
+                                                        }
+                                                        )
+                                                    </Text>
+                                                </View>
+                                                <View
+                                                    style={
+                                                        styles.distanceContainer
+                                                    }>
+                                                    <Text
+                                                        numberOfLines={1}
+                                                        style={
+                                                            styles.distanceText
+                                                        }>
+                                                        {distanceString(
+                                                            route.params.pub
+                                                                .dist_meters,
+                                                        )}
+                                                    </Text>
+                                                </View>
+                                            </View>
                                         </View>
-                                        <View style={styles.distanceContainer}>
-                                            <Text
-                                                numberOfLines={1}
-                                                style={styles.distanceText}>
-                                                {distanceString(
-                                                    route.params.pub
-                                                        .dist_meters,
+                                        <View style={styles.heartContainer}>
+                                            <TouchableOpacity
+                                                onPress={toggleLike}>
+                                                {saved ? (
+                                                    <Ionicons
+                                                        name="heart"
+                                                        size={14}
+                                                        color="#dc2626"
+                                                    />
+                                                ) : (
+                                                    <Ionicons
+                                                        name="heart-outline"
+                                                        size={14}
+                                                        color="#dc2626"
+                                                    />
                                                 )}
-                                            </Text>
+                                            </TouchableOpacity>
                                         </View>
                                     </View>
                                 </LinearGradient>
@@ -391,6 +498,21 @@ const styles = StyleSheet.create({
         zIndex: 100,
         top: 0,
         paddingBottom: 5,
+    },
+    headerContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    headerContentContainer: {},
+    heartContainer: {
+        height: 28,
+        width: 28,
+        borderRadius: 14,
+        backgroundColor: '#fff',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 10,
     },
     button: {
         height: 28,
