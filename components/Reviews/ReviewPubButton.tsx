@@ -12,6 +12,7 @@ import {
 import Review from './Review';
 import { PubSchema, UserReviewType } from '@/types';
 import CreateReview from './CreateReview';
+import { useSharedPubViewContext } from '@/context/pubViewContext';
 
 type ReviewPubButtonProps = {
     pub: PubSchema;
@@ -19,7 +20,8 @@ type ReviewPubButtonProps = {
 
 export default function ReviewPubButton({ pub }: ReviewPubButtonProps) {
     const [isLoading, setIsLoading] = useState(true);
-    const [review, setReview] = useState<UserReviewType | null>(null);
+    const { userReview, setUserReview } = useSharedPubViewContext();
+
     const [createReviewExpanded, setCreateReviewExpanded] = useState(false);
 
     const user = useAppSelector(state => state.user.docData);
@@ -39,16 +41,17 @@ export default function ReviewPubButton({ pub }: ReviewPubButtonProps) {
                     .limit(1);
 
                 if (data && data.length) {
-                    setReview(data[0] as UserReviewType);
+                    setUserReview(data[0] as UserReviewType);
                 } else {
-                    setReview(null);
+                    setUserReview(null);
                 }
 
                 setIsLoading(false);
             };
 
             checkIfReviewed();
-        }, [pub, user]),
+            // TODO: Update to only check once per pub (i.e. not new loads on tab change).
+        }, [pub, user, setUserReview]),
     );
 
     const buttonPress = () => {
@@ -67,8 +70,8 @@ export default function ReviewPubButton({ pub }: ReviewPubButtonProps) {
 
     return (
         <View style={styles.container}>
-            {review ? (
-                <Review pub={pub} review={review} />
+            {userReview ? (
+                <Review pub={pub} review={userReview} />
             ) : (
                 <View style={styles.reviewButtonContainer}>
                     <TouchableOpacity

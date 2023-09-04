@@ -8,6 +8,7 @@ import {
     ViewStyle,
 } from 'react-native';
 import { Ionicons, Feather } from '@expo/vector-icons';
+import { FAIL_COLOR, SUCCESS_COLOR } from '@/constants';
 
 type FilterToggleItemProps = {
     title: string;
@@ -25,14 +26,14 @@ export default function FilterToggleItem({
 
         if (state === true) {
             return {
-                backgroundColor: '#16A34A',
+                backgroundColor: SUCCESS_COLOR,
                 borderWidth: 0,
                 width: styles.radioButton.width + BORDER_WIDTH,
                 height: styles.radioButton.height + BORDER_WIDTH,
             };
         } else if (state === false) {
             return {
-                backgroundColor: '#dc2626',
+                backgroundColor: FAIL_COLOR,
                 borderWidth: 0,
                 width: styles.radioButton.width + BORDER_WIDTH,
                 height: styles.radioButton.height + BORDER_WIDTH,

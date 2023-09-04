@@ -50,10 +50,12 @@ export const fetchMapPubs = createAsyncThunk<
         return { pubs: [], requestedBox: [] };
     }
 
+    const l = await Location.getCurrentPositionAsync();
+
     let query = supabase.rpc('pubs_in_polygon', {
         geojson: JSON.stringify(geojson.geometry),
-        dist_lat: 0,
-        dist_long: 0,
+        dist_lat: l.coords.latitude,
+        dist_long: l.coords.longitude,
     });
 
     query = applyFilters(

@@ -1,5 +1,5 @@
 import { SECONDARY_COLOR } from '@/constants';
-import { useSharedPuViewContext } from '@/context/pubViewContext';
+import { useSharedPubViewContext } from '@/context/pubViewContext';
 import React, { useEffect, useState } from 'react';
 import {
     View,
@@ -38,7 +38,7 @@ type TopTabsPageProps = {
 };
 
 function TopTabsPage({ component }: TopTabsPageProps) {
-    const { calculateWithinScrollBounds } = useSharedPuViewContext();
+    const { calculateWithinScrollBounds } = useSharedPubViewContext();
 
     // TODO: onLayout still not showing updated height with measure function.
     return (

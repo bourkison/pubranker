@@ -50,7 +50,7 @@ export default function PubHome({
     const [headerImageUrl, setHeaderImageUrl] = useState('');
 
     const [reviews, setReviews] = useState<UserReviewType[]>([]);
-    const [isLoadingReviews, setIsLoadingReviews] = useState(false);
+    const [userReview, setUserReview] = useState<UserReviewType | null>(null);
 
     const { width, height } = useWindowDimensions();
 
@@ -186,8 +186,8 @@ export default function PubHome({
                 calculateWithinScrollBounds,
                 reviews,
                 setReviews,
-                isLoadingReviews: isLoadingReviews,
-                setIsLoadingReviews: setIsLoadingReviews,
+                userReview,
+                setUserReview,
             }}>
             <View style={styles.container}>
                 <GestureDetector gesture={panGesture}>

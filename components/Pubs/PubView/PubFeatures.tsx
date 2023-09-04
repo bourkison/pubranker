@@ -4,6 +4,9 @@ import { Octicons } from '@expo/vector-icons';
 import { PubSchema } from '@/types';
 import PubMap from '@/components/Pubs/PubView/PubMap';
 import DraughtBeersList from '@/components/Beers/DraughtBeersList';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 
 type PubFeaturesProps = {
     pub: PubSchema;
@@ -47,11 +50,16 @@ function Feature({ input, title }: FeatureProps) {
 }
 
 export default function PubFeatures({ pub }: PubFeaturesProps) {
+    const navigation =
+        useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
+
     return (
         <>
             <View style={styles.headerContainer}>
                 <Text style={styles.headerText}>Features</Text>
-                <TouchableOpacity style={styles.makeSuggestionContainer}>
+                <TouchableOpacity
+                    style={styles.makeSuggestionContainer}
+                    onPress={() => navigation.navigate('Suggestions', { pub })}>
                     <Text style={styles.makeSuggestionText}>Suggest</Text>
                     <Octicons name="plus" />
                 </TouchableOpacity>

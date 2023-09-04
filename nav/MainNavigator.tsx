@@ -2,11 +2,13 @@ import { createStackNavigator } from '@react-navigation/stack';
 import BottomTabNavigator from '@/nav/BottomTabNavigator';
 import React from 'react';
 import PubView from '@/screens/PubView';
+import Suggestions from '@/screens/Suggestions';
 import { PubSchema } from '@/types';
 
 export type MainNavigatorStackParamList = {
     Home: undefined;
     PubView: { pub: PubSchema };
+    Suggestions: { pub: PubSchema };
 };
 
 const Stack = createStackNavigator<MainNavigatorStackParamList>();
@@ -24,6 +26,7 @@ export default function MainNavigator() {
                 component={PubView}
                 options={{ headerShown: false }}
             />
+            <Stack.Screen name="Suggestions" component={Suggestions} />
         </Stack.Navigator>
     );
 }

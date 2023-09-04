@@ -6,13 +6,13 @@ type PubViewContext = {
 
     reviews: UserReviewType[];
     setReviews: Dispatch<SetStateAction<UserReviewType[]>>;
-    isLoadingReviews: boolean;
-    setIsLoadingReviews: Dispatch<SetStateAction<boolean>>;
+    userReview: UserReviewType | null;
+    setUserReview: Dispatch<SetStateAction<UserReviewType | null>>;
 };
 
 export const PubViewContext = createContext<PubViewContext | null>(null);
 
-export const useSharedPuViewContext = () => {
+export const useSharedPubViewContext = () => {
     const context = useContext(PubViewContext);
 
     if (!context) {
