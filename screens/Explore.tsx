@@ -184,7 +184,7 @@ export default function Explore() {
                 </View>
 
                 <AnimatedScrollView
-                    style={[styles.container, rScrollViewStyle]}
+                    style={[styles.exploreHomeContainer, rScrollViewStyle]}
                     onScroll={e =>
                         toggleOnScroll(e.nativeEvent.contentOffset.y)
                     }
@@ -249,6 +249,10 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         height: '100%',
+    },
+    exploreHomeContainer: {
+        flex: 1,
+        zIndex: -2,
     },
     filtersContainer: {
         marginBottom: 10,
