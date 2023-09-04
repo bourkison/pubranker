@@ -1,21 +1,16 @@
 import { supabase } from '@/services/supabase';
 import { PubSchema } from '@/types';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Pressable,
     Image,
     StyleSheet,
     useWindowDimensions,
-    View,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { StackNavigationProp } from '@react-navigation/stack';
 import PubInfo from '@/components/Pubs/PubView/PubInfo';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import { Ionicons } from '@expo/vector-icons';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { setPubSave } from '@/store/slices/explore';
 
 const NO_IMAGE = require('@/assets/noimage.png');
 const WIDTH_PERCENTAGE = 0.8;
@@ -28,9 +23,6 @@ type PubListItemProps = {
 
 export default function PubListItem({ pub, onSaveToggle }: PubListItemProps) {
     const [imageUrl, setImageUrl] = useState('');
-    const [isSaving, setIsSaving] = useState(false);
-    const user = useAppSelector(state => state.user.docData);
-    const dispatch = useAppDispatch();
 
     const { width } = useWindowDimensions();
     const COMPONENT_WIDTH = width * WIDTH_PERCENTAGE;
@@ -52,58 +44,6 @@ export default function PubListItem({ pub, onSaveToggle }: PubListItemProps) {
         }
     }, [pub]);
 
-    const toggleLike = useCallback(async () => {
-        if (!user || isSaving) {
-            return;
-        }
-
-        setIsSaving(true);
-
-        if (!pub.saved) {
-            if (onSaveToggle) {
-                onSaveToggle(pub.id, true);
-            }
-
-            const { error } = await supabase.from('saves').insert({
-                pub_id: pub.id,
-            });
-
-            setIsSaving(false);
-
-            if (!error) {
-                dispatch(setPubSave({ id: pub.id, value: true }));
-            } else {
-                if (onSaveToggle) {
-                    onSaveToggle(pub.id, false);
-                }
-
-                console.error(error);
-            }
-        } else {
-            if (onSaveToggle) {
-                onSaveToggle(pub.id, false);
-            }
-
-            const { error } = await supabase
-                .from('saves')
-                .delete()
-                .eq('pub_id', pub.id)
-                .eq('user_id', user.id);
-
-            setIsSaving(false);
-
-            if (!error) {
-                dispatch(setPubSave({ id: pub.id, value: false }));
-            } else {
-                if (onSaveToggle) {
-                    onSaveToggle(pub.id, true);
-                }
-
-                console.error(error);
-            }
-        }
-    }, [user, dispatch, isSaving, onSaveToggle, pub]);
-
     return (
         <Pressable
             style={[styles.container, { width: COMPONENT_WIDTH }]}
@@ -117,21 +57,6 @@ export default function PubListItem({ pub, onSaveToggle }: PubListItemProps) {
                     { height: COMPONENT_WIDTH / ASPECT_RATIO },
                 ]}
             />
-            <View style={styles.heartContainer}>
-                <Pressable onPress={toggleLike}>
-                    <TouchableOpacity>
-                        {pub.saved ? (
-                            <Ionicons name="heart" size={14} color="#dc2626" />
-                        ) : (
-                            <Ionicons
-                                name="heart-outline"
-                                size={14}
-                                color="#dc2626"
-                            />
-                        )}
-                    </TouchableOpacity>
-                </Pressable>
-            </View>
             <PubInfo pub={pub} />
         </Pressable>
     );
