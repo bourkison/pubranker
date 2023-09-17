@@ -35,7 +35,7 @@ export default function BottomSheetPubList({ pubs }: BottomSheetPubListProps) {
             ListHeaderComponent={
                 <View style={styles.headerContainer}>
                     <Text style={styles.headerText}>
-                        {resultsAmount} Result{resultsAmount === 1 ? '' : 's'}
+                        {resultsAmount} Pub{resultsAmount === 1 ? '' : 's'}
                     </Text>
                 </View>
             }

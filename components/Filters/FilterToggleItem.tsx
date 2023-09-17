@@ -27,14 +27,14 @@ export default function FilterToggleItem({
         if (state === true) {
             return {
                 backgroundColor: SUCCESS_COLOR,
-                borderWidth: 0,
+                borderColor: SUCCESS_COLOR,
                 width: styles.radioButton.width + BORDER_WIDTH,
                 height: styles.radioButton.height + BORDER_WIDTH,
             };
         } else if (state === false) {
             return {
                 backgroundColor: FAIL_COLOR,
-                borderWidth: 0,
+                borderColor: FAIL_COLOR,
                 width: styles.radioButton.width + BORDER_WIDTH,
                 height: styles.radioButton.height + BORDER_WIDTH,
             };

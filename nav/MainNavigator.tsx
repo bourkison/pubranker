@@ -29,7 +29,11 @@ export default function MainNavigator() {
                 component={PubView}
                 options={{ headerShown: false }}
             />
-            <Stack.Screen name="Suggestions" component={Suggestions} />
+            <Stack.Screen
+                name="Suggestions"
+                component={Suggestions}
+                options={{ headerShown: false }}
+            />
         </Stack.Navigator>
     );
 }

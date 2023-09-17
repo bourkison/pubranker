@@ -7,47 +7,11 @@ import DraughtBeersList from '@/components/Beers/DraughtBeersList';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
+import PubFeature from '@/components/Pubs/PubFeature';
 
 type PubFeaturesProps = {
     pub: PubSchema;
 };
-
-type FeatureProps = {
-    title: string;
-    input: boolean | null;
-};
-
-const TRUE_COLOR = '#000';
-const FALSE_COLOR = '#A3A3A3';
-
-function Feature({ input, title }: FeatureProps) {
-    if (input === null) {
-        return null;
-    }
-
-    return (
-        <View
-            style={[
-                styles.featureContainer,
-                input
-                    ? styles.trueFeatureContainer
-                    : styles.falseFeatureContainer,
-            ]}>
-            {input ? (
-                <Octicons name="check" size={12} color={TRUE_COLOR} />
-            ) : (
-                <Octicons name="x" size={12} color={FALSE_COLOR} />
-            )}
-            <Text
-                style={[
-                    styles.featureText,
-                    input ? styles.trueFeature : styles.falseFeature,
-                ]}>
-                {title}
-            </Text>
-        </View>
-    );
-}
 
 export default function PubFeatures({ pub }: PubFeaturesProps) {
     const navigation =
@@ -66,17 +30,17 @@ export default function PubFeatures({ pub }: PubFeaturesProps) {
             </View>
 
             <View style={styles.featureList}>
-                <Feature title="Reservable" input={pub.reservable} />
-                <Feature title="Free Wifi" input={pub.free_wifi} />
-                <Feature title="Dog Friendly" input={pub.dog_friendly} />
-                <Feature title="Kid Friendly" input={pub.kid_friendly} />
-                <Feature title="Rooftop" input={pub.rooftop} />
-                <Feature title="Garden" input={pub.beer_garden} />
-                <Feature title="Pool Tables" input={pub.pool_table} />
-                <Feature title="Darts" input={pub.dart_board} />
-                <Feature title="Foosball" input={pub.foosball_table} />
-                <Feature title="Live Sport" input={pub.live_sport} />
-                <Feature
+                <PubFeature title="Reservable" input={pub.reservable} />
+                <PubFeature title="Free Wifi" input={pub.free_wifi} />
+                <PubFeature title="Dog Friendly" input={pub.dog_friendly} />
+                <PubFeature title="Kid Friendly" input={pub.kid_friendly} />
+                <PubFeature title="Rooftop" input={pub.rooftop} />
+                <PubFeature title="Garden" input={pub.beer_garden} />
+                <PubFeature title="Pool Tables" input={pub.pool_table} />
+                <PubFeature title="Darts" input={pub.dart_board} />
+                <PubFeature title="Foosball" input={pub.foosball_table} />
+                <PubFeature title="Live Sport" input={pub.live_sport} />
+                <PubFeature
                     title="Wheelchair Accessible"
                     input={pub.wheelchair_accessible}
                 />
@@ -106,33 +70,6 @@ const styles = StyleSheet.create({
         fontSize: 12,
         marginRight: 2,
         fontWeight: '300',
-    },
-    featureContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 10,
-        borderWidth: 1,
-        borderRadius: 4,
-        marginHorizontal: 5,
-        paddingVertical: 2,
-        paddingHorizontal: 5,
-    },
-    trueFeatureContainer: {
-        borderColor: TRUE_COLOR,
-    },
-    falseFeatureContainer: {
-        borderColor: FALSE_COLOR,
-    },
-    featureText: {
-        fontSize: 12,
-    },
-    trueFeature: {
-        marginLeft: 3,
-    },
-    falseFeature: {
-        marginLeft: 3,
-        color: '#a3a3a3',
-        fontFamily: 'JostLight',
     },
     featureList: {
         flexDirection: 'row',

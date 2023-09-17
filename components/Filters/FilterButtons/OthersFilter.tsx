@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import FilterItem from '@/components/Filters/FilterItem';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import FilterToggleItem from '../FilterToggleItem';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { BoolOrUnset } from '@/types';
@@ -11,6 +11,7 @@ import {
     setState,
 } from '@/store/slices/explore';
 import { INITIAL_SEARCH_AMOUNT } from '@/constants';
+import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 
 export default function OthersFilter() {
     const dispatch = useAppDispatch();
@@ -65,7 +66,7 @@ export default function OthersFilter() {
             onClearPress={() => dispatch(resetFilters())}
             withBottomBar={true}
             bottomSheetContent={
-                <ScrollView style={styles.bottomSheetContainer}>
+                <BottomSheetScrollView style={styles.bottomSheetContainer}>
                     <View style={styles.headerContainer}>
                         <View>
                             <Text style={styles.bottomSheetHeader}>
@@ -149,7 +150,7 @@ export default function OthersFilter() {
                             }
                         />
                     </View>
-                </ScrollView>
+                </BottomSheetScrollView>
             }
             snapPoints={['80%']}
         />

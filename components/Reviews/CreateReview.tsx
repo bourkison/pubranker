@@ -11,7 +11,13 @@ import React, {
     useRef,
     useState,
 } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import {
+    View,
+    Text,
+    StyleSheet,
+    ActivityIndicator,
+    Pressable,
+} from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import StarRanker from '@/components/Utility/StarRanker';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
@@ -208,6 +214,7 @@ export default function CreateReview({
                     </View>
 
                     <BottomSheetTextInput
+                        value={content}
                         multiline={true}
                         placeholder="Add some extra information about your experience at the pub"
                         textAlignVertical="top"
@@ -243,10 +250,10 @@ export default function CreateReview({
                                 title="Beer"
                                 value={beer}
                                 onThumbsUp={() =>
-                                    setBeer(vibe === true ? null : true)
+                                    setBeer(beer === true ? null : true)
                                 }
                                 onThumbsDown={() =>
-                                    setBeer(vibe === false ? null : false)
+                                    setBeer(beer === false ? null : false)
                                 }
                             />
 
@@ -315,6 +322,7 @@ export default function CreateReview({
         setFood,
         service,
         setService,
+        content,
     ]);
 
     return (
@@ -336,7 +344,10 @@ export default function CreateReview({
                 <View style={styles.pageCountContainer}>
                     {Array.from(new Array(PAGES_AMOUNT)).map((_, index) => (
                         <>
-                            <View
+                            <Pressable
+                                onPress={() =>
+                                    page > index ? setPage(index) : undefined
+                                }
                                 style={[
                                     styles.pageCount,
                                     page >= index
@@ -352,10 +363,10 @@ export default function CreateReview({
                                     ]}>
                                     {index + 1}
                                 </Text>
-                            </View>
-                            {index < PAGES_AMOUNT - 1 ? (
+                            </Pressable>
+                            {index < PAGES_AMOUNT - 1 && (
                                 <View style={styles.pageCountSeparator} />
-                            ) : undefined}
+                            )}
                         </>
                     ))}
                 </View>

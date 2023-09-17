@@ -273,7 +273,7 @@ export default function PubHome({
                                     showActionSheetWithOptions(
                                         {
                                             options: [
-                                                'Save',
+                                                saved ? 'Unsave' : 'Save',
                                                 'Write Review',
                                                 'Suggest an edit',
                                                 'View on map',
@@ -285,6 +285,17 @@ export default function PubHome({
                                                 PRIMARY_COLOR,
                                         },
                                         selected => {
+                                            if (selected === 0) {
+                                                toggleLike();
+                                                return;
+                                            }
+
+                                            if (selected === 2) {
+                                                navigation.navigate(
+                                                    'Suggestions',
+                                                    { pub: route.params.pub },
+                                                );
+                                            }
                                             console.log('select', selected);
                                         },
                                     )

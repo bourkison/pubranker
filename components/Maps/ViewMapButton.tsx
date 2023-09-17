@@ -1,5 +1,5 @@
 import React, { MutableRefObject, useEffect } from 'react';
-import { View, StyleSheet, Pressable, Text } from 'react-native';
+import { View, StyleSheet, Pressable, Text, Keyboard } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchExplorePubs, setState } from '@/store/slices/explore';
@@ -47,6 +47,8 @@ export default function ViewMapButton({
     }, [expand, collapse, expandTimeout]);
 
     const openMap = () => {
+        Keyboard.dismiss();
+
         if (numPubsLoaded === 0) {
             // TODO: Instead fetch pubs within map object itself.
             dispatch(fetchExplorePubs({ amount: 25 }));
