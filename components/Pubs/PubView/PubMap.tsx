@@ -52,7 +52,6 @@ export default function PubMap({ pub }: PubMapProps) {
     return (
         <>
             <MapView
-                provider="google"
                 ref={mapRef}
                 initialRegion={{
                     latitude: pubLocation.coordinates[1],

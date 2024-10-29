@@ -22,6 +22,10 @@ export default function OverallRatings({
         [amountByRating],
     );
 
+    if (ratingsAmount === 0) {
+        return <></>;
+    }
+
     return (
         <View style={styles.container}>
             <View style={styles.numberedRatingsBarsContainer}>
