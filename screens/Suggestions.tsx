@@ -35,6 +35,8 @@ export default function Suggestions({
         value: boolean | null,
         func: (val: boolean | null) => void,
     ) => {
+        console.log('toggle', value);
+
         if (value === true) {
             func(false);
         }
