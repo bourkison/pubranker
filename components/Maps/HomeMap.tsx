@@ -121,7 +121,6 @@ export default function HomeMap() {
     return (
         <>
             <MapView
-                provider="google"
                 ref={MapRef}
                 showsUserLocation={true}
                 showsMyLocationButton={false}
