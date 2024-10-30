@@ -1,5 +1,5 @@
 import { supabase } from '@/services/supabase';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 
 type ProfileTopBarProps = {
@@ -32,6 +32,14 @@ export default function ProfileTopBar({ userId }: ProfileTopBarProps) {
         fetchAmounts();
     }, [userId]);
 
+    const reviewsText = useMemo<string>(() => {
+        if (numReviews === 1) {
+            return 'Review';
+        }
+
+        return 'Reviews';
+    }, [numReviews]);
+
     if (isLoading) {
         return (
             <View style={styles.topBarContainer}>
@@ -48,7 +56,7 @@ export default function ProfileTopBar({ userId }: ProfileTopBarProps) {
                 </View>
 
                 <View style={styles.topBarHeaderContainer}>
-                    <Text style={styles.topBarHeaderText}>Reviews</Text>
+                    <Text style={styles.topBarHeaderText}>{reviewsText}</Text>
                 </View>
             </View>
 

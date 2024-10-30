@@ -18,6 +18,9 @@ import { Text } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import BottomSheetPubItem from '@/components/Pubs/BottomSheetPubItem';
 import { User } from '@supabase/supabase-js';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { SavedNavigatorStackParamList } from '@/nav/SavedNavigator';
 
 export default function SavedPubs() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -29,6 +32,8 @@ export default function SavedPubs() {
     const [collectionsAmount, setCollectionsAmount] = useState(0);
 
     const { width } = useWindowDimensions();
+    const navigation =
+        useNavigation<StackNavigationProp<SavedNavigatorStackParamList>>();
 
     useEffect(() => {
         const fetchSavedPromise = (userData: User) => {
@@ -148,7 +153,9 @@ export default function SavedPubs() {
                     </View>
                 }
                 ListHeaderComponent={
-                    <TouchableOpacity style={styles.collectionsContainer}>
+                    <TouchableOpacity
+                        style={styles.collectionsContainer}
+                        onPress={() => navigation.navigate('CollectionsHome')}>
                         <View>
                             <Text style={styles.collectionsText}>
                                 {collectionsAmountText}
