@@ -1,58 +1,35 @@
+DO $$ DECLARE user_id uuid;
+
+BEGIN user_id := public.create_user('3@gmail.com', 'password');
+
+-- First create users_public
+INSERT INTO
+    public.users_public (id, name, profile_photo)
+VALUES
+    (user_id, 'Harrison', '123');
+
+-- Then create reviews
 insert into
-    auth.users (
-        instance_id,
+    public.reviews (
         id,
-        aud,
-        role,
-        email,
-        encrypted_password,
-        raw_app_meta_data,
-        raw_user_meta_data,
-        email_confirmed_at,
-        created_at
-    )
-values
-    (
-        '00000000-0000-0000-0000-000000000000',
-        '185f2f83-d63a-4c9b-b4a0-7e4a885799e2',
-        'authenticated',
-        'authenticated',
-        'harrisonbourke97@gmail.com',
-        '$2a$10$54Nv3gssrFzEo424i9ycdOwqcY0f8VFb1nqoxS2uVzapylTIIhdYy',
-        '{"provider":"email","providers":["email"]}',
-        '{}',
-        timezone('utc' :: text, now()),
-        timezone('utc' :: text, now())
-    );
-
-insert into
-    auth.identities (
-        provider_id,
+        created_at,
+        updated_at,
+        pub_id,
         user_id,
-        identity_data,
-        provider,
-        created_at
+        content,
+        editors_review,
+        rating
     )
 values
     (
-        '185f2f83-d63a-4c9b-b4a0-7e4a885799e2',
-        '185f2f83-d63a-4c9b-b4a0-7e4a885799e2',
-        json(
-            '{"sub": "185f2f83-d63a-4c9b-b4a0-7e4a885799e2",
-        "email": "harrisonbourke97@gmail.com",
-        "email_verified": false,
-        "phone_verified": false }'
-        ),
-        'harrisonbourke97@gmail.com',
-        timezone('utc' :: text, now())
+        1,
+        timezone('utc' :: text, now()),
+        timezone('utc' :: text, now()),
+        56,
+        user_id,
+        'Lorem ipsom dolor sit amet',
+        false,
+        4
     );
 
-insert into
-    public.users_public
-values
-    (
-        '185f2f83-d63a-4c9b-b4a0-7e4a885799e2',
-        timezone('utc' :: text, now()),
-        'Harrison',
-        '123'
-    );
+END $$;

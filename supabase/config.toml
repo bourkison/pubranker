@@ -73,4 +73,4 @@ url = ""
 
 [db.seed]
 enabled = true
-sql_paths = ['./seed/users.sql', './seed/pubs.sql', './seed/reviews.sql']
+sql_paths = ['./seed/pubs.sql', './seed/users.sql']
