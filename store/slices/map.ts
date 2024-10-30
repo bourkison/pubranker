@@ -87,7 +87,7 @@ export const fetchMapPubs = createAsyncThunk<
     console.log('pubs pulled', data);
 
     if (error) {
-        console.error('error pulling map pubs', data, error);
+        console.error('error pulling map pubs', error);
         return rejectWithValue({ message: error.message, code: error.code });
     }
 
