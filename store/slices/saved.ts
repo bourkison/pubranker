@@ -85,7 +85,7 @@ export const toggleSave = createAsyncThunk<
             .from('saves')
             .delete()
             .eq('pub_id', id)
-            .eq('user_id', state.user.docData?.id);
+            .eq('user_id', state.user.docData?.id || '');
 
         console.log('RESPONSE:', data, error);
 
