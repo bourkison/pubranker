@@ -1,6 +1,6 @@
 DO $$ DECLARE user_id uuid;
 
-BEGIN user_id := public.create_user('3@gmail.com', 'password');
+BEGIN user_id := public.create_user('harrison@gmail.com', 'password');
 
 -- First create users_public
 INSERT INTO
