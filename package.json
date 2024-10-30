@@ -7,9 +7,7 @@
         "android": "expo start --android",
         "ios": "expo start --ios",
         "web": "expo start --web",
-        "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-        "test": "jest",
-        "db:seed": "cat ./seed/*.sql > ./supabase/seed.sql && supabase db reset"
+        "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
     },
     "dependencies": {
         "@expo/react-native-action-sheet": "^4.0.1",
