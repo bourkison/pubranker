@@ -31,8 +31,9 @@ export default function Review({ review }: ReviewProps) {
     const onTextLayout = useCallback(
         (e: NativeSyntheticEvent<TextLayoutEventData>) => {
             setLengthMore(e.nativeEvent.lines.length >= MAX_LINES_LENGTH);
+            console.log('TEXT', review);
         },
-        [],
+        [review],
     );
 
     const toggleText = () => {
@@ -61,6 +62,7 @@ export default function Review({ review }: ReviewProps) {
                                             : 'rgba(0, 0, 0, 0.2)'
                                     }
                                 />
+                                {/* <Text>{JSON.stringify(review.rating)}</Text> */}
                             </View>
                         ))}
                         <Text style={styles.dateText}>

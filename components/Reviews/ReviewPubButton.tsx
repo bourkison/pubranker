@@ -30,6 +30,7 @@ export default function ReviewPubButton({ pub }: ReviewPubButtonProps) {
         useCallback(() => {
             const checkIfReviewed = async () => {
                 if (!user) {
+                    setIsLoading(false);
                     return;
                 }
 

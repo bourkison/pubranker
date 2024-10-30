@@ -26,21 +26,27 @@ export default function PubReviews({ pub }: PubReviewsProps) {
         const fetchReviews = async () => {
             setIsLoading(true);
 
-            const { data, error } = await supabase
+            let query = supabase
                 .from('user_reviews')
                 .select()
                 .eq('pub_id', pub.id)
                 .neq('content', null)
-                .neq('content', '')
-                .neq('user_id', user?.id)
-                .order('created_at', { ascending: false });
+                .neq('content', '');
+
+            if (user?.id) {
+                query = query.neq('user_id', user?.id || '');
+            }
+
+            const { data, error } = await query.order('created_at', {
+                ascending: false,
+            });
 
             if (error) {
                 console.error(error);
                 return;
             }
 
-            console.log('reviews', data.length, reviews.length);
+            console.log('reviews', data.length, data);
 
             setReviews(data as UserReviewType[]);
             setIsLoading(false);
