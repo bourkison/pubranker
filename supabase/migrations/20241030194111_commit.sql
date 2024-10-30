@@ -24,7 +24,7 @@ alter table "public"."pub_schema" add column "review_sevens" integer not null;
 
 alter table "public"."pub_schema" add column "review_sixes" integer not null;
 
-alter table "public"."pub_schema" add column "review_tens" integer;
+alter table "public"."pub_schema" add column "review_tens" integer not null;
 
 alter table "public"."pub_schema" add column "review_threes" integer not null;
 

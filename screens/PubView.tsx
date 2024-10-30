@@ -45,6 +45,7 @@ import { UserReviewType } from '@/types';
 import { PubViewContext } from '@/context/pubViewContext';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setPubSave } from '@/store/slices/explore';
+import RatingsSummary from '@/components/Ratings/RatingsSummary';
 
 export default function PubHome({
     route,
@@ -417,6 +418,26 @@ export default function PubHome({
                                 <PubDescription pub={route.params.pub} />
                             </View>
 
+                            <View style={styles.summaryContainer}>
+                                <RatingsSummary
+                                    header="Ratings"
+                                    totalRating={route.params.pub.rating}
+                                    ratings={[
+                                        route.params.pub.review_ones,
+                                        route.params.pub.review_twos,
+                                        route.params.pub.review_threes,
+                                        route.params.pub.review_fours,
+                                        route.params.pub.review_fives,
+                                        route.params.pub.review_sixes,
+                                        route.params.pub.review_sevens,
+                                        route.params.pub.review_eights,
+                                        route.params.pub.review_nines,
+                                        route.params.pub.review_tens,
+                                    ]}
+                                    ratingsHeight={80}
+                                />
+                            </View>
+
                             <View>
                                 <PubFeatures pub={route.params.pub} />
                             </View>
@@ -578,5 +599,9 @@ const styles = StyleSheet.create({
         fontSize: 10,
         color: '#fff',
         fontWeight: '300',
+    },
+    summaryContainer: {
+        borderBottomWidth: 1,
+        borderColor: '#E5E7EB',
     },
 });
