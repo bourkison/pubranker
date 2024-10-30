@@ -1,13 +1,13 @@
 import React from 'react';
 
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Saved from '@/screens/Saved';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { requestBackgroundPermissionsAsync } from 'expo-location';
 import Profile from '@/screens/Profile';
 import Explore from '@/screens/Explore';
 import { SECONDARY_COLOR } from '@/constants';
 import Feed from '@/screens/Feed';
+import SavedNavigator from './SavedNavigator';
 
 export type BottomTabNavigatorParamList = {
     Explore: undefined;
@@ -43,7 +43,7 @@ export default function BottomTabNavigator() {
             />
             <Tab.Screen
                 name="Saved"
-                component={Saved}
+                component={SavedNavigator}
                 options={{
                     tabBarIcon: ({ size, focused }) => (
                         <Ionicons
