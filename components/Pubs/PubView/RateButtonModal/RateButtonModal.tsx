@@ -5,6 +5,7 @@ import { Text, StyleSheet, Pressable, View } from 'react-native';
 import { SimpleLineIcons } from '@expo/vector-icons';
 import { BottomSheetBackdrop, BottomSheetModal } from '@gorhom/bottom-sheet';
 import TopSection from './TopSection';
+import RateSection from './RateSection';
 
 type RateButtonProps = {
     pub: PubSchema;
@@ -41,10 +42,24 @@ export default function RateButtonModal({ pub }: RateButtonProps) {
                         opacity={0.8}
                     />
                 )}
-                snapPoints={[400]}>
+                snapPoints={[420]}>
                 <View>
                     <View style={styles.modalSection}>
-                        <TopSection pub={pub} />
+                        <View style={styles.modalSubsection}>
+                            <TopSection pub={pub} />
+                        </View>
+
+                        <View style={styles.modalSubsection}>
+                            <RateSection pub={pub} />
+                        </View>
+
+                        <View style={styles.modalSubsection}>
+                            <Text style={styles.modalOptionText}>Review</Text>
+                        </View>
+
+                        <View style={styles.modalSubsection}>
+                            <Text style={styles.modalOptionText}>Share</Text>
+                        </View>
                     </View>
                     <View style={styles.modalSection}>
                         <Pressable>
@@ -80,7 +95,7 @@ const styles = StyleSheet.create({
     modalSection: {
         backgroundColor: '#fff',
         borderRadius: 6,
-        marginHorizontal: 6,
+        marginHorizontal: 10,
         shadowColor: '#000',
         shadowOpacity: 0.3,
         shadowOffset: {
@@ -94,5 +109,9 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 14,
         fontWeight: '600',
+    },
+    modalSubsection: {
+        borderBottomWidth: 1,
+        borderColor: '#E5E7EB',
     },
 });

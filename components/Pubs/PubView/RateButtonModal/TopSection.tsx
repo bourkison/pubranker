@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Ionicons, Feather, Octicons } from '@expo/vector-icons';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Ionicons, Feather } from '@expo/vector-icons';
 import { PubSchema } from '@/types';
 
 type TopSectionProps = {
@@ -12,12 +12,7 @@ const ICON_SIZE = 40;
 export default function TopSection({ pub }: TopSectionProps) {
     return (
         <View style={styles.container}>
-            <View style={styles.column}>
-                <Octicons name="pencil" size={ICON_SIZE} color={'#000'} />
-                <Text style={styles.headerText}>Review</Text>
-            </View>
-
-            <View style={styles.column}>
+            <TouchableOpacity style={styles.column}>
                 {pub.saved ? (
                     <Ionicons name="heart" size={ICON_SIZE} color="#dc2626" />
                 ) : (
@@ -28,12 +23,21 @@ export default function TopSection({ pub }: TopSectionProps) {
                     />
                 )}
                 <Text style={styles.headerText}>Favourite</Text>
-            </View>
+            </TouchableOpacity>
 
-            <View style={styles.column}>
+            <TouchableOpacity style={styles.column}>
                 <Feather name="plus" size={ICON_SIZE} color={'#000'} />
                 <Text style={styles.headerText}>Add to List</Text>
-            </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.column}>
+                <Ionicons
+                    name="share-outline"
+                    size={ICON_SIZE}
+                    color={'#000'}
+                />
+                <Text style={styles.headerText}>Share</Text>
+            </TouchableOpacity>
         </View>
     );
 }
@@ -50,5 +54,6 @@ const styles = StyleSheet.create({
     headerText: {
         marginTop: 5,
         fontWeight: '300',
+        fontSize: 12,
     },
 });
