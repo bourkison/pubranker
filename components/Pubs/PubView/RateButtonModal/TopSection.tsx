@@ -1,8 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Ionicons, Feather } from '@expo/vector-icons';
+import { Ionicons, Feather, Octicons } from '@expo/vector-icons';
 import { PubSchema } from '@/types';
-import { GOLD_RATINGS_COLOR } from '@/constants';
 
 type TopSectionProps = {
     pub: PubSchema;
@@ -14,7 +13,7 @@ export default function TopSection({ pub }: TopSectionProps) {
     return (
         <View style={styles.container}>
             <View style={styles.column}>
-                <Ionicons name="star-outline" size={ICON_SIZE} color={'#000'} />
+                <Octicons name="pencil" size={ICON_SIZE} color={'#000'} />
                 <Text style={styles.headerText}>Review</Text>
             </View>
 
