@@ -21,7 +21,7 @@ import {
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import StarRanker from '@/components/Utility/StarRanker';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
-import { FAIL_COLOR, SECONDARY_COLOR, SUCCESS_COLOR } from '@/constants';
+import { FAIL_COLOR, PRIMARY_COLOR, SUCCESS_COLOR } from '@/constants';
 import { Ionicons } from '@expo/vector-icons';
 import { UserReviewType } from '@/types';
 import { useAppSelector } from '@/store/hooks';
@@ -426,11 +426,11 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         justifyContent: 'center',
         alignItems: 'center',
-        borderColor: SECONDARY_COLOR,
+        borderColor: PRIMARY_COLOR,
         borderWidth: 1,
     },
     activePageCount: {
-        backgroundColor: SECONDARY_COLOR,
+        backgroundColor: PRIMARY_COLOR,
     },
     inactivePageCount: {
         backgroundColor: 'transparent',

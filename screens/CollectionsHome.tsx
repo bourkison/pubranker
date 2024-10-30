@@ -6,10 +6,11 @@ import {
     TouchableOpacity,
     StyleSheet,
 } from 'react-native';
-import { Feather, Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { SavedNavigatorStackParamList } from '@/nav/SavedNavigator';
+import CreateCollectionIcon from '@/components/Collections/CreateCollectionIcon';
 
 export default function CollectionsHome() {
     const navigation =
@@ -28,9 +29,9 @@ export default function CollectionsHome() {
                     <Text style={styles.headerText}>Collections</Text>
                 </View>
 
-                <TouchableOpacity style={styles.menuContainer}>
-                    <Feather name="plus" size={18} />
-                </TouchableOpacity>
+                <View style={styles.menuContainer}>
+                    <CreateCollectionIcon />
+                </View>
             </View>
             <View />
         </SafeAreaView>

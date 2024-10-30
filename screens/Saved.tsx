@@ -21,6 +21,7 @@ import { User } from '@supabase/supabase-js';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { SavedNavigatorStackParamList } from '@/nav/SavedNavigator';
+import CreateCollectionIcon from '@/components/Collections/CreateCollectionIcon';
 
 export default function SavedPubs() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -72,7 +73,7 @@ export default function SavedPubs() {
                 const { count: collectionsCount, error: collectionsError } =
                     await supabase
                         .from('collections')
-                        .select('', { count: 'exact' })
+                        .select('count', { count: 'exact' })
                         .eq('user_id', userData.id);
 
                 if (collectionsError) {
@@ -116,7 +117,7 @@ export default function SavedPubs() {
             return 'No collections';
         }
 
-        if (collectionsAmount) {
+        if (collectionsAmount === 1) {
             return '1 collection';
         }
 
@@ -142,9 +143,9 @@ export default function SavedPubs() {
                     <Text style={styles.headerText}>Saved</Text>
                 </View>
 
-                <TouchableOpacity style={styles.menuContainer}>
-                    <Feather name="plus" size={18} />
-                </TouchableOpacity>
+                <View style={styles.menuContainer}>
+                    <CreateCollectionIcon />
+                </View>
             </View>
             <FlatList
                 ListEmptyComponent={

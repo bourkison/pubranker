@@ -6,7 +6,9 @@ import CollectionsHome from '@/screens/CollectionsHome';
 export type SavedNavigatorStackParamList = {
     SavedHome: undefined;
     CollectionsHome: undefined;
-    CollectionsView: undefined;
+    CollectionsView: {
+        collectionId: number;
+    };
 };
 
 const Stack = createStackNavigator<SavedNavigatorStackParamList>();
