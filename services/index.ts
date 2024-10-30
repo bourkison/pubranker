@@ -372,3 +372,44 @@ export const editUserReview = (
         updated_at: review.updated_at || '',
     };
 };
+
+export const convertFormattedPubsToPubSchema = (
+    input: Database['public']['Views']['formatted_pubs']['Row'],
+): Database['public']['Tables']['pub_schema']['Row'] => {
+    return {
+        ...input,
+        address: input.address || '',
+        description: input.description || '',
+        dist_meters: 0, // TODO: calculate distance
+        google_id: input.google_id || '',
+        id: input.id || 1,
+        location: input.location || '',
+        name: input.name || '',
+        num_reviews: input.num_reviews || 0,
+        opening_hours: input.opening_hours || '',
+        phone_number: input.phone_number || '',
+        photos: input.photos || [],
+        rating: input.rating || 0,
+        review_beer_amount: input.review_beer_amount || 0,
+        review_food_amount: input.review_food_amount || 0,
+        review_location_amount: input.review_location_amount || 0,
+        review_music_amount: input.review_music_amount || 0,
+        review_negative_beer_amount: input.negative_review_beer_amount || 0,
+        review_negative_food_amount: input.negative_review_food_amount || 0,
+        review_negative_location_amount:
+            input.negative_review_location_amount || 0,
+        review_negative_music_amount: input.negative_review_music_amount || 0,
+        review_negative_service_amount:
+            input.negative_review_service_amount || 0,
+        review_negative_vibe_amount: input.negative_review_vibe_amount || 0,
+        review_service_amount: input.review_service_amount || 0,
+        review_stars_five: input.review_stars_five || 0,
+        review_stars_four: input.review_stars_four || 0,
+        review_stars_one: input.review_stars_one || 0,
+        review_stars_three: input.review_stars_three || 0,
+        review_stars_two: input.review_stars_two || 0,
+        review_vibe_amount: input.review_vibe_amount || 0,
+        saved: input.saved || false,
+        website: input.website || '',
+    };
+};

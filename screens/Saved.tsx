@@ -1,5 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import React, { useEffect, useState } from 'react';
 import {
     SafeAreaView,
     FlatList,
@@ -7,57 +6,127 @@ import {
     View,
     StyleSheet,
     RefreshControl,
+    TouchableOpacity,
+    useWindowDimensions,
 } from 'react-native';
 import Unauthorized from '@/screens/Unauthorized';
 
-import { fetchSavedPubs } from '@/store/slices/saved';
-import DiscoverPub from '@/components/Pubs/DiscoverPub';
+import { Database } from '@/types/schema';
+import { supabase } from '@/services/supabase';
+import { convertFormattedPubsToPubSchema } from '@/services';
+import { Text } from 'react-native';
+import { Feather, SimpleLineIcons } from '@expo/vector-icons';
+import BottomSheetPubItem from '@/components/Pubs/BottomSheetPubItem';
 
 export default function SavedPubs() {
-    const loggedIn = useAppSelector(state => state.user.loggedIn);
-    const user = useAppSelector(state => state.user.docData);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+    const [pubs, setPubs] = useState<
+        Database['public']['Tables']['pub_schema']['Row'][]
+    >([]);
 
-    const isLoading = useAppSelector(state => state.saved.isLoading);
-    const isRefreshing = useAppSelector(state => state.saved.isRefreshing);
-    const savedPubs = useAppSelector(state => state.saved.pubs);
+    const { width } = useWindowDimensions();
 
-    const dispatch = useAppDispatch();
+    useEffect(() => {
+        const fetchSaved = async () => {
+            setIsLoading(true);
+            setIsLoggedIn(false);
 
-    const fetchPubs = useCallback(
-        async (refreshing: boolean) => {
-            if (!user) {
+            const { data: userData, error: userError } =
+                await supabase.auth.getUser();
+
+            if (userError) {
+                console.warn(userError);
+                setIsLoading(false);
                 return;
             }
 
-            dispatch(fetchSavedPubs({ amount: 10, id: user.id, refreshing }));
-        },
-        [dispatch, user],
-    );
+            setIsLoggedIn(true);
 
-    useEffect(() => {
-        if (!loggedIn || !user) {
-            return;
-        }
+            const { data: savesData, error: savesError } = await supabase
+                .from('saves')
+                .select()
+                .eq('user_id', userData.user.id)
+                .order('created_at', { ascending: false });
 
-        fetchPubs(false);
-    }, [loggedIn, user, fetchPubs]);
+            if (savesError) {
+                console.error(savesError);
+                setIsLoading(false);
+                return;
+            }
 
-    if (!loggedIn) {
+            console.log('saves', savesData);
+
+            const { data, error } = await supabase
+                .from('formatted_pubs')
+                .select()
+                .in(
+                    'id',
+                    savesData.map(s => s.pub_id),
+                );
+
+            if (error) {
+                console.error(error);
+                setIsLoading(false);
+                return;
+            }
+
+            console.log('pubs', data);
+
+            setIsLoading(false);
+            setPubs(data.map(d => convertFormattedPubsToPubSchema(d)));
+        };
+
+        fetchSaved();
+    }, []);
+
+    if (isLoading) {
+        return <ActivityIndicator />;
+    }
+
+    if (!isLoggedIn) {
         return <Unauthorized type="saved" />;
     }
 
     return (
         <SafeAreaView style={styles.container}>
+            <View style={styles.headerContainer}>
+                <TouchableOpacity style={styles.settingsContainer}>
+                    <Feather name="settings" size={18} />
+                </TouchableOpacity>
+
+                <View style={styles.headerTextContainer}>
+                    <Text style={styles.headerText}>Saved</Text>
+                </View>
+
+                <TouchableOpacity style={styles.menuContainer}>
+                    <SimpleLineIcons name="options" size={18} />
+                </TouchableOpacity>
+            </View>
             <FlatList
                 ListEmptyComponent={
-                    isLoading ? <ActivityIndicator /> : <View />
+                    <View>
+                        <Text>Empty</Text>
+                    </View>
                 }
-                data={savedPubs}
-                renderItem={({ item }) => <DiscoverPub pub={item} />}
+                ListHeaderComponent={<View style={styles.marginTopView} />}
+                data={pubs}
+                renderItem={({ item }) => (
+                    <View
+                        style={{
+                            width,
+                        }}>
+                        <BottomSheetPubItem pub={item} />
+                    </View>
+                )}
                 keyExtractor={item => item.id.toString()}
                 refreshControl={
                     <RefreshControl
-                        onRefresh={() => fetchPubs(true)}
+                        onRefresh={() => {
+                            setIsRefreshing(false);
+                            console.log('refresh');
+                        }}
                         refreshing={isRefreshing}
                     />
                 }
@@ -66,6 +135,37 @@ export default function SavedPubs() {
     );
 }
 
+const ICON_PADDING = 10;
+
 const styles = StyleSheet.create({
-    container: { flex: 1 },
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    marginTopView: {
+        marginTop: 10,
+    },
+    headerContainer: {
+        paddingVertical: 10,
+        alignItems: 'center',
+        flexDirection: 'row',
+        borderBottomWidth: 1,
+        borderColor: '#E5E7EB',
+    },
+    settingsContainer: {
+        paddingLeft: ICON_PADDING,
+    },
+    menuContainer: {
+        paddingRight: ICON_PADDING,
+    },
+    headerTextContainer: {
+        flex: 1,
+    },
+    headerText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        fontFamily: 'Jost',
+        textAlign: 'center',
+    },
 });
