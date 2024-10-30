@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
     SafeAreaView,
     FlatList,
@@ -15,8 +15,9 @@ import { Database } from '@/types/schema';
 import { supabase } from '@/services/supabase';
 import { convertFormattedPubsToPubSchema } from '@/services';
 import { Text } from 'react-native';
-import { Feather, SimpleLineIcons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import BottomSheetPubItem from '@/components/Pubs/BottomSheetPubItem';
+import { User } from '@supabase/supabase-js';
 
 export default function SavedPubs() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -25,10 +26,60 @@ export default function SavedPubs() {
     const [pubs, setPubs] = useState<
         Database['public']['Tables']['pub_schema']['Row'][]
     >([]);
+    const [collectionsAmount, setCollectionsAmount] = useState(0);
 
     const { width } = useWindowDimensions();
 
     useEffect(() => {
+        const fetchSavedPromise = (userData: User) => {
+            return new Promise<void>(async (resolve, reject) => {
+                const { data: savesData, error: savesError } = await supabase
+                    .from('saves')
+                    .select()
+                    .eq('user_id', userData.id)
+                    .order('created_at', { ascending: false });
+
+                if (savesError) {
+                    reject(savesError);
+                    return;
+                }
+
+                const { data, error } = await supabase
+                    .from('formatted_pubs')
+                    .select()
+                    .in(
+                        'id',
+                        savesData.map(s => s.pub_id),
+                    );
+
+                if (error) {
+                    reject(error);
+                    return;
+                }
+
+                setPubs(data.map(d => convertFormattedPubsToPubSchema(d)));
+                resolve();
+            });
+        };
+
+        const fetchCollectionsPromise = (userData: User) => {
+            return new Promise<void>(async (resolve, reject) => {
+                const { count: collectionsCount, error: collectionsError } =
+                    await supabase
+                        .from('collections')
+                        .select('', { count: 'exact' })
+                        .eq('user_id', userData.id);
+
+                if (collectionsError) {
+                    reject(collectionsError);
+                    return;
+                }
+
+                setCollectionsAmount(collectionsCount ?? 0);
+                resolve();
+            });
+        };
+
         const fetchSaved = async () => {
             setIsLoading(true);
             setIsLoggedIn(false);
@@ -44,42 +95,28 @@ export default function SavedPubs() {
 
             setIsLoggedIn(true);
 
-            const { data: savesData, error: savesError } = await supabase
-                .from('saves')
-                .select()
-                .eq('user_id', userData.user.id)
-                .order('created_at', { ascending: false });
-
-            if (savesError) {
-                console.error(savesError);
-                setIsLoading(false);
-                return;
-            }
-
-            console.log('saves', savesData);
-
-            const { data, error } = await supabase
-                .from('formatted_pubs')
-                .select()
-                .in(
-                    'id',
-                    savesData.map(s => s.pub_id),
-                );
-
-            if (error) {
-                console.error(error);
-                setIsLoading(false);
-                return;
-            }
-
-            console.log('pubs', data);
+            await Promise.allSettled([
+                fetchSavedPromise(userData.user),
+                fetchCollectionsPromise(userData.user),
+            ]);
 
             setIsLoading(false);
-            setPubs(data.map(d => convertFormattedPubsToPubSchema(d)));
         };
 
         fetchSaved();
     }, []);
+
+    const collectionsAmountText = useMemo<string>(() => {
+        if (collectionsAmount === 0) {
+            return 'No collections';
+        }
+
+        if (collectionsAmount) {
+            return '1 collection';
+        }
+
+        return `${collectionsAmount} collections`;
+    }, [collectionsAmount]);
 
     if (isLoading) {
         return <ActivityIndicator />;
@@ -93,7 +130,7 @@ export default function SavedPubs() {
         <SafeAreaView style={styles.container}>
             <View style={styles.headerContainer}>
                 <TouchableOpacity style={styles.settingsContainer}>
-                    <Feather name="settings" size={18} />
+                    <Feather name="settings" size={18} color="#00000000" />
                 </TouchableOpacity>
 
                 <View style={styles.headerTextContainer}>
@@ -101,7 +138,7 @@ export default function SavedPubs() {
                 </View>
 
                 <TouchableOpacity style={styles.menuContainer}>
-                    <SimpleLineIcons name="options" size={18} />
+                    <Feather name="plus" size={18} />
                 </TouchableOpacity>
             </View>
             <FlatList
@@ -110,7 +147,19 @@ export default function SavedPubs() {
                         <Text>Empty</Text>
                     </View>
                 }
-                ListHeaderComponent={<View style={styles.marginTopView} />}
+                ListHeaderComponent={
+                    <TouchableOpacity style={styles.collectionsContainer}>
+                        <View>
+                            <Text style={styles.collectionsText}>
+                                {collectionsAmountText}
+                            </Text>
+                        </View>
+
+                        <View>
+                            <Feather name="chevron-right" size={18} />
+                        </View>
+                    </TouchableOpacity>
+                }
                 data={pubs}
                 renderItem={({ item }) => (
                     <View
@@ -143,8 +192,19 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    marginTopView: {
-        marginTop: 10,
+    collectionsContainer: {
+        paddingVertical: 20,
+        borderBottomWidth: 1,
+        borderColor: '#E5E7EB',
+        marginBottom: 10,
+        paddingHorizontal: 20,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    collectionsText: {
+        fontSize: 14,
+        fontWeight: '300',
     },
     headerContainer: {
         paddingVertical: 10,
