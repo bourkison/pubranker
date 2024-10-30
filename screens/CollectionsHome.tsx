@@ -26,7 +26,7 @@ export default function CollectionsHome() {
                 </TouchableOpacity>
 
                 <View style={styles.headerTextContainer}>
-                    <Text style={styles.headerText}>Collections</Text>
+                    <Text style={styles.headerText}>Lists</Text>
                 </View>
 
                 <View style={styles.menuContainer}>

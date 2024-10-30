@@ -104,7 +104,7 @@ export default function CreateCollectionIcon() {
                 )}>
                 <View style={styles.bottomSheetContainer}>
                     <View>
-                        <Text style={styles.headerText}>Collection name</Text>
+                        <Text style={styles.headerText}>List name</Text>
                     </View>
 
                     <View>

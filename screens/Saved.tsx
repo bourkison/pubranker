@@ -114,14 +114,14 @@ export default function SavedPubs() {
 
     const collectionsAmountText = useMemo<string>(() => {
         if (collectionsAmount === 0) {
-            return 'No collections';
+            return 'No lists';
         }
 
         if (collectionsAmount === 1) {
-            return '1 collection';
+            return '1 list';
         }
 
-        return `${collectionsAmount} collections`;
+        return `${collectionsAmount} lists`;
     }, [collectionsAmount]);
 
     if (isLoading) {

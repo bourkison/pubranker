@@ -8,6 +8,7 @@ import {
     TextLayoutEventData,
     TouchableOpacity,
 } from 'react-native';
+import RateButton from '@/components/Pubs/PubView/RateButtonModal/RateButtonModal';
 
 type PubDescriptionProps = {
     pub: PubSchema;
@@ -33,6 +34,9 @@ export default function PubDescription({ pub }: PubDescriptionProps) {
     return (
         <>
             <View style={styles.container}>
+                <View>
+                    <RateButton pub={pub} />
+                </View>
                 <Text
                     numberOfLines={textShown ? undefined : MAX_LINES_LENGTH}
                     style={styles.descriptionText}
