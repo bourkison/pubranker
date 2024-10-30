@@ -62,7 +62,7 @@ export default function PubReviews({ pub }: PubReviewsProps) {
 
     return (
         <View>
-            <OverallRatings
+            {/* <OverallRatings
                 rating={pub.rating}
                 amountByRating={[
                     pub.review_stars_one,
@@ -72,7 +72,7 @@ export default function PubReviews({ pub }: PubReviewsProps) {
                     pub.review_stars_five,
                 ]}
                 ratingsAmount={pub.num_reviews}
-            />
+            /> */}
             <ReviewPubButton pub={pub} />
             {!isLoading ? (
                 <View>

@@ -1,21 +1,28 @@
-import { PubSchema } from '@/types';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { GOLD_RATINGS_COLOR } from '@/constants';
-
-type RateSectionProps = {
-    pub: PubSchema;
-};
+import { supabase } from '@/services/supabase';
+import { PubSchema, UserReviewType } from '@/types';
 
 const STAR_SIZE = 40;
 const STAR_PADDING = 4;
 
-export default function RateSection({}: RateSectionProps) {
-    const [selected, setSelected] = useState(0);
-    const [containerWidth, setContainerWidth] = useState(0);
+type RateSectionProps = {
+    pub: PubSchema;
+    userReview: UserReviewType | null;
+    setUserReview: React.Dispatch<React.SetStateAction<UserReviewType | null>>;
+};
 
+export default function RateSection({
+    pub,
+    userReview,
+    setUserReview,
+}: RateSectionProps) {
+    const [containerWidth, setContainerWidth] = useState(0);
     const starContainerRef = useRef<View>(null);
+
+    const rating = useMemo(() => userReview?.rating || 0, [userReview]);
 
     const measureContainer = useCallback(() => {
         if (containerWidth !== 0) {
@@ -26,6 +33,49 @@ export default function RateSection({}: RateSectionProps) {
             setContainerWidth(width);
         });
     }, [containerWidth]);
+
+    const updateRating = useCallback(
+        (amount: number) => {
+            const originalAmount = rating;
+
+            const upsert = async () => {
+                const { data: userData, error: userError } =
+                    await supabase.auth.getUser();
+
+                if (userError) {
+                    console.error(userError);
+                    setUserReview(r =>
+                        r ? { ...r, rating: originalAmount } : null,
+                    );
+                    return;
+                }
+
+                const { error } = await supabase
+                    .from('reviews')
+                    .upsert(
+                        {
+                            rating: amount,
+                            pub_id: pub.id,
+                            user_id: userData.user.id,
+                        },
+                        { onConflict: 'pub_id, user_id' },
+                    )
+                    .eq('pub_id', pub.id)
+                    .eq('user_id', userData.user.id);
+
+                if (error) {
+                    console.error(error);
+                    setUserReview(r =>
+                        r ? { ...r, rating: originalAmount } : null,
+                    );
+                }
+            };
+
+            setUserReview(r => (r ? { ...r, rating: amount } : null));
+            upsert();
+        },
+        [pub, rating, setUserReview],
+    );
 
     const calculateStar = useCallback((sel: number, i: number) => {
         // Calc half star first
@@ -64,6 +114,7 @@ export default function RateSection({}: RateSectionProps) {
             <View style={styles.starsContainer}>
                 {Array.from(Array(5)).map((_, index) => (
                     <View
+                        key={index}
                         style={styles.starContainer}
                         ref={starContainerRef}
                         onLayout={measureContainer}>
@@ -75,7 +126,7 @@ export default function RateSection({}: RateSectionProps) {
                                     height: STAR_SIZE,
                                 },
                             ]}
-                            onPress={() => setSelected(index * 2 + 1)}
+                            onPress={() => updateRating(index * 2 + 1)}
                         />
                         <Pressable
                             style={[
@@ -85,9 +136,9 @@ export default function RateSection({}: RateSectionProps) {
                                     height: STAR_SIZE,
                                 },
                             ]}
-                            onPress={() => setSelected(index * 2 + 2)}
+                            onPress={() => updateRating(index * 2 + 2)}
                         />
-                        {calculateStar(selected, index)}
+                        {calculateStar(rating, index)}
                     </View>
                 ))}
             </View>

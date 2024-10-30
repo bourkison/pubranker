@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Ionicons, Feather } from '@expo/vector-icons';
+import { Ionicons, Feather, MaterialIcons } from '@expo/vector-icons';
 import { PubSchema } from '@/types';
 
 type TopSectionProps = {
@@ -31,12 +31,12 @@ export default function TopSection({ pub }: TopSectionProps) {
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.column}>
-                <Ionicons
-                    name="share-outline"
+                <MaterialIcons
+                    name="location-history"
                     size={ICON_SIZE}
                     color={'#000'}
                 />
-                <Text style={styles.headerText}>Share</Text>
+                <Text style={styles.headerText}>Check In</Text>
             </TouchableOpacity>
         </View>
     );

@@ -4,9 +4,9 @@ BEGIN user_id := public.create_user('harrison@gmail.com', 'password');
 
 -- First create users_public
 INSERT INTO
-    public.users_public (id, name, profile_photo)
+    public.users_public (id, name, profile_photo, username)
 VALUES
-    (user_id, 'Harrison', '');
+    (user_id, 'Harrison', '', 'bourkison');
 
 -- Then create reviews
 insert into

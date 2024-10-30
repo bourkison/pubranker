@@ -58,7 +58,7 @@ SELECT
     COALESCE(
         (avg(r.rating)) :: double precision,
         (0) :: double precision
-    ) AS rating,
+    ) / 2 AS rating,
     count(DISTINCT r.*) AS num_reviews,
     (
         count(
@@ -146,31 +146,61 @@ SELECT
             WHEN (r.rating = 1) THEN 1
             ELSE 0
         END
-    ) AS review_stars_one,
+    ) AS review_ones,
     sum(
         DISTINCT CASE
             WHEN (r.rating = 2) THEN 1
             ELSE 0
         END
-    ) AS review_stars_two,
+    ) AS review_twos,
     sum(
         DISTINCT CASE
             WHEN (r.rating = 3) THEN 1
             ELSE 0
         END
-    ) AS review_stars_three,
+    ) AS review_threes,
     sum(
         DISTINCT CASE
             WHEN (r.rating = 4) THEN 1
             ELSE 0
         END
-    ) AS review_stars_four,
+    ) AS review_fours,
     sum(
         DISTINCT CASE
             WHEN (r.rating = 5) THEN 1
             ELSE 0
         END
-    ) AS review_stars_five,
+    ) AS review_fives,
+    sum(
+        DISTINCT CASE
+            WHEN (r.rating = 6) THEN 1
+            ELSE 0
+        END
+    ) AS review_sixes,
+    sum(
+        DISTINCT CASE
+            WHEN (r.rating = 7) THEN 1
+            ELSE 0
+        END
+    ) AS review_sevens,
+    sum(
+        DISTINCT CASE
+            WHEN (r.rating = 8) THEN 1
+            ELSE 0
+        END
+    ) AS review_eights,
+    sum(
+        DISTINCT CASE
+            WHEN (r.rating = 9) THEN 1
+            ELSE 0
+        END
+    ) AS review_nines,
+    sum(
+        DISTINCT CASE
+            WHEN (r.rating = 10) THEN 1
+            ELSE 0
+        END
+    ) AS review_tens,
     p.description
 FROM
     (

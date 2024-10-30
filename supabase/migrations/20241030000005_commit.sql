@@ -44,11 +44,16 @@ select
 	p.negative_review_service_amount,
 	p.negative_review_vibe_amount,
 	p.review_service_amount,
-	p.review_stars_five,
-	p.review_stars_four,
-	p.review_stars_one,
-	p.review_stars_three,
-	p.review_stars_two,
+	p.review_tens,
+	p.review_nines,
+	p.review_eights,
+	p.review_sevens,
+	p.review_sixes,
+	p.review_fives,
+	p.review_fours,
+	p.review_ones,
+	p.review_threes,
+	p.review_twos,
 	p.review_vibe_amount
 from
     public.formatted_pubs p

@@ -34,18 +34,20 @@ export default function ReviewPubButton({ pub }: ReviewPubButtonProps) {
                     return;
                 }
 
-                const { data } = await supabase
+                const { data, error } = await supabase
                     .from('user_reviews')
                     .select()
                     .eq('pub_id', pub.id)
                     .eq('user_id', user.id)
-                    .limit(1);
+                    .limit(1)
+                    .single();
 
-                if (data && data.length) {
-                    setUserReview(data[0] as UserReviewType);
-                } else {
+                if (error) {
+                    console.error(error);
                     setUserReview(null);
                 }
+
+                setUserReview(data as UserReviewType);
 
                 setIsLoading(false);
             };

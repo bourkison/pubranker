@@ -1,11 +1,12 @@
 import { PRIMARY_COLOR } from '@/constants';
 import { PubSchema } from '@/types';
-import React, { useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { Text, StyleSheet, Pressable, View } from 'react-native';
 import { SimpleLineIcons } from '@expo/vector-icons';
 import { BottomSheetBackdrop, BottomSheetModal } from '@gorhom/bottom-sheet';
 import TopSection from './TopSection';
 import RateSection from './RateSection';
+import { useSharedPubViewContext } from '@/context/pubViewContext';
 
 type RateButtonProps = {
     pub: PubSchema;
@@ -13,15 +14,24 @@ type RateButtonProps = {
 
 export default function RateButtonModal({ pub }: RateButtonProps) {
     // const [isLoading, setIsLoading] = useState(false);
-
     const bottomSheetRef = useRef<BottomSheetModal>(null);
+
+    const { userReview, setUserReview } = useSharedPubViewContext();
+
+    const buttonText = useMemo<string>(() => {
+        if (userReview?.rating) {
+            return `Rated ${userReview.rating} stars`;
+        }
+
+        return 'Review, favourite, add to list, or more';
+    }, [userReview]);
 
     return (
         <>
             <Pressable
                 style={styles.button}
                 onPress={() => bottomSheetRef.current?.present()}>
-                <Text style={styles.buttonText}>Rate, save or add to list</Text>
+                <Text style={styles.buttonText}>{buttonText}</Text>
                 <SimpleLineIcons name="options" color={'#fff'} size={10} />
             </Pressable>
 
@@ -50,7 +60,11 @@ export default function RateButtonModal({ pub }: RateButtonProps) {
                         </View>
 
                         <View style={styles.modalSubsection}>
-                            <RateSection pub={pub} />
+                            <RateSection
+                                pub={pub}
+                                userReview={userReview}
+                                setUserReview={setUserReview}
+                            />
                         </View>
 
                         <View style={styles.modalSubsection}>
@@ -62,8 +76,15 @@ export default function RateButtonModal({ pub }: RateButtonProps) {
                         </View>
                     </View>
                     <View style={styles.modalSection}>
-                        <Pressable>
-                            <Text style={styles.modalOptionText}>Done</Text>
+                        <Pressable
+                            onPress={() => bottomSheetRef.current?.dismiss()}>
+                            <Text
+                                style={[
+                                    styles.modalOptionText,
+                                    styles.doneText,
+                                ]}>
+                                Done
+                            </Text>
                         </Pressable>
                     </View>
                 </View>
@@ -89,6 +110,7 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontWeight: '500',
     },
+
     backgroundModal: {
         backgroundColor: 'transparent',
     },
@@ -108,6 +130,8 @@ const styles = StyleSheet.create({
         paddingVertical: 15,
         textAlign: 'center',
         fontSize: 14,
+    },
+    doneText: {
         fontWeight: '600',
     },
     modalSubsection: {
