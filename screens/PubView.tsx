@@ -110,14 +110,13 @@ export default function PubHome({
 
     const withinScrollBoundsWorklet = (withAnimation: boolean) => {
         'worklet';
-        const { height: contentContainerHeight }: { height: number } =
-            measure(animatedContainerRef);
+        const measurement = measure(animatedContainerRef);
 
-        console.log('content container height', contentContainerHeight);
-
-        if (!contentContainerHeight) {
+        if (!measurement) {
             return;
         }
+
+        const { height: contentContainerHeight } = measurement;
 
         const screenHeightBeingUsed = height - width; // Height of content container if no translation and not including overflow
         const screenOverflow =
@@ -146,12 +145,13 @@ export default function PubHome({
             contextY.value = sTranslateY.value;
         })
         .onUpdate(e => {
-            const { height: contentContainerHeight }: { height: number } =
-                measure(animatedContainerRef);
+            const measurement = measure(animatedContainerRef);
 
-            if (!contentContainerHeight) {
+            if (!measurement) {
                 return;
             }
+
+            const { height: contentContainerHeight } = measurement;
 
             const screenHeightBeingUsed = height - width; // Height of pixels being used if not translation (and not including overflow)
             const screenOverflow =
