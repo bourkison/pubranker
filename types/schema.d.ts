@@ -98,6 +98,24 @@ export type Database = {
                 };
                 Relationships: [];
             };
+            collections: {
+                Row: {
+                    created_at: string;
+                    id: number;
+                    name: string;
+                };
+                Insert: {
+                    created_at?: string;
+                    id?: number;
+                    name: string;
+                };
+                Update: {
+                    created_at?: string;
+                    id?: number;
+                    name?: string;
+                };
+                Relationships: [];
+            };
             comment_likes: {
                 Row: {
                     comment_id: number;
@@ -580,24 +598,34 @@ export type Database = {
             };
             saves: {
                 Row: {
+                    collection_id: number | null;
                     created_at: string | null;
                     id: number;
                     pub_id: number;
                     user_id: string;
                 };
                 Insert: {
+                    collection_id?: number | null;
                     created_at?: string | null;
                     id?: number;
                     pub_id: number;
                     user_id?: string;
                 };
                 Update: {
+                    collection_id?: number | null;
                     created_at?: string | null;
                     id?: number;
                     pub_id?: number;
                     user_id?: string;
                 };
                 Relationships: [
+                    {
+                        foreignKeyName: 'saves_collection_id_fkey';
+                        columns: ['collection_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'collections';
+                        referencedColumns: ['id'];
+                    },
                     {
                         foreignKeyName: 'saves_pub_id_fkey';
                         columns: ['pub_id'];
@@ -620,18 +648,21 @@ export type Database = {
                     id: string;
                     name: string;
                     profile_photo: string | null;
+                    username: string;
                 };
                 Insert: {
                     created_at?: string | null;
                     id: string;
                     name: string;
                     profile_photo?: string | null;
+                    username: string;
                 };
                 Update: {
                     created_at?: string | null;
                     id?: string;
                     name?: string;
                     profile_photo?: string | null;
+                    username?: string;
                 };
                 Relationships: [];
             };
@@ -724,6 +755,7 @@ export type Database = {
                     location: boolean | null;
                     music: boolean | null;
                     pub_id: number | null;
+                    rating: number | null;
                     service: boolean | null;
                     total_helpfuls: number | null;
                     updated_at: string | null;
