@@ -34,7 +34,7 @@ export default function SearchSuggestionList({}: SearchSuggestionListProps) {
             type: 'pub',
             pub: pub,
             onPress() {
-                navigation.navigate('PubView', { pub });
+                navigation.navigate('PubView', { pubId: pub.id });
             },
         }));
 

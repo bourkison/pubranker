@@ -133,7 +133,9 @@ export default function SelectedPub({ pub }: SelectedPubProps) {
             <GestureDetector gesture={panGesture}>
                 <Pressable
                     style={styles.container}
-                    onPress={() => navigation.navigate('PubView', { pub })}>
+                    onPress={() =>
+                        navigation.navigate('PubView', { pubId: pub.id })
+                    }>
                     {imageUrl ? (
                         <Image
                             source={{ uri: imageUrl }}

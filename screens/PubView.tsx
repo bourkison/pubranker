@@ -9,6 +9,7 @@ import {
     useWindowDimensions,
     Pressable,
     TouchableOpacity,
+    ActivityIndicator,
 } from 'react-native';
 import { supabase } from '@/services/supabase';
 import {
@@ -30,7 +31,11 @@ import Animated, {
     withTiming,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
-import { distanceString, roundToNearest } from '@/services';
+import {
+    convertFormattedPubsToPubSchema,
+    distanceString,
+    roundToNearest,
+} from '@/services';
 import { Ionicons, SimpleLineIcons } from '@expo/vector-icons';
 import PubTopBar from '@/components/Pubs/PubTopBar';
 import PubDescription from '@/components/Pubs/PubView/PubDescription';
@@ -41,9 +46,9 @@ import PubReviews from '@/components/Reviews/PubReviews';
 import PubGallery from '../components/Pubs/PubView/PubGallery';
 import PubDetails from '@/components/Pubs/PubView/PubDetails';
 import { useActionSheet } from '@expo/react-native-action-sheet';
-import { UserReviewType } from '@/types';
+import { PubSchema, UserReviewType } from '@/types';
 import { PubViewContext } from '@/context/pubViewContext';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { useAppDispatch } from '@/store/hooks';
 import { setPubSave } from '@/store/slices/explore';
 import RatingsSummary from '@/components/Ratings/RatingsSummary';
 
@@ -56,11 +61,12 @@ export default function PubHome({
     const [reviews, setReviews] = useState<UserReviewType[]>([]);
     const [userReview, setUserReview] = useState<UserReviewType | null>(null);
 
-    const [saved, setSaved] = useState(route.params.pub.saved);
+    const [isLoading, setIsLoading] = useState(false);
+    const [pub, setPub] = useState<PubSchema>();
+    const [saved, setSaved] = useState(false);
 
     const { width, height } = useWindowDimensions();
 
-    const user = useAppSelector(state => state.user.docData);
     const dispatch = useAppDispatch();
     const [isSaving, setIsSaving] = useState(false);
 
@@ -69,11 +75,38 @@ export default function PubHome({
     const animatedContainerRef = useAnimatedRef();
 
     useEffect(() => {
-        const url = supabase.storage
-            .from('pubs')
-            .getPublicUrl(route.params.pub.photos[0]);
+        const fetchPub = async () => {
+            setIsLoading(true);
+
+            const { data, error } = await supabase
+                .from('formatted_pubs')
+                .select()
+                .eq('id', route.params.pubId)
+                .limit(1)
+                .single();
+
+            if (error) {
+                console.error(error);
+                setIsLoading(false);
+                return;
+            }
+
+            setIsLoading(false);
+            setPub(convertFormattedPubsToPubSchema(data));
+            setSaved(convertFormattedPubsToPubSchema(data).saved);
+        };
+
+        fetchPub();
+    }, [route]);
+
+    useEffect(() => {
+        if (!pub) {
+            return;
+        }
+
+        const url = supabase.storage.from('pubs').getPublicUrl(pub.photos[0]);
         setHeaderImageUrl(url.data.publicUrl);
-    }, [route.params.pub]);
+    }, [pub]);
 
     const insets = useSafeAreaInsets();
 
@@ -191,26 +224,34 @@ export default function PubHome({
     };
 
     const toggleLike = useCallback(async () => {
-        if (!user || isSaving) {
+        if (isSaving || !pub) {
             return;
         }
 
         setIsSaving(true);
 
-        if (!route.params.pub.saved) {
+        const { data: userData, error: userError } =
+            await supabase.auth.getUser();
+
+        if (userError) {
+            console.error(userError);
+            return;
+        }
+
+        if (!pub.saved) {
             setSaved(true);
 
             const { error } = await supabase.from('saves').insert({
-                pub_id: route.params.pub.id,
+                pub_id: pub.id,
             });
 
             setIsSaving(false);
 
             if (!error) {
-                dispatch(setPubSave({ id: route.params.pub.id, value: true }));
+                dispatch(setPubSave({ id: pub.id, value: true }));
 
                 if (route.params.onSaveToggle) {
-                    route.params.onSaveToggle(route.params.pub.id, true);
+                    route.params.onSaveToggle(pub.id, true);
                 }
             } else {
                 setSaved(false);
@@ -223,23 +264,31 @@ export default function PubHome({
             const { error } = await supabase
                 .from('saves')
                 .delete()
-                .eq('pub_id', route.params.pub.id)
-                .eq('user_id', user.id);
+                .eq('pub_id', pub.id)
+                .eq('user_id', userData.user.id);
 
             setIsSaving(false);
 
             if (!error) {
-                dispatch(setPubSave({ id: route.params.pub.id, value: false }));
+                dispatch(setPubSave({ id: pub.id, value: false }));
 
                 if (route.params.onSaveToggle) {
-                    route.params.onSaveToggle(route.params.pub.id, false);
+                    route.params.onSaveToggle(pub.id, false);
                 }
             } else {
                 setSaved(true);
                 console.error(error);
             }
         }
-    }, [route.params, user, dispatch, isSaving]);
+    }, [pub, dispatch, isSaving, route]);
+
+    if (isLoading) {
+        return <ActivityIndicator />;
+    }
+
+    if (!pub) {
+        return <Text>Pub error</Text>;
+    }
 
     return (
         <PubViewContext.Provider
@@ -294,7 +343,7 @@ export default function PubHome({
                                             if (selected === 2) {
                                                 navigation.navigate(
                                                     'Suggestions',
-                                                    { pub: route.params.pub },
+                                                    { pub: pub },
                                                 );
                                             }
                                             console.log('select', selected);
@@ -331,7 +380,7 @@ export default function PubHome({
                                                 styles.headerContentContainer
                                             }>
                                             <Text style={styles.titleText}>
-                                                {route.params.pub.name}
+                                                {pub.name}
                                             </Text>
                                             <View
                                                 style={
@@ -353,16 +402,10 @@ export default function PubHome({
                                                             styles.ratingsText
                                                         }>
                                                         {roundToNearest(
-                                                            route.params.pub
-                                                                .rating,
+                                                            pub.rating,
                                                             0.1,
                                                         ).toFixed(1)}{' '}
-                                                        (
-                                                        {
-                                                            route.params.pub
-                                                                .num_reviews
-                                                        }
-                                                        )
+                                                        ({pub.num_reviews})
                                                     </Text>
                                                 </View>
                                                 <View
@@ -375,8 +418,7 @@ export default function PubHome({
                                                             styles.distanceText
                                                         }>
                                                         {distanceString(
-                                                            route.params.pub
-                                                                .dist_meters,
+                                                            pub.dist_meters,
                                                         )}
                                                     </Text>
                                                 </View>
@@ -412,34 +454,34 @@ export default function PubHome({
                                 rContentContainerStyle,
                             ]}>
                             <View>
-                                <PubTopBar pub={route.params.pub} />
+                                <PubTopBar pub={pub} />
                             </View>
                             <View>
-                                <PubDescription pub={route.params.pub} />
+                                <PubDescription pub={pub} />
                             </View>
 
                             <View style={styles.summaryContainer}>
                                 <RatingsSummary
                                     header="Ratings"
-                                    totalRating={route.params.pub.rating}
+                                    totalRating={pub.rating}
                                     ratings={[
-                                        route.params.pub.review_ones,
-                                        route.params.pub.review_twos,
-                                        route.params.pub.review_threes,
-                                        route.params.pub.review_fours,
-                                        route.params.pub.review_fives,
-                                        route.params.pub.review_sixes,
-                                        route.params.pub.review_sevens,
-                                        route.params.pub.review_eights,
-                                        route.params.pub.review_nines,
-                                        route.params.pub.review_tens,
+                                        pub.review_ones,
+                                        pub.review_twos,
+                                        pub.review_threes,
+                                        pub.review_fours,
+                                        pub.review_fives,
+                                        pub.review_sixes,
+                                        pub.review_sevens,
+                                        pub.review_eights,
+                                        pub.review_nines,
+                                        pub.review_tens,
                                     ]}
                                     ratingsHeight={80}
                                 />
                             </View>
 
                             <View>
-                                <PubFeatures pub={route.params.pub} />
+                                <PubFeatures pub={pub} />
                             </View>
 
                             <View>
@@ -447,11 +489,7 @@ export default function PubHome({
                                     data={[
                                         {
                                             title: 'Gallery',
-                                            component: (
-                                                <PubGallery
-                                                    pub={route.params.pub}
-                                                />
-                                            ),
+                                            component: <PubGallery pub={pub} />,
                                         },
                                     ]}
                                 />
@@ -461,20 +499,12 @@ export default function PubHome({
                                 <TopTabs
                                     data={[
                                         {
-                                            title: `Reviews (${route.params.pub.num_reviews})`,
-                                            component: (
-                                                <PubReviews
-                                                    pub={route.params.pub}
-                                                />
-                                            ),
+                                            title: `Reviews (${pub.num_reviews})`,
+                                            component: <PubReviews pub={pub} />,
                                         },
                                         {
-                                            title: `User Photos (${route.params.pub.photos.length})`,
-                                            component: (
-                                                <PubGallery
-                                                    pub={route.params.pub}
-                                                />
-                                            ),
+                                            title: `User Photos (${pub.photos.length})`,
+                                            component: <PubGallery pub={pub} />,
                                         },
                                         {
                                             title: 'Menu',
@@ -486,11 +516,7 @@ export default function PubHome({
                                         },
                                         {
                                             title: 'Additional Information',
-                                            component: (
-                                                <PubDetails
-                                                    pub={route.params.pub}
-                                                />
-                                            ),
+                                            component: <PubDetails pub={pub} />,
                                         },
                                         {
                                             title: 'Similar Pubs',

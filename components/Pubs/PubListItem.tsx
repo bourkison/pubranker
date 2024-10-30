@@ -48,7 +48,7 @@ export default function PubListItem({ pub, onSaveToggle }: PubListItemProps) {
         <Pressable
             style={[styles.container, { width: COMPONENT_WIDTH }]}
             onPress={() =>
-                navigation.navigate('PubView', { pub, onSaveToggle })
+                navigation.navigate('PubView', { pubId: pub.id, onSaveToggle })
             }>
             <Image
                 source={imageUrl ? { uri: imageUrl } : NO_IMAGE}

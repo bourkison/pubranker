@@ -8,7 +8,7 @@ import { PubSchema } from '@/types';
 export type MainNavigatorStackParamList = {
     Home: undefined;
     PubView: {
-        pub: PubSchema;
+        pubId: number;
         onSaveToggle?: (id: number, value: boolean) => void;
     };
     Suggestions: { pub: PubSchema };

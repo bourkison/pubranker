@@ -167,7 +167,10 @@ export default function BottomSheetPubItem({ pub }: BottomSheetPubItemProps) {
                     )}
                 </TouchableOpacity>
             </View>
-            <Pressable onPress={() => navigation.navigate('PubView', { pub })}>
+            <Pressable
+                onPress={() =>
+                    navigation.navigate('PubView', { pubId: pub.id })
+                }>
                 <PubInfo pub={pub} />
             </Pressable>
         </View>
