@@ -46,7 +46,7 @@ export default function PubReviews({ pub }: PubReviewsProps) {
                 return;
             }
 
-            console.log('reviews', data.length, reviews.length);
+            console.log('reviews', data.length, data);
 
             setReviews(data as UserReviewType[]);
             setIsLoading(false);
