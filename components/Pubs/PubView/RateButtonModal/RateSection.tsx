@@ -20,19 +20,8 @@ export default function RateSection({
     setUserReview,
 }: RateSectionProps) {
     const [containerWidth, setContainerWidth] = useState(0);
-    const starContainerRef = useRef<View>(null);
 
     const rating = useMemo(() => userReview?.rating || 0, [userReview]);
-
-    const measureContainer = useCallback(() => {
-        if (containerWidth !== 0) {
-            return;
-        }
-
-        starContainerRef.current?.measure((x, y, width) => {
-            setContainerWidth(width);
-        });
-    }, [containerWidth]);
 
     const updateRating = useCallback(
         (amount: number) => {
@@ -121,8 +110,11 @@ export default function RateSection({
                     <View
                         key={index}
                         style={styles.starContainer}
-                        ref={starContainerRef}
-                        onLayout={measureContainer}>
+                        onLayout={({
+                            nativeEvent: {
+                                layout: { width },
+                            },
+                        }) => setContainerWidth(width)}>
                         <Pressable
                             style={[
                                 styles.pressableLeft,
