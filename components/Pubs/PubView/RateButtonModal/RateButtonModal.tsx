@@ -75,11 +75,7 @@ export default function RateButtonModal({ pub }: RateButtonProps) {
             <BottomSheetModal
                 backgroundStyle={styles.backgroundModal}
                 ref={bottomSheetRef}
-                handleComponent={props => (
-                    <View {...props}>
-                        <Text>{pub.name}</Text>
-                    </View>
-                )}
+                handleIndicatorStyle={styles.handle}
                 backdropComponent={props => (
                     <BottomSheetBackdrop
                         {...props}
@@ -104,9 +100,11 @@ export default function RateButtonModal({ pub }: RateButtonProps) {
                             />
                         </View>
 
-                        <View style={styles.modalSubsection}>
+                        <Pressable
+                            style={styles.modalSubsection}
+                            onPress={() => bottomSheetRef.current?.dismiss()}>
                             <Text style={styles.modalOptionText}>Review</Text>
-                        </View>
+                        </Pressable>
 
                         <View style={styles.modalSubsection}>
                             <Text style={styles.modalOptionText}>Share</Text>
@@ -186,4 +184,5 @@ const styles = StyleSheet.create({
         marginRight: 1,
         marginTop: 2,
     },
+    handle: { backgroundColor: 'transparent' },
 });

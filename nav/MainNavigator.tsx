@@ -4,6 +4,7 @@ import React from 'react';
 import PubView from '@/screens/PubView';
 import Suggestions from '@/screens/Suggestions';
 import { PubSchema } from '@/types';
+import CreateReview from '@/screens/CreateReview';
 
 export type MainNavigatorStackParamList = {
     Home: undefined;
@@ -12,6 +13,9 @@ export type MainNavigatorStackParamList = {
         onSaveToggle?: (id: number, value: boolean) => void;
     };
     Suggestions: { pub: PubSchema };
+    CreateReview: {
+        pubId: number;
+    };
 };
 
 const Stack = createStackNavigator<MainNavigatorStackParamList>();
@@ -33,6 +37,11 @@ export default function MainNavigator() {
                 name="Suggestions"
                 component={Suggestions}
                 options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="CreateReview"
+                component={CreateReview}
+                options={{ headerShown: false, presentation: 'modal' }}
             />
         </Stack.Navigator>
     );
