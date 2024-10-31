@@ -51,6 +51,7 @@ import { PubViewContext } from '@/context/pubViewContext';
 import { useAppDispatch } from '@/store/hooks';
 import { setPubSave } from '@/store/slices/explore';
 import RatingsSummary from '@/components/Ratings/RatingsSummary';
+import RateButtonModal from '@/components/Pubs/PubView/RateButtonModal/RateButtonModal';
 
 export default function PubHome({
     route,
@@ -480,6 +481,14 @@ export default function PubHome({
                                 />
                             </View>
 
+                            <View style={styles.seperator} />
+
+                            <View style={styles.rateButtonContainer}>
+                                <RateButtonModal pub={pub} />
+                            </View>
+
+                            <View style={styles.seperator} />
+
                             <View>
                                 <PubFeatures pub={pub} />
                             </View>
@@ -626,8 +635,15 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontWeight: '300',
     },
-    summaryContainer: {
-        borderBottomWidth: 1,
-        borderColor: '#E5E7EB',
+    summaryContainer: {},
+    rateButtonContainer: {
+        marginTop: 25,
+        paddingHorizontal: 15,
+        marginBottom: 7,
+    },
+    seperator: {
+        height: 1,
+        marginHorizontal: 30,
+        backgroundColor: '#E5E7EB',
     },
 });

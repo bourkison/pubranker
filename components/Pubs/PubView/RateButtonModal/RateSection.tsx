@@ -50,7 +50,7 @@ export default function RateSection({
                     return;
                 }
 
-                const { error } = await supabase
+                const { error, data } = await supabase
                     .from('reviews')
                     .upsert(
                         {
@@ -61,7 +61,8 @@ export default function RateSection({
                         { onConflict: 'pub_id, user_id' },
                     )
                     .eq('pub_id', pub.id)
-                    .eq('user_id', userData.user.id);
+                    .eq('user_id', userData.user.id)
+                    .select();
 
                 if (error) {
                     console.error(error);
@@ -69,12 +70,16 @@ export default function RateSection({
                         r ? { ...r, rating: originalAmount } : null,
                     );
                 }
+
+                if (!userReview && data) {
+                    setUserReview(data as UserReviewType);
+                }
             };
 
             setUserReview(r => (r ? { ...r, rating: amount } : null));
             upsert();
         },
-        [pub, rating, setUserReview],
+        [pub, rating, setUserReview, userReview],
     );
 
     const calculateStar = useCallback((sel: number, i: number) => {
