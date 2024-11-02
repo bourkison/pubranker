@@ -13,6 +13,10 @@ import { StyleSheet, View } from 'react-native';
 import { useFonts } from 'expo-font';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { StatusBar } from 'expo-status-bar';
+import dayjs from 'dayjs';
+import advancedFormat from 'dayjs/plugin/advancedFormat';
+
+dayjs.extend(advancedFormat);
 
 export default function App() {
     const [fontsLoaded] = useFonts({

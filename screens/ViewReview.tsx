@@ -1,6 +1,6 @@
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
     View,
     Text,
@@ -9,6 +9,7 @@ import {
     TouchableOpacity,
     ActivityIndicator,
     Image,
+    Pressable,
 } from 'react-native';
 import { Ionicons, SimpleLineIcons } from '@expo/vector-icons';
 import UserAvatar from '@/components/User/UserAvatar';
@@ -16,12 +17,14 @@ import { supabase } from '@/services/supabase';
 import { UserReviewType } from '@/types';
 import { convertViewToUserReviews } from '@/services';
 import RatingsStarViewer from '@/components/Ratings/RatingsStarsViewer';
+import dayjs from 'dayjs';
+import LikeReviewButton from '@/components/Reviews/LikeReviewButton';
 
 const NO_IMAGE = require('@/assets/noimage.png');
 
 const ASPECT_RATIO = 1.3333;
-const WIDTH_PERCENTAGE = 0.3;
-const IMAGE_MARGIN = 10;
+const WIDTH_PERCENTAGE = 0.33;
+const IMAGE_MARGIN = 8;
 
 export default function ViewReview({
     route,
@@ -38,8 +41,6 @@ export default function ViewReview({
         () => contentWidth * WIDTH_PERCENTAGE,
         [contentWidth],
     );
-
-    useEffect(() => console.log(IMAGE_WIDTH), [IMAGE_WIDTH]);
 
     useEffect(() => {
         const fetchReview = async () => {
@@ -72,6 +73,30 @@ export default function ViewReview({
 
         fetchReview();
     }, [route]);
+
+    const setToLiked = useCallback(() => {
+        if (!review) {
+            return;
+        }
+
+        setReview({
+            ...review,
+            liked: true,
+            likes: review.likes + 1,
+        });
+    }, [review]);
+
+    const setToUnliked = useCallback(() => {
+        if (!review) {
+            return;
+        }
+
+        setReview({
+            ...review,
+            liked: false,
+            likes: review.likes - 1,
+        });
+    }, [review]);
 
     if (isLoading) {
         return <ActivityIndicator />;
@@ -131,7 +156,13 @@ export default function ViewReview({
                                 </Text>
                             </View>
 
-                            <View style={styles.pubNameContainer}>
+                            <Pressable
+                                style={styles.pubNameContainer}
+                                onPress={() =>
+                                    navigation.push('PubView', {
+                                        pubId: review.pub_id,
+                                    })
+                                }>
                                 <Text style={styles.pubNameText}>
                                     {review.pub_name}
                                 </Text>
@@ -139,7 +170,7 @@ export default function ViewReview({
                                 <Text style={styles.pubAddressText}>
                                     {review.pub_address}
                                 </Text>
-                            </View>
+                            </Pressable>
 
                             <View style={styles.ratingsContainer}>
                                 <RatingsStarViewer
@@ -147,6 +178,15 @@ export default function ViewReview({
                                     amount={review.rating}
                                     size={18}
                                 />
+                            </View>
+
+                            <View style={styles.reviewedAtContainer}>
+                                <Text style={styles.reviewedAtText}>
+                                    Reviewed{' '}
+                                    {dayjs(review.created_at).format(
+                                        'D MMM YYYY',
+                                    )}
+                                </Text>
                             </View>
                         </View>
 
@@ -160,14 +200,36 @@ export default function ViewReview({
                                 style={[
                                     styles.pubImage,
                                     {
-                                        width: IMAGE_WIDTH - IMAGE_MARGIN,
-                                        height:
-                                            (IMAGE_WIDTH - IMAGE_MARGIN) /
-                                            ASPECT_RATIO,
+                                        width: IMAGE_WIDTH,
+                                        height: IMAGE_WIDTH / ASPECT_RATIO,
                                     },
                                 ]}
                             />
                         </View>
+                    </View>
+
+                    <View style={styles.reviewContentContainer}>
+                        <Text style={styles.contentText}>{review.content}</Text>
+                    </View>
+
+                    <View style={styles.likedContainer}>
+                        <LikeReviewButton
+                            reviewId={review.id}
+                            size={18}
+                            liked={review.liked}
+                            onLikeCommence={setToLiked}
+                            onUnlikeCommence={setToUnliked}
+                            onLikeComplete={success =>
+                                !success ? setToUnliked : undefined
+                            }
+                            onUnlikeComplete={success =>
+                                !success ? setToLiked : undefined
+                            }
+                        />
+                        <Text style={styles.likedText}>
+                            {review.likes}{' '}
+                            {review.likes === 1 ? 'like' : 'likes'}
+                        </Text>
                     </View>
                 </View>
             </View>
@@ -242,12 +304,33 @@ const styles = StyleSheet.create({
         marginTop: 10,
     },
     pubInfoRightColumn: {
-        backgroundColor: 'red',
+        width: '100%',
         flex: 1,
-        marginLeft: IMAGE_MARGIN,
         borderRadius: 3,
+        justifyContent: 'center',
     },
     pubImage: {
         borderRadius: 3,
+        marginLeft: IMAGE_MARGIN,
+    },
+    reviewedAtContainer: {
+        marginTop: 10,
+    },
+    reviewedAtText: {
+        fontSize: 10,
+        fontWeight: '200',
+    },
+    reviewContentContainer: {
+        paddingVertical: 20,
+    },
+    contentText: {},
+    likedContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    likedText: {
+        marginLeft: 3,
+        fontWeight: '300',
+        fontSize: 12,
     },
 });

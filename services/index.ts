@@ -427,8 +427,6 @@ export const convertViewToUserReviews = (
         id: input.id || 0,
         created_at: input.created_at || '',
         editors_review: input.editors_review || false,
-        is_helpfuls: input.is_helpfuls || 0,
-        total_helpfuls: input.total_helpfuls || 0,
         updated_at: input.updated_at || '',
         user_id: input.user_id || '',
         pub_id: input.pub_id || 0,
@@ -436,5 +434,9 @@ export const convertViewToUserReviews = (
         rating: input.rating || 0,
         username: input.username || '',
         user_profile_photo: input.user_profile_photo || '',
+        liked: input.liked || false,
+        likes: input.likes || 0,
+        is_helpfuls: 0,
+        total_helpfuls: 0,
     };
 };
