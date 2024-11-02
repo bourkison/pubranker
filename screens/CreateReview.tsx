@@ -20,7 +20,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 const NO_IMAGE = require('@/assets/noimage.png');
 
-const ASPECT_RATIO = 1.3333;
+const ASPECT_RATIO = 1;
 const WIDTH_PERCENTAGE = 0.2;
 
 const ICON_SIZE = 32;
@@ -254,10 +254,13 @@ export default function CreateReview({
                     <View style={styles.pubInfoContainer}>
                         <Image
                             source={imageUrl ? { uri: imageUrl } : NO_IMAGE}
-                            style={{
-                                width: IMAGE_WIDTH,
-                                height: IMAGE_WIDTH / ASPECT_RATIO,
-                            }}
+                            style={[
+                                styles.image,
+                                {
+                                    width: IMAGE_WIDTH,
+                                    height: IMAGE_WIDTH / ASPECT_RATIO,
+                                },
+                            ]}
                         />
 
                         <Text style={styles.pubNameText}>{pub.name}</Text>
@@ -399,4 +402,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
     },
     textInput: {},
+    image: {
+        borderRadius: 3,
+    },
 });

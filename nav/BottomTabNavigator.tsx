@@ -11,7 +11,7 @@ import SavedNavigator from './SavedNavigator';
 
 export type BottomTabNavigatorParamList = {
     Explore: undefined;
-    Saved: undefined;
+    Favourites: undefined;
     Profile: undefined;
     Feed: undefined;
 };
@@ -42,7 +42,7 @@ export default function BottomTabNavigator() {
                 }}
             />
             <Tab.Screen
-                name="Saved"
+                name="Favourites"
                 component={SavedNavigator}
                 options={{
                     tabBarIcon: ({ size, focused }) => (

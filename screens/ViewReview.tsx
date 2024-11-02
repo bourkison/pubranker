@@ -27,8 +27,8 @@ import Comment from '@/components/Comments/Comment';
 
 const NO_IMAGE = require('@/assets/noimage.png');
 
-const ASPECT_RATIO = 1.3333;
-const WIDTH_PERCENTAGE = 0.33;
+const ASPECT_RATIO = 1;
+const WIDTH_PERCENTAGE = 0.3;
 const IMAGE_MARGIN = 8;
 
 export default function ViewReview({
@@ -233,20 +233,13 @@ export default function ViewReview({
                 ListHeaderComponent={
                     <View style={styles.contentContainer}>
                         <View
+                            style={styles.flexOne}
                             onLayout={({
                                 nativeEvent: {
                                     layout: { width: w },
                                 },
                             }) => setContentWidth(w)}>
-                            <View
-                                style={[
-                                    styles.pubInfoContainer,
-                                    {
-                                        width:
-                                            contentWidth -
-                                            contentWidth * WIDTH_PERCENTAGE,
-                                    },
-                                ]}>
+                            <View style={[styles.pubInfoContainer]}>
                                 <View style={styles.pubInfoLeftColumn}>
                                     <View style={styles.userContainer}>
                                         <UserAvatar
@@ -388,13 +381,16 @@ const styles = StyleSheet.create({
         width: '100%',
         borderBottomWidth: 1,
         borderColor: '#E5E7EB',
+        flex: 1,
     },
     pubInfoContainer: {
         flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        width: '100%',
     },
-    pubInfoLeftColumn: {},
+    pubInfoLeftColumn: {
+        flex: 1,
+        paddingRight: IMAGE_MARGIN,
+    },
     userContainer: {
         alignItems: 'center',
         flexDirection: 'row',
@@ -421,14 +417,11 @@ const styles = StyleSheet.create({
         marginTop: 10,
     },
     pubInfoRightColumn: {
-        width: '100%',
-        flex: 1,
         borderRadius: 3,
         justifyContent: 'center',
     },
     pubImage: {
         borderRadius: 3,
-        marginLeft: IMAGE_MARGIN,
     },
     reviewedAtContainer: {
         marginTop: 10,

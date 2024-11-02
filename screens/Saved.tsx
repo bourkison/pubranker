@@ -140,7 +140,7 @@ export default function SavedPubs() {
                 </TouchableOpacity>
 
                 <View style={styles.headerTextContainer}>
-                    <Text style={styles.headerText}>Saved</Text>
+                    <Text style={styles.headerText}>Favourites</Text>
                 </View>
 
                 <View style={styles.menuContainer}>
