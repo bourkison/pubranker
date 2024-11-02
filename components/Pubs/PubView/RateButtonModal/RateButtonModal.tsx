@@ -24,8 +24,9 @@ export default function RateButtonModal({ pub }: RateButtonProps) {
 
         return (
             <>
-                {Array.from(Array(fullStarsAmount)).map(() => (
+                {Array.from(Array(fullStarsAmount)).map((_, index) => (
                     <Ionicons
+                        key={index}
                         name="star"
                         style={styles.star}
                         size={12}

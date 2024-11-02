@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import AnimatedRatingsBar from '@/components/Ratings/AnimatedRatingsBar';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-reanimated';
+import { roundToNearest } from '@/services';
 
 type RatingsSummaryProps = {
     header: string;
@@ -24,7 +25,7 @@ type RatingsSummaryProps = {
     totalRating: number;
 };
 
-export const BAR_MARGINS = 3;
+export const BAR_MARGINS = 1;
 
 export default function RatingsSummary({
     header,
@@ -58,7 +59,7 @@ export default function RatingsSummary({
 
     const rightColumnText = useMemo<string>(() => {
         if (selected === null) {
-            return totalRating.toString();
+            return roundToNearest(totalRating, 0.1).toFixed(1);
         }
 
         return ratings[selected].toString();
@@ -80,7 +81,7 @@ export default function RatingsSummary({
     );
 
     const gesture = Gesture.Pan()
-        .failOffsetY([-5, 5])
+        .failOffsetY([-2, 2])
         .onBegin(e => runOnJS(setSelected)(calculateRatingsTouch(e.x)))
         .onUpdate(e => runOnJS(setSelected)(calculateRatingsTouch(e.x)))
         .onFinalize(() => runOnJS(setSelected)(null));
@@ -103,14 +104,17 @@ export default function RatingsSummary({
 
         return (
             <>
-                {Array.from(Array(Math.floor((selected + 1) / 2))).map(_ => (
-                    <Ionicons
-                        name="star"
-                        style={styles.star}
-                        color={GOLD_RATINGS_COLOR}
-                        size={12}
-                    />
-                ))}
+                {Array.from(Array(Math.floor((selected + 1) / 2))).map(
+                    (_, index) => (
+                        <Ionicons
+                            key={index}
+                            name="star"
+                            style={styles.star}
+                            color={GOLD_RATINGS_COLOR}
+                            size={12}
+                        />
+                    ),
+                )}
                 {(selected + 1) % 2 === 1 ? (
                     <Ionicons
                         name="star-half"
