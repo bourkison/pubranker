@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons, Feather, MaterialIcons } from '@expo/vector-icons';
 import { PubSchema } from '@/types';
@@ -17,7 +17,7 @@ export default function TopSection({ pub }: TopSectionProps) {
     const [isSaving, setIsSaving] = useState(false);
     const [saved, setSaved] = useState(false);
 
-    useMemo(() => {
+    useEffect(() => {
         setSaved(pub.saved);
     }, [pub]);
 

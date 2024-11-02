@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import Review from '@/components/Reviews/Review';
-import OverallRatings from '@/components/Ratings/OverallRatings';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import ReviewPubButton from '@/components/Reviews/ReviewPubButton';
 import { PubSchema, UserReviewType } from '@/types';
@@ -53,6 +52,10 @@ export default function PubReviews({ pub }: PubReviewsProps) {
             setHasLoaded(true);
         };
 
+        if (reviews.length) {
+            setHasLoaded(true);
+        }
+
         if (!hasLoaded) {
             fetchReviews();
         }
@@ -62,17 +65,6 @@ export default function PubReviews({ pub }: PubReviewsProps) {
 
     return (
         <View>
-            {/* <OverallRatings
-                rating={pub.rating}
-                amountByRating={[
-                    pub.review_stars_one,
-                    pub.review_stars_two,
-                    pub.review_stars_three,
-                    pub.review_stars_four,
-                    pub.review_stars_five,
-                ]}
-                ratingsAmount={pub.num_reviews}
-            /> */}
             <ReviewPubButton pub={pub} />
             {!isLoading ? (
                 <View>

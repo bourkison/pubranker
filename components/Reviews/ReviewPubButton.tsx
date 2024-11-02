@@ -1,6 +1,5 @@
 import { supabase } from '@/services/supabase';
-import { useAppSelector } from '@/store/hooks';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import React, { useCallback, useState } from 'react';
 import {
     View,
@@ -11,8 +10,10 @@ import {
 } from 'react-native';
 import Review from '@/components/Reviews/Review';
 import { PubSchema, UserReviewType } from '@/types';
-import CreateReview from '@/components/Reviews/CreateReview';
 import { useSharedPubViewContext } from '@/context/pubViewContext';
+import { PRIMARY_COLOR } from '@/constants';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 
 type ReviewPubButtonProps = {
     pub: PubSchema;
@@ -22,14 +23,19 @@ export default function ReviewPubButton({ pub }: ReviewPubButtonProps) {
     const [isLoading, setIsLoading] = useState(true);
     const { userReview, setUserReview } = useSharedPubViewContext();
 
-    const [createReviewExpanded, setCreateReviewExpanded] = useState(false);
-
-    const user = useAppSelector(state => state.user.docData);
+    const navigation =
+        useNavigation<
+            StackNavigationProp<MainNavigatorStackParamList, 'PubView'>
+        >();
 
     useFocusEffect(
         useCallback(() => {
             const checkIfReviewed = async () => {
-                if (!user) {
+                const { data: userData, error: userError } =
+                    await supabase.auth.getUser();
+
+                if (userError) {
+                    console.error(userError);
                     setIsLoading(false);
                     return;
                 }
@@ -38,7 +44,7 @@ export default function ReviewPubButton({ pub }: ReviewPubButtonProps) {
                     .from('user_reviews')
                     .select()
                     .eq('pub_id', pub.id)
-                    .eq('user_id', user.id)
+                    .eq('user_id', userData.user.id)
                     .limit(1)
                     .single();
 
@@ -52,14 +58,17 @@ export default function ReviewPubButton({ pub }: ReviewPubButtonProps) {
                 setIsLoading(false);
             };
 
-            checkIfReviewed();
-            // TODO: Update to only check once per pub (i.e. not new loads on tab change).
-        }, [pub, user, setUserReview]),
+            if (!userReview) {
+                checkIfReviewed();
+            } else {
+                setIsLoading(false);
+            }
+        }, [pub, setUserReview, userReview]),
     );
 
     const buttonPress = () => {
-        if (!isLoading && user) {
-            setCreateReviewExpanded(true);
+        if (!isLoading) {
+            navigation.navigate('CreateReview', { pubId: pub.id });
         }
     };
 
@@ -67,13 +76,9 @@ export default function ReviewPubButton({ pub }: ReviewPubButtonProps) {
         return <ActivityIndicator />;
     }
 
-    if (!user) {
-        return <View />;
-    }
-
     return (
         <View style={styles.container}>
-            {userReview ? (
+            {userReview && userReview.content ? (
                 <Review pub={pub} review={userReview} />
             ) : (
                 <View style={styles.reviewButtonContainer}>
@@ -86,12 +91,6 @@ export default function ReviewPubButton({ pub }: ReviewPubButtonProps) {
                     </TouchableOpacity>
                 </View>
             )}
-            <CreateReview
-                pubId={pub.id}
-                expanded={createReviewExpanded}
-                onDismiss={() => setCreateReviewExpanded(false)}
-                onCreate={review => setUserReview(review)}
-            />
         </View>
     );
 }
@@ -103,16 +102,15 @@ const styles = StyleSheet.create({
         paddingBottom: 10,
     },
     reviewButton: {
-        backgroundColor: '#292935',
+        backgroundColor: PRIMARY_COLOR,
         paddingVertical: 3,
-        borderRadius: 40,
+        marginVertical: 10,
+        borderRadius: 5,
         alignItems: 'center',
     },
     reviewButtonText: {
         color: '#FFF',
-        fontWeight: 'bold',
-        fontSize: 16,
-        fontFamily: 'Jost',
+        fontSize: 14,
         textAlign: 'center',
     },
 });
