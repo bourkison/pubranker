@@ -4,7 +4,7 @@ import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { supabase } from '@/services/supabase';
 import { Database } from '@/types/schema';
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
     View,
     Text,
@@ -12,6 +12,8 @@ import {
     ActivityIndicator,
     Image,
     useWindowDimensions,
+    TextInput,
+    ScrollView,
 } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
@@ -34,6 +36,8 @@ export default function CreateReview({
 
     const [initialSaved, setInitialSaved] = useState(false);
     const [saved, setSaved] = useState(false);
+
+    const [isCreating, setIsCreating] = useState(false);
 
     const [review, setReview] = useState<
         Database['public']['Tables']['reviews']['Insert']
@@ -142,6 +146,68 @@ export default function CreateReview({
         fetchData();
     }, [route]);
 
+    const saveReview = useCallback(() => {
+        const save = async () => {
+            if (!pub) {
+                return;
+            }
+
+            setIsCreating(true);
+
+            const { data: userData, error: userError } =
+                await supabase.auth.getUser();
+
+            if (userError) {
+                console.error(userError);
+                setIsCreating(false);
+                return;
+            }
+
+            const { data, error } = await supabase
+                .from('reviews')
+                .upsert(
+                    { ...review, pub_id: pub.id },
+                    { onConflict: 'pub_id, user_id' },
+                )
+                .eq('pub_id', pub.id)
+                .eq('user_id', userData.user.id)
+                .select()
+                .limit(1)
+                .single();
+
+            if (error) {
+                console.error(error);
+                setIsCreating(false);
+                return;
+            }
+
+            if (initialSaved === false && saved === true) {
+                const { error: savesError } = await supabase
+                    .from('saves')
+                    .insert({ pub_id: pub.id });
+
+                if (savesError) {
+                    console.error(savesError);
+                }
+            } else if (initialSaved === true && saved === false) {
+                const { error: savesError } = await supabase
+                    .from('saves')
+                    .delete()
+                    .eq('pub_id', pub.id)
+                    .eq('user_id', userData.user.id);
+
+                if (savesError) {
+                    console.error(savesError);
+                }
+            }
+
+            setIsCreating(false);
+            navigation.replace('ViewReview', { reviewId: data.id });
+        };
+
+        save();
+    }, [pub, review, saved, initialSaved, navigation]);
+
     return (
         <View>
             <View style={styles.headerContainer}>
@@ -155,8 +221,18 @@ export default function CreateReview({
                     <Text style={styles.headerText}>Review</Text>
                 </View>
 
-                <TouchableOpacity style={styles.saveContainer}>
-                    <Text style={styles.saveText}>Save</Text>
+                <TouchableOpacity
+                    disabled={isCreating}
+                    style={styles.saveContainer}
+                    onPress={saveReview}>
+                    {isCreating ? (
+                        <ActivityIndicator
+                            size={15}
+                            style={styles.creatingIndicator}
+                        />
+                    ) : (
+                        <Text style={styles.saveText}>Save</Text>
+                    )}
                 </TouchableOpacity>
             </View>
 
@@ -167,7 +243,10 @@ export default function CreateReview({
                     <Text>Error on pub load</Text>
                 </View>
             ) : (
-                <View style={styles.contentContainer}>
+                <ScrollView
+                    bounces={false}
+                    keyboardDismissMode="on-drag"
+                    style={styles.contentContainer}>
                     <View style={styles.pubInfoContainer}>
                         <Image
                             source={imageUrl ? { uri: imageUrl } : NO_IMAGE}
@@ -221,7 +300,20 @@ export default function CreateReview({
                             </TouchableOpacity>
                         </View>
                     </View>
-                </View>
+
+                    <View style={styles.textInputContainer}>
+                        <TextInput
+                            value={review.content || ''}
+                            onChangeText={val =>
+                                setReview(r => ({ ...r, content: val }))
+                            }
+                            placeholder="Add review..."
+                            textAlignVertical="top"
+                            multiline={true}
+                            style={styles.textInput}
+                        />
+                    </View>
+                </ScrollView>
             )}
         </View>
     );
@@ -244,6 +336,7 @@ const styles = StyleSheet.create({
         color: SECONDARY_COLOR,
         fontWeight: 'bold',
     },
+    creatingIndicator: { marginLeft: 12, marginRight: 6 },
     cancelContainer: {
         flex: 1,
         paddingHorizontal: 10,
@@ -297,4 +390,9 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
         alignContent: 'flex-end',
     },
+    textInputContainer: {
+        paddingVertical: 15,
+        paddingHorizontal: 15,
+    },
+    textInput: {},
 });

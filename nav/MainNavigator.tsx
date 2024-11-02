@@ -5,6 +5,7 @@ import PubView from '@/screens/PubView';
 import Suggestions from '@/screens/Suggestions';
 import { PubSchema } from '@/types';
 import CreateReview from '@/screens/CreateReview';
+import ViewReview from '@/screens/ViewReview';
 
 export type MainNavigatorStackParamList = {
     Home: undefined;
@@ -15,6 +16,9 @@ export type MainNavigatorStackParamList = {
     Suggestions: { pub: PubSchema };
     CreateReview: {
         pubId: number;
+    };
+    ViewReview: {
+        reviewId: number;
     };
 };
 
@@ -42,6 +46,11 @@ export default function MainNavigator() {
                 name="CreateReview"
                 component={CreateReview}
                 options={{ headerShown: false, presentation: 'modal' }}
+            />
+            <Stack.Screen
+                name="ViewReview"
+                component={ViewReview}
+                options={{ headerShown: false }}
             />
         </Stack.Navigator>
     );

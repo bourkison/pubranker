@@ -50,7 +50,9 @@ export default function RateSection({
                     )
                     .eq('pub_id', pub.id)
                     .eq('user_id', userData.user.id)
-                    .select();
+                    .select()
+                    .limit(1)
+                    .single();
 
                 if (error) {
                     console.error(error);
