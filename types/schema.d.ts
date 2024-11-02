@@ -780,13 +780,18 @@ export type Database = {
                     is_helpfuls: number | null;
                     location: boolean | null;
                     music: boolean | null;
+                    pub_address: string | null;
                     pub_id: number | null;
+                    pub_name: string | null;
+                    pub_primary_photo: string | null;
                     rating: number | null;
                     service: boolean | null;
                     total_helpfuls: number | null;
                     updated_at: string | null;
                     user_id: string | null;
                     user_name: string | null;
+                    user_profile_photo: string | null;
+                    username: string | null;
                     vibe: boolean | null;
                 };
                 Relationships: [

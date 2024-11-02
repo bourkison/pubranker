@@ -1,11 +1,10 @@
-import { GOLD_RATINGS_COLOR } from '@/constants';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import AnimatedRatingsBar from '@/components/Ratings/AnimatedRatingsBar';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-reanimated';
 import { roundToNearest } from '@/services';
+import RatingsStarViewer from './RatingsStarsViewer';
 
 type RatingsSummaryProps = {
     header: string;
@@ -86,47 +85,6 @@ export default function RatingsSummary({
         .onUpdate(e => runOnJS(setSelected)(calculateRatingsTouch(e.x)))
         .onFinalize(() => runOnJS(setSelected)(null));
 
-    const rightColumnStars = useMemo<React.ReactNode>(() => {
-        if (selected === null) {
-            return (
-                <>
-                    {Array.from(Array(5)).map(_ => (
-                        <Ionicons
-                            name="star"
-                            style={styles.star}
-                            color={GOLD_RATINGS_COLOR}
-                            size={12}
-                        />
-                    ))}
-                </>
-            );
-        }
-
-        return (
-            <>
-                {Array.from(Array(Math.floor((selected + 1) / 2))).map(
-                    (_, index) => (
-                        <Ionicons
-                            key={index}
-                            name="star"
-                            style={styles.star}
-                            color={GOLD_RATINGS_COLOR}
-                            size={12}
-                        />
-                    ),
-                )}
-                {(selected + 1) % 2 === 1 ? (
-                    <Ionicons
-                        name="star-half"
-                        style={styles.star}
-                        color={GOLD_RATINGS_COLOR}
-                        size={12}
-                    />
-                ) : undefined}
-            </>
-        );
-    }, [selected]);
-
     return (
         <View style={styles.container}>
             <Text style={styles.headerText}>{header}</Text>
@@ -162,7 +120,11 @@ export default function RatingsSummary({
                 <View style={styles.rightColumn}>
                     <Text style={styles.starsText}>{rightColumnText}</Text>
                     <View style={styles.starsContainer}>
-                        {rightColumnStars}
+                        <RatingsStarViewer
+                            padding={0}
+                            amount={selected === null ? 10 : selected + 1}
+                            size={12}
+                        />
                     </View>
                 </View>
             </View>

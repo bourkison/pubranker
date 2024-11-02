@@ -69,7 +69,7 @@ export default function Profile() {
         <SafeAreaView>
             <View style={styles.headerContainer}>
                 <TouchableOpacity style={styles.settingsContainer}>
-                    <Feather name="settings" size={18} />
+                    <Feather name="settings" size={14} />
                 </TouchableOpacity>
 
                 <View style={styles.headerTextContainer}>
@@ -77,7 +77,7 @@ export default function Profile() {
                 </View>
 
                 <TouchableOpacity style={styles.menuContainer}>
-                    <SimpleLineIcons name="options" size={18} />
+                    <SimpleLineIcons name="options" size={14} />
                 </TouchableOpacity>
             </View>
 

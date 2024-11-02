@@ -74,6 +74,8 @@ export type UserReviewType = Omit<
     pub_id: number;
     user_name: string;
     rating: number;
+    username: string;
+    user_profile_photo: string;
 };
 
 export type RGB = `rgb(${number}, ${number}, ${number})`;

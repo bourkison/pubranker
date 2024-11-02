@@ -22,7 +22,7 @@ export default function CollectionsHome() {
                 <TouchableOpacity
                     style={styles.settingsContainer}
                     onPress={() => navigation.goBack()}>
-                    <Ionicons name="arrow-back-outline" size={18} />
+                    <Ionicons name="arrow-back-outline" size={14} />
                 </TouchableOpacity>
 
                 <View style={styles.headerTextContainer}>

@@ -88,7 +88,7 @@ export default function CreateCollectionIcon() {
     return (
         <>
             <TouchableOpacity onPress={openSheet}>
-                <Feather name="plus" size={18} />
+                <Feather name="plus" size={14} />
             </TouchableOpacity>
             <BottomSheetModal
                 ref={bottomSheetRef}

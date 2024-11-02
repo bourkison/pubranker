@@ -382,7 +382,7 @@ export const convertFormattedPubsToPubSchema = (
         description: input.description || '',
         dist_meters: 0, // TODO: calculate distance
         google_id: input.google_id || '',
-        id: input.id || 1,
+        id: input.id || 0,
         location: input.location || '',
         name: input.name || '',
         num_reviews: input.num_reviews || 0,
@@ -416,5 +416,25 @@ export const convertFormattedPubsToPubSchema = (
         review_vibe_amount: input.review_vibe_amount || 0,
         saved: input.saved || false,
         website: input.website || '',
+    };
+};
+
+export const convertViewToUserReviews = (
+    input: Database['public']['Views']['user_reviews']['Row'],
+): UserReviewType => {
+    return {
+        ...input,
+        id: input.id || 0,
+        created_at: input.created_at || '',
+        editors_review: input.editors_review || false,
+        is_helpfuls: input.is_helpfuls || 0,
+        total_helpfuls: input.total_helpfuls || 0,
+        updated_at: input.updated_at || '',
+        user_id: input.user_id || '',
+        pub_id: input.pub_id || 0,
+        user_name: input.user_name || '',
+        rating: input.rating || 0,
+        username: input.username || '',
+        user_profile_photo: input.user_profile_photo || '',
     };
 };

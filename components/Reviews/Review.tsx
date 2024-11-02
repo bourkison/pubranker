@@ -8,16 +8,15 @@ import {
     TouchableOpacity,
     TouchableHighlight,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { fromNowString } from '@/services';
 import { PubSchema, UserReviewType } from '@/types';
-import { GOLD_RATINGS_COLOR } from '@/constants';
 import UserAvatar from '../User/UserAvatar';
 import { useSharedPubViewContext } from '@/context/pubViewContext';
 import Helpfuls from '@/components/Reviews/Helpfuls';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
+import RatingsStarViewer from '../Ratings/RatingsStarsViewer';
 
 type ReviewProps = {
     review: UserReviewType;
@@ -68,19 +67,11 @@ export default function Review({ review, noBorder }: ReviewProps) {
                     <View style={styles.headerTextContainer}>
                         <Text style={styles.nameText}>{review.user_name}</Text>
                         <View style={styles.bottomHeaderRow}>
-                            {Array.from(Array(5)).map((_, i) => (
-                                <View key={i} style={styles.starContainer}>
-                                    <Ionicons
-                                        name="star"
-                                        size={14}
-                                        color={
-                                            i < review.rating / 2
-                                                ? GOLD_RATINGS_COLOR
-                                                : 'rgba(0, 0, 0, 0.2)'
-                                        }
-                                    />
-                                </View>
-                            ))}
+                            <RatingsStarViewer
+                                amount={review.rating}
+                                size={14}
+                                padding={1}
+                            />
                             <Text style={styles.dateText}>
                                 {fromNowString(review.created_at)}
                             </Text>
