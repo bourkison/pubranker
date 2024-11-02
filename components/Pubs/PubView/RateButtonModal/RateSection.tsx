@@ -1,9 +1,10 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import React, { useCallback, useMemo } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { GOLD_RATINGS_COLOR } from '@/constants';
 import { supabase } from '@/services/supabase';
 import { PubSchema, UserReviewType } from '@/types';
+import RatingsSelector from '@/components/Ratings/RatingsSelector';
 
 const STAR_SIZE = 40;
 const STAR_PADDING = 4;
@@ -19,8 +20,6 @@ export default function RateSection({
     userReview,
     setUserReview,
 }: RateSectionProps) {
-    const [containerWidth, setContainerWidth] = useState(0);
-
     const rating = useMemo(() => userReview?.rating || 0, [userReview]);
 
     const updateRating = useCallback(
@@ -71,73 +70,16 @@ export default function RateSection({
         [pub, rating, setUserReview, userReview],
     );
 
-    const calculateStar = useCallback((sel: number, i: number) => {
-        // Calc half star first
-        if (i * 2 + 1 === sel) {
-            return (
-                <Ionicons
-                    name="star-half-outline"
-                    size={STAR_SIZE}
-                    color={GOLD_RATINGS_COLOR}
-                />
-            );
-        }
-
-        if (i * 2 < sel) {
-            return (
-                <Ionicons
-                    name="star"
-                    size={STAR_SIZE}
-                    color={GOLD_RATINGS_COLOR}
-                />
-            );
-        }
-
-        return (
-            <Ionicons
-                name="star-outline"
-                size={STAR_SIZE}
-                color={GOLD_RATINGS_COLOR}
-            />
-        );
-    }, []);
-
     return (
         <View style={styles.container}>
             <Text style={styles.headerText}>Rate</Text>
             <View style={styles.starsContainer}>
-                {Array.from(Array(5)).map((_, index) => (
-                    <View
-                        key={index}
-                        style={styles.starContainer}
-                        onLayout={({
-                            nativeEvent: {
-                                layout: { width },
-                            },
-                        }) => setContainerWidth(width)}>
-                        <Pressable
-                            style={[
-                                styles.pressableLeft,
-                                {
-                                    width: containerWidth / 2,
-                                    height: STAR_SIZE,
-                                },
-                            ]}
-                            onPress={() => updateRating(index * 2 + 1)}
-                        />
-                        <Pressable
-                            style={[
-                                styles.pressableRight,
-                                {
-                                    width: containerWidth / 2,
-                                    height: STAR_SIZE,
-                                },
-                            ]}
-                            onPress={() => updateRating(index * 2 + 2)}
-                        />
-                        {calculateStar(rating, index)}
-                    </View>
-                ))}
+                <RatingsSelector
+                    rating={rating}
+                    onRating={updateRating}
+                    starPadding={STAR_PADDING}
+                    starSize={STAR_SIZE}
+                />
             </View>
         </View>
     );
@@ -157,18 +99,5 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         position: 'relative',
         paddingVertical: 10,
-    },
-    starContainer: {
-        paddingHorizontal: STAR_PADDING,
-    },
-    pressableLeft: {
-        position: 'absolute',
-        left: 0,
-        zIndex: 9,
-    },
-    pressableRight: {
-        position: 'absolute',
-        right: 0,
-        zIndex: 9,
     },
 });

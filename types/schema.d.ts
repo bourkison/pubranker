@@ -451,6 +451,7 @@ export type Database = {
                     name: string;
                     phone_number: string | null;
                     pool_table: boolean | null;
+                    primary_photo: string | null;
                     reservable: boolean | null;
                     rooftop: boolean | null;
                     updated_at: string;
@@ -476,6 +477,7 @@ export type Database = {
                     name: string;
                     phone_number?: string | null;
                     pool_table?: boolean | null;
+                    primary_photo?: string | null;
                     reservable?: boolean | null;
                     rooftop?: boolean | null;
                     updated_at?: string;
@@ -501,6 +503,7 @@ export type Database = {
                     name?: string;
                     phone_number?: string | null;
                     pool_table?: boolean | null;
+                    primary_photo?: string | null;
                     reservable?: boolean | null;
                     rooftop?: boolean | null;
                     updated_at?: string;

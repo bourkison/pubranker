@@ -32,13 +32,9 @@ export default function PubListItem({ pub, onSaveToggle }: PubListItemProps) {
 
     useEffect(() => {
         if (pub.photos[0]) {
-            console.log('photos', pub.photos[0], NO_IMAGE);
-
             const url = supabase.storage
                 .from('pubs')
                 .getPublicUrl(pub.photos[0]);
-
-            console.log('url', url);
 
             setImageUrl(url.data.publicUrl);
         }
