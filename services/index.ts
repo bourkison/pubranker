@@ -309,33 +309,6 @@ export const checkIfOpen = (
     return { isOpen: false, nextHours: nextOpeningHours };
 };
 
-// export const convertUserReviewsToNonNullable = (
-//     userReviews: Database['public']['Views']['user_reviews']['Row'][],
-// ): UserReviewType[] => {
-//     let response: UserReviewType[] = [];
-
-//     userReviews.forEach(review => {
-//         const keys = Object.keys(review) as (keyof typeof review)[];
-//         let hasNull = false;
-
-//         for (let i = 0; i < keys.length; i++) {
-//             const key = keys[i];
-//             if (review[key] === null && key !== 'content') {
-//                 hasNull = true;
-//             } else if (review[key] === null && key === 'content') {
-//                 review[key] = '';
-//             }
-//         }
-
-//         if (!hasNull) {
-//             const nonNull = review as UserReviewType;
-//             response.push(nonNull);
-//         }
-//     });
-
-//     return response;
-// };
-
 export const convertUserCommentsToNonNullable = (
     userComments: Database['public']['Views']['user_comments']['Row'][],
 ): UserCommentType[] => {
@@ -438,5 +411,22 @@ export const convertViewToUserReviews = (
         likes: input.likes || 0,
         is_helpfuls: 0,
         total_helpfuls: 0,
+    };
+};
+
+export const convertViewToUserComments = (
+    input: Database['public']['Views']['user_comments']['Row'],
+): UserCommentType => {
+    return {
+        ...input,
+        content: input.content || '',
+        created_at: input.created_at || '',
+        id: input.id || 0,
+        liked: input.liked || false,
+        likes_amount: input.likes_amount || 0,
+        review_id: input.review_id || 0,
+        updated_at: input.updated_at || '',
+        user_id: input.user_id || '',
+        user_name: input.user_name || '',
     };
 };
