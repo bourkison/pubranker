@@ -153,6 +153,7 @@ export default function RatingsSummary({
                                 index={index}
                                 selected={selected}
                                 setSelected={setSelected}
+                                barMargins={BAR_MARGINS}
                             />
                         ))}
                     </View>

@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { GOLD_RATINGS_COLOR } from '@/constants';
-import { BAR_MARGINS } from '@/components/Ratings/RatingsSummary';
 import Animated, {
     useAnimatedStyle,
     useSharedValue,
@@ -14,6 +13,7 @@ type AnimatedRatingsBarProps = {
     height: number;
     width: number;
     index: number;
+    barMargins: number;
     selected: number | null;
     setSelected: React.Dispatch<React.SetStateAction<number | null>>;
 };
@@ -27,6 +27,7 @@ export default function AnimatedRatingsBar({
     width,
     index,
     selected,
+    barMargins,
 }: AnimatedRatingsBarProps) {
     const sHeight = useSharedValue(MINIMUM_BAR_HEIGHT);
 
@@ -51,7 +52,7 @@ export default function AnimatedRatingsBar({
                 <Animated.View
                     style={[
                         styles.ratingsBar,
-                        { width },
+                        { width, marginHorizontal: barMargins },
                         selected === index
                             ? { backgroundColor: GOLD_RATINGS_COLOR }
                             : undefined,
@@ -73,7 +74,6 @@ const styles = StyleSheet.create({
     },
     ratingsBar: {
         backgroundColor: `${GOLD_RATINGS_COLOR}77`,
-        marginHorizontal: BAR_MARGINS,
         width: 20,
         borderRadius: 1,
         marginBottom: 4,

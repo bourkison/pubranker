@@ -6,6 +6,7 @@ import {
     TextLayoutEventData,
     NativeSyntheticEvent,
     TouchableOpacity,
+    TouchableHighlight,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { fromNowString } from '@/services';
@@ -14,17 +15,24 @@ import { GOLD_RATINGS_COLOR } from '@/constants';
 import UserAvatar from '../User/UserAvatar';
 import { useSharedPubViewContext } from '@/context/pubViewContext';
 import Helpfuls from '@/components/Reviews/Helpfuls';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 
 type ReviewProps = {
     review: UserReviewType;
     pub: PubSchema;
+    noBorder?: boolean;
 };
 
 const MAX_LINES_LENGTH = 4;
 
-export default function Review({ review }: ReviewProps) {
+export default function Review({ review, noBorder }: ReviewProps) {
     const [textShown, setTextShown] = useState(false);
     const [lengthMore, setLengthMore] = useState(false);
+
+    const navigation =
+        useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
 
     const { calculateWithinScrollBounds } = useSharedPubViewContext();
 
@@ -41,62 +49,72 @@ export default function Review({ review }: ReviewProps) {
     };
 
     return (
-        <View
-            style={styles.container}
+        <TouchableHighlight
+            underlayColor="#E5E7EB"
+            activeOpacity={1}
+            style={[
+                styles.container,
+                noBorder === true ? styles.noBorder : undefined,
+            ]}
+            onPress={() =>
+                navigation.navigate('ViewReview', { reviewId: review.id })
+            }
             onLayout={() => calculateWithinScrollBounds(false)}>
-            <View style={styles.headerContainer}>
-                <View style={styles.avatarContainer}>
-                    <UserAvatar size={24} photo="" />
-                </View>
-                <View style={styles.headerTextContainer}>
-                    <Text style={styles.nameText}>{review.user_name}</Text>
-                    <View style={styles.bottomHeaderRow}>
-                        {Array.from(Array(5)).map((_, index) => (
-                            <View key={index} style={styles.starContainer}>
-                                <Ionicons
-                                    name="star"
-                                    size={14}
-                                    color={
-                                        index < review.rating / 2
-                                            ? GOLD_RATINGS_COLOR
-                                            : 'rgba(0, 0, 0, 0.2)'
-                                    }
-                                />
-                            </View>
-                        ))}
-                        <Text style={styles.dateText}>
-                            {fromNowString(review.created_at)}
-                        </Text>
+            <View>
+                <View style={styles.headerContainer}>
+                    <View style={styles.avatarContainer}>
+                        <UserAvatar size={24} photo="" />
+                    </View>
+                    <View style={styles.headerTextContainer}>
+                        <Text style={styles.nameText}>{review.user_name}</Text>
+                        <View style={styles.bottomHeaderRow}>
+                            {Array.from(Array(5)).map((_, i) => (
+                                <View key={i} style={styles.starContainer}>
+                                    <Ionicons
+                                        name="star"
+                                        size={14}
+                                        color={
+                                            i < review.rating / 2
+                                                ? GOLD_RATINGS_COLOR
+                                                : 'rgba(0, 0, 0, 0.2)'
+                                        }
+                                    />
+                                </View>
+                            ))}
+                            <Text style={styles.dateText}>
+                                {fromNowString(review.created_at)}
+                            </Text>
+                        </View>
                     </View>
                 </View>
-            </View>
 
-            <View style={styles.contentContainer}>
-                <Text
-                    style={styles.contentText}
-                    numberOfLines={textShown ? undefined : MAX_LINES_LENGTH}
-                    onTextLayout={onTextLayout}>
-                    {review.content}
-                </Text>
-                {lengthMore ? (
-                    <TouchableOpacity
-                        onPress={toggleText}
-                        style={
-                            textShown
-                                ? styles.seeLessContainer
-                                : styles.seeMoreContainer
-                        }>
-                        <Text style={styles.toggleTextText}>
-                            {textShown ? 'See Less' : '... See More'}
-                        </Text>
-                    </TouchableOpacity>
-                ) : undefined}
-            </View>
+                <View style={styles.contentContainer}>
+                    <Text
+                        style={styles.contentText}
+                        numberOfLines={textShown ? undefined : MAX_LINES_LENGTH}
+                        onTextLayout={onTextLayout}>
+                        {review.content}
+                    </Text>
+                    {lengthMore ? (
+                        <TouchableOpacity
+                            onPress={toggleText}
+                            style={
+                                textShown
+                                    ? styles.seeLessContainer
+                                    : styles.seeMoreContainer
+                            }>
+                            <Text style={styles.toggleTextText}>
+                                {textShown ? 'See Less' : '... See More'}
+                            </Text>
+                        </TouchableOpacity>
+                    ) : undefined}
+                </View>
 
-            <View style={styles.isHelpfulContainer}>
-                <Helpfuls review={review} />
+                <View style={styles.isHelpfulContainer}>
+                    <Helpfuls review={review} />
+                </View>
             </View>
-        </View>
+        </TouchableHighlight>
     );
 }
 
@@ -104,9 +122,12 @@ const styles = StyleSheet.create({
     container: {
         paddingTop: 25,
         paddingBottom: 20,
-        marginHorizontal: 25,
+        paddingHorizontal: 25,
         borderTopWidth: 1,
         borderColor: '#E5E7EB',
+    },
+    noBorder: {
+        borderTopWidth: 0,
     },
     headerContainer: {
         flexDirection: 'row',

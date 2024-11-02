@@ -166,7 +166,11 @@ export default function CreateReview({
             const { data, error } = await supabase
                 .from('reviews')
                 .upsert(
-                    { ...review, pub_id: pub.id },
+                    {
+                        ...review,
+                        content: review.content?.trim(),
+                        pub_id: pub.id,
+                    },
                     { onConflict: 'pub_id, user_id' },
                 )
                 .eq('pub_id', pub.id)

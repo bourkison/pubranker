@@ -1,12 +1,15 @@
 import { PRIMARY_COLOR } from '@/constants';
 import { PubSchema } from '@/types';
-import React, { useMemo, useRef } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import { Text, StyleSheet, Pressable, View } from 'react-native';
 import { Ionicons, SimpleLineIcons } from '@expo/vector-icons';
 import { BottomSheetBackdrop, BottomSheetModal } from '@gorhom/bottom-sheet';
 import TopSection from './TopSection';
 import RateSection from './RateSection';
 import { useSharedPubViewContext } from '@/context/pubViewContext';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 
 type RateButtonProps = {
     pub: PubSchema;
@@ -15,6 +18,8 @@ type RateButtonProps = {
 export default function RateButtonModal({ pub }: RateButtonProps) {
     // const [isLoading, setIsLoading] = useState(false);
     const bottomSheetRef = useRef<BottomSheetModal>(null);
+    const navigation =
+        useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
 
     const { userReview, setUserReview } = useSharedPubViewContext();
 
@@ -64,6 +69,11 @@ export default function RateButtonModal({ pub }: RateButtonProps) {
         );
     }, [userReview, stars]);
 
+    const navigateToReview = useCallback(() => {
+        bottomSheetRef.current?.dismiss();
+        navigation.navigate('CreateReview', { pubId: pub.id });
+    }, [bottomSheetRef, pub, navigation]);
+
     return (
         <>
             <Pressable
@@ -103,7 +113,7 @@ export default function RateButtonModal({ pub }: RateButtonProps) {
 
                         <Pressable
                             style={styles.modalSubsection}
-                            onPress={() => bottomSheetRef.current?.dismiss()}>
+                            onPress={navigateToReview}>
                             <Text style={styles.modalOptionText}>Review</Text>
                         </Pressable>
 
