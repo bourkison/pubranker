@@ -89,7 +89,8 @@ export default function ViewReview({
             const { data, error } = await supabase
                 .from('user_comments')
                 .select()
-                .eq('review_id', route.params.reviewId);
+                .eq('review_id', route.params.reviewId)
+                .order('created_at', { ascending: true });
 
             if (error) {
                 console.error(error);
@@ -126,6 +127,52 @@ export default function ViewReview({
             likes: review.likes - 1,
         });
     }, [review]);
+
+    const setCommentToLiked = useCallback(
+        (index: number) => {
+            if (!comments[index]) {
+                return;
+            }
+
+            const updatedComments = comments.map((comment, i) => {
+                if (index === i) {
+                    return {
+                        ...comment,
+                        liked: true,
+                        likes_amount: comment.likes_amount + 1,
+                    };
+                }
+
+                return comment;
+            });
+
+            setComments(updatedComments);
+        },
+        [comments],
+    );
+
+    const setCommentToUnliked = useCallback(
+        (index: number) => {
+            if (!comments[index]) {
+                return;
+            }
+
+            const updatedComments = comments.map((comment, i) => {
+                if (index === i) {
+                    return {
+                        ...comment,
+                        liked: false,
+                        likes_amount: comment.likes_amount - 1,
+                    };
+                }
+
+                return comment;
+            });
+
+            setComments(updatedComments);
+        },
+        [comments],
+    );
 
     if (isLoading) {
         return <ActivityIndicator />;
@@ -173,7 +220,14 @@ export default function ViewReview({
                     <Comment
                         comment={item}
                         index={index}
-                        onLikeToggle={() => console.log('like toggle')}
+                        onLikeCommence={setCommentToLiked}
+                        onUnlikeCommence={setCommentToUnliked}
+                        onLikeComplete={(i, success) =>
+                            !success ? setCommentToUnliked(i) : undefined
+                        }
+                        onUnlikeComplete={(i, success) =>
+                            !success ? setCommentToLiked(i) : undefined
+                        }
                     />
                 )}
                 ListHeaderComponent={

@@ -11,11 +11,15 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '@/services/supabase';
+import UserAvatar from '../User/UserAvatar';
 
 type CommentProps = {
     comment: UserCommentType;
     index: number;
-    onLikeToggle?: (index: number, liked: boolean) => void;
+    onLikeCommence?: (index: number) => void;
+    onLikeComplete?: (index: number, success: boolean) => void;
+    onUnlikeCommence?: (index: number) => void;
+    onUnlikeComplete?: (index: number, success: boolean) => void;
 };
 
 const MAX_LINES_LENGTH = 4;
@@ -23,7 +27,10 @@ const MAX_LINES_LENGTH = 4;
 export default function Comment({
     comment,
     index,
-    onLikeToggle,
+    onLikeCommence,
+    onUnlikeCommence,
+    onUnlikeComplete,
+    onLikeComplete,
 }: CommentProps) {
     const [isLiking, setIsLiking] = useState(false);
     const [textShown, setTextShown] = useState(false);
@@ -37,28 +44,43 @@ export default function Comment({
     );
 
     const toggleLike = async () => {
-        const userId = (await supabase.auth.getUser()).data.user?.id;
-
-        if (isLiking || !userId) {
+        if (isLiking) {
             return;
         }
 
         setIsLiking(true);
 
         if (comment.liked) {
-            await supabase
+            onUnlikeCommence && onUnlikeCommence(index);
+
+            const { error } = await supabase
                 .from('comment_likes')
                 .delete()
-                .eq('comment_id', comment.id)
-                .eq('user_id', userId);
+                .eq('comment_id', comment.id);
+
+            if (error) {
+                console.error(error);
+                setIsLiking(false);
+                onUnlikeComplete && onUnlikeComplete(index, false);
+                return;
+            }
+
+            onUnlikeComplete && onUnlikeComplete(index, true);
         } else {
-            await supabase
+            onLikeCommence && onLikeCommence(index);
+
+            const { error } = await supabase
                 .from('comment_likes')
                 .insert({ comment_id: comment.id });
-        }
 
-        if (onLikeToggle) {
-            onLikeToggle(index, !comment.liked);
+            if (error) {
+                console.error(error);
+                setIsLiking(false);
+                onLikeComplete && onLikeComplete(index, false);
+                return;
+            }
+
+            onLikeComplete && onLikeComplete(index, true);
         }
 
         setIsLiking(false);
@@ -66,7 +88,11 @@ export default function Comment({
 
     return (
         <View style={styles.container}>
-            <Text style={styles.createdByText}>{comment.user_name}</Text>
+            <View style={styles.userContainer}>
+                <UserAvatar photo={comment.user_profile_photo} size={18} />
+
+                <Text style={styles.usernameText}>{comment.user_name}</Text>
+            </View>
             <Text
                 style={styles.contentText}
                 numberOfLines={textShown ? undefined : MAX_LINES_LENGTH}
@@ -118,7 +144,7 @@ export default function Comment({
 const styles = StyleSheet.create({
     container: {
         paddingHorizontal: 20,
-        paddingVertical: 10,
+        paddingVertical: 20,
         borderColor: '#E5E7EB',
         borderBottomWidth: 1,
     },
@@ -126,7 +152,8 @@ const styles = StyleSheet.create({
         fontWeight: '800',
     },
     contentText: {
-        paddingVertical: 5,
+        paddingVertical: 15,
+        fontSize: 14,
     },
     bottomSectionContainer: {
         flexDirection: 'row',
@@ -141,12 +168,11 @@ const styles = StyleSheet.create({
         marginRight: 4,
     },
     likeText: {
-        color: '#a3a3a3',
-        fontWeight: '300',
+        fontWeight: '200',
+        fontSize: 12,
     },
     createdAtText: {
-        color: '#a3a3a3',
-        fontWeight: '300',
+        fontWeight: '200',
         fontSize: 10,
     },
     seeLessContainer: {
@@ -159,5 +185,14 @@ const styles = StyleSheet.create({
     },
     toggleTextText: {
         color: '#A3A3A3',
+    },
+    userContainer: {
+        alignItems: 'center',
+        flexDirection: 'row',
+    },
+    usernameText: {
+        marginLeft: 5,
+        fontWeight: '500',
+        fontSize: 14,
     },
 });

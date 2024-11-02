@@ -748,6 +748,7 @@ export type Database = {
                     updated_at: string | null;
                     user_id: string | null;
                     user_name: string | null;
+                    user_profile_photo: string | null;
                 };
                 Relationships: [
                     {
