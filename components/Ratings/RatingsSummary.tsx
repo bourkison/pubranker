@@ -1,7 +1,10 @@
 import { GOLD_RATINGS_COLOR } from '@/constants';
-import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import AnimatedRatingsBar from '@/components/Ratings/AnimatedRatingsBar';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { runOnJS } from 'react-native-reanimated';
 
 type RatingsSummaryProps = {
     header: string;
@@ -21,57 +24,7 @@ type RatingsSummaryProps = {
     totalRating: number;
 };
 
-type RatingsBarProps = {
-    val: number;
-    maxVal: number;
-    height: number;
-    width: number;
-    index: number;
-    selected: number | null;
-    setSelected: React.Dispatch<React.SetStateAction<number | null>>;
-};
-
-const MINIMUM_BAR_HEIGHT = 3;
-const BAR_MARGINS = 3;
-
-function RatingsBar({
-    val,
-    maxVal,
-    height,
-    width,
-    index,
-    setSelected,
-    selected,
-}: RatingsBarProps) {
-    const h = useMemo(() => {
-        if (maxVal === 0) {
-            return MINIMUM_BAR_HEIGHT;
-        }
-
-        const temp = (val / maxVal) * height;
-
-        return (temp ?? 0) + MINIMUM_BAR_HEIGHT;
-    }, [val, maxVal, height]);
-
-    return (
-        <Pressable
-            style={styles.pressable}
-            onPressIn={() => setSelected(index)}
-            onPressOut={() => setSelected(null)}>
-            <View style={styles.barContainer}>
-                <View
-                    style={[
-                        styles.ratingsBar,
-                        { height: h, width },
-                        selected === index
-                            ? { backgroundColor: GOLD_RATINGS_COLOR }
-                            : undefined,
-                    ]}
-                />
-            </View>
-        </Pressable>
-    );
-}
+export const BAR_MARGINS = 3;
 
 export default function RatingsSummary({
     header,
@@ -88,6 +41,8 @@ export default function RatingsSummary({
         () => elementWidth / 10 - BAR_MARGINS * 2,
         [elementWidth],
     );
+
+    const totalBarWidth = useMemo(() => barWidth + BAR_MARGINS * 2, [barWidth]);
 
     useEffect(() => {
         let largest = 0;
@@ -108,6 +63,27 @@ export default function RatingsSummary({
 
         return ratings[selected].toString();
     }, [selected, ratings, totalRating]);
+
+    const calculateRatingsTouch = useCallback<(x: number) => number | null>(
+        (x: number) => {
+            'worklet';
+
+            for (let i = 0; i < ratings.length; i++) {
+                if (x < totalBarWidth * (i + 1)) {
+                    return i;
+                }
+            }
+
+            return null;
+        },
+        [totalBarWidth, ratings],
+    );
+
+    const gesture = Gesture.Pan()
+        .failOffsetY([-5, 5])
+        .onBegin(e => runOnJS(setSelected)(calculateRatingsTouch(e.x)))
+        .onUpdate(e => runOnJS(setSelected)(calculateRatingsTouch(e.x)))
+        .onFinalize(() => runOnJS(setSelected)(null));
 
     const rightColumnStars = useMemo<React.ReactNode>(() => {
         if (selected === null) {
@@ -152,26 +128,31 @@ export default function RatingsSummary({
             <Text style={styles.headerText}>{header}</Text>
 
             <View style={styles.contentContainer}>
-                <View
-                    style={styles.barsContainer}
-                    onLayout={({
-                        nativeEvent: {
-                            layout: { width },
-                        },
-                    }) => setElementWidth(width)}>
-                    {ratings.map((r, index) => (
-                        <RatingsBar
-                            val={r}
-                            key={index}
-                            width={barWidth}
-                            maxVal={ratings[largestIndex]}
-                            height={ratingsHeight}
-                            index={index}
-                            selected={selected}
-                            setSelected={setSelected}
-                        />
-                    ))}
-                </View>
+                <GestureDetector gesture={gesture}>
+                    <View
+                        style={[
+                            styles.barsContainer,
+                            { height: ratingsHeight },
+                        ]}
+                        onLayout={({
+                            nativeEvent: {
+                                layout: { width },
+                            },
+                        }) => setElementWidth(width)}>
+                        {ratings.map((r, index) => (
+                            <AnimatedRatingsBar
+                                val={r}
+                                key={index}
+                                width={barWidth}
+                                maxVal={ratings[largestIndex]}
+                                height={ratingsHeight}
+                                index={index}
+                                selected={selected}
+                                setSelected={setSelected}
+                            />
+                        ))}
+                    </View>
+                </GestureDetector>
 
                 <View style={styles.rightColumn}>
                     <Text style={styles.starsText}>{rightColumnText}</Text>
@@ -190,27 +171,22 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
     },
     contentContainer: { flexDirection: 'row' },
-    headerText: { fontSize: 16, fontFamily: 'Jost', paddingHorizontal: 15 },
+    headerText: {
+        fontSize: 16,
+        fontFamily: 'Jost',
+        paddingHorizontal: 15,
+        marginBottom: 10,
+    },
     barsContainer: {
         flexDirection: 'row',
         flex: 1,
-    },
-    barContainer: {
-        justifyContent: 'flex-end',
-        alignItems: 'center',
-    },
-    ratingsBar: {
-        backgroundColor: `${GOLD_RATINGS_COLOR}77`,
-        marginHorizontal: BAR_MARGINS,
-        width: 20,
-        borderRadius: 1,
-        marginBottom: 4,
     },
     rightColumn: {
         justifyContent: 'center',
         alignItems: 'center',
         marginLeft: 5,
         width: 55,
+        marginTop: -20,
     },
     starsText: {
         fontSize: 18,
@@ -220,7 +196,4 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
     star: {},
-    pressable: {
-        justifyContent: 'flex-end',
-    },
 });

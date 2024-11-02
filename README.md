@@ -1,5 +1,17 @@
 ### Supabase commands
 
+##### Start DB
+
+```
+supabase start
+```
+
+##### Stop DB
+
+```
+supabase stop
+```
+
 ##### Diff DB
 
 ```

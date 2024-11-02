@@ -57,12 +57,11 @@ export default function Review({ review }: ReviewProps) {
                                     name="star"
                                     size={14}
                                     color={
-                                        index < review.rating
+                                        index < review.rating / 2
                                             ? GOLD_RATINGS_COLOR
                                             : 'rgba(0, 0, 0, 0.2)'
                                     }
                                 />
-                                {/* <Text>{JSON.stringify(review.rating)}</Text> */}
                             </View>
                         ))}
                         <Text style={styles.dateText}>
