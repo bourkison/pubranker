@@ -43,7 +43,7 @@ import PubFeatures from '@/components/Pubs/PubView/PubFeatures';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import TopTabs from '@/components/Utility/TopTabs';
 import PubReviews from '@/components/Reviews/PubReviews';
-import PubGallery from '../components/Pubs/PubView/PubGallery';
+import PubGallery from '@/components/Pubs/PubView/PubGallery';
 import PubDetails from '@/components/Pubs/PubView/PubDetails';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import { PubSchema, UserReviewType } from '@/types';

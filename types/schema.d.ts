@@ -98,23 +98,72 @@ export type Database = {
                 };
                 Relationships: [];
             };
+            collection_items: {
+                Row: {
+                    collection_id: number;
+                    created_by: string;
+                    id: number;
+                    pub_id: number;
+                };
+                Insert: {
+                    collection_id: number;
+                    created_by?: string;
+                    id?: number;
+                    pub_id: number;
+                };
+                Update: {
+                    collection_id?: number;
+                    created_by?: string;
+                    id?: number;
+                    pub_id?: number;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'collection_items_collection_id_fkey';
+                        columns: ['collection_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'collections';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'collection_items_pub_id_fkey';
+                        columns: ['pub_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'formatted_pubs';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'collection_items_pub_id_fkey';
+                        columns: ['pub_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'pubs';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
             collections: {
                 Row: {
+                    collaborative: boolean;
                     created_at: string;
                     id: number;
                     name: string;
+                    public: boolean;
                     user_id: string;
                 };
                 Insert: {
+                    collaborative?: boolean;
                     created_at?: string;
                     id?: number;
                     name: string;
+                    public?: boolean;
                     user_id: string;
                 };
                 Update: {
+                    collaborative?: boolean;
                     created_at?: string;
                     id?: number;
                     name?: string;
+                    public?: boolean;
                     user_id?: string;
                 };
                 Relationships: [];
@@ -616,34 +665,24 @@ export type Database = {
             };
             saves: {
                 Row: {
-                    collection_id: number | null;
                     created_at: string | null;
                     id: number;
                     pub_id: number;
                     user_id: string;
                 };
                 Insert: {
-                    collection_id?: number | null;
                     created_at?: string | null;
                     id?: number;
                     pub_id: number;
                     user_id?: string;
                 };
                 Update: {
-                    collection_id?: number | null;
                     created_at?: string | null;
                     id?: number;
                     pub_id?: number;
                     user_id?: string;
                 };
                 Relationships: [
-                    {
-                        foreignKeyName: 'saves_collection_id_fkey';
-                        columns: ['collection_id'];
-                        isOneToOne: false;
-                        referencedRelation: 'collections';
-                        referencedColumns: ['id'];
-                    },
                     {
                         foreignKeyName: 'saves_pub_id_fkey';
                         columns: ['pub_id'];

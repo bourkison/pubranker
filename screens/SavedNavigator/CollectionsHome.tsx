@@ -1,18 +1,65 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     View,
     Text,
     SafeAreaView,
     TouchableOpacity,
     StyleSheet,
+    FlatList,
+    ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { SavedNavigatorStackParamList } from '@/nav/SavedNavigator';
 import CreateCollectionIcon from '@/components/Collections/CreateCollectionIcon';
+import { supabase } from '@/services/supabase';
+import { ListCollectionType } from '@/types/collections';
+import CollectionListItem from '@/components/Collections/CollectionListItem';
+
+const INITIAL_LOAD_AMOUNT = 10;
 
 export default function CollectionsHome() {
+    const [isLoading, setIsLoading] = useState(false);
+    const [collections, setCollections] = useState<ListCollectionType[]>([]);
+
+    useEffect(() => {
+        const fetchCollections = async () => {
+            setIsLoading(true);
+
+            const { data, error } = await supabase
+                .from('collections')
+                .select(
+                    `
+                    id,
+                    name,
+                    pubs(
+                        id,
+                        primary_photo
+                    ),
+                    pubs_count:pubs(count)
+                `,
+                )
+                .order('created_at', { ascending: false })
+                .order('created_at', {
+                    referencedTable: 'pubs',
+                    ascending: false,
+                })
+                .limit(INITIAL_LOAD_AMOUNT)
+                .limit(3, { referencedTable: 'pubs' });
+
+            if (error) {
+                setIsLoading(false);
+                return;
+            }
+
+            setCollections(data);
+            setIsLoading(false);
+        };
+
+        fetchCollections();
+    }, []);
+
     const navigation =
         useNavigation<StackNavigationProp<SavedNavigatorStackParamList>>();
 
@@ -33,7 +80,27 @@ export default function CollectionsHome() {
                     <CreateCollectionIcon />
                 </View>
             </View>
-            <View />
+
+            <FlatList
+                ListEmptyComponent={
+                    isLoading ? (
+                        <ActivityIndicator />
+                    ) : (
+                        <View>
+                            <Text>
+                                No collections yet. Hit the plus at the top
+                                right to add.
+                            </Text>
+                        </View>
+                    )
+                }
+                data={collections}
+                contentContainerStyle={styles.listContainer}
+                renderItem={({ item }) => (
+                    <CollectionListItem collection={item} />
+                )}
+                keyExtractor={item => item.id.toString()}
+            />
         </SafeAreaView>
     );
 }
@@ -66,4 +133,5 @@ const styles = StyleSheet.create({
     menuContainer: {
         paddingRight: ICON_PADDING,
     },
+    listContainer: {},
 });
