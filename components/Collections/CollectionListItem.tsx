@@ -1,7 +1,16 @@
 import { supabase } from '@/services/supabase';
 import { ListCollectionType } from '@/types/collections';
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, Image, StyleSheet, Pressable } from 'react-native';
+import {
+    View,
+    Text,
+    Image,
+    StyleSheet,
+    TouchableHighlight,
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { SavedNavigatorStackParamList } from '@/nav/SavedNavigator';
 
 const NO_IMAGE = require('@/assets/noimage.png');
 
@@ -17,6 +26,9 @@ export default function CollectionListItem({
 }: CollectionListItemProps) {
     const [containerWidth, setContainerWidth] = useState(0);
     const [imageUrls, setImageUrls] = useState<(string | null)[]>([]);
+
+    const navigation =
+        useNavigation<StackNavigationProp<SavedNavigatorStackParamList>>();
 
     const primaryImageDimensions = useMemo(
         () => (containerWidth / 3) * 2 - IMAGE_HORIZONTAL_MARGINS,
@@ -62,7 +74,7 @@ export default function CollectionListItem({
 
         if (imageUrls.length === 1) {
             return (
-                <View style={{ alignItems: 'center', width: '100%' }}>
+                <View style={styles.soloImageContainer}>
                     <Image
                         source={imageUrls[0] ? { uri: imageUrls[0] } : NO_IMAGE}
                         style={[
@@ -84,6 +96,7 @@ export default function CollectionListItem({
                         source={imageUrls[0] ? { uri: imageUrls[0] } : NO_IMAGE}
                         style={[
                             styles.image,
+                            styles.imageRightMargin,
                             {
                                 width: halfImageDimensions,
                                 height: halfImageDimensions,
@@ -94,6 +107,7 @@ export default function CollectionListItem({
                         source={imageUrls[1] ? { uri: imageUrls[1] } : NO_IMAGE}
                         style={[
                             styles.image,
+                            styles.imageLeftMargin,
                             {
                                 width: halfImageDimensions,
                                 height: halfImageDimensions,
@@ -154,7 +168,15 @@ export default function CollectionListItem({
     ]);
 
     return (
-        <Pressable style={styles.container}>
+        <TouchableHighlight
+            style={styles.container}
+            underlayColor="#E5E7EB"
+            onPress={() =>
+                navigation.navigate('CollectionsView', {
+                    collectionId: collection.id,
+                })
+            }
+            activeOpacity={1}>
             <View
                 onLayout={({
                     nativeEvent: {
@@ -168,13 +190,13 @@ export default function CollectionListItem({
                     {collection.pubs_count[0].count === 1 ? 'pub' : 'pubs'}
                 </Text>
             </View>
-        </Pressable>
+        </TouchableHighlight>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        paddingVertical: 20,
+        paddingVertical: 15,
         borderBottomWidth: 1,
         borderColor: '#E5E7EB',
         paddingHorizontal: 30,
@@ -197,6 +219,7 @@ const styles = StyleSheet.create({
     imageBottomMargin: {
         marginBottom: IMAGE_VERTICAL_MARGINS,
     },
+    soloImageContainer: { alignItems: 'center', width: '100%' },
     nameText: {
         fontSize: 16,
         marginTop: 6,
