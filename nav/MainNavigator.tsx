@@ -1,13 +1,13 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import BottomTabNavigator from '@/nav/BottomTabNavigator';
 import React from 'react';
-import PubView from '@/screens/PubView';
-import Suggestions from '@/screens/Suggestions';
+import PubView from '@/screens/MainNavigator/PubView';
+import Suggestions from '@/screens/MainNavigator/Suggestions';
 import { PubSchema } from '@/types';
-import CreateReview from '@/screens/CreateReview';
-import ViewReview from '@/screens/ViewReview';
+import CreateReview from '@/screens/MainNavigator/CreateReview';
+import ViewReview from '@/screens/MainNavigator/ViewReview';
 import { Database } from '@/types/schema';
-import CreateComment from '@/screens/CreateComment';
+import CreateComment from '@/screens/MainNavigator/CreateComment';
 
 export type MainNavigatorStackParamList = {
     Home: undefined;

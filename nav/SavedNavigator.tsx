@@ -1,8 +1,8 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
-import Saved from '@/screens/Saved';
-import CollectionsHome from '@/screens/CollectionsHome';
-import CollectionsView from '@/screens/CollectionsView';
+import Saved from '@/screens/SavedNavigator/Saved';
+import CollectionsHome from '@/screens/SavedNavigator/CollectionsHome';
+import CollectionsView from '@/screens/SavedNavigator/CollectionsView';
 
 export type SavedNavigatorStackParamList = {
     SavedHome: undefined;

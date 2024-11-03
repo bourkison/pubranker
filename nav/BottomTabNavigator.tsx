@@ -3,11 +3,11 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { requestBackgroundPermissionsAsync } from 'expo-location';
-import Profile from '@/screens/Profile';
-import Explore from '@/screens/Explore';
+import Profile from '@/screens/BottomTabNavigator/Profile';
+import Explore from '@/screens/BottomTabNavigator/Explore';
 import { SECONDARY_COLOR } from '@/constants';
-import Feed from '@/screens/Feed';
-import SavedNavigator from './SavedNavigator';
+import Feed from '@/screens/BottomTabNavigator/Feed';
+import SavedNavigator from '@/nav/SavedNavigator';
 
 export type BottomTabNavigatorParamList = {
     Explore: undefined;
