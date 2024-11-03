@@ -6,6 +6,8 @@ import Suggestions from '@/screens/Suggestions';
 import { PubSchema } from '@/types';
 import CreateReview from '@/screens/CreateReview';
 import ViewReview from '@/screens/ViewReview';
+import { Database } from '@/types/schema';
+import CreateComment from '@/screens/CreateComment';
 
 export type MainNavigatorStackParamList = {
     Home: undefined;
@@ -19,6 +21,12 @@ export type MainNavigatorStackParamList = {
     };
     ViewReview: {
         reviewId: number;
+    };
+    CreateComment: {
+        reviewId: number;
+        onCreate: (
+            comment: Database['public']['Tables']['comments']['Row'],
+        ) => void;
     };
 };
 
@@ -51,6 +59,11 @@ export default function MainNavigator() {
                 name="ViewReview"
                 component={ViewReview}
                 options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="CreateComment"
+                component={CreateComment}
+                options={{ headerShown: false, presentation: 'modal' }}
             />
         </Stack.Navigator>
     );

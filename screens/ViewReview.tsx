@@ -11,6 +11,7 @@ import {
     Image,
     Pressable,
     FlatList,
+    ScrollView,
 } from 'react-native';
 import { Ionicons, SimpleLineIcons } from '@expo/vector-icons';
 import UserAvatar from '@/components/User/UserAvatar';
@@ -24,6 +25,8 @@ import RatingsStarViewer from '@/components/Ratings/RatingsStarsViewer';
 import dayjs from 'dayjs';
 import LikeReviewButton from '@/components/Reviews/LikeReviewButton';
 import Comment from '@/components/Comments/Comment';
+import { PRIMARY_COLOR } from '@/constants';
+import { useAppSelector } from '@/store/hooks';
 
 const NO_IMAGE = require('@/assets/noimage.png');
 
@@ -40,6 +43,8 @@ export default function ViewReview({
 
     const [isLoadingComments, setIsLoadingComments] = useState(false);
     const [comments, setComments] = useState<UserCommentType[]>([]);
+
+    const user = useAppSelector(state => state.user.docData);
 
     const [imageUrl, setImageUrl] = useState('');
 
@@ -174,6 +179,25 @@ export default function ViewReview({
         [comments],
     );
 
+    const createComment = useCallback(() => {
+        navigation.navigate('CreateComment', {
+            reviewId: route.params.reviewId,
+            onCreate: comment => {
+                setComments(c => [
+                    ...c,
+                    {
+                        ...comment,
+                        liked: false,
+                        likes_amount: 0,
+                        user_name: user?.name || '',
+                        user_profile_photo: user?.profile_photo || '',
+                        user_id: user?.id || '',
+                    },
+                ]);
+            },
+        });
+    }, [navigation, user, route]);
+
     if (isLoading) {
         return <ActivityIndicator />;
     }
@@ -231,110 +255,128 @@ export default function ViewReview({
                     />
                 )}
                 ListHeaderComponent={
-                    <View style={styles.contentContainer}>
-                        <View
-                            style={styles.flexOne}
-                            onLayout={({
-                                nativeEvent: {
-                                    layout: { width: w },
-                                },
-                            }) => setContentWidth(w)}>
-                            <View style={[styles.pubInfoContainer]}>
-                                <View style={styles.pubInfoLeftColumn}>
-                                    <View style={styles.userContainer}>
-                                        <UserAvatar
-                                            photo={review.user_profile_photo}
-                                            size={18}
-                                        />
+                    <View>
+                        <View style={styles.contentContainer}>
+                            <View
+                                style={styles.flexOne}
+                                onLayout={({
+                                    nativeEvent: {
+                                        layout: { width: w },
+                                    },
+                                }) => setContentWidth(w)}>
+                                <View style={[styles.pubInfoContainer]}>
+                                    <View style={styles.pubInfoLeftColumn}>
+                                        <View style={styles.userContainer}>
+                                            <UserAvatar
+                                                photo={
+                                                    review.user_profile_photo
+                                                }
+                                                size={18}
+                                            />
 
-                                        <Text style={styles.usernameText}>
-                                            {review.user_name}
-                                        </Text>
+                                            <Text style={styles.usernameText}>
+                                                {review.user_name}
+                                            </Text>
+                                        </View>
+
+                                        <Pressable
+                                            style={styles.pubNameContainer}
+                                            onPress={() =>
+                                                navigation.push('PubView', {
+                                                    pubId: review.pub_id,
+                                                })
+                                            }>
+                                            <Text style={styles.pubNameText}>
+                                                {review.pub_name}
+                                            </Text>
+
+                                            <Text style={styles.pubAddressText}>
+                                                {review.pub_address}
+                                            </Text>
+                                        </Pressable>
+
+                                        <View style={styles.ratingsContainer}>
+                                            <RatingsStarViewer
+                                                padding={0}
+                                                amount={review.rating}
+                                                size={18}
+                                            />
+                                        </View>
+
+                                        <View
+                                            style={styles.reviewedAtContainer}>
+                                            <Text style={styles.reviewedAtText}>
+                                                Reviewed{' '}
+                                                {dayjs(
+                                                    review.created_at,
+                                                ).format('D MMM YYYY')}
+                                            </Text>
+                                        </View>
                                     </View>
 
-                                    <Pressable
-                                        style={styles.pubNameContainer}
-                                        onPress={() =>
-                                            navigation.push('PubView', {
-                                                pubId: review.pub_id,
-                                            })
-                                        }>
-                                        <Text style={styles.pubNameText}>
-                                            {review.pub_name}
-                                        </Text>
-
-                                        <Text style={styles.pubAddressText}>
-                                            {review.pub_address}
-                                        </Text>
-                                    </Pressable>
-
-                                    <View style={styles.ratingsContainer}>
-                                        <RatingsStarViewer
-                                            padding={0}
-                                            amount={review.rating}
-                                            size={18}
-                                        />
-                                    </View>
-
-                                    <View style={styles.reviewedAtContainer}>
-                                        <Text style={styles.reviewedAtText}>
-                                            Reviewed{' '}
-                                            {dayjs(review.created_at).format(
-                                                'D MMM YYYY',
-                                            )}
-                                        </Text>
-                                    </View>
-                                </View>
-
-                                <View
-                                    style={[
-                                        styles.pubInfoRightColumn,
-                                        { width: IMAGE_WIDTH },
-                                    ]}>
-                                    <Image
-                                        source={
-                                            imageUrl
-                                                ? { uri: imageUrl }
-                                                : NO_IMAGE
-                                        }
+                                    <View
                                         style={[
-                                            styles.pubImage,
-                                            {
-                                                width: IMAGE_WIDTH,
-                                                height:
-                                                    IMAGE_WIDTH / ASPECT_RATIO,
-                                            },
-                                        ]}
-                                    />
+                                            styles.pubInfoRightColumn,
+                                            { width: IMAGE_WIDTH },
+                                        ]}>
+                                        <Image
+                                            source={
+                                                imageUrl
+                                                    ? { uri: imageUrl }
+                                                    : NO_IMAGE
+                                            }
+                                            style={[
+                                                styles.pubImage,
+                                                {
+                                                    width: IMAGE_WIDTH,
+                                                    height:
+                                                        IMAGE_WIDTH /
+                                                        ASPECT_RATIO,
+                                                },
+                                            ]}
+                                        />
+                                    </View>
                                 </View>
-                            </View>
 
-                            <View style={styles.reviewContentContainer}>
-                                <Text style={styles.contentText}>
-                                    {review.content}
-                                </Text>
-                            </View>
+                                <View style={styles.reviewContentContainer}>
+                                    <Text style={styles.contentText}>
+                                        {review.content}
+                                    </Text>
+                                </View>
 
-                            <View style={styles.likedContainer}>
-                                <LikeReviewButton
-                                    reviewId={review.id}
-                                    size={18}
-                                    liked={review.liked}
-                                    onLikeCommence={setToLiked}
-                                    onUnlikeCommence={setToUnliked}
-                                    onLikeComplete={success =>
-                                        !success ? setToUnliked : undefined
-                                    }
-                                    onUnlikeComplete={success =>
-                                        !success ? setToLiked : undefined
-                                    }
-                                />
-                                <Text style={styles.likedText}>
-                                    {review.likes}{' '}
-                                    {review.likes === 1 ? 'like' : 'likes'}
-                                </Text>
+                                <View style={styles.likedContainer}>
+                                    <LikeReviewButton
+                                        reviewId={review.id}
+                                        size={18}
+                                        liked={review.liked}
+                                        onLikeCommence={setToLiked}
+                                        onUnlikeCommence={setToUnliked}
+                                        onLikeComplete={success =>
+                                            !success ? setToUnliked : undefined
+                                        }
+                                        onUnlikeComplete={success =>
+                                            !success ? setToLiked : undefined
+                                        }
+                                    />
+                                    <Text style={styles.likedText}>
+                                        {review.likes}{' '}
+                                        {review.likes === 1 ? 'like' : 'likes'}
+                                    </Text>
+                                </View>
                             </View>
                         </View>
+
+                        <ScrollView
+                            horizontal={true}
+                            style={styles.scrollableTagsContainer}>
+                            <Pressable
+                                style={styles.createCommentButtonContainer}
+                                onPress={createComment}>
+                                <Text style={styles.createCommentText}>
+                                    Comment
+                                </Text>
+                            </Pressable>
+                        </ScrollView>
                     </View>
                 }
             />
@@ -442,5 +484,20 @@ const styles = StyleSheet.create({
         marginLeft: 3,
         fontWeight: '300',
         fontSize: 12,
+    },
+    scrollableTagsContainer: {
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+    },
+    createCommentButtonContainer: {
+        backgroundColor: PRIMARY_COLOR,
+        borderRadius: 15,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+    },
+    createCommentText: {
+        fontSize: 12,
+        color: '#FFF',
+        fontWeight: '500',
     },
 });
