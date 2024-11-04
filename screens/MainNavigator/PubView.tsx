@@ -52,6 +52,7 @@ import { useAppDispatch } from '@/store/hooks';
 import { setPubSave } from '@/store/slices/explore';
 import RatingsSummary from '@/components/Ratings/RatingsSummary';
 import RateButtonModal from '@/components/Pubs/PubView/RateButtonModal/RateButtonModal';
+import { useSharedCollectionContext } from '@/context/collectionContext';
 
 export default function PubHome({
     route,
@@ -69,6 +70,7 @@ export default function PubHome({
     const { width, height } = useWindowDimensions();
 
     const dispatch = useAppDispatch();
+    const { showAddToCollection } = useSharedCollectionContext();
     const [isSaving, setIsSaving] = useState(false);
 
     const { showActionSheetWithOptions } = useActionSheet();
@@ -249,6 +251,8 @@ export default function PubHome({
             setIsSaving(false);
 
             if (!error) {
+                showAddToCollection(pub.id);
+
                 dispatch(setPubSave({ id: pub.id, value: true }));
 
                 if (route.params.onSaveToggle) {
@@ -281,7 +285,7 @@ export default function PubHome({
                 console.error(error);
             }
         }
-    }, [pub, dispatch, isSaving, route]);
+    }, [pub, dispatch, isSaving, showAddToCollection, route]);
 
     if (isLoading) {
         return <ActivityIndicator />;

@@ -23,7 +23,7 @@ export default function CollectionProvider({
     const [selectedPub, setSelectedPub] = useState<null | number>(null);
     const [timer, setTimer] = useState<NodeJS.Timeout>();
 
-    const showAddToCollection = useCallback((id: number, duration = 3000) => {
+    const showAddToCollection = useCallback((id: number, duration = 2500) => {
         setSelectedPub(id);
 
         const timeout = setTimeout(() => {
@@ -47,8 +47,8 @@ export default function CollectionProvider({
             {children}
             {selectedPub !== null ? (
                 <Animated.View
-                    entering={FadeInDown}
-                    exiting={FadeOutDown}
+                    entering={FadeInDown.duration(150)}
+                    exiting={FadeOutDown.duration(150)}
                     style={[
                         styles.container,
                         {
