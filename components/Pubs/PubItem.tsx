@@ -16,6 +16,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { Ionicons } from '@expo/vector-icons';
 import { Database } from '@/types/schema';
+import { useSharedCollectionContext } from '@/context/collectionContext';
 
 export type PubItemType =
     Database['public']['Functions']['get_pub_list_item']['Returns'][number];
@@ -85,6 +86,8 @@ export default function PubItem({
     const navigation =
         useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
 
+    const { showAddToCollection } = useSharedCollectionContext();
+
     const IMAGE_WIDTH = width - HORIZONTAL_PADDING * 2;
 
     useEffect(() => {
@@ -132,6 +135,7 @@ export default function PubItem({
                 onSaveComplete && onSaveComplete(false, pub.id);
             }
 
+            showAddToCollection(pub.id);
             onSaveComplete && onSaveComplete(true, pub.id);
         } else {
             onUnsaveCommence && onUnsaveCommence(pub.id);
@@ -158,6 +162,7 @@ export default function PubItem({
         onSaveComplete,
         onUnsaveCommence,
         onUnsaveComplete,
+        showAddToCollection,
     ]);
 
     return (

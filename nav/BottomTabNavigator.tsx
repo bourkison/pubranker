@@ -1,5 +1,4 @@
 import React from 'react';
-
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { requestBackgroundPermissionsAsync } from 'expo-location';
@@ -8,6 +7,10 @@ import Explore from '@/screens/BottomTabNavigator/Explore';
 import { SECONDARY_COLOR } from '@/constants';
 import Feed from '@/screens/BottomTabNavigator/Feed';
 import SavedNavigator from '@/nav/SavedNavigator';
+import { useSharedCollectionContext } from '@/context/collectionContext';
+import { StackScreenProps } from '@react-navigation/stack';
+import { MainNavigatorStackParamList } from './MainNavigator';
+import { useFocusEffect } from '@react-navigation/native';
 
 export type BottomTabNavigatorParamList = {
     Explore: undefined;
@@ -18,7 +21,18 @@ export type BottomTabNavigatorParamList = {
 
 const Tab = createBottomTabNavigator<BottomTabNavigatorParamList>();
 
-export default function BottomTabNavigator() {
+export default function BottomTabNavigator({}: StackScreenProps<
+    MainNavigatorStackParamList,
+    'Home'
+>) {
+    const { setIsOnBottomTabsPage } = useSharedCollectionContext();
+
+    useFocusEffect(() => {
+        setIsOnBottomTabsPage(true);
+
+        return () => setIsOnBottomTabsPage(false);
+    });
+
     return (
         <Tab.Navigator
             screenOptions={{

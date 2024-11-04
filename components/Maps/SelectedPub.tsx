@@ -127,7 +127,7 @@ export default function SelectedPub({ pub }: SelectedPubProps) {
 
     return (
         <Animated.View
-            style={rStyle}
+            style={[rStyle, styles.animatedContainer]}
             entering={FadeInDown}
             exiting={CustomExitingAnimation}>
             <GestureDetector gesture={panGesture}>
@@ -180,6 +180,9 @@ export default function SelectedPub({ pub }: SelectedPubProps) {
 }
 
 const styles = StyleSheet.create({
+    animatedContainer: {
+        zIndex: 3,
+    },
     container: {
         borderRadius: BORDER_RADIUS,
         backgroundColor: '#fff',

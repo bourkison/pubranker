@@ -27,6 +27,8 @@ import {
     MIN_MAP_BUTTON_WIDTH,
 } from '@/constants';
 import { ExploreContext } from '@/context/exploreContext';
+import { useSharedCollectionContext } from '@/context/collectionContext';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 // import { Ionicons } from '@expo/vector-icons';
 
 const COLLAPSE_ON_SCROLL_AMOUNT = 100;
@@ -42,6 +44,14 @@ export default function Explore() {
     const exploreState = useAppSelector(state => state.explore.exploreState);
     const previousExploreState = useAppSelector(
         state => state.explore.previousExploreState,
+    );
+
+    const { setBottomTabHeight } = useSharedCollectionContext();
+    const tabBarHeight = useBottomTabBarHeight();
+
+    useEffect(
+        () => setBottomTabHeight(tabBarHeight),
+        [setBottomTabHeight, tabBarHeight],
     );
 
     // START VARIABLES FOR MAP BUTTON

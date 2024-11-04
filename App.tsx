@@ -15,6 +15,8 @@ import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { StatusBar } from 'expo-status-bar';
 import dayjs from 'dayjs';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
+import CollectionProvider from '@/components/Collections/CollectionProvider';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 dayjs.extend(advancedFormat);
 
@@ -35,10 +37,14 @@ export default function App() {
                     <AuthContainer>
                         <BottomSheetModalProvider>
                             <ActionSheetProvider>
-                                <View style={styles.flexOne}>
-                                    <StatusBar style="dark" />
-                                    <Navigator />
-                                </View>
+                                <SafeAreaProvider>
+                                    <CollectionProvider>
+                                        <View style={styles.flexOne}>
+                                            <StatusBar style="dark" />
+                                            <Navigator />
+                                        </View>
+                                    </CollectionProvider>
+                                </SafeAreaProvider>
                             </ActionSheetProvider>
                         </BottomSheetModalProvider>
                     </AuthContainer>

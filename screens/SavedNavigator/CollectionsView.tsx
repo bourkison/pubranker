@@ -124,7 +124,6 @@ export default function CollectionsView({
 
             if (index > -1) {
                 pubs[index].saved = isSave;
-                console.log('index found', index, pubs[index], isSave);
             }
 
             setCollection({ ...collection, pubs });
