@@ -242,6 +242,11 @@ export default function PubHome({
                 return;
             }
 
+            if (sTranslateY.value < -screenOverflow) {
+                withinScrollBoundsWorklet(true);
+                return;
+            }
+
             sTranslateY.value = withDecay(
                 {
                     velocity: e.velocityY,
