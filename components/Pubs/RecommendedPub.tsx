@@ -16,12 +16,15 @@ const NO_IMAGE = require('@/assets/noimage.png');
 const WIDTH_PERCENTAGE = 0.8;
 const ASPECT_RATIO = 1.3333; // 4:3
 
-type PubListItemProps = {
+type RecommendedPubItemProps = {
     pub: PubSchema;
     onSaveToggle?: (id: number, value: boolean) => void;
 };
 
-export default function PubListItem({ pub, onSaveToggle }: PubListItemProps) {
+export default function RecommendedPubItem({
+    pub,
+    onSaveToggle,
+}: RecommendedPubItemProps) {
     const [imageUrl, setImageUrl] = useState('');
 
     const { width } = useWindowDimensions();

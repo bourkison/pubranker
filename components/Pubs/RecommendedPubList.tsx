@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, View } from 'react-native';
 import { PubSchema } from '@/types';
-import PubListItem from '@/components/Pubs/RecommendedPub';
+import RecommendedPub from '@/components/Pubs/RecommendedPub';
 import * as Location from 'expo-location';
 import { supabase } from '@/services/supabase';
 
 const METERS_WITHIN = 1000;
 const INITIAL_AMOUNT = 10;
 
-type PubListProps = {};
+type RecommendedPubListProps = {};
 
-export default function PubList({}: PubListProps) {
+export default function RecommendedPubList({}: RecommendedPubListProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [pubs, setPubs] = useState<PubSchema[]>([]);
 
@@ -53,7 +53,7 @@ export default function PubList({}: PubListProps) {
                     showsHorizontalScrollIndicator={false}
                     keyExtractor={item => item.id.toString()}
                     renderItem={({ item }) => (
-                        <PubListItem
+                        <RecommendedPub
                             pub={item}
                             onSaveToggle={(id, value) => {
                                 const temp = pubs.slice();

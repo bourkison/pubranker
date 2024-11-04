@@ -7,7 +7,7 @@ import { StyleSheet, View } from 'react-native';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import DebugPolygons from './DebugPolygons';
 import BottomSheet from '@gorhom/bottom-sheet';
-import BottomSheetPubList from '@/components/Pubs/BottomSheetPubList';
+import BottomSheetPubList from '@/components/Pubs/PubList';
 import { deselectPub, fetchMapPubs, selectPub } from '@/store/slices/map';
 import SelectedPub from './SelectedPub';
 import { useSharedExploreContext } from '@/context/exploreContext';

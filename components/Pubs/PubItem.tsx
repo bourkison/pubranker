@@ -22,10 +22,10 @@ export type PubItemType =
 
 type BottomSheetPubItemProps = {
     pub: PubItemType;
-    onSaveCommence?: (id?: number) => void;
-    onSaveComplete?: (success: boolean, id?: number) => void;
-    onUnsaveCommence?: (id?: number) => void;
-    onUnsaveComplete?: (success: boolean, id?: number) => void;
+    onSaveCommence?: (id: number) => void;
+    onSaveComplete?: (success: boolean, id: number) => void;
+    onUnsaveCommence?: (id: number) => void;
+    onUnsaveComplete?: (success: boolean, id: number) => void;
 };
 
 const HORIZONTAL_PADDING = 30;
@@ -71,7 +71,7 @@ function ImageItem({ imageWidth, index, imagesLength, item }: ImageItemProps) {
     );
 }
 
-export default function BottomSheetPubItem({
+export default function PubItem({
     pub,
     onSaveCommence,
     onSaveComplete,
@@ -119,7 +119,7 @@ export default function BottomSheetPubItem({
         }
 
         if (!pub.saved) {
-            onUnsaveCommence && onUnsaveCommence(pub.id);
+            onSaveCommence && onSaveCommence(pub.id);
 
             const { error } = await supabase.from('saves').insert({
                 pub_id: pub.id,
@@ -134,7 +134,7 @@ export default function BottomSheetPubItem({
 
             onSaveComplete && onSaveComplete(true, pub.id);
         } else {
-            onSaveCommence && onSaveCommence(pub.id);
+            onUnsaveCommence && onUnsaveCommence(pub.id);
 
             const { error } = await supabase
                 .from('saves')
@@ -146,7 +146,7 @@ export default function BottomSheetPubItem({
 
             if (error) {
                 console.error(error);
-                onSaveComplete && onSaveComplete(false, pub.id);
+                onUnsaveComplete && onUnsaveComplete(false, pub.id);
             }
 
             onUnsaveComplete && onUnsaveComplete(true, pub.id);

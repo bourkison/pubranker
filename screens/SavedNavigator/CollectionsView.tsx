@@ -3,15 +3,18 @@ import { SavedNavigatorStackParamList } from '@/nav/SavedNavigator';
 import { supabase } from '@/services/supabase';
 import { Ionicons } from '@expo/vector-icons';
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
     SafeAreaView,
     Text,
     View,
     TouchableOpacity,
     StyleSheet,
+    FlatList,
+    ActivityIndicator,
 } from 'react-native';
 import * as Location from 'expo-location';
+import PubItem from '@/components/Pubs/PubItem';
 
 type CollectionType = {
     id: number;
@@ -109,8 +112,28 @@ export default function CollectionsView({
         fetchCollection();
     }, [route]);
 
+    const toggleSave = useCallback(
+        (id: number, isSave: boolean) => {
+            if (!collection) {
+                return;
+            }
+
+            const pubs = collection.pubs.slice();
+
+            const index = pubs.findIndex(pub => pub.id === id);
+
+            if (index > -1) {
+                pubs[index].saved = isSave;
+                console.log('index found', index, pubs[index], isSave);
+            }
+
+            setCollection({ ...collection, pubs });
+        },
+        [collection],
+    );
+
     return (
-        <SafeAreaView>
+        <SafeAreaView style={styles.container}>
             <View style={styles.headerContainer}>
                 <TouchableOpacity
                     style={styles.settingsContainer}
@@ -119,11 +142,40 @@ export default function CollectionsView({
                 </TouchableOpacity>
 
                 <View style={styles.headerTextContainer}>
-                    <Text style={styles.headerText}>{}</Text>
+                    <Text style={styles.headerText}>
+                        {collection?.name || 'Collection'}
+                    </Text>
                 </View>
 
                 <View style={styles.menuContainer} />
             </View>
+
+            <FlatList
+                data={collection?.pubs || []}
+                keyExtractor={item => item.id.toString()}
+                ListEmptyComponent={
+                    isLoading ? (
+                        <ActivityIndicator />
+                    ) : (
+                        <View>
+                            <Text>No pubs added to this collection yet</Text>
+                        </View>
+                    )
+                }
+                renderItem={({ item }) => (
+                    <PubItem
+                        pub={item}
+                        onSaveCommence={id => toggleSave(id, true)}
+                        onSaveComplete={(success, id) =>
+                            !success ? toggleSave(id, false) : undefined
+                        }
+                        onUnsaveCommence={id => toggleSave(id, false)}
+                        onUnsaveComplete={(success, id) =>
+                            !success ? toggleSave(id, true) : undefined
+                        }
+                    />
+                )}
+            />
         </SafeAreaView>
     );
 }
@@ -131,6 +183,9 @@ export default function CollectionsView({
 const ICON_PADDING = 10;
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
     headerContainer: {
         paddingVertical: 10,
         alignItems: 'center',
