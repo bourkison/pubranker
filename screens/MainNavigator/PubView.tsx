@@ -27,7 +27,9 @@ import Animated, {
     runOnUI,
     useAnimatedRef,
     useAnimatedStyle,
+    useDerivedValue,
     useSharedValue,
+    withDecay,
     withTiming,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -120,32 +122,7 @@ export default function PubHome({
         return fourByThreeHeight - width;
     }, [width]);
 
-    const sTranslateY = useSharedValue(0);
-    const contextY = useSharedValue(0);
-
-    const rContentContainerStyle = useAnimatedStyle(() => ({
-        transform: [{ translateY: sTranslateY.value + initTranslateY }],
-    }));
-
-    const rOverlayStyle = useAnimatedStyle(() => ({
-        transform: [{ translateY: sTranslateY.value + initTranslateY }],
-    }));
-
-    const rButtonStyle = useAnimatedStyle(() => {
-        const imageHeight = -(width / PUB_HOME_IMAGE_ASPECT_RATIO);
-        const crossOverPoint = imageHeight + insets.top + styles.button.height;
-
-        return {
-            backgroundColor: interpolateColor(
-                sTranslateY.value,
-                [crossOverPoint - 25, crossOverPoint + 50],
-                ['rgba(255, 255, 255, 0.99)', 'rgba(255, 255, 255, 0)'],
-                'RGB',
-            ),
-        };
-    });
-
-    const withinScrollBoundsWorklet = (withAnimation: boolean) => {
+    const calculateScreenOverflow = () => {
         'worklet';
         const measurement = measure(animatedContainerRef);
 
@@ -158,6 +135,75 @@ export default function PubHome({
         const screenHeightBeingUsed = height - width; // Height of content container if no translation and not including overflow
         const screenOverflow =
             contentContainerHeight - screenHeightBeingUsed + initTranslateY;
+
+        return screenOverflow;
+    };
+
+    const sTranslateY = useSharedValue(0);
+    const contextY = useSharedValue(0);
+
+    const dTranslateY = useDerivedValue(() => {
+        const screenOverflow = calculateScreenOverflow();
+
+        if (!screenOverflow) {
+            console.warn('no screen overflow');
+            return sTranslateY.value;
+        }
+
+        return interpolate(
+            sTranslateY.value,
+            [
+                -screenOverflow - 70,
+                -screenOverflow - 50,
+                -screenOverflow,
+                0,
+                -initTranslateY * 0.8,
+                -initTranslateY * 2,
+            ],
+            [
+                -screenOverflow - 50,
+                -screenOverflow - 40,
+                -screenOverflow,
+                0,
+                -initTranslateY / 2,
+                -initTranslateY,
+            ],
+            {
+                extrapolateLeft: Extrapolation.CLAMP,
+                extrapolateRight: Extrapolation.CLAMP,
+            },
+        );
+    });
+
+    const rContentContainerStyle = useAnimatedStyle(() => ({
+        transform: [{ translateY: dTranslateY.value + initTranslateY }],
+    }));
+
+    const rOverlayStyle = useAnimatedStyle(() => ({
+        transform: [{ translateY: dTranslateY.value + initTranslateY }],
+    }));
+
+    const rButtonStyle = useAnimatedStyle(() => {
+        const imageHeight = -(width / PUB_HOME_IMAGE_ASPECT_RATIO);
+        const crossOverPoint = imageHeight + insets.top + styles.button.height;
+
+        return {
+            backgroundColor: interpolateColor(
+                dTranslateY.value,
+                [crossOverPoint - 25, crossOverPoint + 50],
+                ['rgba(255, 255, 255, 0.99)', 'rgba(255, 255, 255, 0)'],
+                'RGB',
+            ),
+        };
+    });
+
+    const withinScrollBoundsWorklet = (withAnimation: boolean) => {
+        'worklet';
+        const screenOverflow = calculateScreenOverflow();
+
+        if (!screenOverflow) {
+            return;
+        }
 
         if (sTranslateY.value > 0) {
             sTranslateY.value = withAnimation
@@ -182,44 +228,28 @@ export default function PubHome({
             contextY.value = sTranslateY.value;
         })
         .onUpdate(e => {
-            const measurement = measure(animatedContainerRef);
+            sTranslateY.value = e.translationY + contextY.value;
+        })
+        .onFinalize(e => {
+            const screenOverflow = calculateScreenOverflow();
 
-            if (!measurement) {
+            if (!screenOverflow) {
                 return;
             }
 
-            const { height: contentContainerHeight } = measurement;
+            if (sTranslateY.value > 0) {
+                withinScrollBoundsWorklet(true);
+                return;
+            }
 
-            const screenHeightBeingUsed = height - width; // Height of pixels being used if not translation (and not including overflow)
-            const screenOverflow =
-                contentContainerHeight - screenHeightBeingUsed + initTranslateY; // Height of pixels off screen.
-
-            sTranslateY.value = interpolate(
-                e.translationY + contextY.value,
-                [
-                    -screenOverflow - 70,
-                    -screenOverflow - 50,
-                    -screenOverflow,
-                    0,
-                    -initTranslateY * 0.8,
-                    -initTranslateY * 2,
-                ],
-                [
-                    -screenOverflow - 50,
-                    -screenOverflow - 40,
-                    -screenOverflow,
-                    0,
-                    -initTranslateY / 2,
-                    -initTranslateY,
-                ],
+            sTranslateY.value = withDecay(
                 {
-                    extrapolateLeft: Extrapolation.CLAMP,
-                    extrapolateRight: Extrapolation.CLAMP,
+                    velocity: e.velocityY,
+                    deceleration: 0.998,
+                    clamp: [-screenOverflow, -initTranslateY],
                 },
+                () => withinScrollBoundsWorklet(true),
             );
-        })
-        .onFinalize(() => {
-            withinScrollBoundsWorklet(true);
         });
 
     const calculateWithinScrollBounds = (withAnimation: boolean) => {
