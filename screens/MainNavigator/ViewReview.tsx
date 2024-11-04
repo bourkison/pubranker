@@ -27,6 +27,7 @@ import LikeReviewButton from '@/components/Reviews/LikeReviewButton';
 import Comment from '@/components/Comments/Comment';
 import { PRIMARY_COLOR } from '@/constants';
 import { useAppSelector } from '@/store/hooks';
+import * as Haptics from 'expo-haptics';
 
 const NO_IMAGE = require('@/assets/noimage.png');
 
@@ -180,6 +181,8 @@ export default function ViewReview({
     );
 
     const createComment = useCallback(() => {
+        Haptics.selectionAsync();
+
         navigation.navigate('CreateComment', {
             reviewId: route.params.reviewId,
             onCreate: comment => {
