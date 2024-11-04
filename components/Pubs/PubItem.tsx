@@ -1,5 +1,4 @@
 import { supabase } from '@/services/supabase';
-import { PubSchema } from '@/types';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
     View,
@@ -16,11 +15,17 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { Ionicons } from '@expo/vector-icons';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { setPubSave } from '@/store/slices/explore';
+import { Database } from '@/types/schema';
+
+export type PubItemType =
+    Database['public']['Functions']['get_pub_list_item']['Returns'][number];
 
 type BottomSheetPubItemProps = {
-    pub: PubSchema;
+    pub: PubItemType;
+    onSaveCommence?: (id?: number) => void;
+    onSaveComplete?: (success: boolean, id?: number) => void;
+    onUnsaveCommence?: (id?: number) => void;
+    onUnsaveComplete?: (success: boolean, id?: number) => void;
 };
 
 const HORIZONTAL_PADDING = 30;
@@ -66,12 +71,15 @@ function ImageItem({ imageWidth, index, imagesLength, item }: ImageItemProps) {
     );
 }
 
-export default function BottomSheetPubItem({ pub }: BottomSheetPubItemProps) {
+export default function BottomSheetPubItem({
+    pub,
+    onSaveCommence,
+    onSaveComplete,
+    onUnsaveCommence,
+    onUnsaveComplete,
+}: BottomSheetPubItemProps) {
     const [imageUrls, setImageUrls] = useState<string[]>([]);
     const [isSaving, setIsSaving] = useState(false);
-    const user = useAppSelector(state => state.user.docData);
-
-    const dispatch = useAppDispatch();
 
     const { width } = useWindowDimensions();
     const navigation =
@@ -85,6 +93,7 @@ export default function BottomSheetPubItem({ pub }: BottomSheetPubItemProps) {
 
             pub.photos.forEach(photo => {
                 const url = supabase.storage.from('pubs').getPublicUrl(photo);
+
                 urls.push(url.data.publicUrl);
             });
 
@@ -94,16 +103,23 @@ export default function BottomSheetPubItem({ pub }: BottomSheetPubItemProps) {
     }, [pub, imageUrls]);
 
     const toggleLike = useCallback(async () => {
-        if (!user || isSaving) {
+        if (isSaving) {
             return;
         }
 
-        console.log('TOGGLING LIKE');
-
         setIsSaving(true);
 
+        const { data: userData, error: userError } =
+            await supabase.auth.getUser();
+
+        if (userError) {
+            console.error(userError);
+            setIsSaving(false);
+            return;
+        }
+
         if (!pub.saved) {
-            dispatch(setPubSave({ id: pub.id, value: true }));
+            onUnsaveCommence && onUnsaveCommence(pub.id);
 
             const { error } = await supabase.from('saves').insert({
                 pub_id: pub.id,
@@ -113,25 +129,36 @@ export default function BottomSheetPubItem({ pub }: BottomSheetPubItemProps) {
 
             if (error) {
                 console.error(error);
-                dispatch(setPubSave({ id: pub.id, value: false }));
+                onSaveComplete && onSaveComplete(false, pub.id);
             }
+
+            onSaveComplete && onSaveComplete(true, pub.id);
         } else {
-            dispatch(setPubSave({ id: pub.id, value: false }));
+            onSaveCommence && onSaveCommence(pub.id);
 
             const { error } = await supabase
                 .from('saves')
                 .delete()
                 .eq('pub_id', pub.id)
-                .eq('user_id', user.id);
+                .eq('user_id', userData.user.id);
 
             setIsSaving(false);
 
             if (error) {
                 console.error(error);
-                dispatch(setPubSave({ id: pub.id, value: true }));
+                onSaveComplete && onSaveComplete(false, pub.id);
             }
+
+            onUnsaveComplete && onUnsaveComplete(true, pub.id);
         }
-    }, [user, dispatch, isSaving, pub]);
+    }, [
+        isSaving,
+        pub,
+        onSaveCommence,
+        onSaveComplete,
+        onUnsaveCommence,
+        onUnsaveComplete,
+    ]);
 
     return (
         <View style={[styles.container, { width: IMAGE_WIDTH }]}>

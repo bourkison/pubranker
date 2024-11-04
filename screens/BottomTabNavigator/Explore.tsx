@@ -1,4 +1,4 @@
-import PubList from '@/components/Pubs/PubList';
+import PubList from '@/components/Pubs/RecommendedPubList';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
     KeyboardAvoidingView,

@@ -11,12 +11,11 @@ import {
 } from 'react-native';
 import Unauthorized from '@/screens/Unauthorized';
 
-import { Database } from '@/types/schema';
 import { supabase } from '@/services/supabase';
-import { convertFormattedPubsToPubSchema } from '@/services';
+import * as Location from 'expo-location';
 import { Text } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import BottomSheetPubItem from '@/components/Pubs/BottomSheetPubItem';
+import BottomSheetPubItem, { PubItemType } from '@/components/Pubs/PubItem';
 import { User } from '@supabase/supabase-js';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -27,9 +26,7 @@ export default function SavedPubs() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
-    const [pubs, setPubs] = useState<
-        Database['public']['Tables']['pub_schema']['Row'][]
-    >([]);
+    const [pubs, setPubs] = useState<PubItemType[]>([]);
     const [collectionsAmount, setCollectionsAmount] = useState(0);
 
     const { width } = useWindowDimensions();
@@ -50,20 +47,43 @@ export default function SavedPubs() {
                     return;
                 }
 
+                const { coords } = await Location.getCurrentPositionAsync();
+
                 const { data, error } = await supabase
-                    .from('formatted_pubs')
-                    .select()
+                    .rpc('get_pub_list_item', {
+                        lat: coords.latitude,
+                        long: coords.longitude,
+                    })
                     .in(
                         'id',
-                        savesData.map(s => s.pub_id),
+                        savesData.map(save => save.pub_id),
                     );
+
+                if (error) {
+                    console.error(error);
+                    reject();
+                    return;
+                }
+
+                const orderedPubs: PubItemType[] = [];
+
+                savesData.forEach(save => {
+                    const pub = data.find(p => p.id === save.pub_id);
+
+                    if (!pub) {
+                        console.warn('pub not found', save.pub_id);
+                        return;
+                    }
+
+                    orderedPubs.push(pub);
+                });
 
                 if (error) {
                     reject(error);
                     return;
                 }
 
-                setPubs(data.map(d => convertFormattedPubsToPubSchema(d)));
+                setPubs(data);
                 resolve();
             });
         };

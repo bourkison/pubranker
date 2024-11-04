@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { PubSchema } from '@/types';
 import { distanceString, roundToNearest } from '@/services';
 import { GOLD_RATINGS_COLOR } from '@/constants';
+import { PubItemType } from '@/components/Pubs/PubItem';
 
 type PubInfoProps = {
-    pub: PubSchema;
+    pub: PubItemType;
 };
 
 export default function PubInfo({ pub }: PubInfoProps) {

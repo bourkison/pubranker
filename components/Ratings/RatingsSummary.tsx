@@ -5,6 +5,7 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-reanimated';
 import { roundToNearest } from '@/services';
 import RatingsStarViewer from './RatingsStarsViewer';
+import * as Haptics from 'expo-haptics';
 
 type RatingsSummaryProps = {
     header: string;
@@ -55,6 +56,12 @@ export default function RatingsSummary({
 
         setLargestIndex(largest);
     }, [ratings, largestIndex]);
+
+    useEffect(() => {
+        if (selected !== null) {
+            Haptics.selectionAsync();
+        }
+    }, [selected]);
 
     const rightColumnText = useMemo<string>(() => {
         if (selected === null) {

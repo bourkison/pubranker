@@ -39,14 +39,15 @@ export default function HomeMap() {
 
     useEffect(() => {
         (async () => {
-            let { status } = await Location.requestForegroundPermissionsAsync();
+            const { status } =
+                await Location.requestForegroundPermissionsAsync();
 
             if (status !== 'granted') {
                 // TODO: Error.
                 return;
             }
 
-            let l = await Location.getCurrentPositionAsync();
+            const l = await Location.getCurrentPositionAsync();
             setLocation(l);
         })();
     }, []);
