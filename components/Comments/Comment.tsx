@@ -12,6 +12,9 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '@/services/supabase';
 import UserAvatar from '../User/UserAvatar';
+import * as Haptics from 'expo-haptics';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { runOnJS } from 'react-native-reanimated';
 
 type CommentProps = {
     comment: UserCommentType;
@@ -43,11 +46,12 @@ export default function Comment({
         [],
     );
 
-    const toggleLike = async () => {
+    const toggleLike = useCallback(async () => {
         if (isLiking) {
             return;
         }
 
+        Haptics.impactAsync();
         setIsLiking(true);
 
         if (comment.liked) {
@@ -84,60 +88,88 @@ export default function Comment({
         }
 
         setIsLiking(false);
-    };
+    }, [
+        comment,
+        index,
+        isLiking,
+        onLikeCommence,
+        onLikeComplete,
+        onUnlikeCommence,
+        onUnlikeComplete,
+    ]);
+
+    const doubleTap = useCallback(() => {
+        if (!comment.liked) {
+            toggleLike();
+        } else {
+            Haptics.impactAsync();
+        }
+    }, [toggleLike, comment]);
+
+    const gesture = Gesture.Tap()
+        .numberOfTaps(2)
+        .onStart(() => {
+            runOnJS(doubleTap)();
+        });
 
     return (
-        <View style={styles.container}>
-            <View style={styles.userContainer}>
-                <UserAvatar photo={comment.user_profile_photo} size={18} />
+        <GestureDetector gesture={gesture}>
+            <View style={styles.container}>
+                <View style={styles.userContainer}>
+                    <UserAvatar photo={comment.user_profile_photo} size={18} />
 
-                <Text style={styles.usernameText}>{comment.user_name}</Text>
-            </View>
-            <Text
-                style={styles.contentText}
-                numberOfLines={textShown ? undefined : MAX_LINES_LENGTH}
-                onTextLayout={onTextLayout}>
-                {comment.content}
-            </Text>
-            {lengthMore ? (
-                <TouchableOpacity
-                    onPress={() => setTextShown(!textShown)}
-                    style={
-                        textShown
-                            ? styles.seeLessContainer
-                            : styles.seeMoreContainer
-                    }>
-                    <Text style={styles.toggleTextText}>
-                        {textShown ? 'See Less' : '... See More'}
-                    </Text>
-                </TouchableOpacity>
-            ) : undefined}
-            <View style={styles.bottomSectionContainer}>
-                <View style={styles.likeSectionContainer}>
+                    <Text style={styles.usernameText}>{comment.user_name}</Text>
+                </View>
+                <Text
+                    style={styles.contentText}
+                    numberOfLines={textShown ? undefined : MAX_LINES_LENGTH}
+                    onTextLayout={onTextLayout}>
+                    {comment.content}
+                </Text>
+                {lengthMore ? (
                     <TouchableOpacity
-                        style={styles.likeButton}
-                        onPress={toggleLike}>
-                        {comment.liked ? (
-                            <Ionicons name="heart" size={14} color="#dc2626" />
-                        ) : (
-                            <Ionicons
-                                name="heart-outline"
-                                size={14}
-                                color="#a3a3a3"
-                            />
-                        )}
+                        onPress={() => setTextShown(!textShown)}
+                        style={
+                            textShown
+                                ? styles.seeLessContainer
+                                : styles.seeMoreContainer
+                        }>
+                        <Text style={styles.toggleTextText}>
+                            {textShown ? 'See Less' : '... See More'}
+                        </Text>
                     </TouchableOpacity>
-                    <Text style={styles.likeText}>
-                        {comment.likes_amount} likes
-                    </Text>
-                </View>
-                <View>
-                    <Text style={styles.createdAtText}>
-                        {fromNowString(comment.created_at)}
-                    </Text>
+                ) : undefined}
+                <View style={styles.bottomSectionContainer}>
+                    <View style={styles.likeSectionContainer}>
+                        <TouchableOpacity
+                            style={styles.likeButton}
+                            onPress={toggleLike}>
+                            {comment.liked ? (
+                                <Ionicons
+                                    name="heart"
+                                    size={14}
+                                    color="#dc2626"
+                                />
+                            ) : (
+                                <Ionicons
+                                    name="heart-outline"
+                                    size={14}
+                                    color="#a3a3a3"
+                                />
+                            )}
+                        </TouchableOpacity>
+                        <Text style={styles.likeText}>
+                            {comment.likes_amount} likes
+                        </Text>
+                    </View>
+                    <View>
+                        <Text style={styles.createdAtText}>
+                            {fromNowString(comment.created_at)}
+                        </Text>
+                    </View>
                 </View>
             </View>
-        </View>
+        </GestureDetector>
     );
 }
 
