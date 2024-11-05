@@ -15,12 +15,13 @@ import { supabase } from '@/services/supabase';
 import * as Location from 'expo-location';
 import { Text } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import BottomSheetPubItem, { PubItemType } from '@/components/Pubs/PubItem';
+import { PubItemType } from '@/components/Pubs/PubItem';
 import { User } from '@supabase/supabase-js';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { SavedNavigatorStackParamList } from '@/nav/SavedNavigator';
 import CreateCollectionIcon from '@/components/Collections/CreateCollectionIcon';
+import SavedListItem from '@/components/Saves/SavedListItem';
 
 export default function SavedPubs() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -194,7 +195,7 @@ export default function SavedPubs() {
                         style={{
                             width,
                         }}>
-                        <BottomSheetPubItem pub={item} />
+                        <SavedListItem pub={item} />
                     </View>
                 )}
                 keyExtractor={item => item.id.toString()}
@@ -224,7 +225,6 @@ const styles = StyleSheet.create({
         paddingVertical: 20,
         borderBottomWidth: 1,
         borderColor: '#E5E7EB',
-        marginBottom: 10,
         paddingHorizontal: 20,
         flexDirection: 'row',
         justifyContent: 'space-between',

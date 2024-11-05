@@ -43,6 +43,7 @@ export default function BottomTabNavigator({
                 tabBarStyle: {
                     backgroundColor: '#fff',
                 },
+                tabBarShowLabel: false,
             }}>
             <Tab.Screen
                 name="Explore"
@@ -98,5 +99,3 @@ export default function BottomTabNavigator({
             />
         </Tab.Navigator>
     );
-}
-requestBackgroundPermissionsAsync();
