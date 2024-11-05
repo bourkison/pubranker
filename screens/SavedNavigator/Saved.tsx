@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
     SafeAreaView,
     FlatList,
@@ -17,13 +17,14 @@ import { Text } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { PubItemType } from '@/components/Pubs/PubItem';
 import { User } from '@supabase/supabase-js';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { StackScreenProps } from '@react-navigation/stack';
 import { SavedNavigatorStackParamList } from '@/nav/SavedNavigator';
 import CreateCollectionIcon from '@/components/Collections/CreateCollectionIcon';
 import SavedListItem from '@/components/Saves/SavedListItem';
 
-export default function SavedPubs() {
+export default function SavedPubs({
+    navigation,
+}: StackScreenProps<SavedNavigatorStackParamList, 'SavedHome'>) {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
@@ -31,8 +32,6 @@ export default function SavedPubs() {
     const [collectionsAmount, setCollectionsAmount] = useState(0);
 
     const { width } = useWindowDimensions();
-    const navigation =
-        useNavigation<StackNavigationProp<SavedNavigatorStackParamList>>();
 
     useEffect(() => {
         const fetchSavedPromise = (userData: User) => {
@@ -133,6 +132,21 @@ export default function SavedPubs() {
         fetchSaved();
     }, []);
 
+    const toggleSave = useCallback(
+        (id: number, isSave: boolean) => {
+            const p = pubs.slice();
+
+            const index = p.findIndex(pub => pub.id === id);
+
+            if (index > -1) {
+                p[index].saved = isSave;
+            }
+
+            setPubs(p);
+        },
+        [pubs],
+    );
+
     const collectionsAmountText = useMemo<string>(() => {
         if (collectionsAmount === 0) {
             return 'No lists';
@@ -195,7 +209,17 @@ export default function SavedPubs() {
                         style={{
                             width,
                         }}>
-                        <SavedListItem pub={item} />
+                        <SavedListItem
+                            pub={item}
+                            onSaveCommence={id => toggleSave(id, true)}
+                            onSaveComplete={(success, id) =>
+                                !success ? toggleSave(id, false) : undefined
+                            }
+                            onUnsaveCommence={id => toggleSave(id, false)}
+                            onUnsaveComplete={(success, id) =>
+                                !success ? toggleSave(id, true) : undefined
+                            }
+                        />
                     </View>
                 )}
                 keyExtractor={item => item.id.toString()}

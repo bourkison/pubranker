@@ -1,10 +1,21 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+    View,
+    Text,
+    StyleSheet,
+    Image,
+    TouchableHighlight,
+    TouchableOpacity,
+} from 'react-native';
 import { PubItemType } from '@/components/Pubs/PubItem';
 import { Ionicons } from '@expo/vector-icons';
 import { distanceString, roundToNearest } from '@/services';
 import { GOLD_RATINGS_COLOR } from '@/constants';
 import { supabase } from '@/services/supabase';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
+import { useSharedCollectionContext } from '@/context/collectionContext';
 
 const NO_IMAGE = require('@/assets/noimage.png');
 
@@ -19,9 +30,21 @@ type BottomSheetPubItemProps = {
 const ASPECT_RATIO = 1;
 const WIDTH_PERCENTAGE = 0.3;
 
-export default function SavedListItem({ pub }: BottomSheetPubItemProps) {
+export default function SavedListItem({
+    pub,
+    onSaveCommence,
+    onSaveComplete,
+    onUnsaveCommence,
+    onUnsaveComplete,
+}: BottomSheetPubItemProps) {
     const [containerWidth, setContainerWidth] = useState(0);
     const [imageUrl, setImageUrl] = useState('');
+    const [isSaving, setIsSaving] = useState(false);
+
+    const { showAddToCollection } = useSharedCollectionContext();
+
+    const navigation =
+        useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
 
     const IMAGE_WIDTH = useMemo(
         () => containerWidth * WIDTH_PERCENTAGE,
@@ -36,8 +59,71 @@ export default function SavedListItem({ pub }: BottomSheetPubItemProps) {
         setImageUrl(url.data.publicUrl);
     }, [pub]);
 
+    const toggleLike = useCallback(async () => {
+        if (isSaving) {
+            return;
+        }
+
+        setIsSaving(true);
+
+        const { data: userData, error: userError } =
+            await supabase.auth.getUser();
+
+        if (userError) {
+            console.error(userError);
+            setIsSaving(false);
+            return;
+        }
+
+        if (!pub.saved) {
+            onSaveCommence && onSaveCommence(pub.id);
+
+            const { error } = await supabase.from('saves').insert({
+                pub_id: pub.id,
+            });
+
+            setIsSaving(false);
+
+            if (error) {
+                console.error(error);
+                onSaveComplete && onSaveComplete(false, pub.id);
+            }
+
+            showAddToCollection(pub.id);
+            onSaveComplete && onSaveComplete(true, pub.id);
+        } else {
+            onUnsaveCommence && onUnsaveCommence(pub.id);
+
+            const { error } = await supabase
+                .from('saves')
+                .delete()
+                .eq('pub_id', pub.id)
+                .eq('user_id', userData.user.id);
+
+            setIsSaving(false);
+
+            if (error) {
+                console.error(error);
+                onUnsaveComplete && onUnsaveComplete(false, pub.id);
+            }
+
+            onUnsaveComplete && onUnsaveComplete(true, pub.id);
+        }
+    }, [
+        isSaving,
+        pub,
+        onSaveCommence,
+        onSaveComplete,
+        onUnsaveCommence,
+        onUnsaveComplete,
+        showAddToCollection,
+    ]);
+
     return (
-        <View style={styles.container}>
+        <TouchableHighlight
+            style={styles.container}
+            underlayColor="#E5E7EB"
+            onPress={() => navigation.navigate('PubView', { pubId: pub.id })}>
             <View
                 style={styles.innerContainer}
                 onLayout={({
@@ -56,6 +142,21 @@ export default function SavedListItem({ pub }: BottomSheetPubItemProps) {
                             },
                         ]}
                     />
+
+                    <TouchableOpacity
+                        onPress={toggleLike}
+                        disabled={isSaving}
+                        style={styles.saveButton}>
+                        {pub.saved ? (
+                            <Ionicons name="heart" size={12} color="#dc2626" />
+                        ) : (
+                            <Ionicons
+                                name="heart-outline"
+                                size={12}
+                                color="#dc2626"
+                            />
+                        )}
+                    </TouchableOpacity>
                 </View>
 
                 <View style={styles.infoContainer}>
@@ -85,7 +186,7 @@ export default function SavedListItem({ pub }: BottomSheetPubItemProps) {
                     </View>
                 </View>
             </View>
-        </View>
+        </TouchableHighlight>
     );
 }
 
@@ -145,5 +246,16 @@ const styles = StyleSheet.create({
     },
     image: {
         borderRadius: 3,
+    },
+    saveButton: {
+        height: 20,
+        width: 20,
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'absolute',
+        top: 3,
+        left: 3,
     },
 });

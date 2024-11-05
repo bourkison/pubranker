@@ -1,4 +1,5 @@
 import { PubItemType } from '@/components/Pubs/PubItem';
+import SavedListItem from '@/components/Saves/SavedListItem';
 import { SavedNavigatorStackParamList } from '@/nav/SavedNavigator';
 import { supabase } from '@/services/supabase';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,7 +15,6 @@ import {
     ActivityIndicator,
 } from 'react-native';
 import * as Location from 'expo-location';
-import PubItem from '@/components/Pubs/PubItem';
 
 type CollectionType = {
     id: number;
@@ -162,7 +162,7 @@ export default function CollectionsView({
                     )
                 }
                 renderItem={({ item }) => (
-                    <PubItem
+                    <SavedListItem
                         pub={item}
                         onSaveCommence={id => toggleSave(id, true)}
                         onSaveComplete={(success, id) =>
@@ -205,6 +205,4 @@ const styles = StyleSheet.create({
         paddingLeft: ICON_PADDING,
     },
     menuContainer: {
-        paddingRight: ICON_PADDING,
-    },
-});
+        paddingRight: ICON_P
