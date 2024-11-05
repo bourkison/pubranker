@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { requestBackgroundPermissionsAsync } from 'expo-location';
@@ -21,11 +21,13 @@ export type BottomTabNavigatorParamList = {
 
 const Tab = createBottomTabNavigator<BottomTabNavigatorParamList>();
 
-export default function BottomTabNavigator({}: StackScreenProps<
-    MainNavigatorStackParamList,
-    'Home'
->) {
-    const { setIsOnBottomTabsPage } = useSharedCollectionContext();
+export default function BottomTabNavigator({
+    navigation,
+}: StackScreenProps<MainNavigatorStackParamList, 'Home'>) {
+    const { setIsOnBottomTabsPage, setNavigation } =
+        useSharedCollectionContext();
+
+    useEffect(() => setNavigation(navigation), [navigation, setNavigation]);
 
     useFocusEffect(() => {
         setIsOnBottomTabsPage(true);

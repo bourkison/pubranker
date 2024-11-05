@@ -5,6 +5,8 @@ import { Feather, Ionicons } from '@expo/vector-icons';
 import { SECONDARY_COLOR } from '@/constants';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
+import { StackScreenProps } from '@react-navigation/stack';
+import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 
 type CollectionProviderProps = {
     children: JSX.Element;
@@ -20,11 +22,18 @@ export default function CollectionProvider({
     const [bottomTabHeight, setBottomTabHeight] = useState(0);
     const { bottom } = useSafeAreaInsets();
 
+    const [hidden, setHidden] = useState(false);
+
     const [selectedPub, setSelectedPub] = useState<null | number>(null);
     const [timer, setTimer] = useState<NodeJS.Timeout>();
+    const [navigation, setNavigation] =
+        useState<
+            StackScreenProps<MainNavigatorStackParamList, 'Home'>['navigation']
+        >();
 
     const showAddToCollection = useCallback((id: number, duration = 2500) => {
         setSelectedPub(id);
+        setHidden(false);
 
         const timeout = setTimeout(() => {
             setSelectedPub(null);
@@ -32,6 +41,18 @@ export default function CollectionProvider({
 
         setTimer(timeout);
     }, []);
+
+    const navigateToModal = useCallback(() => {
+        if (!navigation || !selectedPub) {
+            return;
+        }
+
+        setHidden(true);
+
+        navigation.navigate('AddToList', {
+            pubId: selectedPub,
+        });
+    }, [navigation, selectedPub]);
 
     useEffect(() => {
         return () => clearTimeout(timer);
@@ -43,6 +64,7 @@ export default function CollectionProvider({
                 showAddToCollection,
                 setBottomTabHeight,
                 setIsOnBottomTabsPage,
+                setNavigation,
             }}>
             {children}
             {selectedPub !== null ? (
@@ -56,6 +78,7 @@ export default function CollectionProvider({
                                 ? BOTTOM_PADDING_BOTTOM_TAB + bottomTabHeight
                                 : BOTTOM_PADDING_NO_TAB + bottom,
                         },
+                        hidden ? styles.hidden : undefined,
                     ]}>
                     <View style={styles.textContainer}>
                         <View style={styles.leftTextContainer}>
@@ -65,7 +88,9 @@ export default function CollectionProvider({
                             </Text>
                         </View>
 
-                        <TouchableOpacity style={styles.addTextContainer}>
+                        <TouchableOpacity
+                            style={styles.addTextContainer}
+                            onPress={navigateToModal}>
                             <Feather
                                 name="plus"
                                 color={SECONDARY_COLOR}
@@ -86,6 +111,9 @@ const styles = StyleSheet.create({
         width: '100%',
         paddingVertical: 5,
         zIndex: 3,
+    },
+    hidden: {
+        opacity: 0,
     },
     textContainer: {
         backgroundColor: '#FFF',

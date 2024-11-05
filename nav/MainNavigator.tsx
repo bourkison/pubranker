@@ -8,6 +8,7 @@ import CreateReview from '@/screens/MainNavigator/CreateReview';
 import ViewReview from '@/screens/MainNavigator/ViewReview';
 import { Database } from '@/types/schema';
 import CreateComment from '@/screens/MainNavigator/CreateComment';
+import AddToList from '@/screens/MainNavigator/AddToList';
 
 export type MainNavigatorStackParamList = {
     Home: undefined;
@@ -27,6 +28,9 @@ export type MainNavigatorStackParamList = {
         onCreate: (
             comment: Database['public']['Tables']['comments']['Row'],
         ) => void;
+    };
+    AddToList: {
+        pubId: number;
     };
 };
 
@@ -63,6 +67,11 @@ export default function MainNavigator() {
             <Stack.Screen
                 name="CreateComment"
                 component={CreateComment}
+                options={{ headerShown: false, presentation: 'modal' }}
+            />
+            <Stack.Screen
+                name="AddToList"
+                component={AddToList}
                 options={{ headerShown: false, presentation: 'modal' }}
             />
         </Stack.Navigator>
