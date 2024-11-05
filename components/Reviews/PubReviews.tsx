@@ -3,9 +3,9 @@ import React, { useEffect, useState } from 'react';
 
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import Review from '@/components/Reviews/Review';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { v4 as uuidv4 } from 'uuid';
 import ReviewPubButton from '@/components/Reviews/ReviewPubButton';
-import { PubSchema, UserReviewType } from '@/types';
+import { PubSchema } from '@/types';
 import { useSharedPubViewContext } from '@/context/pubViewContext';
 
 type PubReviewsProps = {
@@ -13,9 +13,6 @@ type PubReviewsProps = {
 };
 
 export default function PubReviews({ pub }: PubReviewsProps) {
-    const dispatch = useAppDispatch();
-    const user = useAppSelector(state => state.user.docData);
-
     const [isLoading, setIsLoading] = useState(false);
     const [hasLoaded, setHasLoaded] = useState(false);
 
@@ -25,15 +22,24 @@ export default function PubReviews({ pub }: PubReviewsProps) {
         const fetchReviews = async () => {
             setIsLoading(true);
 
+            const { data: userData } = await supabase.auth.getUser();
+
             let query = supabase
-                .from('user_reviews')
-                .select()
+                .from('reviews')
+                .select(
+                    `*,
+                    user:users_public(name, profile_photo),
+                    liked:review_likes(count),
+                    like_amount:review_likes(count)`,
+                )
                 .eq('pub_id', pub.id)
+                // If not logged in, generate random UUID so this shows up as 0.
+                .eq('liked.user_id', userData.user?.id || uuidv4())
                 .neq('content', null)
                 .neq('content', '');
 
-            if (user?.id) {
-                query = query.neq('user_id', user?.id || '');
+            if (userData.user?.id) {
+                query = query.neq('user_id', userData.user?.id || '');
             }
 
             const { data, error } = await query.order('created_at', {
@@ -45,9 +51,9 @@ export default function PubReviews({ pub }: PubReviewsProps) {
                 return;
             }
 
-            console.log('reviews', data.length, data);
+            console.log('reviews', data.length, JSON.stringify(data));
 
-            setReviews(data as UserReviewType[]);
+            // setReviews(data);
             setIsLoading(false);
             setHasLoaded(true);
         };
@@ -61,7 +67,7 @@ export default function PubReviews({ pub }: PubReviewsProps) {
         }
 
         // console.log(pub.review_stars_one, pub.review_stars_two);
-    }, [pub, reviews, dispatch, user, setIsLoading, setReviews, hasLoaded]);
+    }, [pub, reviews, setIsLoading, setReviews, hasLoaded]);
 
     return (
         <View>

@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '@/services/supabase';
+import { Color } from '@/types';
 
 type LikeReviewButtonProps = {
     liked: boolean;
@@ -11,6 +12,7 @@ type LikeReviewButtonProps = {
     onLikeComplete?: (success: boolean) => void;
     onUnlikeCommence?: () => void;
     onUnlikeComplete?: (success: boolean) => void;
+    unlikedColor?: Color;
 };
 
 export default function LikeReviewButton({
@@ -21,6 +23,7 @@ export default function LikeReviewButton({
     onLikeComplete,
     onUnlikeCommence,
     onUnlikeComplete,
+    unlikedColor = '#dc2626',
 }: LikeReviewButtonProps) {
     const [isLiking, setIsLiking] = useState(false);
 
@@ -74,7 +77,11 @@ export default function LikeReviewButton({
             {liked ? (
                 <Ionicons name="heart" size={size} color="#dc2626" />
             ) : (
-                <Ionicons name="heart-outline" size={size} color="#dc2626" />
+                <Ionicons
+                    name="heart-outline"
+                    size={size}
+                    color={unlikedColor}
+                />
             )}
         </TouchableOpacity>
     );

@@ -9,11 +9,12 @@ import {
     ActivityIndicator,
 } from 'react-native';
 import Review from '@/components/Reviews/Review';
-import { PubSchema, UserReviewType } from '@/types';
+import { PubSchema } from '@/types';
 import { useSharedPubViewContext } from '@/context/pubViewContext';
 import { PRIMARY_COLOR } from '@/constants';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
+import { v4 as uuidv4 } from 'uuid';
 
 type ReviewPubButtonProps = {
     pub: PubSchema;
@@ -41,10 +42,17 @@ export default function ReviewPubButton({ pub }: ReviewPubButtonProps) {
                 }
 
                 const { data, error } = await supabase
-                    .from('user_reviews')
-                    .select()
+                    .from('reviews')
+                    .select(
+                        `*,
+                    user:users_public(name, profile_photo),
+                    liked:review_likes(count),
+                    like_amount:review_likes(count)`,
+                    )
                     .eq('pub_id', pub.id)
                     .eq('user_id', userData.user.id)
+                    // If not logged in, generate random UUID so this shows up as 0.
+                    .eq('liked.user_id', userData.user?.id || uuidv4())
                     .limit(1)
                     .single();
 
@@ -53,7 +61,7 @@ export default function ReviewPubButton({ pub }: ReviewPubButtonProps) {
                     setUserReview(null);
                 }
 
-                setUserReview(data as UserReviewType);
+                setUserReview(data);
 
                 setIsLoading(false);
             };

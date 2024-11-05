@@ -9,17 +9,17 @@ import {
     TouchableHighlight,
 } from 'react-native';
 import { fromNowString } from '@/services';
-import { PubSchema, UserReviewType } from '@/types';
+import { PubSchema } from '@/types';
 import UserAvatar from '../User/UserAvatar';
-import { useSharedPubViewContext } from '@/context/pubViewContext';
-import Helpfuls from '@/components/Reviews/Helpfuls';
+import { ReviewType, useSharedPubViewContext } from '@/context/pubViewContext';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import RatingsStarViewer from '../Ratings/RatingsStarsViewer';
+import LikeReviewButton from './LikeReviewButton';
 
 type ReviewProps = {
-    review: UserReviewType;
+    review: ReviewType;
     pub: PubSchema;
     noBorder?: boolean;
 };
@@ -65,7 +65,7 @@ export default function Review({ review, noBorder }: ReviewProps) {
                         <UserAvatar size={24} photo="" />
                     </View>
                     <View style={styles.headerTextContainer}>
-                        <Text style={styles.nameText}>{review.user_name}</Text>
+                        <Text style={styles.nameText}>{review.user.name}</Text>
                         <View style={styles.bottomHeaderRow}>
                             <RatingsStarViewer
                                 amount={review.rating}
@@ -102,7 +102,17 @@ export default function Review({ review, noBorder }: ReviewProps) {
                 </View>
 
                 <View style={styles.isHelpfulContainer}>
-                    <Helpfuls review={review} />
+                    <LikeReviewButton
+                        reviewId={review.id}
+                        liked={review.liked[0]?.count > 0 || false}
+                        size={14}
+                        unlikedColor="#a3a3a3"
+                    />
+
+                    <Text style={styles.likedText}>
+                        {review.like_amount[0].count}{' '}
+                        {review.like_amount[0].count === 1 ? 'like' : 'likes'}
+                    </Text>
                 </View>
             </View>
         </TouchableHighlight>
@@ -166,5 +176,12 @@ const styles = StyleSheet.create({
     },
     isHelpfulContainer: {
         paddingTop: 15,
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    likedText: {
+        marginLeft: 3,
+        fontWeight: '300',
+        fontSize: 10,
     },
 });

@@ -1,13 +1,19 @@
-import { UserReviewType } from '@/types';
+import { Tables } from '@/types/schema';
 import { Dispatch, SetStateAction, createContext, useContext } from 'react';
+
+export type ReviewType = Tables<'reviews'> & {
+    user: { name: string; profile_photo: string | null };
+    liked: { count: number }[];
+    like_amount: { count: number }[];
+};
 
 type PubViewContext = {
     calculateWithinScrollBounds: (withAnimation: boolean) => void; // A function to ensure changes in layout haven't meant we are now viewing outside of the viewport (i.e. see less on comments)
 
-    reviews: UserReviewType[];
-    setReviews: Dispatch<SetStateAction<UserReviewType[]>>;
-    userReview: UserReviewType | null;
-    setUserReview: Dispatch<SetStateAction<UserReviewType | null>>;
+    reviews: ReviewType[];
+    setReviews: Dispatch<SetStateAction<ReviewType[]>>;
+    userReview: ReviewType | null;
+    setUserReview: Dispatch<SetStateAction<ReviewType | null>>;
 };
 
 export const PubViewContext = createContext<PubViewContext | null>(null);
