@@ -678,4 +678,11 @@ const styles = StyleSheet.create({
     rateButtonContainer: {
         marginTop: 25,
         paddingHorizontal: 15,
-  
+        marginBottom: 7,
+    },
+    seperator: {
+        height: 1,
+        marginHorizontal: 30,
+        backgroundColor: '#E5E7EB',
+    },
+});

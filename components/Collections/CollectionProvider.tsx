@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { SECONDARY_COLOR } from '@/constants';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { StackScreenProps } from '@react-navigation/stack';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 
@@ -14,6 +14,9 @@ type CollectionProviderProps = {
 
 const BOTTOM_PADDING_BOTTOM_TAB = 15;
 const BOTTOM_PADDING_NO_TAB = 5;
+
+const ANIMATION_DURATION = 300;
+const DEFAULT_DURATION = 5000;
 
 export default function CollectionProvider({
     children,
@@ -31,16 +34,19 @@ export default function CollectionProvider({
             StackScreenProps<MainNavigatorStackParamList, 'Home'>['navigation']
         >();
 
-    const showAddToCollection = useCallback((id: number, duration = 2500) => {
-        setSelectedPub(id);
-        setHidden(false);
+    const showAddToCollection = useCallback(
+        (id: number, duration = DEFAULT_DURATION) => {
+            setSelectedPub(id);
+            setHidden(false);
 
-        const timeout = setTimeout(() => {
-            setSelectedPub(null);
-        }, duration);
+            const timeout = setTimeout(() => {
+                setSelectedPub(null);
+            }, duration);
 
-        setTimer(timeout);
-    }, []);
+            setTimer(timeout);
+        },
+        [],
+    );
 
     const navigateToModal = useCallback(() => {
         if (!navigation || !selectedPub) {
@@ -71,10 +77,10 @@ export default function CollectionProvider({
             }}>
             {children}
             {selectedPub !== null ? (
-                <View style={hidden ? styles.hidden : undefined}>
+                <View style={hidden ? styles.hidden : styles.topContainer}>
                     <Animated.View
-                        entering={FadeInDown.duration(150)}
-                        exiting={FadeOutDown.duration(150)}
+                        entering={FadeIn.duration(ANIMATION_DURATION)}
+                        exiting={FadeOut.duration(ANIMATION_DURATION)}
                         style={[
                             styles.container,
                             {
@@ -83,6 +89,7 @@ export default function CollectionProvider({
                                       bottomTabHeight
                                     : BOTTOM_PADDING_NO_TAB + bottom,
                             },
+                            !hidden ? styles.zIndex : undefined,
                         ]}>
                         <View style={styles.textContainer}>
                             <View style={styles.leftTextContainer}>
@@ -115,11 +122,16 @@ export default function CollectionProvider({
 }
 
 const styles = StyleSheet.create({
+    topContainer: {
+        zIndex: 2,
+    },
     container: {
         position: 'absolute',
         width: '100%',
         paddingVertical: 5,
-        zIndex: 3,
+    },
+    zIndex: {
+        zIndex: 1,
     },
     hidden: {
         opacity: 0,
