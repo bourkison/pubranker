@@ -8,11 +8,15 @@ import { setPubSave } from '@/store/slices/explore';
 
 type TopSectionProps = {
     pub: PubSchema;
+    navigateToAddToCollection: () => void;
 };
 
 const ICON_SIZE = 40;
 
-export default function TopSection({ pub }: TopSectionProps) {
+export default function TopSection({
+    pub,
+    navigateToAddToCollection,
+}: TopSectionProps) {
     const dispatch = useAppDispatch();
     const [isSaving, setIsSaving] = useState(false);
     const [saved, setSaved] = useState(false);
@@ -87,7 +91,9 @@ export default function TopSection({ pub }: TopSectionProps) {
                 <Text style={styles.headerText}>Favourite</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.column}>
+            <TouchableOpacity
+                style={styles.column}
+                onPress={navigateToAddToCollection}>
                 <Feather name="plus" size={ICON_SIZE} color={'#000'} />
                 <Text style={styles.headerText}>Add to List</Text>
             </TouchableOpacity>

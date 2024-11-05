@@ -48,11 +48,14 @@ export default function CollectionProvider({
         }
 
         setHidden(true);
+        clearTimeout(timer);
 
         navigation.navigate('AddToList', {
             pubId: selectedPub,
         });
-    }, [navigation, selectedPub]);
+
+        setSelectedPub(null);
+    }, [navigation, selectedPub, timer]);
 
     useEffect(() => {
         return () => clearTimeout(timer);
@@ -68,38 +71,44 @@ export default function CollectionProvider({
             }}>
             {children}
             {selectedPub !== null ? (
-                <Animated.View
-                    entering={FadeInDown.duration(150)}
-                    exiting={FadeOutDown.duration(150)}
-                    style={[
-                        styles.container,
-                        {
-                            bottom: isOnBottomTabsPage
-                                ? BOTTOM_PADDING_BOTTOM_TAB + bottomTabHeight
-                                : BOTTOM_PADDING_NO_TAB + bottom,
-                        },
-                        hidden ? styles.hidden : undefined,
-                    ]}>
-                    <View style={styles.textContainer}>
-                        <View style={styles.leftTextContainer}>
-                            <Ionicons name="heart" size={15} color="#dc2626" />
-                            <Text style={styles.text}>
-                                Favourited! Add to a list?
-                            </Text>
-                        </View>
+                <View style={hidden ? styles.hidden : undefined}>
+                    <Animated.View
+                        entering={FadeInDown.duration(150)}
+                        exiting={FadeOutDown.duration(150)}
+                        style={[
+                            styles.container,
+                            {
+                                bottom: isOnBottomTabsPage
+                                    ? BOTTOM_PADDING_BOTTOM_TAB +
+                                      bottomTabHeight
+                                    : BOTTOM_PADDING_NO_TAB + bottom,
+                            },
+                        ]}>
+                        <View style={styles.textContainer}>
+                            <View style={styles.leftTextContainer}>
+                                <Ionicons
+                                    name="heart"
+                                    size={15}
+                                    color="#dc2626"
+                                />
+                                <Text style={styles.text}>
+                                    Favourited! Add to a list?
+                                </Text>
+                            </View>
 
-                        <TouchableOpacity
-                            style={styles.addTextContainer}
-                            onPress={navigateToModal}>
-                            <Feather
-                                name="plus"
-                                color={SECONDARY_COLOR}
-                                size={15}
-                            />
-                            <Text style={styles.addText}>Add</Text>
-                        </TouchableOpacity>
-                    </View>
-                </Animated.View>
+                            <TouchableOpacity
+                                style={styles.addTextContainer}
+                                onPress={navigateToModal}>
+                                <Feather
+                                    name="plus"
+                                    color={SECONDARY_COLOR}
+                                    size={15}
+                                />
+                                <Text style={styles.addText}>Add</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </Animated.View>
+                </View>
             ) : undefined}
         </CollectionContext.Provider>
     );

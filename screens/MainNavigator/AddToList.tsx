@@ -1,15 +1,13 @@
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
+import { supabase } from '@/services/supabase';
+import { Tables } from '@/types/schema';
 import { StackScreenProps } from '@react-navigation/stack';
-import React from 'react';
-import { View, Text } from 'react-native';
-
-export default function AddToList({}: StackScreenProps<
-    MainNavigatorStackParamList,
-    'AddToList'
->) {
-    return (
-        <View>
-            <Text>Add to list</Text>
-        </View>
-    );
-}
+import React, { useCallback, useEffect, useState } from 'react';
+import {
+    View,
+    Text,
+    StyleSheet,
+    FlatList,
+    ActivityIndicator,
+    TouchableHighlight,
+} from 'rea

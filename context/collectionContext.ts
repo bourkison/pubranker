@@ -14,13 +14,4 @@ type CollectionContext = {
     ) => void;
 };
 
-export const CollectionContext = createContext<CollectionContext | null>(null);
-
-export const useSharedCollectionContext = () => {
-    const context = useContext(CollectionContext);
-
-    if (!context) {
-        throw "'useSharedCollectionContext' must be used within CollectionContext";
-    }
-    return context;
-};
+export const CollectionContext

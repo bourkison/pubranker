@@ -69,6 +69,11 @@ export default function RateButtonModal({ pub }: RateButtonProps) {
         );
     }, [userReview, stars]);
 
+    const navigateToAddToCollection = useCallback(() => {
+        bottomSheetRef.current?.dismiss();
+        navigation.navigate('AddToList', { pubId: pub.id });
+    }, [bottomSheetRef, pub, navigation]);
+
     const navigateToReview = useCallback(() => {
         bottomSheetRef.current?.dismiss();
         navigation.navigate('CreateReview', { pubId: pub.id });
@@ -100,7 +105,12 @@ export default function RateButtonModal({ pub }: RateButtonProps) {
                 <View>
                     <View style={styles.modalSection}>
                         <View style={styles.modalSubsection}>
-                            <TopSection pub={pub} />
+                            <TopSection
+                                pub={pub}
+                                navigateToAddToCollection={
+                                    navigateToAddToCollection
+                                }
+                            />
                         </View>
 
                         <View style={styles.modalSubsection}>
