@@ -246,4 +246,38 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     collectionsContainer: {
-     
+        paddingVertical: 20,
+        borderBottomWidth: 1,
+        borderColor: '#E5E7EB',
+        paddingHorizontal: 20,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    collectionsText: {
+        fontSize: 14,
+        fontWeight: '300',
+    },
+    headerContainer: {
+        paddingVertical: 10,
+        alignItems: 'center',
+        flexDirection: 'row',
+        borderBottomWidth: 1,
+        borderColor: '#E5E7EB',
+    },
+    settingsContainer: {
+        paddingLeft: ICON_PADDING,
+    },
+    menuContainer: {
+        paddingRight: ICON_PADDING,
+    },
+    headerTextContainer: {
+        flex: 1,
+    },
+    headerText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        fontFamily: 'Jost',
+        textAlign: 'center',
+    },
+});

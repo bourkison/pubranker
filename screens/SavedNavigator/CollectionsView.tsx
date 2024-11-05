@@ -189,4 +189,132 @@ export default function CollectionsView({
                                     <Text style={styles.userNameText}>
                                         {collection.user.name}
                                     </Text>
-             
+                                </View>
+
+                                <TouchableOpacity
+                                    style={styles.followContainer}
+                                    onPress={() => setIsFollowed(!isFollowed)}>
+                                    {isFollowed ? (
+                                        <>
+                                            <Ionicons
+                                                name="checkmark"
+                                                size={16}
+                                                color={PRIMARY_COLOR}
+                                            />
+                                            <Text style={styles.followText}>
+                                                Followed
+                                            </Text>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <FontAwesome6
+                                                name="plus"
+                                                size={14}
+                                                color={PRIMARY_COLOR}
+                                            />
+                                            <Text style={styles.followText}>
+                                                Follow
+                                            </Text>
+                                        </>
+                                    )}
+                                </TouchableOpacity>
+                            </View>
+
+                            <Text style={styles.collectionNameText}>
+                                {collection.name}
+                            </Text>
+
+                            {collection.description ? (
+                                <Text style={styles.descriptionText}>
+                                    {collection.description}
+                                </Text>
+                            ) : undefined}
+                        </View>
+                    )
+                }
+                renderItem={({ item }) => (
+                    <SavedListItem
+                        pub={item}
+                        onSaveCommence={id => toggleSave(id, true)}
+                        onSaveComplete={(success, id) =>
+                            !success ? toggleSave(id, false) : undefined
+                        }
+                        onUnsaveCommence={id => toggleSave(id, false)}
+                        onUnsaveComplete={(success, id) =>
+                            !success ? toggleSave(id, true) : undefined
+                        }
+                    />
+                )}
+            />
+        </SafeAreaView>
+    );
+}
+
+const ICON_PADDING = 10;
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+    headerContainer: {
+        paddingVertical: 10,
+        alignItems: 'center',
+        flexDirection: 'row',
+        borderBottomWidth: 1,
+        borderColor: '#E5E7EB',
+    },
+    headerTextContainer: {
+        flex: 1,
+    },
+    headerText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        fontFamily: 'Jost',
+        textAlign: 'center',
+    },
+    settingsContainer: {
+        paddingLeft: ICON_PADDING,
+    },
+    menuContainer: {
+        paddingRight: ICON_PADDING,
+    },
+    listHeaderContainer: {
+        paddingHorizontal: 15,
+        paddingVertical: 20,
+        borderBottomWidth: 1,
+        borderColor: '#E5E7EB',
+    },
+    userContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    userNameText: {
+        marginLeft: 5,
+        fontWeight: '300',
+        fontSize: 14,
+    },
+    collectionNameText: {
+        fontSize: 18,
+        fontWeight: '500',
+        fontFamily: 'Jost',
+        marginTop: 10,
+    },
+    descriptionText: {
+        fontSize: 14,
+        marginTop: 20,
+    },
+    topListHeaderContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    followContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+    },
+    followText: {
+        marginLeft: 4,
+        color: PRIMARY_COLOR,
+        fontWeight: '500',
+    },
+});

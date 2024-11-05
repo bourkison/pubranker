@@ -16,7 +16,6 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import RatingsStarViewer from '../Ratings/RatingsStarsViewer';
-import LikeReviewButton from './LikeReviewButton';
 
 type ReviewProps = {
     review: ReviewType;
@@ -99,20 +98,6 @@ export default function Review({ review, noBorder }: ReviewProps) {
                             </Text>
                         </TouchableOpacity>
                     ) : undefined}
-                </View>
-
-                <View style={styles.isHelpfulContainer}>
-                    <LikeReviewButton
-                        reviewId={review.id}
-                        liked={review.liked[0]?.count > 0 || false}
-                        size={14}
-                        unlikedColor="#a3a3a3"
-                    />
-
-                    <Text style={styles.likedText}>
-                        {review.like_amount[0].count}{' '}
-                        {review.like_amount[0].count === 1 ? 'like' : 'likes'}
-                    </Text>
                 </View>
             </View>
         </TouchableHighlight>
