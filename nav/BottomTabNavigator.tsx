@@ -93,4 +93,10 @@ export default function BottomTabNavigator({
                             size={size}
                             color={focused ? SECONDARY_COLOR : undefined}
                         />
-     
+                    ),
+                }}
+            />
+        </Tab.Navigator>
+    );
+}
+requestBackgroundPermissionsAsync();

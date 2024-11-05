@@ -67,13 +67,4 @@ export default function MainNavigator() {
             <Stack.Screen
                 name="CreateComment"
                 component={CreateComment}
-                options={{ headerShown: false, presentation: 'modal' }}
-            />
-            <Stack.Screen
-                name="AddToList"
-                component={AddToList}
-                options={{ headerShown: false, presentation: 'modal' }}
-            />
-        </Stack.Navigator>
-    );
-}
+                o
