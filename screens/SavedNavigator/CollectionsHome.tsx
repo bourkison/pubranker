@@ -28,32 +28,40 @@ export default function CollectionsHome() {
             setIsLoading(true);
 
             const { data, error } = await supabase
-                .from('collections')
+                .from('collection_follows')
                 .select(
                     `
                     id,
-                    name,
-                    pubs(
+                    created_at,
+                    updated_at,
+                    collections(
                         id,
-                        primary_photo
-                    ),
-                    pubs_count:pubs(count)
+                        name,
+                        pubs(
+                            id,
+                            primary_photo
+                        ),
+                        pubs_count:pubs(count)
+                    )
                 `,
                 )
-                .order('created_at', { ascending: false })
+                .order('updated_at', { ascending: false })
                 .order('created_at', {
-                    referencedTable: 'pubs',
+                    referencedTable: 'collections.pubs',
                     ascending: false,
                 })
                 .limit(INITIAL_LOAD_AMOUNT)
-                .limit(3, { referencedTable: 'pubs' });
+                .limit(3, { referencedTable: 'collections.pubs' });
+
+            console.log('response', data);
 
             if (error) {
                 setIsLoading(false);
+                console.error(error);
                 return;
             }
 
-            setCollections(data);
+            setCollections(data.map(follow => follow.collections));
             setIsLoading(false);
         };
 

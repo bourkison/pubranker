@@ -104,27 +104,66 @@ export type Database = {
         }
         Relationships: []
       }
-      collection_items: {
+      collection_follows: {
         Row: {
           collection_id: number
           created_at: string
-          created_by: string
           id: number
-          pub_id: number
+          updated_at: string
+          user_id: string
         }
         Insert: {
           collection_id: number
           created_at?: string
-          created_by?: string
           id?: number
-          pub_id: number
+          updated_at?: string
+          user_id: string
         }
         Update: {
           collection_id?: number
           created_at?: string
-          created_by?: string
+          id?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_follows_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_follows_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collection_items: {
+        Row: {
+          collection_id: number
+          created_at: string
+          id: number
+          pub_id: number
+          user_id: string
+        }
+        Insert: {
+          collection_id?: number
+          created_at?: string
           id?: number
           pub_id?: number
+          user_id?: string
+        }
+        Update: {
+          collection_id?: number
+          created_at?: string
+          id?: number
+          pub_id?: number
+          user_id?: string
         }
         Relationships: [
           {
@@ -148,6 +187,13 @@ export type Database = {
             referencedRelation: "pubs"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "collection_items_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       collections: {
@@ -158,6 +204,7 @@ export type Database = {
           id: number
           name: string
           public: boolean
+          updated_at: string
           user_id: string
         }
         Insert: {
@@ -167,6 +214,7 @@ export type Database = {
           id?: number
           name: string
           public?: boolean
+          updated_at?: string
           user_id: string
         }
         Update: {
@@ -176,6 +224,7 @@ export type Database = {
           id?: number
           name?: string
           public?: boolean
+          updated_at?: string
           user_id?: string
         }
         Relationships: [
@@ -215,13 +264,6 @@ export type Database = {
             referencedRelation: "comments"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "comment_likes_comment_id_fkey"
-            columns: ["comment_id"]
-            isOneToOne: false
-            referencedRelation: "user_comments"
-            referencedColumns: ["id"]
-          },
         ]
       }
       comments: {
@@ -255,13 +297,6 @@ export type Database = {
             columns: ["review_id"]
             isOneToOne: false
             referencedRelation: "reviews"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "comments_review_id_fkey"
-            columns: ["review_id"]
-            isOneToOne: false
-            referencedRelation: "user_reviews"
             referencedColumns: ["id"]
           },
           {
@@ -615,13 +650,6 @@ export type Database = {
             referencedRelation: "reviews"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "review_likes_review_id_fkey"
-            columns: ["review_id"]
-            isOneToOne: false
-            referencedRelation: "user_reviews"
-            referencedColumns: ["id"]
-          },
         ]
       }
       reviews: {
@@ -809,92 +837,6 @@ export type Database = {
           wheelchair_accessible: boolean | null
         }
         Relationships: []
-      }
-      user_comments: {
-        Row: {
-          content: string | null
-          created_at: string | null
-          id: number | null
-          liked: boolean | null
-          likes_amount: number | null
-          review_id: number | null
-          updated_at: string | null
-          user_id: string | null
-          user_name: string | null
-          user_profile_photo: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "comments_review_id_fkey"
-            columns: ["review_id"]
-            isOneToOne: false
-            referencedRelation: "reviews"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "comments_review_id_fkey"
-            columns: ["review_id"]
-            isOneToOne: false
-            referencedRelation: "user_reviews"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "comments_user_id_fkey1"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users_public"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      user_reviews: {
-        Row: {
-          beer: boolean | null
-          content: string | null
-          created_at: string | null
-          editors_review: boolean | null
-          food: boolean | null
-          id: number | null
-          liked: boolean | null
-          likes: number | null
-          location: boolean | null
-          music: boolean | null
-          pub_address: string | null
-          pub_id: number | null
-          pub_name: string | null
-          pub_primary_photo: string | null
-          rating: number | null
-          service: boolean | null
-          updated_at: string | null
-          user_id: string | null
-          user_name: string | null
-          user_profile_photo: string | null
-          username: string | null
-          vibe: boolean | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "reviews_pub_id_fkey"
-            columns: ["pub_id"]
-            isOneToOne: false
-            referencedRelation: "formatted_pubs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reviews_pub_id_fkey"
-            columns: ["pub_id"]
-            isOneToOne: false
-            referencedRelation: "pubs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reviews_user_id_fkey1"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users_public"
-            referencedColumns: ["id"]
-          },
-        ]
       }
     }
     Functions: {

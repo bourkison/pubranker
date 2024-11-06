@@ -92,7 +92,7 @@ export default function SavedPubs({
             return new Promise<void>(async (resolve, reject) => {
                 const { count: collectionsCount, error: collectionsError } =
                     await supabase
-                        .from('collections')
+                        .from('collection_follows')
                         .select('count', { count: 'exact' })
                         .eq('user_id', userData.id);
 
