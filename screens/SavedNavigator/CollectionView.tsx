@@ -17,6 +17,7 @@ import {
 import * as Location from 'expo-location';
 import UserAvatar from '@/components/User/UserAvatar';
 import { PRIMARY_COLOR } from '@/constants';
+import { v4 as uuidv4 } from 'uuid';
 
 type CollectionType = {
     id: number;
@@ -28,21 +29,22 @@ type CollectionType = {
         name: string;
         profile_photo: string | null;
     };
+    is_followed: { count: number }[];
 };
 
-export default function CollectionsView({
+export default function CollectionView({
     navigation,
     route,
-}: StackScreenProps<SavedNavigatorStackParamList, 'CollectionsView'>) {
+}: StackScreenProps<SavedNavigatorStackParamList, 'CollectionView'>) {
     const [isLoading, setIsLoading] = useState(false);
     const [collection, setCollection] = useState<CollectionType>();
-    const [isFollowed, setIsFollowed] = useState(false);
 
     useEffect(() => {
         const fetchCollection = async () => {
             setIsLoading(true);
 
-            const { error: userError } = await supabase.auth.getUser();
+            const { data: userData, error: userError } =
+                await supabase.auth.getUser();
 
             if (userError) {
                 console.error(userError);
@@ -58,10 +60,12 @@ export default function CollectionsView({
                 name,
                 description,
                 collection_items(pub_id, created_at),
-                user:users_public(id, name, profile_photo)
+                user:users_public(id, name, profile_photo),
+                is_followed:collection_follows(count)
                 `,
                 )
                 .eq('id', route.params.collectionId)
+                .eq('is_followed.user_id', userData.user?.id || uuidv4())
                 .order('created_at', {
                     referencedTable: 'collection_items',
                     ascending: true,
@@ -75,7 +79,7 @@ export default function CollectionsView({
                 return;
             }
 
-            console.log('collection', data);
+            console.log('collection', JSON.stringify(data));
 
             const { coords } = await Location.getCurrentPositionAsync();
 
@@ -114,11 +118,8 @@ export default function CollectionsView({
             });
 
             setCollection({
-                id: data.id,
-                name: data.name,
-                description: data.description,
+                ...data,
                 pubs: orderedPubs,
-                user: data.user,
             });
 
             setIsLoading(false);
@@ -193,8 +194,10 @@ export default function CollectionsView({
 
                                 <TouchableOpacity
                                     style={styles.followContainer}
-                                    onPress={() => setIsFollowed(!isFollowed)}>
-                                    {isFollowed ? (
+                                    onPress={() =>
+                                        console.log('toggle follow')
+                                    }>
+                                    {collection.is_followed[0].count > 0 ? (
                                         <>
                                             <Ionicons
                                                 name="checkmark"

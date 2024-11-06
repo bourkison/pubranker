@@ -2,12 +2,12 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 import Saved from '@/screens/SavedNavigator/Saved';
 import CollectionsHome from '@/screens/SavedNavigator/CollectionsHome';
-import CollectionsView from '@/screens/SavedNavigator/CollectionsView';
+import CollectionView from '@/screens/SavedNavigator/CollectionView';
 
 export type SavedNavigatorStackParamList = {
     SavedHome: undefined;
     CollectionsHome: undefined;
-    CollectionsView: {
+    CollectionView: {
         collectionId: number;
     };
 };
@@ -28,8 +28,8 @@ export default function SavedNavigator() {
                 options={{ headerShown: false }}
             />
             <Stack.Screen
-                name="CollectionsView"
-                component={CollectionsView}
+                name="CollectionView"
+                component={CollectionView}
                 options={{ headerShown: false }}
             />
         </Stack.Navigator>

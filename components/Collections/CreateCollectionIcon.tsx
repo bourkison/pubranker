@@ -79,7 +79,7 @@ export default function CreateCollectionIcon() {
             }
 
             bottomSheetRef.current?.dismiss();
-            navigation.navigate('CollectionsView', { collectionId: data.id });
+            navigation.navigate('CollectionView', { collectionId: data.id });
         };
 
         create();

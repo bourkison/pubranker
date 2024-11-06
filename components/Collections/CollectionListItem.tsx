@@ -172,7 +172,7 @@ export default function CollectionListItem({
             style={styles.container}
             underlayColor="#E5E7EB"
             onPress={() =>
-                navigation.navigate('CollectionsView', {
+                navigation.navigate('CollectionView', {
                     collectionId: collection.id,
                 })
             }
