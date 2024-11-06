@@ -12,13 +12,19 @@ import {
     TouchableHighlight,
 } from 'react-native';
 
+type CollectionContext = Tables<'collections'> & {
+    is_added: {
+        count: number;
+    }[];
+};
+
 export default function AddToList({
     route,
     navigation,
 }: StackScreenProps<MainNavigatorStackParamList, 'AddToList'>) {
     const [isLoading, setIsLoading] = useState(false);
     const [isAdding, setIsAdding] = useState(false);
-    const [collections, setCollections] = useState<Tables<'collections'>[]>([]);
+    const [collections, setCollections] = useState<CollectionContext[]>([]);
 
     useEffect(() => {
         const fetchCollections = async () => {
@@ -35,8 +41,9 @@ export default function AddToList({
 
             const { data, error } = await supabase
                 .from('collections')
-                .select()
-                .eq('user_id', userData.user.id);
+                .select('*, is_added:collection_items(count)')
+                .eq('user_id', userData.user.id)
+                .eq('is_added.pub_id', route.params.pubId);
 
             setIsLoading(false);
 
@@ -49,7 +56,7 @@ export default function AddToList({
         };
 
         fetchCollections();
-    }, []);
+    }, [route]);
 
     const addToCollection = useCallback(
         async (collectionId: number) => {
@@ -97,7 +104,12 @@ export default function AddToList({
                         underlayColor="#E5E7EB"
                         activeOpacity={1}
                         onPress={() => addToCollection(item.id)}>
-                        <Text>{item.name}</Text>
+                        <Text>
+                            {item.name}{' '}
+                            {item.is_added[0].count > 0
+                                ? '(already added)'
+                                : ''}
+                        </Text>
                     </TouchableHighlight>
                 )}
                 keyExtractor={item => item.id.toString()}
