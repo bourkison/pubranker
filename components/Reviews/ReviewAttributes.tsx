@@ -1,15 +1,15 @@
 import { PRIMARY_COLOR } from '@/constants';
-import { ReviewType } from '@/context/pubViewContext';
+import { ListReviewType } from '@/context/pubViewContext';
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native';
 
 type ReviewAttributesProps =
     | {
-          review: ReviewType;
+          review: ListReviewType;
           withComment?: false;
       }
     | {
-          review: ReviewType;
+          review: ListReviewType;
           withComment: true;
           onCreateCommentPress: () => void;
       };

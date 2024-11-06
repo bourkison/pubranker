@@ -156,7 +156,7 @@ export default function CollectionsView({
                 </TouchableOpacity>
 
                 <View style={styles.headerTextContainer}>
-                    <Text style={styles.headerText}>Collection</Text>
+                    <Text style={styles.headerText}>List</Text>
                 </View>
 
                 <View style={styles.menuContainer} />

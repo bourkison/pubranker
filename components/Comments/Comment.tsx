@@ -99,7 +99,7 @@ export default function Comment({
     ]);
 
     const doubleTap = useCallback(() => {
-        if (!comment.liked) {
+        if (comment.liked[0].count === 0) {
             toggleLike();
         } else {
             Haptics.impactAsync();
