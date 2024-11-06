@@ -11,23 +11,19 @@ import {
     Image,
     Pressable,
     FlatList,
-    ScrollView,
 } from 'react-native';
 import { Ionicons, SimpleLineIcons } from '@expo/vector-icons';
 import UserAvatar from '@/components/User/UserAvatar';
 import { supabase } from '@/services/supabase';
-import { UserCommentType, UserReviewType } from '@/types';
-import {
-    convertViewToUserComments,
-    convertViewToUserReviews,
-} from '@/services';
 import RatingsStarViewer from '@/components/Ratings/RatingsStarsViewer';
 import dayjs from 'dayjs';
 import LikeReviewButton from '@/components/Reviews/LikeReviewButton';
 import Comment from '@/components/Comments/Comment';
 import { PRIMARY_COLOR } from '@/constants';
-import { useAppSelector } from '@/store/hooks';
 import * as Haptics from 'expo-haptics';
+import ReviewAttributes from '@/components/Reviews/ReviewAttributes';
+import { Tables } from '@/types/schema';
+import { v4 as uuidv4 } from 'uuid';
 
 const NO_IMAGE = require('@/assets/noimage.png');
 
@@ -35,17 +31,29 @@ const ASPECT_RATIO = 1;
 const WIDTH_PERCENTAGE = 0.3;
 const IMAGE_MARGIN = 8;
 
+export type ReviewType = Tables<'reviews'> & {
+    user: { id: string; name: string; profile_photo: string | null };
+    liked: { count: number }[];
+    like_amount: { count: number }[];
+    pub: {
+        id: number;
+        name: string;
+        address: string;
+        primary_photo: string | null;
+    };
+    comments: (Tables<'comments'> & {
+        liked: { count: number }[];
+        like_amount: { count: number }[];
+        user: { id: string; name: string; profile_photo: string | null };
+    })[];
+};
+
 export default function ViewReview({
     route,
     navigation,
 }: StackScreenProps<MainNavigatorStackParamList, 'ViewReview'>) {
     const [isLoading, setIsLoading] = useState(false);
-    const [review, setReview] = useState<UserReviewType>();
-
-    const [isLoadingComments, setIsLoadingComments] = useState(false);
-    const [comments, setComments] = useState<UserCommentType[]>([]);
-
-    const user = useAppSelector(state => state.user.docData);
+    const [review, setReview] = useState<ReviewType>();
 
     const [imageUrl, setImageUrl] = useState('');
 
@@ -60,54 +68,51 @@ export default function ViewReview({
         const fetchReview = async () => {
             setIsLoading(true);
 
+            const { data: userData } = await supabase.auth.getUser();
+
             const { data, error } = await supabase
-                .from('user_reviews')
-                .select()
+                .from('reviews')
+                .select(
+                    `*,
+                    user:users_public(id, name, profile_photo),
+                    liked:review_likes(count),
+                    like_amount:review_likes(count),
+                    pub:pubs(id, name, address, primary_photo),
+                    comments(
+                        *,
+                        liked:comment_likes(count),
+                        like_amount:comment_likes(count),
+                        user:users_public(id, name, profile_photo)
+                    )`,
+                )
                 .eq('id', route.params.reviewId)
+                // If not logged in, generate random UUID so this shows up as 0.
+                .eq('liked.user_id', userData.user?.id || uuidv4())
+                .eq('comments.liked.user_id', userData.user?.id || uuidv4())
                 .limit(1)
                 .single();
 
             setIsLoading(false);
 
+            console.log('data', JSON.stringify(data));
+
             if (error) {
                 console.error(error);
                 return;
             }
 
-            if (data.pub_primary_photo) {
+            if (data.pub.primary_photo) {
                 const url = supabase.storage
                     .from('pubs')
-                    .getPublicUrl(data.pub_primary_photo);
+                    .getPublicUrl(data.pub.primary_photo);
 
                 setImageUrl(url.data.publicUrl);
             }
 
-            setReview(convertViewToUserReviews(data));
+            setReview(data);
         };
 
         fetchReview();
-    }, [route]);
-
-    useEffect(() => {
-        const fetchComments = async () => {
-            setIsLoadingComments(true);
-
-            const { data, error } = await supabase
-                .from('user_comments')
-                .select()
-                .eq('review_id', route.params.reviewId)
-                .order('created_at', { ascending: true });
-
-            if (error) {
-                console.error(error);
-                return;
-            }
-
-            setComments(data.map(d => convertViewToUserComments(d)));
-            setIsLoadingComments(false);
-        };
-
-        fetchComments();
     }, [route]);
 
     const setToLiked = useCallback(() => {
@@ -117,8 +122,8 @@ export default function ViewReview({
 
         setReview({
             ...review,
-            liked: true,
-            likes: review.likes + 1,
+            liked: [{ count: 1 }],
+            like_amount: [{ count: review.like_amount[0].count + 1 }],
         });
     }, [review]);
 
@@ -129,77 +134,116 @@ export default function ViewReview({
 
         setReview({
             ...review,
-            liked: false,
-            likes: review.likes - 1,
+            liked: [{ count: 0 }],
+            like_amount: [{ count: review.like_amount[0].count - 1 }],
         });
     }, [review]);
 
     const setCommentToLiked = useCallback(
         (index: number) => {
-            if (!comments[index]) {
+            if (!review || !review.comments[index]) {
                 return;
             }
 
-            const updatedComments = comments.map((comment, i) => {
-                if (index === i) {
-                    return {
-                        ...comment,
-                        liked: true,
-                        likes_amount: comment.likes_amount + 1,
-                    };
-                }
+            const updatedComments: ReviewType['comments'] = review.comments.map(
+                (comment, i) => {
+                    if (index === i) {
+                        return {
+                            ...comment,
+                            liked: [{ count: 1 }],
+                            like_amount: [
+                                { count: comment.like_amount[0].count + 1 },
+                            ],
+                        };
+                    }
 
-                return comment;
-            });
+                    return comment;
+                },
+            );
 
-            setComments(updatedComments);
+            setReview({ ...review, comments: updatedComments });
         },
-        [comments],
+        [review],
     );
 
     const setCommentToUnliked = useCallback(
         (index: number) => {
-            if (!comments[index]) {
+            if (!review || !review.comments[index]) {
                 return;
             }
 
-            const updatedComments = comments.map((comment, i) => {
-                if (index === i) {
-                    return {
-                        ...comment,
-                        liked: false,
-                        likes_amount: comment.likes_amount - 1,
-                    };
-                }
+            const updatedComments: ReviewType['comments'] = review.comments.map(
+                (comment, i) => {
+                    if (index === i) {
+                        return {
+                            ...comment,
+                            liked: [{ count: 0 }],
+                            like_amount: [
+                                { count: comment.like_amount[0].count - 1 },
+                            ],
+                        };
+                    }
 
-                return comment;
-            });
+                    return comment;
+                },
+            );
 
-            setComments(updatedComments);
+            setReview({ ...review, comments: updatedComments });
         },
-        [comments],
+        [review],
     );
 
-    const createComment = useCallback(() => {
+    const createComment = useCallback(async () => {
         Haptics.selectionAsync();
 
         navigation.navigate('CreateComment', {
             reviewId: route.params.reviewId,
-            onCreate: comment => {
-                setComments(c => [
-                    ...c,
-                    {
-                        ...comment,
-                        liked: false,
-                        likes_amount: 0,
-                        user_name: user?.name || '',
-                        user_profile_photo: user?.profile_photo || '',
-                        user_id: user?.id || '',
-                    },
-                ]);
+            onCreate: async comment => {
+                if (!review) {
+                    console.warn('onCreateComment called with no review');
+                    return;
+                }
+
+                const { data: userData } = await supabase.auth.getUser();
+
+                if (!userData.user) {
+                    console.warn('onCreateComment called with no user');
+                    return;
+                }
+
+                // TODO: Store this info in store.
+                const { data: userPublicData, error: userPublicError } =
+                    await supabase
+                        .from('users_public')
+                        .select('id, name, profile_photo')
+                        .eq('id', userData.user.id)
+                        .limit(1)
+                        .single();
+
+                if (userPublicError) {
+                    console.error(userPublicError);
+                    return;
+                }
+
+                setReview({
+                    ...review,
+                    comments: [
+                        ...review.comments,
+                        {
+                            ...comment,
+                            liked: [{ count: 0 }],
+                            like_amount: [{ count: 0 }],
+                            user: {
+                                id: userData.user.id,
+                                name: userPublicData.name,
+                                profile_photo: userPublicData.profile_photo,
+                            },
+                        },
+                    ],
+                });
             },
         });
-    }, [navigation, user, route]);
+    }, [navigation, review, route]);
 
     if (isLoading) {
         return <ActivityIndicator />;
@@ -232,16 +276,12 @@ export default function ViewReview({
             </View>
 
             <FlatList
-                data={comments}
+                data={review.comments}
                 style={styles.flexOne}
                 ListEmptyComponent={
-                    isLoadingComments ? (
-                        <ActivityIndicator />
-                    ) : (
-                        <View>
-                            <Text>No comments</Text>
-                        </View>
-                    )
+                    <View>
+                        <Text>No comments</Text>
+                    </View>
                 }
                 renderItem={({ item, index }) => (
                     <Comment
@@ -272,13 +312,14 @@ export default function ViewReview({
                                         <View style={styles.userContainer}>
                                             <UserAvatar
                                                 photo={
-                                                    review.user_profile_photo
+                                                    review.user.profile_photo ||
+                                                    ''
                                                 }
                                                 size={18}
                                             />
 
                                             <Text style={styles.usernameText}>
-                                                {review.user_name}
+                                                {review.user.name}
                                             </Text>
                                         </View>
 
@@ -290,11 +331,11 @@ export default function ViewReview({
                                                 })
                                             }>
                                             <Text style={styles.pubNameText}>
-                                                {review.pub_name}
+                                                {review.pub.name}
                                             </Text>
 
                                             <Text style={styles.pubAddressText}>
-                                                {review.pub_address}
+                                                {review.pub.address}
                                             </Text>
                                         </Pressable>
 
@@ -351,7 +392,7 @@ export default function ViewReview({
                                     <LikeReviewButton
                                         reviewId={review.id}
                                         size={18}
-                                        liked={review.liked}
+                                        liked={review.liked[0].count > 0}
                                         onLikeCommence={setToLiked}
                                         onUnlikeCommence={setToUnliked}
                                         onLikeComplete={success =>
@@ -362,24 +403,22 @@ export default function ViewReview({
                                         }
                                     />
                                     <Text style={styles.likedText}>
-                                        {review.likes}{' '}
-                                        {review.likes === 1 ? 'like' : 'likes'}
+                                        {review.like_amount[0].count}{' '}
+                                        {review.like_amount[0].count === 1
+                                            ? 'like'
+                                            : 'likes'}
                                     </Text>
                                 </View>
                             </View>
                         </View>
 
-                        <ScrollView
-                            horizontal={true}
-                            style={styles.scrollableTagsContainer}>
-                            <Pressable
-                                style={styles.createCommentButtonContainer}
-                                onPress={createComment}>
-                                <Text style={styles.createCommentText}>
-                                    Comment
-                                </Text>
-                            </Pressable>
-                        </ScrollView>
+                        <View style={styles.scrollableTagsContainer}>
+                            <ReviewAttributes
+                                review={review}
+                                withComment={true}
+                                onCreateCommentPress={createComment}
+                            />
+                        </View>
                     </View>
                 }
             />

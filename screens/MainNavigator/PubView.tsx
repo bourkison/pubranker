@@ -49,7 +49,7 @@ import PubGallery from '@/components/Pubs/PubView/PubGallery';
 import PubDetails from '@/components/Pubs/PubView/PubDetails';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import { PubSchema } from '@/types';
-import { PubViewContext, ReviewType } from '@/context/pubViewContext';
+import { PubViewContext, ListReviewType } from '@/context/pubViewContext';
 import { useAppDispatch } from '@/store/hooks';
 import { setPubSave } from '@/store/slices/explore';
 import RatingsSummary from '@/components/Ratings/RatingsSummary';
@@ -62,8 +62,8 @@ export default function PubHome({
 }: StackScreenProps<MainNavigatorStackParamList, 'PubView'>) {
     const [headerImageUrl, setHeaderImageUrl] = useState('');
 
-    const [reviews, setReviews] = useState<ReviewType[]>([]);
-    const [userReview, setUserReview] = useState<ReviewType | null>(null);
+    const [reviews, setReviews] = useState<ListReviewType[]>([]);
+    const [userReview, setUserReview] = useState<ListReviewType | null>(null);
 
     const [isLoading, setIsLoading] = useState(false);
     const [pub, setPub] = useState<PubSchema>();

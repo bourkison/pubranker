@@ -264,6 +264,13 @@ export type Database = {
             referencedRelation: "user_reviews"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "comments_user_id_fkey1"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       opening_hours: {
@@ -829,6 +836,13 @@ export type Database = {
             columns: ["review_id"]
             isOneToOne: false
             referencedRelation: "user_reviews"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_user_id_fkey1"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_public"
             referencedColumns: ["id"]
           },
         ]

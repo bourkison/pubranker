@@ -10,15 +10,19 @@ import {
 } from 'react-native';
 import { fromNowString } from '@/services';
 import { PubSchema } from '@/types';
-import UserAvatar from '../User/UserAvatar';
-import { ReviewType, useSharedPubViewContext } from '@/context/pubViewContext';
+import UserAvatar from '@/components/User/UserAvatar';
+import {
+    ListReviewType,
+    useSharedPubViewContext,
+} from '@/context/pubViewContext';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
-import RatingsStarViewer from '../Ratings/RatingsStarsViewer';
+import RatingsStarViewer from '@/components/Ratings/RatingsStarsViewer';
+import ReviewAttributes from '@/components/Reviews/ReviewAttributes';
 
 type ReviewProps = {
-    review: ReviewType;
+    review: ListReviewType;
     pub: PubSchema;
     noBorder?: boolean;
 };
@@ -78,6 +82,10 @@ export default function Review({ review, noBorder }: ReviewProps) {
                     </View>
                 </View>
 
+                <View style={styles.optionsContainer}>
+                    <ReviewAttributes review={review} withComment={false} />
+                </View>
+
                 <View style={styles.contentContainer}>
                     <Text
                         style={styles.contentText}
@@ -108,7 +116,6 @@ const styles = StyleSheet.create({
     container: {
         paddingTop: 25,
         paddingBottom: 20,
-        paddingHorizontal: 25,
         borderTopWidth: 1,
         borderColor: '#E5E7EB',
     },
@@ -118,6 +125,7 @@ const styles = StyleSheet.create({
     headerContainer: {
         flexDirection: 'row',
         alignItems: 'center',
+        paddingHorizontal: 25,
     },
     avatarContainer: {},
     headerTextContainer: {
@@ -140,8 +148,12 @@ const styles = StyleSheet.create({
         opacity: 0.4,
         paddingLeft: 5,
     },
+    optionsContainer: {
+        paddingTop: 10,
+    },
     contentContainer: {
         paddingTop: 15,
+        paddingHorizontal: 25,
     },
     contentText: {
         fontSize: 14,

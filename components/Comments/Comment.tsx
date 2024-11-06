@@ -1,5 +1,4 @@
 import { fromNowString } from '@/services';
-import { UserCommentType } from '@/types';
 import React, { useState, useCallback } from 'react';
 import {
     View,
@@ -15,9 +14,10 @@ import UserAvatar from '../User/UserAvatar';
 import * as Haptics from 'expo-haptics';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-reanimated';
+import { ReviewType } from '@/screens/MainNavigator/ViewReview';
 
 type CommentProps = {
-    comment: UserCommentType;
+    comment: ReviewType['comments'][number];
     index: number;
     onLikeCommence?: (index: number) => void;
     onLikeComplete?: (index: number, success: boolean) => void;
@@ -54,7 +54,7 @@ export default function Comment({
         Haptics.impactAsync();
         setIsLiking(true);
 
-        if (comment.liked) {
+        if (comment.liked[0].count > 0) {
             onUnlikeCommence && onUnlikeCommence(index);
 
             const { error } = await supabase
@@ -116,9 +116,12 @@ export default function Comment({
         <GestureDetector gesture={gesture}>
             <View style={styles.container}>
                 <View style={styles.userContainer}>
-                    <UserAvatar photo={comment.user_profile_photo} size={18} />
+                    <UserAvatar
+                        photo={comment.user.profile_photo || ''}
+                        size={18}
+                    />
 
-                    <Text style={styles.usernameText}>{comment.user_name}</Text>
+                    <Text style={styles.usernameText}>{comment.user.name}</Text>
                 </View>
                 <Text
                     style={styles.contentText}
@@ -144,7 +147,7 @@ export default function Comment({
                         <TouchableOpacity
                             style={styles.likeButton}
                             onPress={toggleLike}>
-                            {comment.liked ? (
+                            {comment.liked[0].count > 0 ? (
                                 <Ionicons
                                     name="heart"
                                     size={14}
@@ -159,7 +162,7 @@ export default function Comment({
                             )}
                         </TouchableOpacity>
                         <Text style={styles.likeText}>
-                            {comment.likes_amount} likes
+                            {comment.like_amount[0].count} likes
                         </Text>
                     </View>
                     <View>
