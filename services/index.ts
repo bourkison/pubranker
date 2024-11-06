@@ -1,9 +1,4 @@
-import {
-    OpeningHoursType,
-    PubFilters,
-    UserCommentType,
-    UserReviewType,
-} from '@/types';
+import { OpeningHoursType, PubFilters } from '@/types';
 import { Database } from '@/types/schema';
 import { PostgrestFilterBuilder } from '@supabase/postgrest-js';
 import * as turf from '@turf/turf';
@@ -309,43 +304,6 @@ export const checkIfOpen = (
     return { isOpen: false, nextHours: nextOpeningHours };
 };
 
-export const convertUserCommentsToNonNullable = (
-    userComments: Database['public']['Views']['user_comments']['Row'][],
-): UserCommentType[] => {
-    let response: UserCommentType[] = [];
-
-    userComments.forEach(comment => {
-        const keys = Object.keys(comment) as (keyof typeof comment)[];
-        let hasNull = false;
-
-        for (let i = 0; i < keys.length; i++) {
-            const key = keys[i];
-            if (comment[key] === null) {
-                hasNull = true;
-            }
-        }
-
-        if (!hasNull) {
-            const nonNull = comment as UserCommentType;
-            response.push(nonNull);
-        }
-    });
-
-    return response;
-};
-
-export const editUserReview = (
-    review: UserReviewType,
-    userReview: UserReviewType,
-): UserReviewType => {
-    return {
-        ...userReview,
-        ...review,
-        content: review.content || '',
-        updated_at: review.updated_at || '',
-    };
-};
-
 export const convertFormattedPubsToPubSchema = (
     input: Database['public']['Views']['formatted_pubs']['Row'],
 ): Database['public']['Tables']['pub_schema']['Row'] => {
@@ -389,44 +347,5 @@ export const convertFormattedPubsToPubSchema = (
         review_vibe_amount: input.review_vibe_amount || 0,
         saved: input.saved || false,
         website: input.website || '',
-    };
-};
-
-export const convertViewToUserReviews = (
-    input: Database['public']['Views']['user_reviews']['Row'],
-): UserReviewType => {
-    return {
-        ...input,
-        id: input.id || 0,
-        created_at: input.created_at || '',
-        editors_review: input.editors_review || false,
-        updated_at: input.updated_at || '',
-        user_id: input.user_id || '',
-        pub_id: input.pub_id || 0,
-        user_name: input.user_name || '',
-        rating: input.rating || 0,
-        username: input.username || '',
-        user_profile_photo: input.user_profile_photo || '',
-        liked: input.liked || false,
-        likes: input.likes || 0,
-        is_helpfuls: 0,
-        total_helpfuls: 0,
-    };
-};
-
-export const convertViewToUserComments = (
-    input: Database['public']['Views']['user_comments']['Row'],
-): UserCommentType => {
-    return {
-        ...input,
-        content: input.content || '',
-        created_at: input.created_at || '',
-        id: input.id || 0,
-        liked: input.liked || false,
-        likes_amount: input.likes_amount || 0,
-        review_id: input.review_id || 0,
-        updated_at: input.updated_at || '',
-        user_id: input.user_id || '',
-        user_name: input.user_name || '',
     };
 };

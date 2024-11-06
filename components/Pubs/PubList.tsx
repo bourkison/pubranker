@@ -1,6 +1,5 @@
-import { PubSchema } from '@/types';
 import React, { useCallback } from 'react';
-import BottomSheetPubItem from '@/components/Pubs/PubItem';
+import PubItem, { PubItemType } from '@/components/Pubs/PubItem';
 import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
@@ -8,7 +7,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchMoreExplorePubs } from '@/store/slices/explore';
 
 type BottomSheetPubListProps = {
-    pubs: PubSchema[];
+    pubs: PubItemType[];
 };
 
 export default function BottomSheetPubList({ pubs }: BottomSheetPubListProps) {
@@ -41,7 +40,7 @@ export default function BottomSheetPubList({ pubs }: BottomSheetPubListProps) {
             }
             data={pubs}
             keyExtractor={item => item.id.toString()}
-            renderItem={({ item }) => <BottomSheetPubItem pub={item} />}
+            renderItem={({ item }) => <PubItem pub={item} />}
             onEndReached={loadMorePubs}
             ListFooterComponent={
                 isLoadingMore ? <ActivityIndicator /> : undefined

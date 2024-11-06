@@ -1,18 +1,17 @@
 import React, { useCallback, useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { GOLD_RATINGS_COLOR } from '@/constants';
 import { supabase } from '@/services/supabase';
-import { PubSchema, UserReviewType } from '@/types';
+import { PubSchema } from '@/types';
 import RatingsSelector from '@/components/Ratings/RatingsSelector';
+import { ListReviewType } from '@/context/pubViewContext';
 
 const STAR_SIZE = 40;
 const STAR_PADDING = 4;
 
 type RateSectionProps = {
     pub: PubSchema;
-    userReview: UserReviewType | null;
-    setUserReview: React.Dispatch<React.SetStateAction<UserReviewType | null>>;
+    userReview: ListReviewType | null;
+    setUserReview: React.Dispatch<React.SetStateAction<ListReviewType | null>>;
 };
 
 export default function RateSection({
@@ -50,7 +49,12 @@ export default function RateSection({
                     )
                     .eq('pub_id', pub.id)
                     .eq('user_id', userData.user.id)
-                    .select()
+                    .select(
+                        `*,
+                    user:users_public(name, profile_photo),
+                    liked:review_likes(count),
+                    like_amount:review_likes(count)`,
+                    )
                     .limit(1)
                     .single();
 
@@ -62,7 +66,7 @@ export default function RateSection({
                 }
 
                 if (!userReview && data) {
-                    setUserReview(data as UserReviewType);
+                    setUserReview(data);
                 }
             };
 

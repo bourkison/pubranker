@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, View } from 'react-native';
-import { PubSchema } from '@/types';
 import RecommendedPub from '@/components/Pubs/RecommendedPub';
 import * as Location from 'expo-location';
 import { supabase } from '@/services/supabase';
+import { PubItemType } from '@/components/Pubs/PubItem';
 
 const METERS_WITHIN = 1000;
 const INITIAL_AMOUNT = 10;
@@ -12,7 +12,7 @@ type RecommendedPubListProps = {};
 
 export default function RecommendedPubList({}: RecommendedPubListProps) {
     const [isLoading, setIsLoading] = useState(false);
-    const [pubs, setPubs] = useState<PubSchema[]>([]);
+    const [pubs, setPubs] = useState<PubItemType[]>([]);
 
     useEffect(() => {
         const initialLoad = async () => {
@@ -21,12 +21,11 @@ export default function RecommendedPubList({}: RecommendedPubListProps) {
             let l = await Location.getCurrentPositionAsync();
 
             const { data, error } = await supabase
-                .rpc('nearby_pubs', {
-                    order_lat: l.coords.latitude,
-                    order_long: l.coords.longitude,
-                    dist_lat: l.coords.latitude,
-                    dist_long: l.coords.longitude,
+                .rpc('get_pub_list_item', {
+                    lat: l.coords.latitude,
+                    long: l.coords.longitude,
                 })
+                .order('dist_meters', { ascending: true })
                 .lte('dist_meters', METERS_WITHIN)
                 .limit(INITIAL_AMOUNT);
 

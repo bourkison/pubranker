@@ -24,4 +24,6 @@ export const useSharedPubViewContext = () => {
     if (!context) {
         throw "'useSharedPubViewContext' must be used within PubViewContext";
     }
-   
+
+    return context;
+};
