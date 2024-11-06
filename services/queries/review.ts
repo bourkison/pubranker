@@ -7,11 +7,10 @@ export type ListReviewType = Tables<'reviews'> & {
     like_amount: { count: number }[];
 };
 
-export const reviewListQueryString = `
-    *,
-    user:users_public(name, profile_photo),
-    liked:review_likes(count),
-    like_amount:review_likes(count)` as const;
+export const reviewListQueryString = `*,
+user:users_public(name, profile_photo),
+liked:review_likes(count),
+like_amount:review_likes(count)` as const;
 
 export const reviewListQuery = () =>
     supabase.from('reviews').select(reviewListQueryString);
