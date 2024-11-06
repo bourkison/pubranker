@@ -17,7 +17,9 @@ export default function ProfileTopBar({ userId }: ProfileTopBarProps) {
             const { count, error } = await supabase
                 .from('reviews')
                 .select('count', { count: 'exact' })
-                .eq('user_id', userId);
+                .eq('user_id', userId)
+                .neq('content', null)
+                .neq('content', '');
 
             setIsLoading(false);
 

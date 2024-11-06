@@ -11,10 +11,8 @@ import {
 import { fromNowString } from '@/services';
 import { PubSchema } from '@/types';
 import UserAvatar from '@/components/User/UserAvatar';
-import {
-    ListReviewType,
-    useSharedPubViewContext,
-} from '@/context/pubViewContext';
+import { useSharedPubViewContext } from '@/context/pubViewContext';
+import { ListReviewType } from '@/services/queries/review';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';

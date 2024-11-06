@@ -3,7 +3,10 @@ import { View, Text, StyleSheet } from 'react-native';
 import { supabase } from '@/services/supabase';
 import { PubSchema } from '@/types';
 import RatingsSelector from '@/components/Ratings/RatingsSelector';
-import { ListReviewType } from '@/context/pubViewContext';
+import {
+    ListReviewType,
+    reviewListQueryString,
+} from '@/services/queries/review';
 
 const STAR_SIZE = 40;
 const STAR_PADDING = 4;
@@ -49,12 +52,7 @@ export default function RateSection({
                     )
                     .eq('pub_id', pub.id)
                     .eq('user_id', userData.user.id)
-                    .select(
-                        `*,
-                    user:users_public(name, profile_photo),
-                    liked:review_likes(count),
-                    like_amount:review_likes(count)`,
-                    )
+                    .select(reviewListQueryString)
                     .limit(1)
                     .single();
 

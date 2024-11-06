@@ -22,7 +22,7 @@ import Comment from '@/components/Comments/Comment';
 import { PRIMARY_COLOR } from '@/constants';
 import * as Haptics from 'expo-haptics';
 import ReviewAttributes from '@/components/Reviews/ReviewAttributes';
-import { Tables } from '@/types/schema';
+import { reviewQuery, ReviewType } from '@/services/queries/review';
 import { v4 as uuidv4 } from 'uuid';
 
 const NO_IMAGE = require('@/assets/noimage.png');
@@ -30,23 +30,6 @@ const NO_IMAGE = require('@/assets/noimage.png');
 const ASPECT_RATIO = 1;
 const WIDTH_PERCENTAGE = 0.3;
 const IMAGE_MARGIN = 8;
-
-export type ReviewType = Tables<'reviews'> & {
-    user: { id: string; name: string; profile_photo: string | null };
-    liked: { count: number }[];
-    like_amount: { count: number }[];
-    pub: {
-        id: number;
-        name: string;
-        address: string;
-        primary_photo: string | null;
-    };
-    comments: (Tables<'comments'> & {
-        liked: { count: number }[];
-        like_amount: { count: number }[];
-        user: { id: string; name: string; profile_photo: string | null };
-    })[];
-};
 
 export default function ViewReview({
     route,
@@ -70,21 +53,7 @@ export default function ViewReview({
 
             const { data: userData } = await supabase.auth.getUser();
 
-            const { data, error } = await supabase
-                .from('reviews')
-                .select(
-                    `*,
-                    user:users_public(id, name, profile_photo),
-                    liked:review_likes(count),
-                    like_amount:review_likes(count),
-                    pub:pubs(id, name, address, primary_photo),
-                    comments(
-                        *,
-                        liked:comment_likes(count),
-                        like_amount:comment_likes(count),
-                        user:users_public(id, name, profile_photo)
-                    )`,
-                )
+            const { data, error } = await reviewQuery()
                 .eq('id', route.params.reviewId)
                 // If not logged in, generate random UUID so this shows up as 0.
                 .eq('liked.user_id', userData.user?.id || uuidv4())

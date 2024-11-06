@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import ReviewPubButton from '@/components/Reviews/ReviewPubButton';
 import { PubSchema } from '@/types';
 import { useSharedPubViewContext } from '@/context/pubViewContext';
+import { reviewListQuery } from '@/services/queries/review';
 
 type PubReviewsProps = {
     pub: PubSchema;
@@ -24,14 +25,7 @@ export default function PubReviews({ pub }: PubReviewsProps) {
 
             const { data: userData } = await supabase.auth.getUser();
 
-            let query = supabase
-                .from('reviews')
-                .select(
-                    `*,
-                    user:users_public(name, profile_photo),
-                    liked:review_likes(count),
-                    like_amount:review_likes(count)`,
-                )
+            let query = reviewListQuery()
                 .eq('pub_id', pub.id)
                 // If not logged in, generate random UUID so this shows up as 0.
                 .eq('liked.user_id', userData.user?.id || uuidv4())

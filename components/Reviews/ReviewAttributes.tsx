@@ -1,5 +1,5 @@
 import { PRIMARY_COLOR } from '@/constants';
-import { ListReviewType } from '@/context/pubViewContext';
+import { ListReviewType } from '@/services/queries/review';
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native';
 

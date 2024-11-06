@@ -14,7 +14,7 @@ import UserAvatar from '../User/UserAvatar';
 import * as Haptics from 'expo-haptics';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-reanimated';
-import { ReviewType } from '@/screens/MainNavigator/ViewReview';
+import { ReviewType } from '@/services/queries/review';
 
 type CommentProps = {
     comment: ReviewType['comments'][number];

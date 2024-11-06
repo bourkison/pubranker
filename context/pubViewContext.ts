@@ -1,11 +1,5 @@
-import { Tables } from '@/types/schema';
+import { ListReviewType } from '@/services/queries/review';
 import { Dispatch, SetStateAction, createContext, useContext } from 'react';
-
-export type ListReviewType = Tables<'reviews'> & {
-    user: { name: string; profile_photo: string | null };
-    liked: { count: number }[];
-    like_amount: { count: number }[];
-};
 
 type PubViewContext = {
     calculateWithinScrollBounds: (withAnimation: boolean) => void; // A function to ensure changes in layout haven't meant we are now viewing outside of the viewport (i.e. see less on comments)

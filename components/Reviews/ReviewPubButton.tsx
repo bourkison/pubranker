@@ -15,6 +15,7 @@ import { PRIMARY_COLOR } from '@/constants';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { v4 as uuidv4 } from 'uuid';
+import { reviewListQuery } from '@/services/queries/review';
 
 type ReviewPubButtonProps = {
     pub: PubSchema;
@@ -41,14 +42,7 @@ export default function ReviewPubButton({ pub }: ReviewPubButtonProps) {
                     return;
                 }
 
-                const { data, error } = await supabase
-                    .from('reviews')
-                    .select(
-                        `*,
-                    user:users_public(name, profile_photo),
-                    liked:review_likes(count),
-                    like_amount:review_likes(count)`,
-                    )
+                const { data, error } = await reviewListQuery()
                     .eq('pub_id', pub.id)
                     .eq('user_id', userData.user.id)
                     // If not logged in, generate random UUID so this shows up as 0.
