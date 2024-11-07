@@ -13,6 +13,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { SavedNavigatorStackParamList } from '@/nav/SavedNavigator';
+import UserAvatar from '../User/UserAvatar';
 
 const NO_IMAGE = require('@/assets/noimage.png');
 
@@ -99,6 +100,17 @@ export default function CollectionListItem({
                         </Text>
                     </View>
                 ) : undefined}
+
+                <View style={styles.userContainer}>
+                    <UserAvatar
+                        size={14}
+                        photo={collection.user.profile_photo || ''}
+                    />
+
+                    <Text style={styles.userNameText}>
+                        {collection.user.name}
+                    </Text>
+                </View>
             </View>
         </TouchableHighlight>
     );
@@ -108,7 +120,8 @@ const styles = StyleSheet.create({
     container: {
         borderBottomWidth: 1,
         borderColor: '#E5E7EB',
-        paddingVertical: 25,
+        paddingTop: 25,
+        paddingBottom: 15,
     },
     headerContainer: {
         flexDirection: 'row',
@@ -140,5 +153,15 @@ const styles = StyleSheet.create({
     },
     descriptionText: {
         fontSize: 12,
+    },
+    userContainer: {
+        marginTop: 20,
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 30,
+    },
+    userNameText: {
+        fontSize: 12,
+        marginLeft: 3,
     },
 });

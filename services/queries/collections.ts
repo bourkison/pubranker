@@ -12,6 +12,11 @@ export type ListCollectionType = {
     pubs_count: {
         count: number;
     }[];
+    user: {
+        id: string;
+        name: string;
+        profile_photo: string | null;
+    };
 };
 
 export const listFollowedCollectionsQueryString = `
@@ -26,7 +31,8 @@ collections(
         id,
         primary_photo
     ),
-    pubs_count:pubs(count)
+    pubs_count:pubs(count),
+    user:users_public(id, name, profile_photo)
 )
 ` as const;
 

@@ -45,11 +45,7 @@ export default function CollectionsHome() {
                 return;
             }
 
-            console.log(
-                'response',
-                data[0].collections.pubs[0].id,
-                data[0].collections.pubs.length,
-            );
+            console.log('response', data[0].collections.user);
 
             setCollections(data.map(follow => follow.collections));
             setIsLoading(false);
