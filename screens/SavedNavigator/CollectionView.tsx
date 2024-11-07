@@ -18,19 +18,10 @@ import * as Location from 'expo-location';
 import UserAvatar from '@/components/User/UserAvatar';
 import { PRIMARY_COLOR } from '@/constants';
 import { v4 as uuidv4 } from 'uuid';
-
-type CollectionType = {
-    id: number;
-    name: string;
-    description: string | null;
-    pubs: PubItemType[];
-    user: {
-        id: string;
-        name: string;
-        profile_photo: string | null;
-    };
-    is_followed: { count: number }[];
-};
+import {
+    collectionQuery,
+    CollectionType,
+} from '@/services/queries/collections';
 
 export default function CollectionView({
     navigation,
@@ -52,18 +43,7 @@ export default function CollectionView({
                 return;
             }
 
-            const { data, error } = await supabase
-                .from('collections')
-                .select(
-                    `
-                id,
-                name,
-                description,
-                collection_items(pub_id, created_at),
-                user:users_public(id, name, profile_photo),
-                is_followed:collection_follows(count)
-                `,
-                )
+            const { data, error } = await collectionQuery()
                 .eq('id', route.params.collectionId)
                 .eq('is_followed.user_id', userData.user?.id || uuidv4())
                 .order('created_at', {

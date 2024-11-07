@@ -13,8 +13,10 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { SavedNavigatorStackParamList } from '@/nav/SavedNavigator';
 import CreateCollectionIcon from '@/components/Collections/CreateCollectionIcon';
-import { supabase } from '@/services/supabase';
-import { ListCollectionType } from '@/types/collections';
+import {
+    ListCollectionType,
+    listFollowedCollectionsQuery,
+} from '@/services/queries/collections';
 import CollectionListItem from '@/components/Collections/CollectionListItem';
 
 const INITIAL_LOAD_AMOUNT = 10;
@@ -27,39 +29,27 @@ export default function CollectionsHome() {
         const fetchCollections = async () => {
             setIsLoading(true);
 
-            const { data, error } = await supabase
-                .from('collection_follows')
-                .select(
-                    `
-                    id,
-                    created_at,
-                    updated_at,
-                    collections(
-                        id,
-                        name,
-                        pubs(
-                            id,
-                            primary_photo
-                        ),
-                        pubs_count:pubs(count)
-                    )
-                `,
-                )
+            const { data, error } = await listFollowedCollectionsQuery()
                 .order('updated_at', { ascending: false })
+                // TODO: This order is useless as its referencing when the pub was created_at
                 .order('created_at', {
                     referencedTable: 'collections.pubs',
-                    ascending: false,
+                    ascending: true,
                 })
                 .limit(INITIAL_LOAD_AMOUNT)
-                .limit(3, { referencedTable: 'collections.pubs' });
-
-            console.log('response', data);
+                .limit(8, { referencedTable: 'collections.pubs' });
 
             if (error) {
                 setIsLoading(false);
                 console.error(error);
                 return;
             }
+
+            console.log(
+                'response',
+                data[0].collections.pubs[0].id,
+                data[0].collections.pubs.length,
+            );
 
             setCollections(data.map(follow => follow.collections));
             setIsLoading(false);
