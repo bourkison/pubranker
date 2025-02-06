@@ -8,11 +8,14 @@ import Animated, {
     interpolateColor,
     useAnimatedStyle,
 } from 'react-native-reanimated';
+import { useAppSelector } from '@/store/hooks';
 
 export default function FiltersContainer() {
     const { setFilterBarHeight, filterBarHeight, mapBottomSheetAnimatedValue } =
         useSharedExploreContext();
     const insets = useSafeAreaInsets();
+
+    const exploreState = useAppSelector(state => state.explore.exploreState);
 
     const rStyle = useAnimatedStyle(() => ({
         backgroundColor: interpolateColor(
@@ -28,9 +31,12 @@ export default function FiltersContainer() {
             onLayout={e => setFilterBarHeight(e.nativeEvent.layout.height)}>
             <View>
                 <SearchBar />
-                <View style={styles.scrollableContainer}>
-                    <FiltersScrollable />
-                </View>
+
+                {exploreState !== 'search' && (
+                    <View style={styles.scrollableContainer}>
+                        <FiltersScrollable />
+                    </View>
+                )}
             </View>
         </Animated.View>
     );

@@ -21,11 +21,19 @@ import Animated, {
     useSharedValue,
     withTiming,
 } from 'react-native-reanimated';
+import { supabase } from '@/services/supabase';
 
 const AnimatedIonicon = Animated.createAnimatedComponent(Ionicons);
 
+type ResultType = {
+    name: string;
+    id: number | string;
+    type: 'list' | 'place' | 'user' | 'pub';
+};
+
 export default function SearchBar() {
     const dispatch = useAppDispatch();
+    const [results, setResults] = useState<ResultType[]>([]);
     const exploreState = useAppSelector(state => state.explore.exploreState);
     const searchText = useAppSelector(state => state.explore.searchText);
 
@@ -36,7 +44,26 @@ export default function SearchBar() {
     const sFocused = useSharedValue(0); // 0 is not focused, 1 is focused.
 
     const search = () => {
-        dispatch(fetchExplorePubs({ amount: INITIAL_SEARCH_AMOUNT }));
+        const asyncSearch = async () => {
+            const { data, error } = await supabase
+                .from('pubs')
+                .select('id, name')
+                .textSearch('name', searchText, {
+                    config: 'english',
+                    type: 'websearch',
+                });
+
+            if (error) {
+                console.error(error);
+                setResults([]);
+                return;
+            }
+
+            setResults(data.map(d => ({ ...d, type: 'place' })));
+            console.log('test', data);
+        };
+
+        asyncSearch();
     };
 
     const goToSuggestions = () => {
