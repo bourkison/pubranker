@@ -167,6 +167,7 @@ export default function HomeMap() {
                 animatedPosition={mapBottomSheetAnimatedValue}
                 backgroundStyle={styles.bottomSheetBackground}
                 animateOnMount={true}
+                containerStyle={styles.bottomSheetContainer}
                 topInset={filterBarHeight}
                 onChange={index => {
                     // Deselect pub if user expands bottom sheet
@@ -199,4 +200,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 30,
     },
     listContainer: { flex: 1 },
+    bottomSheetContainer: {
+        zIndex: 10,
+    },
 });

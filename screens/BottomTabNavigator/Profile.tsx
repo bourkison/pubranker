@@ -12,14 +12,15 @@ import {
 import PubMapMarker from '@/components/Maps/PubMapMarker';
 import { SECONDARY_COLOR } from '@/constants';
 import { supabase } from '@/services/supabase';
-import { Database } from '@/types/schema';
 import UserAvatar from '@/components/User/UserAvatar';
 import { Feather, SimpleLineIcons } from '@expo/vector-icons';
 import ProfileTopBar from '@/components/User/ProfileTopBar';
+import { userQuery } from '@/services/queries/user';
+import { UserType } from '@/services/queries/user';
+import RatingsSummary from '@/components/Ratings/RatingsSummary';
 
 export default function Profile() {
-    const [user, setUser] =
-        useState<Database['public']['Tables']['users_public']['Row']>();
+    const [user, setUser] = useState<UserType>();
     const [isLoading, setIsLoading] = useState(false);
 
     const dispatch = useAppDispatch();
@@ -36,12 +37,8 @@ export default function Profile() {
                 return;
             }
 
-            const { data: publicUser, error: publicUserError } = await supabase
-                .from('users_public')
-                .select()
-                .eq('id', data.user.id)
-                .limit(1)
-                .single();
+            const { data: publicUser, error: publicUserError } =
+                await userQuery().eq('id', data.user.id).limit(1).single();
 
             if (publicUserError) {
                 console.warn('no public user', publicUserError);
@@ -51,7 +48,7 @@ export default function Profile() {
 
             setUser(publicUser);
             setIsLoading(false);
-            console.log(publicUser);
+            console.log('user', publicUser);
         };
 
         fetchData();
@@ -89,15 +86,26 @@ export default function Profile() {
                 />
             </View>
 
-            <ProfileTopBar userId={user.id} />
+            <View style={styles.ratingsContainer}>
+                <RatingsSummary
+                    header="Ratings"
+                    ratingsHeight={100}
+                    ratingsPadding={10}
+                    ratings={[
+                        user.review_ones[0].count,
+                        user.review_twos[0].count,
+                        user.review_threes[0].count,
+                        user.review_fours[0].count,
+                        user.review_fives[0].count,
+                        user.review_sixes[0].count,
+                        user.review_sevens[0].count,
+                        user.review_eights[0].count,
+                        user.review_nines[0].count,
+                        user.review_tens[0].count,
+                    ]}
+                />
+            </View>
 
-            <Text>Check ins, reviews etc</Text>
-            <PubMapMarker
-                width={48}
-                pinColor={SECONDARY_COLOR}
-                outlineColor="#FFF"
-                dotColor="#FFF"
-            />
             <View>
                 <TouchableOpacity onPress={() => dispatch(storeSignOut())}>
                     <Text>Logout</Text>
@@ -144,4 +152,5 @@ const styles = StyleSheet.create({
         fontFamily: 'Jost',
         textAlign: 'center',
     },
+    ratingsContainer: {},
 });

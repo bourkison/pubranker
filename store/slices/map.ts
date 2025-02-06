@@ -34,11 +34,13 @@ const initialState = mapAdapter.getInitialState({
     currentSelected: null as Feature<Polygon> | null,
 });
 
+// TODO: This is currently broken.
+// Pubs are being added to map in explore slice by addPubsToMap.
 export const fetchMapPubs = createAsyncThunk<
     { pubs: { id: number; location: Point }[]; requestedBox: BoundingBox[] },
     BoundingBox,
     { rejectValue: RejectWithValueType }
->('map/fetchMapPubs', async (boundingBox, { getState, rejectWithValue }) => {
+>('map/fetchMapPubs', async (boundingBox, { getState, rejectWithValue }) => {    
     const state = getState() as RootState;
 
     const geojson = hasFetchedPreviously(

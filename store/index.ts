@@ -1,13 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 import userReducer from '@/store/slices/user';
-import savedReducer from '@/store/slices/saved';
 import mapReducer from '@/store/slices/map';
 import exploreReducer from '@/store/slices/explore';
 
 const store = configureStore({
     reducer: {
         user: userReducer,
-        saved: savedReducer,
         map: mapReducer,
         explore: exploreReducer,
     },

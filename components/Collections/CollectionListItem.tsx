@@ -74,8 +74,8 @@ export default function CollectionListItem({
                     contentContainerStyle={styles.scrollableContainer}
                     showsHorizontalScrollIndicator={false}>
                     <Pressable style={styles.imageContainer}>
-                        {imageUrls.map(image => (
-                            <View>
+                        {imageUrls.map((image, index) => (
+                            <View key={index}>
                                 <Image
                                     source={image ? { uri: image } : NO_IMAGE}
                                     style={[

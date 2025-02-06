@@ -266,6 +266,7 @@ const styles = StyleSheet.create({
     },
     filtersContainer: {
         marginBottom: 10,
+        zIndex: 2,
     },
     suggestionsContainer: {
         width: '100%',
@@ -273,7 +274,7 @@ const styles = StyleSheet.create({
     },
     mapContainer: {
         ...StyleSheet.absoluteFillObject,
-        zIndex: -1,
+        // zIndex: -1,
     },
     sectionContainer: {
         marginBottom: 20,

@@ -22,7 +22,8 @@ type RatingsSummaryProps = {
         number,
         number,
     ];
-    totalRating: number;
+    totalRating?: number;
+    ratingsPadding?: number;
 };
 
 export const BAR_MARGINS = 1;
@@ -32,6 +33,7 @@ export default function RatingsSummary({
     ratings,
     ratingsHeight,
     totalRating,
+    ratingsPadding,
 }: RatingsSummaryProps) {
     const [largestIndex, setLargestIndex] = useState(0);
     const [elementWidth, setElementWidth] = useState(1);
@@ -64,11 +66,15 @@ export default function RatingsSummary({
     }, [selected]);
 
     const rightColumnText = useMemo<string>(() => {
-        if (selected === null) {
-            return roundToNearest(totalRating, 0.1).toFixed(1);
+        if (selected !== null) {
+            return ratings[selected].toString();
         }
 
-        return ratings[selected].toString();
+        if (!totalRating) {
+            return '';
+        }
+
+        return roundToNearest(totalRating, 0.1).toFixed(1);
     }, [selected, ratings, totalRating]);
 
     const calculateRatingsTouch = useCallback<(x: number) => number | null>(
@@ -101,7 +107,10 @@ export default function RatingsSummary({
                     <View
                         style={[
                             styles.barsContainer,
-                            { height: ratingsHeight },
+                            {
+                                height: ratingsHeight,
+                                padding: ratingsPadding,
+                            },
                         ]}
                         onLayout={({
                             nativeEvent: {
