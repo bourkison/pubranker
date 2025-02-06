@@ -2,7 +2,10 @@ import { supabase } from '@/services/supabase';
 import { Tables } from '@/types/schema';
 
 export type UserType = Tables<'users_public'> & {
-    total_reviews: { count: number }[];
+    reviews: { count: number }[];
+    ratings: { count: number }[];
+    followers: { count: number }[];
+    following: { count: number }[];
     review_ones: { count: number }[];
     review_twos: { count: number }[];
     review_threes: { count: number }[];
@@ -16,7 +19,10 @@ export type UserType = Tables<'users_public'> & {
 };
 
 const userQueryString = `*,
-total_reviews:reviews(count),
+reviews(count),
+ratings:reviews(count),
+followers:follows!follows_user_id_fkey(count),
+following:follows!follows_created_by_fkey(count),
 review_ones:reviews(count),
 review_twos:reviews(count),
 review_threes:reviews(count),
@@ -29,7 +35,7 @@ review_nines:reviews(count),
 review_tens:reviews(count)
 ` as const;
 
-export const userQuery = () =>
+export const userQuery = (userId: string) =>
     supabase
         .from('users_public')
         .select(userQueryString)
@@ -42,4 +48,8 @@ export const userQuery = () =>
         .eq('review_sevens.rating', 7)
         .eq('review_eights.rating', 8)
         .eq('review_nines.rating', 9)
-        .eq('review_tens.rating', 10);
+        .eq('review_tens.rating', 10)
+        .eq('following.created_by', userId)
+        .eq('followers.user_id', userId)
+        .neq('reviews.content', null)
+        .neq('reviews.content', '');

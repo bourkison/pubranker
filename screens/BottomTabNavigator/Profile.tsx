@@ -36,7 +36,10 @@ export default function Profile() {
             }
 
             const { data: publicUser, error: publicUserError } =
-                await userQuery().eq('id', data.user.id).limit(1).single();
+                await userQuery(data.user.id)
+                    .eq('id', data.user.id)
+                    .limit(1)
+                    .single();
 
             if (publicUserError) {
                 console.warn('no public user', publicUserError);
@@ -84,7 +87,11 @@ export default function Profile() {
                 />
             </View>
 
-            <ProfileTopBar userId={user.id} />
+            <ProfileTopBar
+                reviews={user.reviews[0].count}
+                followers={user.followers[0].count}
+                following={user.following[0].count}
+            />
 
             <View style={styles.ratingsContainer}>
                 <RatingsSummary

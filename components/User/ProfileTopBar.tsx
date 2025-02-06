@@ -1,60 +1,40 @@
-import { supabase } from '@/services/supabase';
-import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import React, { useMemo } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 
 type ProfileTopBarProps = {
-    userId: string;
+    reviews: number;
+    followers: number;
+    following: number;
 };
 
-export default function ProfileTopBar({ userId }: ProfileTopBarProps) {
-    const [isLoading, setIsLoading] = useState(false);
-    const [numReviews, setNumReviews] = useState(0);
-
-    useEffect(() => {
-        const fetchAmounts = async () => {
-            setIsLoading(true);
-
-            const { count, error } = await supabase
-                .from('reviews')
-                .select('count', { count: 'exact' })
-                .eq('user_id', userId)
-                .neq('content', null)
-                .neq('content', '');
-
-            setIsLoading(false);
-
-            if (error) {
-                console.warn(error);
-                return;
-            }
-
-            setNumReviews(count ?? 0);
-        };
-
-        fetchAmounts();
-    }, [userId]);
-
+export default function ProfileTopBar({
+    reviews,
+    followers,
+    following,
+}: ProfileTopBarProps) {
     const reviewsText = useMemo<string>(() => {
-        if (numReviews === 1) {
+        if (reviews === 1) {
             return 'Review';
         }
 
         return 'Reviews';
-    }, [numReviews]);
+    }, [reviews]);
 
-    if (isLoading) {
-        return (
-            <View style={styles.topBarContainer}>
-                <ActivityIndicator style={styles.activityIndicator} />
-            </View>
-        );
-    }
+    const followersText = useMemo<string>(() => {
+        if (followers === 1) {
+            return 'Follower';
+        }
+
+        return 'Followers';
+    }, [followers]);
 
     return (
         <View style={styles.topBarContainer}>
             <View style={styles.topBarColumn}>
                 <View style={styles.topBarValueContainer}>
-                    <Text style={styles.topBarValueText}>{numReviews}</Text>
+                    <Text style={styles.topBarValueText}>
+                        {reviews.toString()}
+                    </Text>
                 </View>
 
                 <View style={styles.topBarHeaderContainer}>
@@ -64,17 +44,21 @@ export default function ProfileTopBar({ userId }: ProfileTopBarProps) {
 
             <View style={styles.topBarColumn}>
                 <View style={styles.topBarValueContainer}>
-                    <Text style={styles.topBarValueText}>0</Text>
+                    <Text style={styles.topBarValueText}>
+                        {followers.toString()}
+                    </Text>
                 </View>
 
                 <View style={styles.topBarHeaderContainer}>
-                    <Text style={styles.topBarHeaderText}>Followers</Text>
+                    <Text style={styles.topBarHeaderText}>{followersText}</Text>
                 </View>
             </View>
 
             <View style={styles.topBarColumn}>
                 <View style={styles.topBarValueContainer}>
-                    <Text style={styles.topBarValueText}>0</Text>
+                    <Text style={styles.topBarValueText}>
+                        {following.toString()}
+                    </Text>
                 </View>
 
                 <View style={styles.topBarHeaderContainer}>

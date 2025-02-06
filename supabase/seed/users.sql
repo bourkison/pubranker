@@ -1,12 +1,14 @@
 DO $$ DECLARE user_id uuid;
 
-BEGIN user_id := public.create_user('harrison@gmail.com', 'password');
+BEGIN 
+    user_id := public.create_user('harrison@gmail.com', 'password');
+    user_two_id := public.create_user('test@gmail.com', 'password');
 
 -- First create users_public
 INSERT INTO
     public.users_public (id, name, profile_photo, username)
 VALUES
-    (user_id, 'Harrison', '', 'bourkison');
+    (user_id, 'Harrison', '', 'bourkison'), (user_id, 'Test user', 'test');
 
 -- Then create reviews
 insert into
