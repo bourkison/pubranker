@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
     },
     exploreHomeContainer: {
         flex: 1,
-        zIndex: -2,
+        // zIndex: -2, // Removed this, not sure why it was here originally.
     },
     filtersContainer: {
         marginBottom: 10,

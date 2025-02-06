@@ -8,7 +8,7 @@ import { Database } from '@/types/schema';
 // const supabaseAnonKey =
 //     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlvamdpaXR5c3RuZm55cnNodWh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2NzY4NTM0MTQsImV4cCI6MTk5MjQyOTQxNH0.EXwL3nYSA0qtU19NEpAcATqwZLOtWXhqGXJavR8dbRA';
 
-const supabaseUrl = 'http://192.168.0.49:54321';
+const supabaseUrl = 'http://192.168.0.197:54321';
 const supabaseAnonKey =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0';
 
