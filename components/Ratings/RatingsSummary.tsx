@@ -40,10 +40,13 @@ export default function RatingsSummary({
 
     const [selected, setSelected] = useState<number | null>(null);
 
-    const barWidth = useMemo(
-        () => elementWidth / 10 - BAR_MARGINS * 2,
-        [elementWidth],
-    );
+    const barWidth = useMemo(() => {
+        const padding = ratingsPadding || 0;
+
+        const totalWidthMinusPadding = elementWidth - padding;
+
+        return totalWidthMinusPadding / 10 - BAR_MARGINS * 2;
+    }, [elementWidth, ratingsPadding]);
 
     const totalBarWidth = useMemo(() => barWidth + BAR_MARGINS * 2, [barWidth]);
 

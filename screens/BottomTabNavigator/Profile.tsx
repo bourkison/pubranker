@@ -9,8 +9,6 @@ import {
     StyleSheet,
     ActivityIndicator,
 } from 'react-native';
-import PubMapMarker from '@/components/Maps/PubMapMarker';
-import { SECONDARY_COLOR } from '@/constants';
 import { supabase } from '@/services/supabase';
 import UserAvatar from '@/components/User/UserAvatar';
 import { Feather, SimpleLineIcons } from '@expo/vector-icons';
@@ -85,6 +83,8 @@ export default function Profile() {
                     withShadow={true}
                 />
             </View>
+
+            <ProfileTopBar userId={user.id} />
 
             <View style={styles.ratingsContainer}>
                 <RatingsSummary

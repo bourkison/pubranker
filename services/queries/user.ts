@@ -2,6 +2,7 @@ import { supabase } from '@/services/supabase';
 import { Tables } from '@/types/schema';
 
 export type UserType = Tables<'users_public'> & {
+    total_reviews: { count: number }[];
     review_ones: { count: number }[];
     review_twos: { count: number }[];
     review_threes: { count: number }[];
@@ -15,6 +16,7 @@ export type UserType = Tables<'users_public'> & {
 };
 
 const userQueryString = `*,
+total_reviews:reviews(count),
 review_ones:reviews(count),
 review_twos:reviews(count),
 review_threes:reviews(count),
