@@ -66,6 +66,13 @@ export type Database = {
                         foreignKeyName: 'beer_pub_relationships_pub_id_fkey';
                         columns: ['pub_id'];
                         isOneToOne: false;
+                        referencedRelation: 'location_pubs';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'beer_pub_relationships_pub_id_fkey';
+                        columns: ['pub_id'];
+                        isOneToOne: false;
                         referencedRelation: 'pubs';
                         referencedColumns: ['id'];
                     },
@@ -214,6 +221,13 @@ export type Database = {
                         foreignKeyName: 'collection_items_pub_id_fkey';
                         columns: ['pub_id'];
                         isOneToOne: false;
+                        referencedRelation: 'location_pubs';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'collection_items_pub_id_fkey';
+                        columns: ['pub_id'];
+                        isOneToOne: false;
                         referencedRelation: 'pubs';
                         referencedColumns: ['id'];
                     },
@@ -346,7 +360,7 @@ export type Database = {
                 };
                 Insert: {
                     created_at?: string;
-                    created_by: string;
+                    created_by?: string;
                     user_id: string;
                 };
                 Update: {
@@ -408,6 +422,13 @@ export type Database = {
                         foreignKeyName: 'opening_hours_pub_id_fkey';
                         columns: ['pub_id'];
                         isOneToOne: false;
+                        referencedRelation: 'location_pubs';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'opening_hours_pub_id_fkey';
+                        columns: ['pub_id'];
+                        isOneToOne: false;
                         referencedRelation: 'pubs';
                         referencedColumns: ['id'];
                     },
@@ -444,6 +465,13 @@ export type Database = {
                         columns: ['pub_id'];
                         isOneToOne: false;
                         referencedRelation: 'formatted_pubs';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'pub_photos_pub_id_fkey';
+                        columns: ['pub_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'location_pubs';
                         referencedColumns: ['id'];
                     },
                     {
@@ -776,6 +804,13 @@ export type Database = {
                         foreignKeyName: 'reviews_pub_id_fkey';
                         columns: ['pub_id'];
                         isOneToOne: false;
+                        referencedRelation: 'location_pubs';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'reviews_pub_id_fkey';
+                        columns: ['pub_id'];
+                        isOneToOne: false;
                         referencedRelation: 'pubs';
                         referencedColumns: ['id'];
                     },
@@ -813,6 +848,13 @@ export type Database = {
                         columns: ['pub_id'];
                         isOneToOne: false;
                         referencedRelation: 'formatted_pubs';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'saves_pub_id_fkey';
+                        columns: ['pub_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'location_pubs';
                         referencedColumns: ['id'];
                     },
                     {
@@ -901,6 +943,90 @@ export type Database = {
                 };
                 Relationships: [];
             };
+            location_pubs: {
+                Row: {
+                    address: string | null;
+                    beer_garden: boolean | null;
+                    brewery: boolean | null;
+                    created_at: string | null;
+                    dart_board: boolean | null;
+                    description: string | null;
+                    dog_friendly: boolean | null;
+                    foosball_table: boolean | null;
+                    free_wifi: boolean | null;
+                    geoj_location: string | null;
+                    google_id: string | null;
+                    hidden: boolean | null;
+                    id: number | null;
+                    kid_friendly: boolean | null;
+                    live_sport: boolean | null;
+                    location: unknown | null;
+                    name: string | null;
+                    phone_number: string | null;
+                    pool_table: boolean | null;
+                    primary_photo: string | null;
+                    reservable: boolean | null;
+                    rooftop: boolean | null;
+                    updated_at: string | null;
+                    website: string | null;
+                    wheelchair_accessible: boolean | null;
+                };
+                Insert: {
+                    address?: string | null;
+                    beer_garden?: boolean | null;
+                    brewery?: boolean | null;
+                    created_at?: string | null;
+                    dart_board?: boolean | null;
+                    description?: string | null;
+                    dog_friendly?: boolean | null;
+                    foosball_table?: boolean | null;
+                    free_wifi?: boolean | null;
+                    geoj_location?: never;
+                    google_id?: string | null;
+                    hidden?: boolean | null;
+                    id?: number | null;
+                    kid_friendly?: boolean | null;
+                    live_sport?: boolean | null;
+                    location?: unknown | null;
+                    name?: string | null;
+                    phone_number?: string | null;
+                    pool_table?: boolean | null;
+                    primary_photo?: string | null;
+                    reservable?: boolean | null;
+                    rooftop?: boolean | null;
+                    updated_at?: string | null;
+                    website?: string | null;
+                    wheelchair_accessible?: boolean | null;
+                };
+                Update: {
+                    address?: string | null;
+                    beer_garden?: boolean | null;
+                    brewery?: boolean | null;
+                    created_at?: string | null;
+                    dart_board?: boolean | null;
+                    description?: string | null;
+                    dog_friendly?: boolean | null;
+                    foosball_table?: boolean | null;
+                    free_wifi?: boolean | null;
+                    geoj_location?: never;
+                    google_id?: string | null;
+                    hidden?: boolean | null;
+                    id?: number | null;
+                    kid_friendly?: boolean | null;
+                    live_sport?: boolean | null;
+                    location?: unknown | null;
+                    name?: string | null;
+                    phone_number?: string | null;
+                    pool_table?: boolean | null;
+                    primary_photo?: string | null;
+                    reservable?: boolean | null;
+                    rooftop?: boolean | null;
+                    updated_at?: string | null;
+                    website?: string | null;
+                    wheelchair_accessible?: boolean | null;
+                };
+                Relationships: [];
+            };
         };
         Functions: {
             create_user: {
@@ -980,6 +1106,7 @@ export type Database = {
                     dist_meters: number;
                     photos: string[];
                     primary_photo: string;
+                    location: string;
                 }[];
             };
             nearby_pubs: {

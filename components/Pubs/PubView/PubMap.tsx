@@ -1,10 +1,9 @@
 import { parseLocation } from '@/services';
 import { PubSchema } from '@/types';
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import MapView, { MapMarker } from 'react-native-maps';
 import MapStyle from '@/json/map_style.json';
 import { StyleSheet, useWindowDimensions } from 'react-native';
-import * as Location from 'expo-location';
 import PubMapMarker from '@/components/Maps/PubMapMarker';
 import { SECONDARY_COLOR } from '@/constants';
 
@@ -20,35 +19,6 @@ export default function PubMap({ pub }: PubMapProps) {
 
     const mapRef = useRef<MapView>(null);
 
-    useEffect(() => {
-        console.log('USE EFFECT');
-
-        (async () => {
-            const l = await Location.getCurrentPositionAsync();
-
-            mapRef.current?.fitToCoordinates(
-                [
-                    {
-                        latitude: pubLocation.coordinates[1],
-                        longitude: pubLocation.coordinates[0],
-                    },
-                    {
-                        latitude: l.coords.latitude,
-                        longitude: l.coords.longitude,
-                    },
-                ],
-                {
-                    edgePadding: {
-                        bottom: 40,
-                        left: 40,
-                        right: 40,
-                        top: 40,
-                    },
-                },
-            );
-        })();
-    }, [pubLocation, mapRef]);
-
     return (
         <>
             <MapView
@@ -56,12 +26,13 @@ export default function PubMap({ pub }: PubMapProps) {
                 initialRegion={{
                     latitude: pubLocation.coordinates[1],
                     longitude: pubLocation.coordinates[0],
-                    latitudeDelta: 0.022,
-                    longitudeDelta: 0.021,
+                    latitudeDelta: 0.006,
+                    longitudeDelta: 0.006,
                 }}
                 rotateEnabled={false}
                 showsUserLocation={true}
                 showsMyLocationButton={false}
+                pointerEvents="none"
                 style={[
                     styles.map,
                     {

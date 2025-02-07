@@ -22,6 +22,7 @@ import {
     collectionQuery,
     CollectionType,
 } from '@/services/queries/collections';
+import CollectionMap from '@/components/Collections/CollectionMap';
 
 export default function CollectionView({
     navigation,
@@ -157,62 +158,66 @@ export default function CollectionView({
                 }
                 ListHeaderComponent={
                     !collection ? undefined : (
-                        <View style={styles.listHeaderContainer}>
-                            <View style={styles.topListHeaderContainer}>
-                                <View style={styles.userContainer}>
-                                    <UserAvatar
-                                        photo={
-                                            collection.user.profile_photo || ''
-                                        }
-                                        size={14}
-                                    />
+                        <>
+                            <CollectionMap pubs={collection.pubs} />
+                            <View style={styles.listHeaderContainer}>
+                                <View style={styles.topListHeaderContainer}>
+                                    <View style={styles.userContainer}>
+                                        <UserAvatar
+                                            photo={
+                                                collection.user.profile_photo ||
+                                                ''
+                                            }
+                                            size={14}
+                                        />
 
-                                    <Text style={styles.userNameText}>
-                                        {collection.user.name}
-                                    </Text>
+                                        <Text style={styles.userNameText}>
+                                            {collection.user.name}
+                                        </Text>
+                                    </View>
+
+                                    <TouchableOpacity
+                                        style={styles.followContainer}
+                                        onPress={() =>
+                                            console.log('toggle follow')
+                                        }>
+                                        {collection.is_followed[0].count > 0 ? (
+                                            <>
+                                                <Ionicons
+                                                    name="checkmark"
+                                                    size={16}
+                                                    color={PRIMARY_COLOR}
+                                                />
+                                                <Text style={styles.followText}>
+                                                    Followed
+                                                </Text>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <FontAwesome6
+                                                    name="plus"
+                                                    size={14}
+                                                    color={PRIMARY_COLOR}
+                                                />
+                                                <Text style={styles.followText}>
+                                                    Follow
+                                                </Text>
+                                            </>
+                                        )}
+                                    </TouchableOpacity>
                                 </View>
 
-                                <TouchableOpacity
-                                    style={styles.followContainer}
-                                    onPress={() =>
-                                        console.log('toggle follow')
-                                    }>
-                                    {collection.is_followed[0].count > 0 ? (
-                                        <>
-                                            <Ionicons
-                                                name="checkmark"
-                                                size={16}
-                                                color={PRIMARY_COLOR}
-                                            />
-                                            <Text style={styles.followText}>
-                                                Followed
-                                            </Text>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <FontAwesome6
-                                                name="plus"
-                                                size={14}
-                                                color={PRIMARY_COLOR}
-                                            />
-                                            <Text style={styles.followText}>
-                                                Follow
-                                            </Text>
-                                        </>
-                                    )}
-                                </TouchableOpacity>
-                            </View>
-
-                            <Text style={styles.collectionNameText}>
-                                {collection.name}
-                            </Text>
-
-                            {collection.description ? (
-                                <Text style={styles.descriptionText}>
-                                    {collection.description}
+                                <Text style={styles.collectionNameText}>
+                                    {collection.name}
                                 </Text>
-                            ) : undefined}
-                        </View>
+
+                                {collection.description ? (
+                                    <Text style={styles.descriptionText}>
+                                        {collection.description}
+                                    </Text>
+                                ) : undefined}
+                            </View>
+                        </>
                     )
                 }
                 renderItem={({ item }) => (
