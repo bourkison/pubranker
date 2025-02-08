@@ -19,50 +19,22 @@ import Animated, {
     useSharedValue,
     withTiming,
 } from 'react-native-reanimated';
-import { supabase } from '@/services/supabase';
 import { useSharedSearchContext } from '@/context/searchContext';
 
 const AnimatedIonicon = Animated.createAnimatedComponent(Ionicons);
 
-type ResultType = {
-    name: string;
-    id: number | string;
-    type: 'list' | 'place' | 'user' | 'pub';
-};
-
 export default function SearchBar() {
     const dispatch = useAppDispatch();
-    const [results, setResults] = useState<ResultType[]>([]);
     const exploreState = useAppSelector(state => state.explore.exploreState);
 
-    const { searchText, setSearchText } = useSharedSearchContext();
+    const { searchText, setSearchText, search, searchType } =
+        useSharedSearchContext();
 
     const [focused, setFocused] = useState(false);
 
     const inputRef = useRef<TextInput>(null);
 
     const sFocused = useSharedValue(0); // 0 is not focused, 1 is focused.
-
-    const search = () => {
-        (async () => {
-            const { data, error } = await supabase
-                .from('pubs')
-                .select('id, name')
-                .textSearch('name', searchText, {
-                    config: 'english',
-                    type: 'websearch',
-                });
-
-            if (error) {
-                console.error(error);
-                setResults([]);
-                return;
-            }
-
-            setResults(data.map(d => ({ ...d, type: 'place' })));
-            console.log('test', data);
-        })();
-    };
 
     const goToSuggestions = () => {
         // dispatch(setSearchText(''));
@@ -133,7 +105,7 @@ export default function SearchBar() {
                 placeholderTextColor="#A3A3A3"
                 value={searchText}
                 returnKeyType="search"
-                onSubmitEditing={search}
+                onSubmitEditing={() => search(searchType)}
                 onChangeText={setSearchText}
                 selectTextOnFocus={true}
             />

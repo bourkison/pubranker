@@ -1,27 +1,22 @@
 import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons, Feather } from '@expo/vector-icons';
+import { ResultType } from '@/context/searchContext';
 
 type SearchSuggestionItemProps = {
-    title: string;
-    subtitle?: string;
-    type: 'pub' | 'station' | 'park' | 'landmark' | 'area' | 'nearby';
-    onPress?: () => void;
+    result: ResultType;
 };
 
 export default function SearchSuggestionItem({
-    type,
-    title,
-    subtitle,
-    onPress,
+    result,
 }: SearchSuggestionItemProps) {
     const icon = useMemo(() => {
-        switch (type) {
+        switch (result.type) {
             case 'pub':
                 return (
                     <Ionicons color="#6E7271" size={28} name="beer-outline" />
                 );
-            case 'area':
+            case 'region':
                 return (
                     <Ionicons
                         color="#6E7271"
@@ -48,16 +43,16 @@ export default function SearchSuggestionItem({
                     <Ionicons color="#6E7271" size={28} name="train-outline" />
                 );
         }
-    }, [type]);
+    }, [result]);
 
     return (
-        <Pressable style={styles.container} onPress={onPress}>
+        <Pressable style={styles.container} onPress={result.onPress}>
             <View style={styles.imageContainer}>{icon}</View>
             <View style={styles.textContainer}>
-                <Text style={styles.title}>{title}</Text>
-                {subtitle ? (
-                    <Text style={styles.subtitle}>{subtitle}</Text>
-                ) : undefined}
+                <Text style={styles.title}>{result.title}</Text>
+                {result.subtitle && (
+                    <Text style={styles.subtitle}>{result.subtitle}</Text>
+                )}
             </View>
         </Pressable>
     );
