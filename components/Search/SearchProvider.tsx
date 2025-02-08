@@ -65,11 +65,11 @@ export default function SearchProvider({ children }: SearchProviderProps) {
                 subtitle: d.name,
                 type: 'user',
                 onPress: () => {
-                    console.log('USER PRESS', d.id);
+                    navigation.navigate('Profile', { userId: d.id });
                 },
             })),
         );
-    }, [searchText]);
+    }, [searchText, navigation]);
 
     const searchPlaces = useCallback(async () => {
         const { data, error } = await supabase

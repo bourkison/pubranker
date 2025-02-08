@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { requestBackgroundPermissionsAsync } from 'expo-location';
-import Profile from '@/screens/BottomTabNavigator/Profile';
+import LoggedInProfile from '@/screens/BottomTabNavigator/LoggedInProfile';
 import Explore from '@/screens/BottomTabNavigator/Explore';
 import { SECONDARY_COLOR } from '@/constants';
 import Feed from '@/screens/BottomTabNavigator/Feed';
@@ -15,7 +15,7 @@ import { useFocusEffect } from '@react-navigation/native';
 export type BottomTabNavigatorParamList = {
     Explore: undefined;
     Favourites: undefined;
-    Profile: undefined;
+    LoggedInProfile: undefined;
     Feed: undefined;
 };
 
@@ -85,8 +85,8 @@ export default function BottomTabNavigator({
                 }}
             />
             <Tab.Screen
-                name="Profile"
-                component={Profile}
+                name="LoggedInProfile"
+                component={LoggedInProfile}
                 options={{
                     tabBarIcon: ({ size, focused }) => (
                         <Ionicons

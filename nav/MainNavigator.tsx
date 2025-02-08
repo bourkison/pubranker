@@ -9,6 +9,7 @@ import ViewReview from '@/screens/MainNavigator/ViewReview';
 import { Database } from '@/types/schema';
 import CreateComment from '@/screens/MainNavigator/CreateComment';
 import AddToList from '@/screens/MainNavigator/AddToList';
+import Profile from '@/screens/MainNavigator/Profile';
 
 export type MainNavigatorStackParamList = {
     Home: undefined;
@@ -32,6 +33,7 @@ export type MainNavigatorStackParamList = {
     AddToList: {
         pubId: number;
     };
+    Profile: { userId: string };
 };
 
 const Stack = createStackNavigator<MainNavigatorStackParamList>();
@@ -73,6 +75,11 @@ export default function MainNavigator() {
                 name="AddToList"
                 component={AddToList}
                 options={{ headerShown: false, presentation: 'modal' }}
+            />
+            <Stack.Screen
+                name="Profile"
+                component={Profile}
+                options={{ headerShown: false }}
             />
         </Stack.Navigator>
     );

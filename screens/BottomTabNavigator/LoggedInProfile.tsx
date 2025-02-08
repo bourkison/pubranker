@@ -10,14 +10,12 @@ import {
     ActivityIndicator,
 } from 'react-native';
 import { supabase } from '@/services/supabase';
-import UserAvatar from '@/components/User/UserAvatar';
 import { Feather, SimpleLineIcons } from '@expo/vector-icons';
-import ProfileTopBar from '@/components/User/ProfileTopBar';
 import { userQuery } from '@/services/queries/user';
 import { UserType } from '@/services/queries/user';
-import RatingsSummary from '@/components/Ratings/RatingsSummary';
+import ProfileView from '@/components/User/ProfileView';
 
-export default function Profile() {
+export default function LoggedInProfile() {
     const [user, setUser] = useState<UserType>();
     const [isLoading, setIsLoading] = useState(false);
 
@@ -36,10 +34,7 @@ export default function Profile() {
             }
 
             const { data: publicUser, error: publicUserError } =
-                await userQuery(data.user.id)
-                    .eq('id', data.user.id)
-                    .limit(1)
-                    .single();
+                await userQuery(data.user.id);
 
             if (publicUserError) {
                 console.warn('no public user', publicUserError);
@@ -79,43 +74,7 @@ export default function Profile() {
                 </TouchableOpacity>
             </View>
 
-            <View style={styles.avatarContainer}>
-                <UserAvatar
-                    photo={user.profile_photo ?? ''}
-                    size={64}
-                    withShadow={true}
-                />
-            </View>
-
-            <ProfileTopBar
-                reviews={user.reviews[0].count}
-                followers={user.followers[0].count}
-                following={user.following[0].count}
-            />
-
-            <View>
-                <Text>Favourites</Text>
-            </View>
-
-            <View style={styles.ratingsContainer}>
-                <RatingsSummary
-                    header="Ratings"
-                    ratingsHeight={100}
-                    ratingsPadding={10}
-                    ratings={[
-                        user.review_ones[0].count,
-                        user.review_twos[0].count,
-                        user.review_threes[0].count,
-                        user.review_fours[0].count,
-                        user.review_fives[0].count,
-                        user.review_sixes[0].count,
-                        user.review_sevens[0].count,
-                        user.review_eights[0].count,
-                        user.review_nines[0].count,
-                        user.review_tens[0].count,
-                    ]}
-                />
-            </View>
+            <ProfileView user={user} isLoggedInUser={true} />
 
             <View>
                 <TouchableOpacity onPress={() => dispatch(storeSignOut())}>
@@ -142,18 +101,7 @@ const styles = StyleSheet.create({
     menuContainer: {
         paddingRight: ICON_PADDING,
     },
-    avatarTextContainer: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        flex: 1,
-    },
-    avatarContainer: {
-        paddingVertical: 40,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderBottomWidth: 1,
-        borderColor: '#E5E7EB',
-    },
+
     headerTextContainer: {
         flex: 1,
     },
@@ -163,5 +111,4 @@ const styles = StyleSheet.create({
         fontFamily: 'Jost',
         textAlign: 'center',
     },
-    ratingsContainer: {},
 });

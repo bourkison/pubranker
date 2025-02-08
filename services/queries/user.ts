@@ -52,4 +52,7 @@ export const userQuery = (userId: string) =>
         .eq('following.created_by', userId)
         .eq('followers.user_id', userId)
         .neq('reviews.content', null)
-        .neq('reviews.content', '');
+        .neq('reviews.content', '')
+        .eq('id', userId)
+        .limit(1)
+        .single();
