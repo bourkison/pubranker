@@ -74,7 +74,12 @@ export default function LoggedInProfile() {
                 </TouchableOpacity>
             </View>
 
-            <ProfileView user={user} isLoggedInUser={true} />
+            <ProfileView
+                user={user}
+                isLoggedInUser={true}
+                isFollowed={true}
+                setIsFollowed={() => console.warn("This shouldn't happen.")}
+            />
 
             <View>
                 <TouchableOpacity onPress={() => dispatch(storeSignOut())}>

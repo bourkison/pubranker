@@ -9,17 +9,19 @@ import {
     ActivityIndicator,
     StyleSheet,
 } from 'react-native';
-import { Feather, SimpleLineIcons } from '@expo/vector-icons';
+import { Ionicons, SimpleLineIcons } from '@expo/vector-icons';
 import ProfileView from '@/components/User/ProfileView';
 import { userQuery, UserType } from '@/services/queries/user';
 import { supabase } from '@/services/supabase';
 
 export default function Profile({
     route,
+    navigation,
 }: StackScreenProps<MainNavigatorStackParamList, 'Profile'>) {
     const [isLoading, setIsLoading] = useState(false);
     const [user, setUser] = useState<UserType>();
     const [isLoggedInUser, setIsLoggedInUser] = useState(false);
+    const [isFollowed, setIsFollowed] = useState(false);
 
     useEffect(() => {
         (async () => {
@@ -35,6 +37,22 @@ export default function Profile({
                 console.warn(userError);
             } else {
                 setIsLoggedInUser(userData.user.id === route.params.userId);
+
+                // Check to see if we follow this user.
+                const { count, error: followError } = await supabase
+                    .from('follows')
+                    .select('count', { count: 'exact' })
+                    .eq('created_by', userData.user.id)
+                    .eq('user_id', route.params.userId)
+                    .limit(1);
+
+                console.log('count', count, followError);
+
+                if (count === 1) {
+                    setIsFollowed(true);
+                } else {
+                    setIsFollowed(false);
+                }
             }
 
             setIsLoading(false);
@@ -63,8 +81,10 @@ export default function Profile({
     return (
         <SafeAreaView>
             <View style={styles.headerContainer}>
-                <TouchableOpacity style={styles.settingsContainer}>
-                    <Feather name="settings" size={14} />
+                <TouchableOpacity
+                    style={styles.settingsContainer}
+                    onPress={() => navigation.goBack()}>
+                    <Ionicons name="arrow-back-outline" size={14} />
                 </TouchableOpacity>
 
                 <View style={styles.headerTextContainer}>
@@ -76,7 +96,12 @@ export default function Profile({
                 </TouchableOpacity>
             </View>
 
-            <ProfileView user={user} />
+            <ProfileView
+                user={user}
+                isLoggedInUser={isLoggedInUser}
+                isFollowed={isFollowed}
+                setIsFollowed={setIsFollowed}
+            />
         </SafeAreaView>
     );
 }

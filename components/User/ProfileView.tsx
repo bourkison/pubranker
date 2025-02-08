@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import UserAvatar from '@/components/User/UserAvatar';
 import ProfileTopBar from '@/components/User/ProfileTopBar';
 import RatingsSummary from '@/components/Ratings/RatingsSummary';
@@ -8,9 +8,15 @@ import { UserType } from '@/services/queries/user';
 type ProfileViewProps = {
     user: UserType;
     isLoggedInUser: boolean;
+    isFollowed: boolean;
+    setIsFollowed: (follow: boolean) => void;
 };
 
-export default function ProfileView({ user }: ProfileViewProps) {
+export default function ProfileView({
+    user,
+    isLoggedInUser,
+    isFollowed,
+}: ProfileViewProps) {
     return (
         <View>
             <View style={styles.avatarContainer}>
@@ -19,6 +25,20 @@ export default function ProfileView({ user }: ProfileViewProps) {
                     size={64}
                     withShadow={true}
                 />
+
+                {!isLoggedInUser && (
+                    <View>
+                        {!isFollowed ? (
+                            <TouchableOpacity>
+                                <Text>Follow</Text>
+                            </TouchableOpacity>
+                        ) : (
+                            <TouchableOpacity>
+                                <Text>Unfollow</Text>
+                            </TouchableOpacity>
+                        )}
+                    </View>
+                )}
             </View>
 
             <ProfileTopBar
