@@ -3,12 +3,10 @@ import { TextInput, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
-    fetchExplorePubs,
-    setSearchText,
     setState,
     // resetPubs,
 } from '@/store/slices/explore';
-import { INITIAL_SEARCH_AMOUNT, PRIMARY_COLOR } from '@/constants';
+import { PRIMARY_COLOR } from '@/constants';
 import { deselectPub } from '@/store/slices/map';
 import Animated, {
     Easing,
@@ -22,6 +20,7 @@ import Animated, {
     withTiming,
 } from 'react-native-reanimated';
 import { supabase } from '@/services/supabase';
+import { useSharedSearchContext } from '@/context/searchContext';
 
 const AnimatedIonicon = Animated.createAnimatedComponent(Ionicons);
 
@@ -35,7 +34,8 @@ export default function SearchBar() {
     const dispatch = useAppDispatch();
     const [results, setResults] = useState<ResultType[]>([]);
     const exploreState = useAppSelector(state => state.explore.exploreState);
-    const searchText = useAppSelector(state => state.explore.searchText);
+
+    const { searchText, setSearchText } = useSharedSearchContext();
 
     const [focused, setFocused] = useState(false);
 
@@ -44,7 +44,7 @@ export default function SearchBar() {
     const sFocused = useSharedValue(0); // 0 is not focused, 1 is focused.
 
     const search = () => {
-        const asyncSearch = async () => {
+        (async () => {
             const { data, error } = await supabase
                 .from('pubs')
                 .select('id, name')
@@ -61,9 +61,7 @@ export default function SearchBar() {
 
             setResults(data.map(d => ({ ...d, type: 'place' })));
             console.log('test', data);
-        };
-
-        asyncSearch();
+        })();
     };
 
     const goToSuggestions = () => {
@@ -124,17 +122,9 @@ export default function SearchBar() {
             )}
 
             <TextInput
-                onFocus={e => {
+                onFocus={() => {
                     dispatch(setState('search'));
                     setFocused(true);
-                    // Work around for selectTextOnFocus={true} not working
-                    // https://github.com/facebook/react-native/issues/30585#issuecomment-1330928411
-                    e.currentTarget.setNativeProps({
-                        selection: {
-                            start: 0,
-                            end: searchText.length,
-                        },
-                    });
                 }}
                 onBlur={() => setFocused(false)}
                 ref={inputRef}
@@ -144,7 +134,7 @@ export default function SearchBar() {
                 value={searchText}
                 returnKeyType="search"
                 onSubmitEditing={search}
-                onChangeText={s => dispatch(setSearchText(s))}
+                onChangeText={setSearchText}
                 selectTextOnFocus={true}
             />
         </Animated.View>

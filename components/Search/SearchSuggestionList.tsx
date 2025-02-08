@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native';
-import SearchSuggestionItem from '@/components/Filters/SearchSuggestionItem';
+import SearchSuggestionItem from '@/components/Search/SearchSuggestionItem';
 import { useAppSelector } from '@/store/hooks';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';

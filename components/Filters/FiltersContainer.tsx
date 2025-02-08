@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import SearchBar from '@/components/Filters/SearchBar';
+import SearchBar from '@/components/Search/SearchBar';
 import FiltersScrollable from '@/components/Filters/FiltersScrollable';
 import { useSharedExploreContext } from '@/context/exploreContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';

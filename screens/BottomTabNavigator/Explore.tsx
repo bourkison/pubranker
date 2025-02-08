@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import FiltersContainer from '@/components/Filters/FiltersContainer';
 import { useAppSelector } from '@/store/hooks';
-import SearchSuggestionList from '@/components/Filters/SearchSuggestionList';
+import SearchSuggestionList from '@/components/Search/SearchSuggestionList';
 import HomeMap from '@/components/Maps/HomeMap';
 import ViewMapButton from '@/components/Maps/ViewMapButton';
 import Animated, {
@@ -29,6 +29,7 @@ import {
 import { ExploreContext } from '@/context/exploreContext';
 import { useSharedCollectionContext } from '@/context/collectionContext';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import SearchProvider from '@/components/Search/SearchProvider';
 // import { Ionicons } from '@expo/vector-icons';
 
 const COLLAPSE_ON_SCROLL_AMOUNT = 100;
@@ -188,69 +189,71 @@ export default function Explore() {
                 setFilterBarHeight,
                 mapBottomSheetAnimatedValue,
             }}>
-            <View style={styles.container}>
-                <View style={styles.filtersContainer}>
-                    <FiltersContainer />
-                </View>
+            <SearchProvider>
+                <View style={styles.container}>
+                    <View style={styles.filtersContainer}>
+                        <FiltersContainer />
+                    </View>
 
-                <AnimatedScrollView
-                    style={[styles.exploreHomeContainer, rScrollViewStyle]}
-                    onScroll={e =>
-                        toggleOnScroll(e.nativeEvent.contentOffset.y)
-                    }
-                    scrollEventThrottle={160}>
-                    <View style={styles.sectionContainer}>
-                        <View style={styles.subheadingContainer}>
-                            <Text style={styles.subheading}>
-                                Top pubs nearby
-                            </Text>
+                    <AnimatedScrollView
+                        style={[styles.exploreHomeContainer, rScrollViewStyle]}
+                        onScroll={e =>
+                            toggleOnScroll(e.nativeEvent.contentOffset.y)
+                        }
+                        scrollEventThrottle={160}>
+                        <View style={styles.sectionContainer}>
+                            <View style={styles.subheadingContainer}>
+                                <Text style={styles.subheading}>
+                                    Top pubs nearby
+                                </Text>
+                            </View>
+                            <PubList />
                         </View>
-                        <PubList />
-                    </View>
-                    <View style={styles.sectionContainer}>
-                        <View style={styles.subheadingContainer}>
-                            <Text style={styles.subheading}>
-                                Top pubs in London
-                            </Text>
+                        <View style={styles.sectionContainer}>
+                            <View style={styles.subheadingContainer}>
+                                <Text style={styles.subheading}>
+                                    Top pubs in London
+                                </Text>
+                            </View>
+                            <PubList />
                         </View>
-                        <PubList />
-                    </View>
-                    <View style={styles.sectionContainer}>
-                        <View style={styles.subheadingContainer}>
-                            <Text style={styles.subheading}>
-                                Top rated pubs by vibe nearby
-                            </Text>
+                        <View style={styles.sectionContainer}>
+                            <View style={styles.subheadingContainer}>
+                                <Text style={styles.subheading}>
+                                    Top rated pubs by vibe nearby
+                                </Text>
+                            </View>
+                            <PubList />
                         </View>
-                        <PubList />
-                    </View>
-                </AnimatedScrollView>
-                {exploreState === 'search' ? (
-                    <Animated.View
-                        style={styles.suggestionsContainer}
-                        entering={FadeIn}>
-                        <SearchSuggestionList />
-                    </Animated.View>
-                ) : undefined}
-                {exploreState === 'map' ? (
-                    <Animated.View
-                        style={styles.mapContainer}
-                        exiting={FadeOut}>
-                        <HomeMap />
-                    </Animated.View>
-                ) : undefined}
-                {exploreState !== 'map' ? (
-                    <View style={styles.mapButtonContainer}>
-                        <KeyboardAvoidingView behavior="position">
-                            <ViewMapButton
-                                expand={expandMapButton}
-                                collapse={collapseMapButton}
-                                animatedWidth={sharedMapButtonWidth}
-                                expandTimeout={expandTimeout}
-                            />
-                        </KeyboardAvoidingView>
-                    </View>
-                ) : undefined}
-            </View>
+                    </AnimatedScrollView>
+                    {exploreState === 'search' && (
+                        <Animated.View
+                            style={styles.suggestionsContainer}
+                            entering={FadeIn}>
+                            <SearchSuggestionList />
+                        </Animated.View>
+                    )}
+                    {exploreState === 'map' && (
+                        <Animated.View
+                            style={styles.mapContainer}
+                            exiting={FadeOut}>
+                            <HomeMap />
+                        </Animated.View>
+                    )}
+                    {exploreState !== 'map' && (
+                        <View style={styles.mapButtonContainer}>
+                            <KeyboardAvoidingView behavior="position">
+                                <ViewMapButton
+                                    expand={expandMapButton}
+                                    collapse={collapseMapButton}
+                                    animatedWidth={sharedMapButtonWidth}
+                                    expandTimeout={expandTimeout}
+                                />
+                            </KeyboardAvoidingView>
+                        </View>
+                    )}
+                </View>
+            </SearchProvider>
         </ExploreContext.Provider>
     );
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import FilterItem from '@/components/Filters/FilterItem';
-import SearchSuggestionItem from '@/components/Filters/SearchSuggestionItem';
+import SearchSuggestionItem from '@/components/Search/SearchSuggestionItem';
 
 // TODO: Load in landmarks and list them out.
 
