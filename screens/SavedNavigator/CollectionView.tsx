@@ -2,7 +2,12 @@ import { PubItemType } from '@/components/Pubs/PubItem';
 import SavedListItem from '@/components/Saves/SavedListItem';
 import { SavedNavigatorStackParamList } from '@/nav/SavedNavigator';
 import { supabase } from '@/services/supabase';
-import { Ionicons, FontAwesome6 } from '@expo/vector-icons';
+import {
+    Ionicons,
+    FontAwesome6,
+    MaterialIcons,
+    Entypo,
+} from '@expo/vector-icons';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
@@ -211,11 +216,16 @@ export default function CollectionView({
                                     {collection.name}
                                 </Text>
 
-                                {collection.description ? (
+                                {collection.description && (
                                     <Text style={styles.descriptionText}>
                                         {collection.description}
                                     </Text>
-                                ) : undefined}
+                                )}
+
+                                <MaterialIcons name="person" />
+                                <MaterialIcons name="people" />
+                                <Entypo name="globe" />
+                                <Entypo name="lock" />
                             </View>
                         </>
                     )

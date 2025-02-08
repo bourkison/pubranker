@@ -57,6 +57,10 @@ import RatingsSummary from '@/components/Ratings/RatingsSummary';
 import RateButtonModal from '@/components/Pubs/PubView/RateButtonModal/RateButtonModal';
 import { useSharedCollectionContext } from '@/context/collectionContext';
 
+// TODO: Rather than all this shit with animations
+// Could this not just be one flat list, with the image being outside of the component and absolutely position
+// Then a transparent list header component the same size of the image
+
 export default function PubHome({
     route,
     navigation,

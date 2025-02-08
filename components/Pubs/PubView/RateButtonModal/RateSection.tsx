@@ -54,7 +54,7 @@ export default function RateSection({
                     .eq('user_id', userData.user.id)
                     .select(reviewListQueryString)
                     .limit(1)
-                    .single();
+                    .maybeSingle();
 
                 if (error) {
                     console.error(error);

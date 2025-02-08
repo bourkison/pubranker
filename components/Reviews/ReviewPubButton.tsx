@@ -48,7 +48,7 @@ export default function ReviewPubButton({ pub }: ReviewPubButtonProps) {
                     // If not logged in, generate random UUID so this shows up as 0.
                     .eq('liked.user_id', userData.user?.id || uuidv4())
                     .limit(1)
-                    .single();
+                    .maybeSingle();
 
                 if (error) {
                     console.error(error);

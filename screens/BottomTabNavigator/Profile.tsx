@@ -93,6 +93,10 @@ export default function Profile() {
                 following={user.following[0].count}
             />
 
+            <View>
+                <Text>Favourites</Text>
+            </View>
+
             <View style={styles.ratingsContainer}>
                 <RatingsSummary
                     header="Ratings"
