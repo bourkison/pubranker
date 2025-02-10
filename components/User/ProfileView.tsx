@@ -151,6 +151,7 @@ export default function ProfileView({
             </View>
 
             <ProfileTopBar
+                userId={user.id}
                 reviews={user.reviews[0].count}
                 followers={user.followers[0].count}
                 following={user.following[0].count}
@@ -164,8 +165,8 @@ export default function ProfileView({
 
             <View style={styles.ratingsContainer}>
                 <RatingsSummary
-                    header="Ratings"
-                    ratingsHeight={100}
+                    header=""
+                    ratingsHeight={80}
                     ratingsPadding={10}
                     ratings={[
                         user.review_ones[0].count,

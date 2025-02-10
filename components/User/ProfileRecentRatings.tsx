@@ -1,11 +1,19 @@
 import { UserType } from '@/services/queries/user';
 import { supabase } from '@/services/supabase';
 import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
+import {
+    View,
+    Text,
+    StyleSheet,
+    Image,
+    Pressable,
+    TouchableOpacity,
+} from 'react-native';
 import RatingsStarViewer from '@/components/Ratings/RatingsStarsViewer';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
+import { Feather } from '@expo/vector-icons';
 
 type ProfileRecentRatingsProps = {
     recentRatings: UserType['recent_ratings'];
@@ -63,6 +71,13 @@ export default function ProfileRecentRatings({
                         layout: { width },
                     },
                 }) => setElementWidth(width)}>
+                {recentRatings.length === 0 && (
+                    <View>
+                        <Text style={styles.noActivityText}>
+                            This user has no recent activity.
+                        </Text>
+                    </View>
+                )}
                 {recentRatings.map((rating, index) => (
                     <Pressable
                         onPress={() =>
@@ -101,6 +116,16 @@ export default function ProfileRecentRatings({
                     </Pressable>
                 ))}
             </View>
+
+            <TouchableOpacity style={styles.viewAllContainer}>
+                <Text style={styles.viewAllText}>View all activity</Text>
+
+                <Feather
+                    name="chevron-right"
+                    size={16}
+                    color={'rgba(0, 0, 0, 0.6)'}
+                />
+            </TouchableOpacity>
         </View>
     );
 }
@@ -129,8 +154,24 @@ const styles = StyleSheet.create({
     },
     starsContainer: {
         flexDirection: 'row',
-        // justifyContent: 'center',
-        // alignItems: 'center',
         marginTop: 5,
+    },
+    noActivityText: {
+        fontStyle: 'italic',
+        fontWeight: '300',
+        fontSize: 12,
+    },
+    viewAllContainer: {
+        marginTop: 15,
+        justifyContent: 'space-between',
+        flexDirection: 'row',
+        marginHorizontal: 10,
+        paddingTop: 15,
+        borderColor: '#E5E7EB',
+        borderTopWidth: 1,
+    },
+    viewAllText: {
+        fontSize: 12,
+        fontWeight: '300',
     },
 });

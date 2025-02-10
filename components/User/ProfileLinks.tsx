@@ -87,6 +87,7 @@ export default function ProfileLinks({ user }: ProfileLinksProps) {
                     navigation.push('FollowersFollowingView', {
                         type: 'following',
                         userId: user.id,
+                        count: user.following[0].count,
                     })
                 }>
                 <>
@@ -112,6 +113,7 @@ export default function ProfileLinks({ user }: ProfileLinksProps) {
                     navigation.push('FollowersFollowingView', {
                         type: 'followers',
                         userId: user.id,
+                        count: user.followers[0].count,
                     })
                 }>
                 <>

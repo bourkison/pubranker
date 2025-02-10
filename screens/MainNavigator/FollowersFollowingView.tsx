@@ -17,7 +17,7 @@ import {
     getFollowersQuery,
     getFollowingQuery,
 } from '@/services/queries/follows';
-import ListFollowItem from '@/components/Follows/FollowListItem';
+import FollowListItem from '@/components/Follows/FollowListItem';
 
 export default function FollowersFollowingView({
     route,
@@ -66,10 +66,10 @@ export default function FollowersFollowingView({
 
     const header = useMemo<string>(() => {
         if (route.params.type === 'followers') {
-            return 'Followers';
+            return `Followers (${route.params.count})`;
         }
 
-        return 'Following';
+        return `Following (${route.params.count})`;
     }, [route]);
 
     const toggleFollow = useCallback(
@@ -115,7 +115,7 @@ export default function FollowersFollowingView({
                     </View>
                 }
                 renderItem={({ item, index }) => (
-                    <ListFollowItem
+                    <FollowListItem
                         user={item}
                         index={index}
                         toggleFollow={toggleFollow}

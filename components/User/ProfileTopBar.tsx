@@ -1,17 +1,25 @@
+import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useMemo } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 
 type ProfileTopBarProps = {
     reviews: number;
     followers: number;
     following: number;
+    userId: string;
 };
 
 export default function ProfileTopBar({
     reviews,
     followers,
     following,
+    userId,
 }: ProfileTopBarProps) {
+    const navigation =
+        useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
+
     const reviewsText = useMemo<string>(() => {
         if (reviews === 1) {
             return 'Review';
@@ -42,7 +50,15 @@ export default function ProfileTopBar({
                 </View>
             </View>
 
-            <View style={styles.topBarColumn}>
+            <Pressable
+                style={styles.topBarColumn}
+                onPress={() =>
+                    navigation.push('FollowersFollowingView', {
+                        userId: userId,
+                        type: 'followers',
+                        count: followers,
+                    })
+                }>
                 <View style={styles.topBarValueContainer}>
                     <Text style={styles.topBarValueText}>
                         {followers.toString()}
@@ -52,9 +68,17 @@ export default function ProfileTopBar({
                 <View style={styles.topBarHeaderContainer}>
                     <Text style={styles.topBarHeaderText}>{followersText}</Text>
                 </View>
-            </View>
+            </Pressable>
 
-            <View style={styles.topBarColumn}>
+            <Pressable
+                style={styles.topBarColumn}
+                onPress={() =>
+                    navigation.push('FollowersFollowingView', {
+                        userId: userId,
+                        type: 'following',
+                        count: following,
+                    })
+                }>
                 <View style={styles.topBarValueContainer}>
                     <Text style={styles.topBarValueText}>
                         {following.toString()}
@@ -64,7 +88,7 @@ export default function ProfileTopBar({
                 <View style={styles.topBarHeaderContainer}>
                     <Text style={styles.topBarHeaderText}>Following</Text>
                 </View>
-            </View>
+            </Pressable>
         </View>
     );
 }

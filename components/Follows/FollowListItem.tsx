@@ -21,7 +21,7 @@ type ListFollowItemProps = {
     toggleFollow: (isFollow: boolean, index: number) => void;
 };
 
-export default function ListFollowItem({
+export default function FollowListItem({
     user,
     index,
     toggleFollow,
@@ -90,7 +90,7 @@ export default function ListFollowItem({
             style={styles.container}
             underlayColor="#E5E7EB"
             onPress={() =>
-                navigation.push('Profile', { userId: user.user_id })
+                navigation.push('Profile', { userId: user.user.id })
             }>
             <>
                 <View style={styles.leftColumnContainer}>

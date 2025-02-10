@@ -80,7 +80,7 @@ export const userQuery = (userId: string) =>
         .eq('id', userId)
         .order('updated_at', {
             referencedTable: 'recent_ratings',
-            ascending: true,
+            ascending: false,
         })
         .limit(3, { referencedTable: 'recent_ratings' })
         .limit(1)

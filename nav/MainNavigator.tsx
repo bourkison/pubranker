@@ -46,6 +46,7 @@ export type MainNavigatorStackParamList = {
     FollowersFollowingView: {
         userId: string;
         type: 'followers' | 'following';
+        count: number;
     };
 };
 
