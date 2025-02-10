@@ -22,6 +22,7 @@ export default function ProfileView({
     isLoggedInUser,
     isFollowed,
     setIsFollowed,
+    isFollowingUs,
 }: ProfileViewProps) {
     const [isFollowing, setIsFollowing] = useState(false);
 
@@ -92,7 +93,7 @@ export default function ProfileView({
             <View style={styles.followAvatarContainer}>
                 <View style={styles.followContainer}>
                     {!isLoggedInUser && (
-                        <View>
+                        <>
                             {!isFollowed ? (
                                 <TouchableOpacity
                                     onPress={follow}
@@ -105,14 +106,22 @@ export default function ProfileView({
                             ) : (
                                 <TouchableOpacity
                                     onPress={unfollow}
-                                    style={styles.unfollowButton}
+                                    style={styles.followButton}
                                     disabled={isFollowing}>
-                                    <Text style={styles.unfollowButtonText}>
+                                    <Text style={styles.followButtonText}>
                                         Unfollow
                                     </Text>
                                 </TouchableOpacity>
                             )}
-                        </View>
+
+                            {isFollowingUs && (
+                                <View style={styles.followsContainer}>
+                                    <Text style={styles.followsText}>
+                                        Follows you
+                                    </Text>
+                                </View>
+                            )}
+                        </>
                     )}
                 </View>
 
@@ -160,6 +169,8 @@ export default function ProfileView({
     );
 }
 
+const FOLLOW_CONTAINER_MARGIN = 15;
+
 const styles = StyleSheet.create({
     flexOne: { flex: 1 },
     ratingsContainer: {},
@@ -185,8 +196,26 @@ const styles = StyleSheet.create({
         borderColor: PRIMARY_COLOR,
         paddingVertical: 2,
         paddingHorizontal: 4,
+        borderWidth: 1,
+        borderRadius: 2,
+        marginRight: FOLLOW_CONTAINER_MARGIN,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-    followButtonText: {},
-    unfollowButton: {},
-    unfollowButtonText: {},
+    followButtonText: {
+        fontSize: 10,
+        textTransform: 'uppercase',
+        fontWeight: '500',
+        textAlign: 'center',
+    },
+    followsContainer: {
+        marginTop: 4,
+        alignContent: 'flex-end',
+        justifyContent: 'flex-end',
+        marginRight: FOLLOW_CONTAINER_MARGIN,
+    },
+    followsText: {
+        fontSize: 10,
+        textAlign: 'right',
+    },
 });
