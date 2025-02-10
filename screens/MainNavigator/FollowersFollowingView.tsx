@@ -45,7 +45,6 @@ export default function FollowersFollowingView({
                 }
 
                 setFollows(data);
-                console.log(JSON.stringify(data));
             }
 
             if (route.params.type === 'following') {
@@ -61,7 +60,6 @@ export default function FollowersFollowingView({
                 }
 
                 setFollows(data);
-                console.log(JSON.stringify(data));
             }
         })();
     }, [route]);

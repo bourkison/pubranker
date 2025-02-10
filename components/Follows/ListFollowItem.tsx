@@ -44,7 +44,7 @@ export default function ListFollowItem({
 
         const { error: followError } = await supabase
             .from('follows')
-            .insert({ user_id: user.user_id, created_by: data.user.id });
+            .insert({ user_id: user.user.id, created_by: data.user.id });
 
         if (followError) {
             console.error('Error following user.', followError);
@@ -67,11 +67,13 @@ export default function ListFollowItem({
             return;
         }
 
+        console.log('unfollowing with', user.user_id, data.user.id);
+
         const { error: unfollowError } = await supabase
             .from('follows')
             .delete()
             .eq('created_by', data.user.id)
-            .eq('user_id', user.user_id);
+            .eq('user_id', user.user.id);
 
         if (unfollowError) {
             console.error('Error unfollowing user.', unfollowError);
@@ -137,6 +139,8 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingHorizontal: 20,
         paddingVertical: 10,
+        borderColor: '#E5E7EB',
+        borderBottomWidth: 1,
     },
     leftColumnContainer: {
         flexDirection: 'row',
