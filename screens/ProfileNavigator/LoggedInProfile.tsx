@@ -11,16 +11,22 @@ import {
     ScrollView,
 } from 'react-native';
 import { supabase } from '@/services/supabase';
-import { Feather, SimpleLineIcons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import { userQuery } from '@/services/queries/user';
 import { UserType } from '@/services/queries/user';
 import ProfileView from '@/components/User/ProfileView';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { ProfileNavigatorStackParamList } from '@/nav/ProfileNavigator';
 
 export default function LoggedInProfile() {
     const [user, setUser] = useState<UserType>();
     const [isLoading, setIsLoading] = useState(false);
 
     const dispatch = useAppDispatch();
+
+    const navigation =
+        useNavigation<StackNavigationProp<ProfileNavigatorStackParamList>>();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -62,7 +68,9 @@ export default function LoggedInProfile() {
     return (
         <SafeAreaView style={styles.flexOne}>
             <View style={styles.headerContainer}>
-                <TouchableOpacity style={styles.settingsContainer}>
+                <TouchableOpacity
+                    style={styles.settingsContainer}
+                    onPress={() => navigation.navigate('Settings')}>
                     <Feather name="settings" size={14} />
                 </TouchableOpacity>
 
@@ -71,7 +79,7 @@ export default function LoggedInProfile() {
                 </View>
 
                 <TouchableOpacity style={styles.menuContainer}>
-                    <SimpleLineIcons name="options" size={14} />
+                    <Feather name="bell" size={15} />
                 </TouchableOpacity>
             </View>
 

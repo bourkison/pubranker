@@ -13,6 +13,7 @@ import Profile from '@/screens/MainNavigator/Profile';
 import UserCollections from '@/screens/MainNavigator/UserCollections';
 import UserCollectionView from '@/screens/MainNavigator/UserCollectionView';
 import FollowersFollowingView from '@/screens/MainNavigator/FollowersFollowingView';
+import Settings from '@/screens/ProfileNavigator/Settings';
 
 export type MainNavigatorStackParamList = {
     Home: undefined;
@@ -48,6 +49,7 @@ export type MainNavigatorStackParamList = {
         type: 'followers' | 'following';
         count: number;
     };
+    Settings: undefined;
 };
 
 const Stack = createStackNavigator<MainNavigatorStackParamList>();
@@ -109,6 +111,11 @@ export default function MainNavigator() {
                 name="FollowersFollowingView"
                 component={FollowersFollowingView}
                 options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="Settings"
+                component={Settings}
+                options={{ headerShown: false, presentation: 'modal' }}
             />
         </Stack.Navigator>
     );
