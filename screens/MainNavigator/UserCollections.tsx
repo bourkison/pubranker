@@ -1,54 +1,36 @@
-import React, { useEffect, useState } from 'react';
-import {
-    View,
-    Text,
-    SafeAreaView,
-    TouchableOpacity,
-    StyleSheet,
-    FlatList,
-    ActivityIndicator,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { StackScreenProps } from '@react-navigation/stack';
-import { SavedNavigatorStackParamList } from '@/nav/SavedNavigator';
-import CreateCollectionIcon from '@/components/Collections/CreateCollectionIcon';
+import CollectionListItem from '@/components/Collections/CollectionListItem';
+import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import {
     ListCollectionType,
     listFollowedCollectionsQuery,
 } from '@/services/queries/collections';
-import CollectionListItem from '@/components/Collections/CollectionListItem';
-import { supabase } from '@/services/supabase';
+import { StackScreenProps } from '@react-navigation/stack';
+import React, { useEffect, useState } from 'react';
+import {
+    View,
+    Text,
+    ActivityIndicator,
+    SafeAreaView,
+    FlatList,
+    StyleSheet,
+    TouchableOpacity,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
-const INITIAL_LOAD_AMOUNT = 10;
-
-export default function CollectionsHome({
+export default function UserCollections({
+    route,
     navigation,
-}: StackScreenProps<SavedNavigatorStackParamList, 'CollectionsHome'>) {
-    const [isLoading, setIsLoading] = useState(false);
+}: StackScreenProps<MainNavigatorStackParamList, 'UserCollections'>) {
     const [collections, setCollections] = useState<ListCollectionType[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        const fetchCollections = async () => {
+        (async () => {
             setIsLoading(true);
 
-            const { data: userData, error: userError } =
-                await supabase.auth.getUser();
-
-            if (userError) {
-                console.error(userError);
-                return;
-            }
-
             const { data, error } = await listFollowedCollectionsQuery()
-                .eq('user_id', userData.user.id)
-                .order('updated_at', { ascending: false })
-                // TODO: This order is useless as its referencing when the pub was created_at
-                .order('created_at', {
-                    referencedTable: 'collections.pubs',
-                    ascending: true,
-                })
-                .limit(INITIAL_LOAD_AMOUNT)
-                .limit(8, { referencedTable: 'collections.pubs' });
+                .eq('user_id', route.params.userId)
+                .order('updated_at', { ascending: false });
 
             if (error) {
                 setIsLoading(false);
@@ -56,20 +38,20 @@ export default function CollectionsHome({
                 return;
             }
 
-            console.log('response', data[0].collections.user);
-
-            setCollections(data.map(follow => follow.collections));
+            setCollections(data.map(d => d.collections));
             setIsLoading(false);
-        };
+        })();
+    }, [route]);
 
-        fetchCollections();
-    }, []);
+    if (isLoading) {
+        return <ActivityIndicator />;
+    }
 
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.headerContainer}>
                 <TouchableOpacity
-                    style={styles.settingsContainer}
+                    style={styles.backContainer}
                     onPress={() => navigation.goBack()}>
                     <Ionicons name="arrow-back-outline" size={14} />
                 </TouchableOpacity>
@@ -78,9 +60,7 @@ export default function CollectionsHome({
                     <Text style={styles.headerText}>Lists</Text>
                 </View>
 
-                <View style={styles.menuContainer}>
-                    <CreateCollectionIcon />
-                </View>
+                <View style={styles.emptyContainer} />
             </View>
 
             <FlatList
@@ -102,7 +82,7 @@ export default function CollectionsHome({
                     <CollectionListItem
                         collection={item}
                         onPress={() =>
-                            navigation.navigate('CollectionView', {
+                            navigation.navigate('UserCollectionView', {
                                 collectionId: item.id,
                             })
                         }
@@ -120,6 +100,9 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
+    listContainer: {
+        flex: 1,
+    },
     headerContainer: {
         paddingVertical: 10,
         alignItems: 'center',
@@ -127,6 +110,13 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderColor: '#E5E7EB',
     },
+    backContainer: {
+        paddingLeft: ICON_PADDING,
+    },
+    emptyContainer: {
+        flexBasis: 32,
+    },
+
     headerTextContainer: {
         flex: 1,
     },
@@ -136,11 +126,4 @@ const styles = StyleSheet.create({
         fontFamily: 'Jost',
         textAlign: 'center',
     },
-    settingsContainer: {
-        paddingLeft: ICON_PADDING,
-    },
-    menuContainer: {
-        paddingRight: ICON_PADDING,
-    },
-    listContainer: {},
 });

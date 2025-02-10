@@ -2,6 +2,9 @@ import { UserType } from '@/services/queries/user';
 import React from 'react';
 import { View, Text, StyleSheet, TouchableHighlight } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 
 type ProfileLinksProps = {
     user: UserType;
@@ -10,6 +13,9 @@ type ProfileLinksProps = {
 const RIGHT_COLUMN_COLOR = 'rgba(0, 0, 0, 0.6)';
 
 export default function ProfileLinks({ user }: ProfileLinksProps) {
+    const navigation =
+        useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
+
     return (
         <View style={styles.container}>
             <TouchableHighlight
@@ -55,7 +61,9 @@ export default function ProfileLinks({ user }: ProfileLinksProps) {
             <TouchableHighlight
                 style={styles.itemContainer}
                 underlayColor="#E5E7EB"
-                onPress={() => console.log('press')}>
+                onPress={() =>
+                    navigation.navigate('UserCollections', { userId: user.id })
+                }>
                 <>
                     <Text style={styles.itemHeader}>Lists</Text>
 

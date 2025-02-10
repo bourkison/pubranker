@@ -6,10 +6,12 @@ import Suggestions from '@/screens/MainNavigator/Suggestions';
 import { PubSchema } from '@/types';
 import CreateReview from '@/screens/MainNavigator/CreateReview';
 import ViewReview from '@/screens/MainNavigator/ViewReview';
-import { Database } from '@/types/schema';
+import { Tables } from '@/types/schema';
 import CreateComment from '@/screens/MainNavigator/CreateComment';
 import AddToList from '@/screens/MainNavigator/AddToList';
 import Profile from '@/screens/MainNavigator/Profile';
+import UserCollections from '@/screens/MainNavigator/UserCollections';
+import UserCollectionView from '@/screens/MainNavigator/UserCollectionView';
 
 export type MainNavigatorStackParamList = {
     Home: undefined;
@@ -26,14 +28,20 @@ export type MainNavigatorStackParamList = {
     };
     CreateComment: {
         reviewId: number;
-        onCreate: (
-            comment: Database['public']['Tables']['comments']['Row'],
-        ) => void;
+        onCreate: (comment: Tables<'comments'>) => void;
     };
     AddToList: {
         pubId: number;
     };
-    Profile: { userId: string };
+    Profile: {
+        userId: string;
+    };
+    UserCollections: {
+        userId: string;
+    };
+    UserCollectionView: {
+        collectionId: number;
+    };
 };
 
 const Stack = createStackNavigator<MainNavigatorStackParamList>();
@@ -79,6 +87,16 @@ export default function MainNavigator() {
             <Stack.Screen
                 name="Profile"
                 component={Profile}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="UserCollections"
+                component={UserCollections}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="UserCollectionView"
+                component={UserCollectionView}
                 options={{ headerShown: false }}
             />
         </Stack.Navigator>

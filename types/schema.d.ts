@@ -151,16 +151,19 @@ export type Database = {
         Row: {
           collection_id: number
           created_at: string
+          updated_at: string
           user_id: string
         }
         Insert: {
           collection_id: number
           created_at?: string
+          updated_at?: string
           user_id?: string
         }
         Update: {
           collection_id?: number
           created_at?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: [

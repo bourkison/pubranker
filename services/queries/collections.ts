@@ -21,7 +21,6 @@ export type ListCollectionType = {
 };
 
 export const listFollowedCollectionsQueryString = `
-id,
 created_at,
 updated_at,
 collections(
@@ -33,7 +32,7 @@ collections(
         primary_photo
     ),
     pubs_count:pubs(count),
-    user:users_public(id, name, profile_photo)
+    user:users_public!collections_user_id_fkey1(id, name, profile_photo)
 )
 ` as const;
 
@@ -57,7 +56,7 @@ export type CollectionType = Tables<'collections'> & {
 const collectionQueryString = `
 *,
 collection_items(pub_id, created_at),
-user:users_public(id, name, profile_photo),
+user:users_public!collections_user_id_fkey1(id, name, profile_photo),
 is_followed:collection_follows(count)
 ` as const;
 

@@ -10,15 +10,13 @@ import {
     ScrollView,
     Pressable,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { SavedNavigatorStackParamList } from '@/nav/SavedNavigator';
 import UserAvatar from '../User/UserAvatar';
 
 const NO_IMAGE = require('@/assets/noimage.png');
 
 type CollectionListItemProps = {
     collection: ListCollectionType;
+    onPress: () => void;
 };
 
 const IMAGE_ASPECT_RATIO = 1.3333;
@@ -26,11 +24,9 @@ const IMAGE_WIDTH = 100;
 
 export default function CollectionListItem({
     collection,
+    onPress,
 }: CollectionListItemProps) {
     const [imageUrls, setImageUrls] = useState<(string | null)[]>([]);
-
-    const navigation =
-        useNavigation<StackNavigationProp<SavedNavigatorStackParamList>>();
 
     useEffect(() => {
         const images: (string | null)[] = [];
@@ -54,11 +50,7 @@ export default function CollectionListItem({
         <TouchableHighlight
             style={styles.container}
             underlayColor="#E5E7EB"
-            onPress={() =>
-                navigation.navigate('CollectionView', {
-                    collectionId: collection.id,
-                })
-            }
+            onPress={onPress}
             activeOpacity={1}>
             <View>
                 <View style={styles.headerContainer}>
