@@ -3,7 +3,7 @@ import {
     CollectionType,
 } from '@/services/queries/collections';
 import { supabase } from '@/services/supabase';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
     View,
     Text,
@@ -31,7 +31,9 @@ type CollectionListProps = {
 
 export default function CollectionList({ collectionId }: CollectionListProps) {
     const [isLoading, setIsLoading] = useState(false);
+    const [isFollowing, setIsFollowing] = useState(false);
     const [collection, setCollection] = useState<CollectionType>();
+    const [userId, setUserId] = useState('');
 
     useEffect(() => {
         (async () => {
@@ -45,6 +47,8 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
                 setIsLoading(false);
                 return;
             }
+
+            setUserId(userData.user.id);
 
             const { data, error } = await collectionQuery()
                 .eq('id', collectionId)
@@ -126,6 +130,89 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
         [collection],
     );
 
+    const followButtonDisabled = useMemo<boolean>(() => {
+        if (!collection) {
+            return true;
+        }
+
+        if (!userId) {
+            return true;
+        }
+
+        if (userId === collection.user_id) {
+            return true;
+        }
+
+        if (isFollowing) {
+            return true;
+        }
+
+        if (isLoading) {
+            return true;
+        }
+
+        return false;
+    }, [collection, userId, isFollowing, isLoading]);
+
+    const toggleFollow = useCallback(async () => {
+        console.log('follow press');
+
+        if (!collection || isFollowing) {
+            return;
+        }
+
+        setIsFollowing(true);
+
+        const { data, error } = await supabase.auth.getUser();
+
+        if (error) {
+            console.error(error);
+            setIsFollowing(false);
+            return;
+        }
+
+        if (collection.is_followed[0].count === 1) {
+            // UNFOLLOW.
+            if (collection.user_id === data.user.id) {
+                console.error('Can not unfollow created collection');
+                setIsFollowing(false);
+                return;
+            }
+
+            const { error: followError } = await supabase
+                .from('collection_follows')
+                .delete()
+                .eq('collection_id', collection.id)
+                .eq('user_id', data.user.id);
+
+            if (followError) {
+                console.error(followError);
+                setIsFollowing(false);
+                return;
+            }
+
+            setCollection({ ...collection, is_followed: [{ count: 0 }] });
+        } else {
+            // FOLLOW.
+            const { error: followError } = await supabase
+                .from('collection_follows')
+                .insert({
+                    collection_id: collection.id,
+                    user_id: data.user.id,
+                });
+
+            if (followError) {
+                console.error(followError);
+                setIsFollowing(false);
+                return;
+            }
+
+            setCollection({ ...collection, is_followed: [{ count: 1 }] });
+        }
+
+        setIsFollowing(false);
+    }, [collection, isFollowing]);
+
     return (
         <FlatList
             data={collection?.pubs || []}
@@ -162,9 +249,8 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
 
                                 <TouchableOpacity
                                     style={styles.followContainer}
-                                    onPress={() =>
-                                        console.log('toggle follow')
-                                    }>
+                                    disabled={followButtonDisabled}
+                                    onPress={toggleFollow}>
                                     {collection.is_followed[0].count > 0 ? (
                                         <>
                                             <Ionicons
