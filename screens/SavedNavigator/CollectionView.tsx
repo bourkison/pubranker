@@ -173,7 +173,7 @@ export default function CollectionView({
                                                 collection.user.profile_photo ||
                                                 ''
                                             }
-                                            size={14}
+                                            size={20}
                                         />
 
                                         <Text style={styles.userNameText}>
@@ -222,10 +222,78 @@ export default function CollectionView({
                                     </Text>
                                 )}
 
-                                <MaterialIcons name="person" />
-                                <MaterialIcons name="people" />
-                                <Entypo name="globe" />
-                                <Entypo name="lock" />
+                                <View style={styles.privacyContainer}>
+                                    {collection.public === 'PRIVATE' ? (
+                                        <View style={styles.privacyItem}>
+                                            <Entypo
+                                                name="lock"
+                                                size={12}
+                                                color="#000"
+                                            />
+
+                                            <Text
+                                                style={styles.privacyItemText}>
+                                                Private
+                                            </Text>
+                                        </View>
+                                    ) : collection.public === 'FRIENDS_ONLY' ? (
+                                        <View style={styles.privacyItem}>
+                                            <MaterialIcons
+                                                name="people"
+                                                size={14}
+                                                color="#000"
+                                            />
+                                            <Text
+                                                style={styles.privacyItemText}>
+                                                Friends only
+                                            </Text>
+                                        </View>
+                                    ) : (
+                                        <View style={styles.privacyItem}>
+                                            <Entypo
+                                                name="globe"
+                                                size={12}
+                                                color="#000"
+                                            />
+
+                                            <Text
+                                                style={styles.privacyItemText}>
+                                                Public
+                                            </Text>
+                                        </View>
+                                    )}
+
+                                    {collection.public !== 'PRIVATE' &&
+                                    collection.collaborative ? (
+                                        <View style={styles.privacyItem}>
+                                            <MaterialIcons
+                                                name="people"
+                                                size={14}
+                                                color="#000"
+                                            />
+                                            <Text
+                                                style={styles.privacyItemText}>
+                                                Collaborative
+                                            </Text>
+                                        </View>
+                                    ) : (
+                                        collection.public !== 'PRIVATE' && (
+                                            <View style={styles.privacyItem}>
+                                                <MaterialIcons
+                                                    name="person"
+                                                    size={14}
+                                                    color="#000"
+                                                />
+                                                <Text
+                                                    style={
+                                                        styles.privacyItemText
+                                                    }>
+                                                    Non-Collaborative
+                                                </Text>
+                                            </View>
+                                        )
+                                    )}
+                                </View>
                             </View>
                         </>
                     )
@@ -299,6 +367,7 @@ const styles = StyleSheet.create({
     },
     descriptionText: {
         fontSize: 14,
+        fontWeight: '300',
         marginTop: 20,
     },
     topListHeaderContainer: {
@@ -314,5 +383,22 @@ const styles = StyleSheet.create({
         marginLeft: 4,
         color: PRIMARY_COLOR,
         fontWeight: '500',
+    },
+    privacyContainer: {
+        marginTop: 15,
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+    },
+    privacyItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginLeft: 3,
+    },
+    privacyItemText: {
+        fontSize: 12,
+        fontWeight: '300',
+        letterSpacing: -0.4,
+        marginLeft: 2,
     },
 });

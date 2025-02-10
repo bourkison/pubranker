@@ -1,5 +1,6 @@
 import { PubItemType } from '@/components/Pubs/PubItem';
 import { supabase } from '../supabase';
+import { Tables } from '@/types/schema';
 
 export type ListCollectionType = {
     id: number;
@@ -43,10 +44,7 @@ export const listFollowedCollectionsQuery = () =>
 
 // --------------------------------
 
-export type CollectionType = {
-    id: number;
-    name: string;
-    description: string | null;
+export type CollectionType = Tables<'collections'> & {
     pubs: PubItemType[];
     user: {
         id: string;
@@ -57,9 +55,7 @@ export type CollectionType = {
 };
 
 const collectionQueryString = `
-id,
-name,
-description,
+*,
 collection_items(pub_id, created_at),
 user:users_public(id, name, profile_photo),
 is_followed:collection_follows(count)

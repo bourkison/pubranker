@@ -103,7 +103,7 @@ export default function CollectionListItem({
 
                 <View style={styles.userContainer}>
                     <UserAvatar
-                        size={14}
+                        size={20}
                         photo={collection.user.profile_photo || ''}
                     />
 
