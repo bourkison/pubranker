@@ -136,6 +136,18 @@ export default function ProfileView({
                 <View style={styles.flexOne} />
             </View>
 
+            <View style={styles.nameBioContainer}>
+                <View style={styles.nameContainer}>
+                    <Text style={styles.nameText}>{user.name}</Text>
+                </View>
+
+                {user.bio && (
+                    <View style={styles.bioContainer}>
+                        <Text style={styles.bioText}>{user.bio}</Text>
+                    </View>
+                )}
+            </View>
+
             <ProfileTopBar
                 reviews={user.reviews[0].count}
                 followers={user.followers[0].count}
@@ -178,6 +190,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
+        paddingTop: 10,
     },
     followContainer: {
         flex: 1,
@@ -185,12 +198,9 @@ const styles = StyleSheet.create({
         alignItems: 'flex-end',
     },
     avatarContainer: {
-        paddingVertical: 40,
+        paddingVertical: 20,
         justifyContent: 'center',
         alignItems: 'center',
-        borderBottomWidth: 1,
-        borderColor: '#E5E7EB',
-        flexBasis: AVATAR_HEIGHT,
     },
     followButton: {
         borderColor: PRIMARY_COLOR,
@@ -217,5 +227,24 @@ const styles = StyleSheet.create({
     followsText: {
         fontSize: 10,
         textAlign: 'right',
+    },
+    nameBioContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingBottom: 20,
+        borderBottomWidth: 1,
+        borderColor: '#E5E7EB',
+        paddingHorizontal: 20,
+    },
+    nameContainer: {},
+    nameText: {
+        fontWeight: '600',
+    },
+    bioContainer: {
+        marginTop: 10,
+    },
+    bioText: {
+        fontSize: 12,
+        fontWeight: '400',
     },
 });
