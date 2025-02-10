@@ -7,6 +7,7 @@ type RatingsStarViewerProps = {
     padding: number;
     size: number;
     withShadows?: boolean;
+    color?: string;
 };
 
 export default function RatingsStarViewer({
@@ -14,6 +15,7 @@ export default function RatingsStarViewer({
     size,
     padding,
     withShadows = false,
+    color = GOLD_RATINGS_COLOR,
 }: RatingsStarViewerProps) {
     return (
         <>
@@ -22,7 +24,7 @@ export default function RatingsStarViewer({
                     key={index}
                     name="star"
                     style={{ paddingHorizontal: padding }}
-                    color={GOLD_RATINGS_COLOR}
+                    color={color}
                     size={size}
                 />
             ))}
@@ -30,7 +32,7 @@ export default function RatingsStarViewer({
                 <Ionicons
                     name="star-half"
                     style={{ paddingHorizontal: padding }}
-                    color={GOLD_RATINGS_COLOR}
+                    color={color}
                     size={size}
                 />
             ) : undefined}

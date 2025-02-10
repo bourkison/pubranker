@@ -7,6 +7,7 @@ import { UserType } from '@/services/queries/user';
 import { PRIMARY_COLOR } from '@/constants';
 import { supabase } from '@/services/supabase';
 import ProfileLinks from '@/components/User/ProfileLinks';
+import ProfileRecentRatings from './ProfileRecentRatings';
 
 type ProfileViewProps = {
     user: UserType;
@@ -159,9 +160,7 @@ export default function ProfileView({
                 <Text>Favourites</Text>
             </View>
 
-            <View>
-                <Text>Recent Reviews</Text>
-            </View>
+            <ProfileRecentRatings recentRatings={user.recent_ratings} />
 
             <View style={styles.ratingsContainer}>
                 <RatingsSummary

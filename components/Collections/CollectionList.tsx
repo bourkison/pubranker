@@ -11,6 +11,7 @@ import {
     TouchableOpacity,
     FlatList,
     ActivityIndicator,
+    Pressable,
 } from 'react-native';
 import * as Location from 'expo-location';
 import { PubItemType } from '@/components/Pubs/PubItem';
@@ -24,6 +25,9 @@ import {
 import CollectionMap from '@/components/Collections/CollectionMap';
 import UserAvatar from '@/components/User/UserAvatar';
 import SavedListItem from '@/components/Saves/SavedListItem';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 
 type CollectionListProps = {
     collectionId: number;
@@ -34,6 +38,9 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
     const [isFollowing, setIsFollowing] = useState(false);
     const [collection, setCollection] = useState<CollectionType>();
     const [userId, setUserId] = useState('');
+
+    const navigation =
+        useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
 
     useEffect(() => {
         (async () => {
@@ -234,7 +241,13 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
                         )}
                         <View style={styles.listHeaderContainer}>
                             <View style={styles.topListHeaderContainer}>
-                                <View style={styles.userContainer}>
+                                <Pressable
+                                    style={styles.userContainer}
+                                    onPress={() =>
+                                        navigation.push('Profile', {
+                                            userId: collection.user.id,
+                                        })
+                                    }>
                                     <UserAvatar
                                         photo={
                                             collection.user.profile_photo || ''
@@ -245,7 +258,7 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
                                     <Text style={styles.userNameText}>
                                         {collection.user.name}
                                     </Text>
-                                </View>
+                                </Pressable>
 
                                 <TouchableOpacity
                                     style={styles.followContainer}

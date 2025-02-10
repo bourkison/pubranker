@@ -17,7 +17,7 @@ import {
     getFollowersQuery,
     getFollowingQuery,
 } from '@/services/queries/follows';
-import ListFollowItem from '@/components/Follows/ListFollowItem';
+import ListFollowItem from '@/components/Follows/FollowListItem';
 
 export default function FollowersFollowingView({
     route,

@@ -4,6 +4,17 @@ import { Tables } from '@/types/schema';
 export type UserType = Tables<'users_public'> & {
     reviews: { count: number }[];
     ratings: { count: number }[];
+    recent_ratings: {
+        id: number;
+        created_at: string;
+        updated_at: string;
+        rating: number;
+        pubs: {
+            id: number;
+            primary_photo: string | null;
+            name: string;
+        };
+    }[];
     followers: { count: number }[];
     following: { count: number }[];
     collections: { count: number }[];
@@ -22,6 +33,17 @@ export type UserType = Tables<'users_public'> & {
 const userQueryString = `*,
 reviews(count),
 ratings:reviews(count),
+recent_ratings:reviews(
+    id,
+    created_at,
+    updated_at,
+    rating,
+    pubs(
+        id,
+        primary_photo,
+        name
+    )
+),
 followers:follows!follows_user_id_fkey(count),
 following:follows!follows_created_by_fkey(count),
 collections:collection_follows!collection_follows_user_id_fkey(count),
@@ -56,5 +78,10 @@ export const userQuery = (userId: string) =>
         .neq('reviews.content', null)
         .neq('reviews.content', '')
         .eq('id', userId)
+        .order('updated_at', {
+            referencedTable: 'recent_ratings',
+            ascending: true,
+        })
+        .limit(3, { referencedTable: 'recent_ratings' })
         .limit(1)
         .single();
