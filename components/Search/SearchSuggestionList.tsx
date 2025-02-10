@@ -103,6 +103,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         paddingVertical: 3,
         paddingHorizontal: 12,
+        justifyContent: 'center',
     },
     radioContainer: {
         borderColor: PRIMARY_COLOR,

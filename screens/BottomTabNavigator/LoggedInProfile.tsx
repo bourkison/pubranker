@@ -79,6 +79,8 @@ export default function LoggedInProfile() {
                 isLoggedInUser={true}
                 isFollowed={true}
                 setIsFollowed={() => console.warn("This shouldn't happen.")}
+                isFollowingUs={true}
+                setIsFollowingUs={() => console.warn("This shouldn't happen.")}
             />
 
             <View>

@@ -101,7 +101,7 @@ export default function SearchBar() {
                 onBlur={() => setFocused(false)}
                 ref={inputRef}
                 style={styles.searchInput}
-                placeholder="Find pubs"
+                placeholder="Find pubs, users or reviews..."
                 placeholderTextColor="#A3A3A3"
                 value={searchText}
                 returnKeyType="search"

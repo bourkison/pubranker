@@ -57,8 +57,6 @@ export default function SearchProvider({ children }: SearchProviderProps) {
             return;
         }
 
-        console.log('user search', data);
-
         setInternalResults(
             data.map(d => ({
                 title: d.username,
@@ -85,8 +83,6 @@ export default function SearchProvider({ children }: SearchProviderProps) {
             setInternalResults([]);
             return;
         }
-
-        console.log('pub search', data);
 
         setInternalResults(
             data.map(d => ({

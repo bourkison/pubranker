@@ -22,6 +22,7 @@ export default function Profile({
     const [user, setUser] = useState<UserType>();
     const [isLoggedInUser, setIsLoggedInUser] = useState(false);
     const [isFollowed, setIsFollowed] = useState(false);
+    const [isFollowingUs, setIsFollowingUs] = useState(false);
 
     useEffect(() => {
         (async () => {
@@ -38,21 +39,46 @@ export default function Profile({
             } else {
                 setIsLoggedInUser(userData.user.id === route.params.userId);
 
-                // Check to see if we follow this user.
-                const { count, error: followError } = await supabase
-                    .from('follows')
-                    .select('count', { count: 'exact' })
-                    .eq('created_by', userData.user.id)
-                    .eq('user_id', route.params.userId)
-                    .limit(1);
+                const weFollowUserPromise = () =>
+                    new Promise<void>(async resolve => {
+                        const { count } = await supabase
+                            .from('follows')
+                            .select('count', { count: 'exact' })
+                            .eq('created_by', userData.user.id)
+                            .eq('user_id', route.params.userId)
+                            .limit(1);
 
-                console.log('count', count, followError);
+                        if (count === 1) {
+                            setIsFollowed(true);
+                        } else {
+                            setIsFollowed(false);
+                        }
 
-                if (count === 1) {
-                    setIsFollowed(true);
-                } else {
-                    setIsFollowed(false);
-                }
+                        resolve();
+                    });
+
+                const userFollowsUsPromise = () =>
+                    new Promise<void>(async resolve => {
+                        const { count } = await supabase
+                            .from('follows')
+                            .select('count', { count: 'exact' })
+                            .eq('user_id', userData.user.id)
+                            .eq('created_by', route.params.userId)
+                            .limit(1);
+
+                        if (count === 1) {
+                            setIsFollowingUs(true);
+                        } else {
+                            setIsFollowingUs(false);
+                        }
+
+                        resolve();
+                    });
+
+                await Promise.allSettled([
+                    weFollowUserPromise(),
+                    userFollowsUsPromise(),
+                ]);
             }
 
             setIsLoading(false);
@@ -101,6 +127,8 @@ export default function Profile({
                 isLoggedInUser={isLoggedInUser}
                 isFollowed={isFollowed}
                 setIsFollowed={setIsFollowed}
+                isFollowingUs={isFollowingUs}
+                setIsFollowingUs={setIsFollowingUs}
             />
         </SafeAreaView>
     );

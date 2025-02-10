@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 
 import MapView, { Region } from 'react-native-maps';
 import * as Location from 'expo-location';
@@ -81,10 +87,13 @@ export default function HomeMap() {
         [setRegion],
     );
 
-    const regionChange = (r: Region) => {
-        throttledSetRegion(r);
-        // setRegion(r);
-    };
+    const regionChange = useCallback(
+        (r: Region) => {
+            throttledSetRegion(r);
+            // setRegion(r);
+        },
+        [throttledSetRegion],
+    );
 
     const pubSelectedOnMap = (pub: { id: number; location: Point }) => {
         MapRef.current?.animateToRegion({

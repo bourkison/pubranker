@@ -10,6 +10,8 @@ type ProfileViewProps = {
     isLoggedInUser: boolean;
     isFollowed: boolean;
     setIsFollowed: (follow: boolean) => void;
+    isFollowingUs: boolean;
+    setIsFollowingUs: (follow: boolean) => void;
 };
 
 export default function ProfileView({
@@ -29,12 +31,16 @@ export default function ProfileView({
                 {!isLoggedInUser && (
                     <View>
                         {!isFollowed ? (
-                            <TouchableOpacity>
-                                <Text>Follow</Text>
+                            <TouchableOpacity style={styles.followButton}>
+                                <Text style={styles.followButtonText}>
+                                    Follow
+                                </Text>
                             </TouchableOpacity>
                         ) : (
-                            <TouchableOpacity>
-                                <Text>Unfollow</Text>
+                            <TouchableOpacity style={styles.unfollowButton}>
+                                <Text style={styles.unfollowButtonText}>
+                                    Unfollow
+                                </Text>
                             </TouchableOpacity>
                         )}
                     </View>
@@ -83,4 +89,8 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderColor: '#E5E7EB',
     },
+    followButton: {},
+    followButtonText: {},
+    unfollowButton: {},
+    unfollowButtonText: {},
 });
