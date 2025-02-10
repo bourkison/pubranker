@@ -6,6 +6,7 @@ import RatingsSummary from '@/components/Ratings/RatingsSummary';
 import { UserType } from '@/services/queries/user';
 import { PRIMARY_COLOR } from '@/constants';
 import { supabase } from '@/services/supabase';
+import ProfileLinks from '@/components/User/ProfileLinks';
 
 type ProfileViewProps = {
     user: UserType;
@@ -158,6 +159,10 @@ export default function ProfileView({
                 <Text>Favourites</Text>
             </View>
 
+            <View>
+                <Text>Recent Reviews</Text>
+            </View>
+
             <View style={styles.ratingsContainer}>
                 <RatingsSummary
                     header="Ratings"
@@ -177,6 +182,8 @@ export default function ProfileView({
                     ]}
                 />
             </View>
+
+            <ProfileLinks user={user} />
         </View>
     );
 }

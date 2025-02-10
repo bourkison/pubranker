@@ -6,6 +6,7 @@ export type UserType = Tables<'users_public'> & {
     ratings: { count: number }[];
     followers: { count: number }[];
     following: { count: number }[];
+    collections: { count: number }[];
     review_ones: { count: number }[];
     review_twos: { count: number }[];
     review_threes: { count: number }[];
@@ -23,6 +24,7 @@ reviews(count),
 ratings:reviews(count),
 followers:follows!follows_user_id_fkey(count),
 following:follows!follows_created_by_fkey(count),
+collections:collection_follows!collection_follows_user_id_fkey(count),
 review_ones:reviews(count),
 review_twos:reviews(count),
 review_threes:reviews(count),

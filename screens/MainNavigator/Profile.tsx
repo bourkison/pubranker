@@ -8,6 +8,7 @@ import {
     TouchableOpacity,
     ActivityIndicator,
     StyleSheet,
+    ScrollView,
 } from 'react-native';
 import { Ionicons, SimpleLineIcons } from '@expo/vector-icons';
 import ProfileView from '@/components/User/ProfileView';
@@ -132,7 +133,7 @@ export default function Profile({
     }
 
     return (
-        <SafeAreaView>
+        <SafeAreaView style={styles.flexOne}>
             <View style={styles.headerContainer}>
                 <TouchableOpacity
                     style={styles.settingsContainer}
@@ -149,13 +150,15 @@ export default function Profile({
                 </TouchableOpacity>
             </View>
 
-            <ProfileView
-                user={user}
-                isLoggedInUser={isLoggedInUser}
-                isFollowed={isFollowed}
-                setIsFollowed={toggleFollow}
-                isFollowingUs={isFollowingUs}
-            />
+            <ScrollView style={styles.flexOne}>
+                <ProfileView
+                    user={user}
+                    isLoggedInUser={isLoggedInUser}
+                    isFollowed={isFollowed}
+                    setIsFollowed={toggleFollow}
+                    isFollowingUs={isFollowingUs}
+                />
+            </ScrollView>
         </SafeAreaView>
     );
 }
@@ -163,6 +166,9 @@ export default function Profile({
 const ICON_PADDING = 10;
 
 const styles = StyleSheet.create({
+    flexOne: {
+        flex: 1,
+    },
     headerContainer: {
         paddingVertical: 10,
         alignItems: 'center',

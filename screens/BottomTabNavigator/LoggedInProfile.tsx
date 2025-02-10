@@ -8,6 +8,7 @@ import {
     TouchableOpacity,
     StyleSheet,
     ActivityIndicator,
+    ScrollView,
 } from 'react-native';
 import { supabase } from '@/services/supabase';
 import { Feather, SimpleLineIcons } from '@expo/vector-icons';
@@ -59,7 +60,7 @@ export default function LoggedInProfile() {
     }
 
     return (
-        <SafeAreaView>
+        <SafeAreaView style={styles.flexOne}>
             <View style={styles.headerContainer}>
                 <TouchableOpacity style={styles.settingsContainer}>
                     <Feather name="settings" size={14} />
@@ -74,19 +75,21 @@ export default function LoggedInProfile() {
                 </TouchableOpacity>
             </View>
 
-            <ProfileView
-                user={user}
-                isLoggedInUser={true}
-                isFollowed={true}
-                setIsFollowed={() => console.warn("This shouldn't happen.")}
-                isFollowingUs={true}
-            />
+            <ScrollView style={styles.flexOne}>
+                <ProfileView
+                    user={user}
+                    isLoggedInUser={true}
+                    isFollowed={true}
+                    setIsFollowed={() => console.warn("This shouldn't happen.")}
+                    isFollowingUs={true}
+                />
 
-            <View>
-                <TouchableOpacity onPress={() => dispatch(storeSignOut())}>
-                    <Text>Logout</Text>
-                </TouchableOpacity>
-            </View>
+                <View>
+                    <TouchableOpacity onPress={() => dispatch(storeSignOut())}>
+                        <Text>Logout</Text>
+                    </TouchableOpacity>
+                </View>
+            </ScrollView>
         </SafeAreaView>
     );
 }
@@ -94,6 +97,7 @@ export default function LoggedInProfile() {
 const ICON_PADDING = 10;
 
 const styles = StyleSheet.create({
+    flexOne: { flex: 1 },
     headerContainer: {
         paddingVertical: 10,
         alignItems: 'center',
