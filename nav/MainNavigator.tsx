@@ -13,7 +13,8 @@ import Profile from '@/screens/MainNavigator/Profile';
 import UserCollections from '@/screens/MainNavigator/UserCollections';
 import UserCollectionView from '@/screens/MainNavigator/UserCollectionView';
 import FollowersFollowingView from '@/screens/MainNavigator/FollowersFollowingView';
-import Settings from '@/screens/ProfileNavigator/Settings';
+import Settings from '@/screens/MainNavigator/Settings';
+import { UserType } from '@/services/queries/user';
 
 export type MainNavigatorStackParamList = {
     Home: undefined;
@@ -49,7 +50,10 @@ export type MainNavigatorStackParamList = {
         type: 'followers' | 'following';
         count: number;
     };
-    Settings: undefined;
+    Settings: {
+        user: UserType;
+        email: string;
+    };
 };
 
 const Stack = createStackNavigator<MainNavigatorStackParamList>();

@@ -184,7 +184,6 @@ const styles = StyleSheet.create({
     menuContainer: {
         paddingRight: ICON_PADDING,
     },
-
     headerTextContainer: {
         flex: 1,
     },

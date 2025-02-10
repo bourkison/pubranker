@@ -5,7 +5,6 @@ import Notifications from '@/screens/ProfileNavigator/Notifications';
 
 export type ProfileNavigatorStackParamList = {
     ProfileHome: undefined;
-    Settings: undefined;
     Notifications: undefined;
 };
 

@@ -357,23 +357,23 @@ export type Database = {
       }
       favourites: {
         Row: {
+          count: number
           created_at: string
           id: number
-          order: number
           pub_id: number
           user_id: string
         }
         Insert: {
+          count?: number
           created_at?: string
           id?: number
-          order?: number
           pub_id: number
           user_id: string
         }
         Update: {
+          count?: number
           created_at?: string
           id?: number
-          order?: number
           pub_id?: number
           user_id?: string
         }
@@ -927,24 +927,27 @@ export type Database = {
           bio: string
           created_at: string | null
           id: string
+          location: string
           name: string
-          profile_photo: string | null
+          profile_photo: string
           username: string
         }
         Insert: {
           bio?: string
           created_at?: string | null
           id: string
+          location?: string
           name: string
-          profile_photo?: string | null
+          profile_photo: string
           username: string
         }
         Update: {
           bio?: string
           created_at?: string | null
           id?: string
+          location?: string
           name?: string
-          profile_photo?: string | null
+          profile_photo?: string
           username?: string
         }
         Relationships: []
@@ -1280,6 +1283,12 @@ export type Database = {
           website: string
           wheelchair_accessible: boolean | null
         }[]
+      }
+      validate_favourites_limit_three: {
+        Args: {
+          u_id: string
+        }
+        Returns: boolean
       }
     }
     Enums: {

@@ -1,5 +1,3 @@
-import { signOut as storeSignOut } from '@/store/slices/user';
-import { useAppDispatch } from '@/store/hooks';
 import React, { useEffect, useState } from 'react';
 import {
     SafeAreaView,
@@ -17,16 +15,15 @@ import { UserType } from '@/services/queries/user';
 import ProfileView from '@/components/User/ProfileView';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { ProfileNavigatorStackParamList } from '@/nav/ProfileNavigator';
+import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 
 export default function LoggedInProfile() {
     const [user, setUser] = useState<UserType>();
+    const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
-    const dispatch = useAppDispatch();
-
     const navigation =
-        useNavigation<StackNavigationProp<ProfileNavigatorStackParamList>>();
+        useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -39,6 +36,8 @@ export default function LoggedInProfile() {
                 setIsLoading(false);
                 return;
             }
+
+            setEmail(data.user.email || '');
 
             const { data: publicUser, error: publicUserError } =
                 await userQuery(data.user.id);
@@ -70,7 +69,9 @@ export default function LoggedInProfile() {
             <View style={styles.headerContainer}>
                 <TouchableOpacity
                     style={styles.settingsContainer}
-                    onPress={() => navigation.navigate('Settings')}>
+                    onPress={() =>
+                        navigation.navigate('Settings', { user, email })
+                    }>
                     <Feather name="settings" size={14} />
                 </TouchableOpacity>
 
@@ -91,12 +92,6 @@ export default function LoggedInProfile() {
                     setIsFollowed={() => console.warn("This shouldn't happen.")}
                     isFollowingUs={true}
                 />
-
-                <View>
-                    <TouchableOpacity onPress={() => dispatch(storeSignOut())}>
-                        <Text>Logout</Text>
-                    </TouchableOpacity>
-                </View>
             </ScrollView>
         </SafeAreaView>
     );
