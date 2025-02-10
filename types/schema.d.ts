@@ -355,6 +355,59 @@ export type Database = {
           },
         ]
       }
+      favourites: {
+        Row: {
+          created_at: string
+          id: number
+          order: number
+          pub_id: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          order?: number
+          pub_id: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          order?: number
+          pub_id?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favourites_pub_id_fkey"
+            columns: ["pub_id"]
+            isOneToOne: false
+            referencedRelation: "formatted_pubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favourites_pub_id_fkey"
+            columns: ["pub_id"]
+            isOneToOne: false
+            referencedRelation: "location_pubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favourites_pub_id_fkey"
+            columns: ["pub_id"]
+            isOneToOne: false
+            referencedRelation: "pubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favourites_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       follows: {
         Row: {
           created_at: string
