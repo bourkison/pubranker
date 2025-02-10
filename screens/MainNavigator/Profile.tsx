@@ -40,46 +40,48 @@ export default function Profile({
             } else {
                 setIsLoggedInUser(userData.user.id === route.params.userId);
 
-                const weFollowUserPromise = () =>
-                    new Promise<void>(async resolve => {
-                        const { count } = await supabase
-                            .from('follows')
-                            .select('count', { count: 'exact' })
-                            .eq('created_by', userData.user.id)
-                            .eq('user_id', route.params.userId)
-                            .limit(1);
+                if (userData.user.id !== route.params.userId) {
+                    const weFollowUserPromise = () =>
+                        new Promise<void>(async resolve => {
+                            const { count } = await supabase
+                                .from('follows')
+                                .select('count', { count: 'exact' })
+                                .eq('created_by', userData.user.id)
+                                .eq('user_id', route.params.userId)
+                                .limit(1);
 
-                        if (count === 1) {
-                            setIsFollowed(true);
-                        } else {
-                            setIsFollowed(false);
-                        }
+                            if (count === 1) {
+                                setIsFollowed(true);
+                            } else {
+                                setIsFollowed(false);
+                            }
 
-                        resolve();
-                    });
+                            resolve();
+                        });
 
-                const userFollowsUsPromise = () =>
-                    new Promise<void>(async resolve => {
-                        const { count } = await supabase
-                            .from('follows')
-                            .select('count', { count: 'exact' })
-                            .eq('user_id', userData.user.id)
-                            .eq('created_by', route.params.userId)
-                            .limit(1);
+                    const userFollowsUsPromise = () =>
+                        new Promise<void>(async resolve => {
+                            const { count } = await supabase
+                                .from('follows')
+                                .select('count', { count: 'exact' })
+                                .eq('user_id', userData.user.id)
+                                .eq('created_by', route.params.userId)
+                                .limit(1);
 
-                        if (count === 1) {
-                            setIsFollowingUs(true);
-                        } else {
-                            setIsFollowingUs(false);
-                        }
+                            if (count === 1) {
+                                setIsFollowingUs(true);
+                            } else {
+                                setIsFollowingUs(false);
+                            }
 
-                        resolve();
-                    });
+                            resolve();
+                        });
 
-                await Promise.allSettled([
-                    weFollowUserPromise(),
-                    userFollowsUsPromise(),
-                ]);
+                    await Promise.allSettled([
+                        weFollowUserPromise(),
+                        userFollowsUsPromise(),
+                    ]);
+                }
             }
 
             setIsLoading(false);

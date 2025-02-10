@@ -12,6 +12,7 @@ import AddToList from '@/screens/MainNavigator/AddToList';
 import Profile from '@/screens/MainNavigator/Profile';
 import UserCollections from '@/screens/MainNavigator/UserCollections';
 import UserCollectionView from '@/screens/MainNavigator/UserCollectionView';
+import FollowersFollowingView from '@/screens/MainNavigator/FollowersFollowingView';
 
 export type MainNavigatorStackParamList = {
     Home: undefined;
@@ -41,6 +42,10 @@ export type MainNavigatorStackParamList = {
     };
     UserCollectionView: {
         collectionId: number;
+    };
+    FollowersFollowingView: {
+        userId: string;
+        type: 'followers' | 'following';
     };
 };
 
@@ -97,6 +102,11 @@ export default function MainNavigator() {
             <Stack.Screen
                 name="UserCollectionView"
                 component={UserCollectionView}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="FollowersFollowingView"
+                component={FollowersFollowingView}
                 options={{ headerShown: false }}
             />
         </Stack.Navigator>

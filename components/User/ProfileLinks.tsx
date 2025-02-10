@@ -62,7 +62,7 @@ export default function ProfileLinks({ user }: ProfileLinksProps) {
                 style={styles.itemContainer}
                 underlayColor="#E5E7EB"
                 onPress={() =>
-                    navigation.navigate('UserCollections', { userId: user.id })
+                    navigation.push('UserCollections', { userId: user.id })
                 }>
                 <>
                     <Text style={styles.itemHeader}>Lists</Text>
@@ -83,7 +83,12 @@ export default function ProfileLinks({ user }: ProfileLinksProps) {
             <TouchableHighlight
                 style={styles.itemContainer}
                 underlayColor="#E5E7EB"
-                onPress={() => console.log('press')}>
+                onPress={() =>
+                    navigation.push('FollowersFollowingView', {
+                        type: 'following',
+                        userId: user.id,
+                    })
+                }>
                 <>
                     <Text style={styles.itemHeader}>Following</Text>
 
@@ -103,7 +108,12 @@ export default function ProfileLinks({ user }: ProfileLinksProps) {
             <TouchableHighlight
                 style={styles.itemContainer}
                 underlayColor="#E5E7EB"
-                onPress={() => console.log('press')}>
+                onPress={() =>
+                    navigation.push('FollowersFollowingView', {
+                        type: 'followers',
+                        userId: user.id,
+                    })
+                }>
                 <>
                     <Text style={styles.itemHeader}>Followers</Text>
 
