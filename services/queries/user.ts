@@ -15,6 +15,15 @@ export type UserType = Tables<'users_public'> & {
             name: string;
         };
     }[];
+    favourites: {
+        id: number;
+        count: number;
+        pubs: {
+            id: number;
+            primary_photo: string | null;
+            name: string;
+        };
+    }[];
     followers: { count: number }[];
     following: { count: number }[];
     collections: { count: number }[];
@@ -38,6 +47,15 @@ recent_ratings:reviews(
     created_at,
     updated_at,
     rating,
+    pubs(
+        id,
+        primary_photo,
+        name
+    )
+),
+favourites(
+    id,
+    count,
     pubs(
         id,
         primary_photo,
@@ -81,6 +99,10 @@ export const userQuery = (userId: string) =>
         .order('updated_at', {
             referencedTable: 'recent_ratings',
             ascending: false,
+        })
+        .order('count', {
+            referencedTable: 'favourites',
+            ascending: true,
         })
         .limit(3, { referencedTable: 'recent_ratings' })
         .limit(1)

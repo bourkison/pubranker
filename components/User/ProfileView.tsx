@@ -7,7 +7,8 @@ import { UserType } from '@/services/queries/user';
 import { PRIMARY_COLOR } from '@/constants';
 import { supabase } from '@/services/supabase';
 import ProfileLinks from '@/components/User/ProfileLinks';
-import ProfileRecentRatings from './ProfileRecentRatings';
+import ProfileRecentRatings from '@/components/User/ProfileRecentRatings';
+import ProfileFavourites from '@/components/User/ProfileFavourites';
 
 type ProfileViewProps = {
     user: UserType;
@@ -157,9 +158,9 @@ export default function ProfileView({
                 following={user.following[0].count}
             />
 
-            <View>
-                <Text>Favourites</Text>
-            </View>
+            {user.favourites.length && (
+                <ProfileFavourites favourites={user.favourites} />
+            )}
 
             <ProfileRecentRatings recentRatings={user.recent_ratings} />
 

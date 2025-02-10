@@ -812,7 +812,7 @@ export type Database = {
           pub_id: number
           rating: number
           service: boolean | null
-          updated_at: string | null
+          updated_at: string
           user_id: string
           vibe: boolean | null
         }
@@ -828,7 +828,7 @@ export type Database = {
           pub_id: number
           rating: number
           service?: boolean | null
-          updated_at?: string | null
+          updated_at?: string
           user_id?: string
           vibe?: boolean | null
         }
@@ -844,7 +844,7 @@ export type Database = {
           pub_id?: number
           rating?: number
           service?: boolean | null
-          updated_at?: string | null
+          updated_at?: string
           user_id?: string
           vibe?: boolean | null
         }
