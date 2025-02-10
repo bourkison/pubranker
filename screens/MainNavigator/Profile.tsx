@@ -1,6 +1,6 @@
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
     View,
     Text,
@@ -92,6 +92,33 @@ export default function Profile({
         })();
     }, [route]);
 
+    const toggleFollow = useCallback(
+        (follow: boolean) => {
+            if (!user) {
+                return;
+            }
+
+            if (follow) {
+                setIsFollowed(true);
+                setUser({
+                    ...user,
+                    followers: [{ count: user.followers[0].count + 1 }],
+                });
+
+                return;
+            }
+
+            if (!follow) {
+                setIsFollowed(false);
+                setUser({
+                    ...user,
+                    followers: [{ count: user.followers[0].count - 1 }],
+                });
+            }
+        },
+        [user],
+    );
+
     if (isLoading) {
         return <ActivityIndicator />;
     }
@@ -126,9 +153,8 @@ export default function Profile({
                 user={user}
                 isLoggedInUser={isLoggedInUser}
                 isFollowed={isFollowed}
-                setIsFollowed={setIsFollowed}
+                setIsFollowed={toggleFollow}
                 isFollowingUs={isFollowingUs}
-                setIsFollowingUs={setIsFollowingUs}
             />
         </SafeAreaView>
     );

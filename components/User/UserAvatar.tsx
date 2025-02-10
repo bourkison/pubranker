@@ -18,23 +18,23 @@ export default function UserAvatar({
     iconColor = '#FFF',
     withShadow,
 }: UserAvatarProps) {
-    const padding = useMemo(() => size / 1.5, [size]);
-    const containerSize = useMemo(() => size + padding, [size, padding]);
+    const iconSize = useMemo(() => size / 1.66666, [size]);
+    // const padding = useMemo(() => size - iconSize, [iconSize, size])
 
     return (
         <View
             style={[
                 styles.container,
                 {
-                    width: containerSize,
-                    height: containerSize,
-                    borderRadius: containerSize / 2,
+                    width: size,
+                    height: size,
+                    borderRadius: size / 2,
                     backgroundColor: backgroundColor,
                 },
                 withShadow ? styles.shadow : undefined,
             ]}>
             {photo ? undefined : (
-                <Ionicons name="person" size={size} color={iconColor} />
+                <Ionicons name="person" size={iconSize} color={iconColor} />
             )}
         </View>
     );

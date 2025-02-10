@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import UserAvatar from '@/components/User/UserAvatar';
 import ProfileTopBar from '@/components/User/ProfileTopBar';
 import RatingsSummary from '@/components/Ratings/RatingsSummary';
 import { UserType } from '@/services/queries/user';
+import { PRIMARY_COLOR } from '@/constants';
+import { supabase } from '@/services/supabase';
 
 type ProfileViewProps = {
     user: UserType;
@@ -11,40 +13,118 @@ type ProfileViewProps = {
     isFollowed: boolean;
     setIsFollowed: (follow: boolean) => void;
     isFollowingUs: boolean;
-    setIsFollowingUs: (follow: boolean) => void;
 };
+
+const AVATAR_HEIGHT = 108;
 
 export default function ProfileView({
     user,
     isLoggedInUser,
     isFollowed,
+    setIsFollowed,
 }: ProfileViewProps) {
+    const [isFollowing, setIsFollowing] = useState(false);
+
+    const follow = useCallback(async () => {
+        if (isLoggedInUser) {
+            console.warn('Attempting to unfollow logged in user.');
+            return;
+        }
+
+        setIsFollowing(true);
+
+        const { data, error } = await supabase.auth.getUser();
+
+        if (error) {
+            console.error(error);
+            setIsFollowing(false);
+            return;
+        }
+
+        const { error: followError } = await supabase
+            .from('follows')
+            .insert({ user_id: user.id, created_by: data.user.id });
+
+        if (followError) {
+            console.error('Error following user.', followError);
+            setIsFollowing(false);
+            return;
+        }
+
+        setIsFollowing(false);
+        setIsFollowed(true);
+    }, [isLoggedInUser, user, setIsFollowed]);
+
+    const unfollow = useCallback(async () => {
+        if (isLoggedInUser) {
+            console.warn('Attempting to unfollow logged in user.');
+            return;
+        }
+
+        setIsFollowing(true);
+
+        const { data, error } = await supabase.auth.getUser();
+
+        if (error) {
+            console.error(error);
+            setIsFollowing(false);
+            return;
+        }
+
+        const { error: unfollowError } = await supabase
+            .from('follows')
+            .delete()
+            .eq('created_by', data.user.id)
+            .eq('user_id', user.id);
+
+        if (unfollowError) {
+            console.error('Error unfollowing user.', unfollowError);
+            setIsFollowing(false);
+            return;
+        }
+
+        setIsFollowing(false);
+        setIsFollowed(false);
+    }, [isLoggedInUser, user, setIsFollowed]);
+
     return (
         <View>
-            <View style={styles.avatarContainer}>
-                <UserAvatar
-                    photo={user.profile_photo ?? ''}
-                    size={64}
-                    withShadow={true}
-                />
+            <View style={styles.followAvatarContainer}>
+                <View style={styles.followContainer}>
+                    {!isLoggedInUser && (
+                        <View>
+                            {!isFollowed ? (
+                                <TouchableOpacity
+                                    onPress={follow}
+                                    style={styles.followButton}
+                                    disabled={isFollowing}>
+                                    <Text style={styles.followButtonText}>
+                                        Follow
+                                    </Text>
+                                </TouchableOpacity>
+                            ) : (
+                                <TouchableOpacity
+                                    onPress={unfollow}
+                                    style={styles.unfollowButton}
+                                    disabled={isFollowing}>
+                                    <Text style={styles.unfollowButtonText}>
+                                        Unfollow
+                                    </Text>
+                                </TouchableOpacity>
+                            )}
+                        </View>
+                    )}
+                </View>
 
-                {!isLoggedInUser && (
-                    <View>
-                        {!isFollowed ? (
-                            <TouchableOpacity style={styles.followButton}>
-                                <Text style={styles.followButtonText}>
-                                    Follow
-                                </Text>
-                            </TouchableOpacity>
-                        ) : (
-                            <TouchableOpacity style={styles.unfollowButton}>
-                                <Text style={styles.unfollowButtonText}>
-                                    Unfollow
-                                </Text>
-                            </TouchableOpacity>
-                        )}
-                    </View>
-                )}
+                <View style={styles.avatarContainer}>
+                    <UserAvatar
+                        photo={user.profile_photo ?? ''}
+                        size={AVATAR_HEIGHT}
+                        withShadow={true}
+                    />
+                </View>
+
+                <View style={styles.flexOne} />
             </View>
 
             <ProfileTopBar
@@ -81,15 +161,31 @@ export default function ProfileView({
 }
 
 const styles = StyleSheet.create({
+    flexOne: { flex: 1 },
     ratingsContainer: {},
+    followAvatarContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    followContainer: {
+        flex: 1,
+        textAlign: 'right',
+        alignItems: 'flex-end',
+    },
     avatarContainer: {
         paddingVertical: 40,
         justifyContent: 'center',
         alignItems: 'center',
         borderBottomWidth: 1,
         borderColor: '#E5E7EB',
+        flexBasis: AVATAR_HEIGHT,
     },
-    followButton: {},
+    followButton: {
+        borderColor: PRIMARY_COLOR,
+        paddingVertical: 2,
+        paddingHorizontal: 4,
+    },
     followButtonText: {},
     unfollowButton: {},
     unfollowButtonText: {},
