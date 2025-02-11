@@ -15,6 +15,7 @@ import UserCollectionView from '@/screens/MainNavigator/UserCollectionView';
 import FollowersFollowingView from '@/screens/MainNavigator/FollowersFollowingView';
 import Settings from '@/screens/MainNavigator/Settings';
 import { UserType } from '@/services/queries/user';
+import AddFavourite from '@/screens/MainNavigator/AddFavourite';
 
 export type MainNavigatorStackParamList = {
     Home: undefined;
@@ -58,6 +59,10 @@ export type MainNavigatorStackParamList = {
         bio: string;
         profile_photo: string;
         favourites: UserType['favourites'];
+    };
+    AddFavourite: {
+        favourites: UserType['favourites'];
+        onAdd: (pub: UserType['favourites'][number]) => void;
     };
 };
 
@@ -124,6 +129,11 @@ export default function MainNavigator() {
             <Stack.Screen
                 name="Settings"
                 component={Settings}
+                options={{ headerShown: false, presentation: 'modal' }}
+            />
+            <Stack.Screen
+                name="AddFavourite"
+                component={AddFavourite}
                 options={{ headerShown: false, presentation: 'modal' }}
             />
         </Stack.Navigator>

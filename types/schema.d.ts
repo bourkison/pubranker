@@ -368,7 +368,7 @@ export type Database = {
           created_at?: string
           id?: number
           pub_id: number
-          user_id: string
+          user_id?: string
         }
         Update: {
           count?: number

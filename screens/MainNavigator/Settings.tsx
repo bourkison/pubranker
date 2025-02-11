@@ -16,6 +16,8 @@ import { useAppDispatch } from '@/store/hooks';
 import { signOut as storeSignOut } from '@/store/slices/user';
 import UserAvatar from '@/components/User/UserAvatar';
 import SettingsFavourites from '@/components/Settings/SettingsFavourites';
+import { UserType } from '@/services/queries/user';
+import { supabase } from '@/services/supabase';
 
 const RIGHT_COLUMN_COLOR = 'rgba(0, 0, 0, 0.6)';
 
@@ -27,8 +29,12 @@ export default function Settings({
     const [location, setLocation] = useState(route.params.location);
     const [favourites, setFavourites] = useState(route.params.favourites);
 
+    const [favouritesChanged, setFavouritesChagned] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+
     const removeFavourite = useCallback(
         (index: number) => {
+            setFavouritesChagned(true);
             const temp = favourites.slice();
 
             if (temp[index]) {
@@ -37,6 +43,59 @@ export default function Settings({
         },
         [favourites],
     );
+
+    const addFavourite = useCallback(
+        (favourite: UserType['favourites'][number]) => {
+            setFavouritesChagned(true);
+            setFavourites([...favourites, favourite]);
+        },
+        [favourites],
+    );
+
+    const updateFavourites = useCallback(async () => {
+        // First delete all favourites.
+        const { data: userData, error: userError } =
+            await supabase.auth.getUser();
+
+        if (userError) {
+            console.error('User error', userError);
+            return;
+        }
+
+        const { error: deleteError } = await supabase
+            .from('favourites')
+            .delete()
+            .eq('user_id', userData.user.id);
+
+        if (deleteError) {
+            console.error('Error deleting', deleteError);
+            return;
+        }
+
+        const { error } = await supabase.from('favourites').upsert(
+            favourites.map((favourite, index) => ({
+                pub_id: favourite.pubs.id,
+                user_id: userData.user.id,
+                count: index + 1,
+            })),
+        );
+
+        if (error) {
+            console.error('Error uploading', error);
+            return;
+        }
+    }, [favourites]);
+
+    const saveChanges = useCallback(async () => {
+        setIsSaving(true);
+
+        if (favouritesChanged) {
+            await updateFavourites();
+        }
+
+        setIsSaving(false);
+        navigation.goBack();
+    }, [updateFavourites, favouritesChanged, navigation]);
 
     const dispatch = useAppDispatch();
 
@@ -53,9 +112,12 @@ export default function Settings({
                     <Text style={styles.headerText}>Settings</Text>
                 </View>
 
-                <View style={styles.cancelContainer}>
-                    <Text style={styles.hiddenText}>Back</Text>
-                </View>
+                <TouchableOpacity
+                    style={styles.saveContainer}
+                    disabled={isSaving}
+                    onPress={saveChanges}>
+                    <Text>Save</Text>
+                </TouchableOpacity>
             </View>
 
             <ScrollView
@@ -161,6 +223,7 @@ export default function Settings({
                     <SettingsFavourites
                         favourites={favourites}
                         onRemove={removeFavourite}
+                        addFavourite={addFavourite}
                     />
                 </View>
 
@@ -189,7 +252,11 @@ const styles = StyleSheet.create({
     cancelContainer: {
         flex: 1,
         paddingHorizontal: 10,
-        justifyContent: 'flex-end',
+    },
+    saveContainer: {
+        flex: 1,
+        alignItems: 'flex-end',
+        paddingHorizontal: 10,
     },
     hiddenText: {
         color: 'transparent',

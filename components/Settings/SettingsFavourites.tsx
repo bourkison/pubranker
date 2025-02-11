@@ -5,10 +5,14 @@ import { useActionSheet } from '@expo/react-native-action-sheet';
 import React, { useState, useMemo, useCallback } from 'react';
 import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
+import { useNavigation } from '@react-navigation/native';
 
 type SettingsFavouritesProps = {
     favourites: UserType['favourites'];
     onRemove: (index: number) => void;
+    addFavourite: (pub: UserType['favourites'][number]) => void;
 };
 
 const NO_IMAGE = require('@/assets/noimage.png');
@@ -18,8 +22,11 @@ const IMAGE_PADDING = 2;
 export default function SettingsFavourites({
     favourites,
     onRemove,
+    addFavourite,
 }: SettingsFavouritesProps) {
     const [elementWidth, setElementWidth] = useState(0);
+    const navigation =
+        useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
 
     const pubElementWidth = useMemo<number>(
         () => elementWidth / MAX_FAVOURITES,
@@ -141,6 +148,12 @@ export default function SettingsFavourites({
                             { width: pubElementWidth },
                         ]}>
                         <Pressable
+                            onPress={() =>
+                                navigation.navigate('AddFavourite', {
+                                    favourites,
+                                    onAdd: pub => addFavourite(pub),
+                                })
+                            }
                             style={[
                                 styles.addFavourite,
                                 {
