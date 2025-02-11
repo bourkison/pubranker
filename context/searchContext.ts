@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react';
+import { createContext, Dispatch, SetStateAction, useContext } from 'react';
 
 export type ResultType = {
     title: string;
@@ -19,7 +19,7 @@ export type SearchType = 'places' | 'users' | 'reviews';
 
 type SearchContextType = {
     searchText: string;
-    setSearchText: (searchText: string) => void;
+    setSearchText: Dispatch<SetStateAction<string>>;
     searchType: SearchType;
     toggleSearchType: (searchType: SearchType) => void;
     results: ResultType[];

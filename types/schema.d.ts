@@ -1236,63 +1236,6 @@ export type Database = {
           location: string
         }[]
       }
-      nearby_pubs: {
-        Args: {
-          order_lat: number
-          order_long: number
-          dist_lat: number
-          dist_long: number
-        }
-        Returns: {
-          address: string
-          beer_garden: boolean | null
-          dart_board: boolean | null
-          description: string
-          dist_meters: number
-          dog_friendly: boolean | null
-          foosball_table: boolean | null
-          free_wifi: boolean | null
-          google_id: string
-          id: number
-          kid_friendly: boolean | null
-          live_sport: boolean | null
-          location: string
-          name: string
-          num_reviews: number
-          opening_hours: Json
-          phone_number: string
-          photos: string[]
-          pool_table: boolean | null
-          rating: number
-          reservable: boolean | null
-          review_beer_amount: number
-          review_eights: number
-          review_fives: number
-          review_food_amount: number
-          review_fours: number
-          review_location_amount: number
-          review_music_amount: number
-          review_negative_beer_amount: number
-          review_negative_food_amount: number
-          review_negative_location_amount: number
-          review_negative_music_amount: number
-          review_negative_service_amount: number
-          review_negative_vibe_amount: number
-          review_nines: number
-          review_ones: number
-          review_service_amount: number
-          review_sevens: number
-          review_sixes: number
-          review_tens: number
-          review_threes: number
-          review_twos: number
-          review_vibe_amount: number
-          rooftop: boolean | null
-          saved: boolean
-          website: string
-          wheelchair_accessible: boolean | null
-        }[]
-      }
       pubs_in_polygon: {
         Args: {
           geojson: string
@@ -1300,53 +1243,24 @@ export type Database = {
           dist_lat: number
         }
         Returns: {
-          address: string
-          beer_garden: boolean | null
-          dart_board: boolean | null
-          description: string
-          dist_meters: number
-          dog_friendly: boolean | null
-          foosball_table: boolean | null
-          free_wifi: boolean | null
-          google_id: string
           id: number
-          kid_friendly: boolean | null
-          live_sport: boolean | null
-          location: string
           name: string
-          num_reviews: number
-          opening_hours: Json
-          phone_number: string
-          photos: string[]
-          pool_table: boolean | null
+          address: string
+          primary_photo: string
+          reservable: boolean
+          dog_friendly: boolean
+          live_sport: boolean
+          pool_table: boolean
+          dart_board: boolean
+          beer_garden: boolean
+          kid_friendly: boolean
+          free_wifi: boolean
+          rooftop: boolean
+          foosball_table: boolean
+          wheelchair_accessible: boolean
           rating: number
-          reservable: boolean | null
-          review_beer_amount: number
-          review_eights: number
-          review_fives: number
-          review_food_amount: number
-          review_fours: number
-          review_location_amount: number
-          review_music_amount: number
-          review_negative_beer_amount: number
-          review_negative_food_amount: number
-          review_negative_location_amount: number
-          review_negative_music_amount: number
-          review_negative_service_amount: number
-          review_negative_vibe_amount: number
-          review_nines: number
-          review_ones: number
-          review_service_amount: number
-          review_sevens: number
-          review_sixes: number
-          review_tens: number
-          review_threes: number
-          review_twos: number
-          review_vibe_amount: number
-          rooftop: boolean | null
-          saved: boolean
-          website: string
-          wheelchair_accessible: boolean | null
+          location: string
+          dist_meters: number
         }[]
       }
       validate_favourites_limit_three: {

@@ -14,12 +14,13 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import DebugPolygons from './DebugPolygons';
 import BottomSheet from '@gorhom/bottom-sheet';
 import BottomSheetPubList from '@/components/Pubs/PubList';
-import { deselectPub, fetchMapPubs, selectPub } from '@/store/slices/map';
+import { deselectPub, selectPub } from '@/store/slices/map';
 import SelectedPub from './SelectedPub';
 import { useSharedExploreContext } from '@/context/exploreContext';
 import MapMarkers from './MapMarkers';
 import _ from 'lodash';
 import { Point } from '@turf/helpers';
+import { useSharedMapContext } from '@/context/mapContext';
 
 const ANIMATE_DELTA = 0.0075;
 const INITIAL_DELTA = 0.01;
@@ -43,6 +44,8 @@ export default function HomeMap() {
 
     const bottomSheetRef = useRef<BottomSheet>(null);
 
+    const { fetchMapPubs, previouslyFetched } = useSharedMapContext();
+
     useEffect(() => {
         (async () => {
             const { status } =
@@ -50,6 +53,7 @@ export default function HomeMap() {
 
             if (status !== 'granted') {
                 // TODO: Error.
+                console.error('NO PERMISSION');
                 return;
             }
 
@@ -118,15 +122,13 @@ export default function HomeMap() {
 
     // When region changes, get any new pubs that are within this new region.
     useEffect(() => {
-        dispatch(
-            fetchMapPubs({
-                minLat: region.latitude - region.latitudeDelta,
-                minLong: region.longitude - region.longitudeDelta,
-                maxLat: region.latitude + region.latitudeDelta,
-                maxLong: region.longitude + region.longitudeDelta,
-            }),
-        );
-    }, [region, dispatch]);
+        fetchMapPubs({
+            minLat: region.latitude - region.latitudeDelta,
+            minLong: region.longitude - region.longitudeDelta,
+            maxLat: region.latitude + region.latitudeDelta,
+            maxLong: region.longitude + region.longitudeDelta,
+        });
+    }, [region, fetchMapPubs]);
 
     return (
         <>
