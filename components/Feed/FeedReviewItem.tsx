@@ -128,7 +128,13 @@ export default function FeedReviewItem({ user, review }: FeedReviewItemProps) {
                 navigation.navigate('PubView', { pubId: review.pub.id })
             }>
             <>
-                <Pressable style={styles.avatarPressable}>
+                <Pressable
+                    style={styles.avatarPressable}
+                    onPress={() =>
+                        navigation.navigate('Profile', {
+                            userId: user.id,
+                        })
+                    }>
                     <UserAvatar size={24} photo={user.profile_photo} />
                 </Pressable>
 

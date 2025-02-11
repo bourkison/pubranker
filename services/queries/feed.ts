@@ -14,7 +14,7 @@ export type FeedType = {
             created_by: string;
         }[];
     };
-    review_likes: {
+    review_like: {
         id: number;
         review: {
             id: number;
@@ -38,6 +38,14 @@ export type FeedType = {
             id: number;
             name: string;
             primary_photo: string;
+        };
+    } | null;
+    follow: {
+        id: number;
+        user: {
+            id: string;
+            username: string;
+            profile_photo: string;
         };
     } | null;
 };
@@ -65,7 +73,7 @@ review:reviews(
         primary_photo
     )
 ),
-review_likes(
+review_like:review_likes(
     id,
     review:reviews(
         id,
@@ -79,6 +87,14 @@ review_likes(
             name,
             primary_photo
         )
+    )
+),
+follow:follows(
+    id,
+    user:users_public!follows_user_id_fkey(
+        id,
+        username,
+        profile_photo
     )
 )
 ` as const;

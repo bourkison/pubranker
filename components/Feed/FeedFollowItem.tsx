@@ -3,50 +3,46 @@ import React from 'react';
 import {
     View,
     Text,
-    StyleSheet,
-    Pressable,
     TouchableHighlight,
+    Pressable,
+    StyleSheet,
 } from 'react-native';
-import UserAvatar from '../User/UserAvatar';
+import UserAvatar from '@/components/User/UserAvatar';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 
-type FeedReviewLikeItemProps = {
+type FeedFollowItemProps = {
     user: FeedType['user'];
-    reviewLike: NonNullable<FeedType['review_like']>;
+    follow: NonNullable<FeedType['follow']>;
 };
 
-export default function FeedReviewLikeItem({
-    user,
-    reviewLike,
-}: FeedReviewLikeItemProps) {
+export default function FeedFollowItem({ follow, user }: FeedFollowItemProps) {
     const navigation =
         useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
 
     return (
         <TouchableHighlight
-            underlayColor="#E5E7EB"
             style={styles.container}
+            underlayColor="#E5E7EB"
             onPress={() =>
-                navigation.navigate('ViewReview', {
-                    reviewId: reviewLike.review.id,
-                })
+                navigation.navigate('Profile', { userId: follow.user.id })
             }>
             <>
-                <Pressable style={styles.avatarPressable}>
+                <Pressable
+                    style={styles.avatarPressable}
+                    onPress={() =>
+                        navigation.navigate('Profile', { userId: user.id })
+                    }>
                     <UserAvatar size={24} photo={user.profile_photo} />
                 </Pressable>
+
                 <View style={styles.textContentContainer}>
                     <Text style={styles.text}>
                         <Text style={styles.boldText}>{user.username}</Text>{' '}
-                        liked{' '}
+                        followed{' '}
                         <Text style={styles.boldText}>
-                            {reviewLike.review.user.username}
-                        </Text>
-                        's review of{' '}
-                        <Text style={styles.boldText}>
-                            {reviewLike.review.pub.name}
+                            {follow.user.username}
                         </Text>
                     </Text>
                 </View>
