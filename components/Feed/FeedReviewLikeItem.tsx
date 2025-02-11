@@ -1,6 +1,12 @@
 import { FeedType } from '@/services/queries/feed';
 import React from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import {
+    View,
+    Text,
+    StyleSheet,
+    Pressable,
+    TouchableHighlight,
+} from 'react-native';
 import UserAvatar from '../User/UserAvatar';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -19,29 +25,33 @@ export default function FeedReviewLikeItem({
         useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
 
     return (
-        <Pressable
+        <TouchableHighlight
+            underlayColor="#E5E7EB"
             style={styles.container}
             onPress={() =>
                 navigation.navigate('ViewReview', {
                     reviewId: reviewLike.review.id,
                 })
             }>
-            <Pressable style={styles.avatarPressable}>
-                <UserAvatar size={24} photo={user.profile_photo} />
-            </Pressable>
-            <View style={styles.textContentContainer}>
-                <Text style={styles.text}>
-                    <Text style={styles.boldText}>{user.username}</Text> liked{' '}
-                    <Text style={styles.boldText}>
-                        {reviewLike.review.user.username}
+            <>
+                <Pressable style={styles.avatarPressable}>
+                    <UserAvatar size={24} photo={user.profile_photo} />
+                </Pressable>
+                <View style={styles.textContentContainer}>
+                    <Text style={styles.text}>
+                        <Text style={styles.boldText}>{user.username}</Text>{' '}
+                        liked{' '}
+                        <Text style={styles.boldText}>
+                            {reviewLike.review.user.username}
+                        </Text>
+                        's review of{' '}
+                        <Text style={styles.boldText}>
+                            {reviewLike.review.pub.name}
+                        </Text>
                     </Text>
-                    's review of{' '}
-                    <Text style={styles.boldText}>
-                        {reviewLike.review.pub.name}
-                    </Text>
-                </Text>
-            </View>
-        </Pressable>
+                </View>
+            </>
+        </TouchableHighlight>
     );
 }
 
@@ -51,7 +61,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'flex-start',
         alignItems: 'center',
-        marginHorizontal: 20,
+        paddingHorizontal: 20,
         paddingVertical: 15,
         borderBottomWidth: 1,
         borderColor: '#E5E7EB',
@@ -70,10 +80,5 @@ const styles = StyleSheet.create({
     },
     boldText: {
         fontWeight: '500',
-    },
-    inlinePressable: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
     },
 });

@@ -294,7 +294,7 @@ export default function ViewReview({
                                             />
 
                                             <Text style={styles.usernameText}>
-                                                {review.user.name}
+                                                {review.user.username}
                                             </Text>
                                         </Pressable>
 

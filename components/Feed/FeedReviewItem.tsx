@@ -1,6 +1,13 @@
 import { FeedType } from '@/services/queries/feed';
 import React, { useMemo, useState } from 'react';
-import { View, Text, Pressable, StyleSheet, Image } from 'react-native';
+import {
+    View,
+    Text,
+    Pressable,
+    StyleSheet,
+    Image,
+    TouchableHighlight,
+} from 'react-native';
 import UserAvatar from '../User/UserAvatar';
 import RatingsStarViewer from '../Ratings/RatingsStarsViewer';
 import { supabase } from '@/services/supabase';
@@ -45,73 +52,110 @@ export default function FeedReviewItem({ user, review }: FeedReviewItemProps) {
 
     if (review.content) {
         return (
-            <Pressable
+            <TouchableHighlight
+                underlayColor="#E5E7EB"
                 style={styles.container}
                 onPress={() =>
                     navigation.navigate('ViewReview', { reviewId: review.id })
                 }>
-                <Pressable
-                    style={styles.topContainer}
-                    onPress={() =>
-                        navigation.navigate('Profile', { userId: user.id })
-                    }>
-                    <View style={styles.avatarContainer}>
-                        <UserAvatar size={24} photo={user.profile_photo} />
-                    </View>
+                <>
+                    <Pressable
+                        style={styles.topContainer}
+                        onPress={() =>
+                            navigation.navigate('Profile', { userId: user.id })
+                        }>
+                        <View style={styles.avatarContainer}>
+                            <UserAvatar size={24} photo={user.profile_photo} />
+                        </View>
 
-                    <View>
-                        <Text style={styles.feedText}>
-                            <Text style={styles.boldText}>{user.username}</Text>{' '}
-                            reviewed
-                        </Text>
-                    </View>
-                </Pressable>
+                        <View>
+                            <Text style={styles.feedText}>
+                                <Text style={styles.boldText}>
+                                    {user.username}
+                                </Text>{' '}
+                                reviewed
+                            </Text>
+                        </View>
+                    </Pressable>
 
-                <View style={styles.contentContainer}>
-                    <Text style={styles.pubName}>{review.pub.name}</Text>
-                    <View style={styles.starsContainer}>
-                        <RatingsStarViewer
-                            size={16}
-                            amount={review.rating}
-                            padding={0}
-                        />
-                    </View>
-
-                    <View
-                        style={styles.reviewContainer}
-                        onLayout={({
-                            nativeEvent: {
-                                layout: { width },
-                            },
-                        }) => setElementWidth(width)}>
-                        <View style={styles.imageContainer}>
-                            <Image
-                                source={image ? { uri: image } : NO_IMAGE}
-                                style={[
-                                    styles.image,
-                                    { width: imageWidth, height: imageHeight },
-                                ]}
+                    <View style={styles.contentContainer}>
+                        <Text style={styles.pubName}>{review.pub.name}</Text>
+                        <View style={styles.starsContainer}>
+                            <RatingsStarViewer
+                                size={16}
+                                amount={review.rating}
+                                padding={0}
                             />
                         </View>
 
-                        <View style={styles.reviewContentContainer}>
-                            <Text style={styles.contentText}>
-                                {review.content}
-                            </Text>
+                        <View
+                            style={styles.reviewContainer}
+                            onLayout={({
+                                nativeEvent: {
+                                    layout: { width },
+                                },
+                            }) => setElementWidth(width)}>
+                            <View style={styles.imageContainer}>
+                                <Image
+                                    source={image ? { uri: image } : NO_IMAGE}
+                                    style={[
+                                        styles.image,
+                                        {
+                                            width: imageWidth,
+                                            height: imageHeight,
+                                        },
+                                    ]}
+                                />
+                            </View>
+
+                            <View style={styles.reviewContentContainer}>
+                                <Text style={styles.contentText}>
+                                    {review.content}
+                                </Text>
+                            </View>
                         </View>
                     </View>
-                </View>
-            </Pressable>
+                </>
+            </TouchableHighlight>
         );
     }
 
-    return <View />;
+    return (
+        <TouchableHighlight
+            underlayColor="#E5E7EB"
+            style={styles.noContentContainer}
+            onPress={() =>
+                navigation.navigate('PubView', { pubId: review.pub.id })
+            }>
+            <>
+                <Pressable style={styles.avatarPressable}>
+                    <UserAvatar size={24} photo={user.profile_photo} />
+                </Pressable>
+
+                <View style={styles.textContentContainer}>
+                    <Text style={styles.text}>
+                        <Text style={styles.boldText}>{user.username}</Text>{' '}
+                        rated{' '}
+                        <Text style={styles.boldText}>{review.pub.name}</Text>{' '}
+                    </Text>
+                    <View style={styles.noContentStarsContainer}>
+                        <RatingsStarViewer
+                            amount={review.rating}
+                            size={12}
+                            padding={0}
+                            color="rgba(0, 0, 0, 0.7)"
+                        />
+                    </View>
+                </View>
+            </>
+        </TouchableHighlight>
+    );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        marginHorizontal: 20,
+        paddingHorizontal: 20,
         paddingVertical: 15,
         borderBottomWidth: 1,
         borderColor: '#E5E7EB',
@@ -155,5 +199,31 @@ const styles = StyleSheet.create({
     },
     contentText: {
         fontSize: 12,
+    },
+    avatarPressable: {
+        flexDirection: 'row',
+        marginRight: 10,
+    },
+    textContentContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        flex: 1,
+    },
+    text: {
+        fontSize: 12,
+    },
+    noContentContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingVertical: 15,
+        borderBottomWidth: 1,
+        borderColor: '#E5E7EB',
+    },
+    noContentStarsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });

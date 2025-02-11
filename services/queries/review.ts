@@ -2,13 +2,18 @@ import { supabase } from '@/services/supabase';
 import { Tables } from '@/types/schema';
 
 export type ListReviewType = Tables<'reviews'> & {
-    user: { name: string; profile_photo: string | null };
+    user: {
+        id: string;
+        name: string;
+        username: string;
+        profile_photo: string | null;
+    };
     liked: { count: number }[];
     like_amount: { count: number }[];
 };
 
 export const reviewListQueryString = `*,
-user:users_public(name, profile_photo),
+user:users_public(id, name, username, profile_photo),
 liked:review_likes(count),
 like_amount:review_likes(count)` as const;
 
@@ -18,7 +23,12 @@ export const reviewListQuery = () =>
 // --------------------
 
 export type ReviewType = Tables<'reviews'> & {
-    user: { id: string; name: string; profile_photo: string | null };
+    user: {
+        id: string;
+        name: string;
+        username: string;
+        profile_photo: string | null;
+    };
     liked: { count: number }[];
     like_amount: { count: number }[];
     pub: {
@@ -35,7 +45,7 @@ export type ReviewType = Tables<'reviews'> & {
 };
 
 export const reviewQueryString = `*,
-user:users_public(id, name, profile_photo),
+user:users_public(id, name, username, profile_photo),
 liked:review_likes(count),
 like_amount:review_likes(count),
 pub:pubs(id, name, address, primary_photo),
