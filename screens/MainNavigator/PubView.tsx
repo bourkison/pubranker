@@ -52,6 +52,8 @@ import RatingsSummary from '@/components/Ratings/RatingsSummary';
 import RateButtonModal from '@/components/Pubs/PubView/RateButtonModal/RateButtonModal';
 import { useSharedCollectionContext } from '@/context/collectionContext';
 import { FetchPubType, pubQuery } from '@/services/queries/pub';
+import * as Location from 'expo-location';
+import { distance, point } from '@turf/turf';
 
 // TODO: Rather than all this shit with animations
 // Could this not just be one flat list, with the image being outside of the component and absolutely position
@@ -68,6 +70,7 @@ export default function PubView({
 
     const [isLoading, setIsLoading] = useState(false);
     const [pub, setPub] = useState<FetchPubType>();
+    const [distMeters, setDistMeters] = useState(0);
     const [saved, setSaved] = useState(false);
 
     const { width, height } = useWindowDimensions();
@@ -100,11 +103,23 @@ export default function PubView({
             }
 
             setIsLoading(false);
-            // @ts-ignore
-            setPub(data);
 
             // @ts-ignore
-            setSaved(data.saved[0].count > 0);
+            const p: FetchPubType = data as FetchPubType;
+
+            setPub(p);
+            setSaved(p.saved[0].count > 0);
+
+            // Next get the distance
+            const l = await Location.getCurrentPositionAsync();
+
+            setDistMeters(
+                distance(
+                    point([l.coords.longitude, l.coords.latitude]),
+                    point(p.location.coordinates),
+                    { units: 'meters' },
+                ),
+            );
         };
 
         fetchPub();
@@ -469,8 +484,9 @@ export default function PubView({
                                                         style={
                                                             styles.distanceText
                                                         }>
-                                                        {/* TODO: Fix to calculate distance: */}
-                                                        {distanceString(0)}
+                                                        {distanceString(
+                                                            distMeters,
+                                                        )}
                                                     </Text>
                                                 </View>
                                             </View>
@@ -505,7 +521,7 @@ export default function PubView({
                                 rContentContainerStyle,
                             ]}>
                             <View>
-                                <PubTopBar pub={pub} />
+                                <PubTopBar pub={pub} distMeters={distMeters} />
                             </View>
                             <View>
                                 <PubDescription pub={pub} />

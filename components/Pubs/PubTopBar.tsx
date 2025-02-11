@@ -9,9 +9,10 @@ import { FetchPubType } from '@/services/queries/pub';
 
 type TopBarPubProps = {
     pub: FetchPubType;
+    distMeters: number;
 };
 
-export default function PubTopBar({ pub }: TopBarPubProps) {
+export default function PubTopBar({ pub, distMeters }: TopBarPubProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [nextOpenCloseTime, setNextOpenCloseTime] = useState('');
 
@@ -91,8 +92,7 @@ export default function PubTopBar({ pub }: TopBarPubProps) {
                     <FontAwesome name="map-marker" size={18} />
                     <Text style={styles.directionsText}>Directions</Text>
                     <Text style={styles.distanceText}>
-                        {/* TODO: Fix distance: */}
-                        {distanceString(0)}
+                        {distanceString(distMeters)}
                     </Text>
                 </View>
             </TouchableOpacity>

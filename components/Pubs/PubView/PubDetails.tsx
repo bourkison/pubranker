@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import * as Linking from 'expo-linking';
 import * as Location from 'expo-location';
-import { parseOpeningHours } from '@/services';
 import HoursCollapsible from '@/components/Utility/HoursCollapsible';
 import url from 'url';
 import { showLocation } from 'react-native-map-link';
@@ -13,8 +12,6 @@ type PubDetailsProps = {
 };
 
 export default function PubDetails({ pub }: PubDetailsProps) {
-    const openingHours = parseOpeningHours(pub.opening_hours);
-
     const pubLocation = pub.location;
     const [userLocation, setUserLocation] = useState<
         Location.LocationObject | undefined
@@ -39,7 +36,7 @@ export default function PubDetails({ pub }: PubDetailsProps) {
     return (
         <View style={styles.container}>
             <View style={styles.sectionContainer}>
-                <HoursCollapsible openingHours={openingHours} />
+                <HoursCollapsible openingHours={pub.opening_hours} />
             </View>
 
             <View style={styles.sectionContainer}>

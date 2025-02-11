@@ -27,7 +27,6 @@ export default function Feed() {
                 return;
             }
 
-            console.log('data', JSON.stringify(data));
             // @ts-ignore
             setFeed(data);
         })();

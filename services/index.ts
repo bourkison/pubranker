@@ -27,60 +27,6 @@ export const convertPointStringToObject = (
     };
 };
 
-export const parseOpeningHours = (openingHours: any): OpeningHoursType[] => {
-    let oh: OpeningHoursType[];
-
-    if (typeof openingHours === 'object') {
-        oh = openingHours;
-    } else if (typeof openingHours === 'string') {
-        oh = JSON.parse(openingHours);
-    } else {
-        throw new Error('Unrecognised type');
-    }
-
-    let response: OpeningHoursType[] = [];
-
-    for (let i = 0; i < oh.length; i++) {
-        const openingHour = oh[i];
-
-        if (
-            openingHour.close_day === undefined ||
-            openingHour.close_day === null
-        ) {
-            console.warn('No close day at index', i, oh[i]);
-            continue;
-        }
-
-        if (
-            openingHour.open_day === undefined ||
-            openingHour.open_day === null
-        ) {
-            console.warn('No open day at index', i, oh[i]);
-            continue;
-        }
-
-        if (
-            openingHour.close_hour === undefined ||
-            openingHour.close_hour === null
-        ) {
-            console.warn('No close hour at index', i, oh[i]);
-            continue;
-        }
-
-        if (
-            openingHour.open_hour === undefined ||
-            openingHour.open_hour === null
-        ) {
-            console.warn('No open hour at index', i, oh[i]);
-            continue;
-        }
-
-        response.push(openingHour);
-    }
-
-    return response;
-};
-
 export const dayString = (input: number): string => {
     switch (input) {
         case 0:
