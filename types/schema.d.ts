@@ -65,20 +65,6 @@ export type Database = {
             foreignKeyName: "beer_pub_relationships_pub_id_fkey"
             columns: ["pub_id"]
             isOneToOne: false
-            referencedRelation: "formatted_pubs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "beer_pub_relationships_pub_id_fkey"
-            columns: ["pub_id"]
-            isOneToOne: false
-            referencedRelation: "location_pubs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "beer_pub_relationships_pub_id_fkey"
-            columns: ["pub_id"]
-            isOneToOne: false
             referencedRelation: "pubs"
             referencedColumns: ["id"]
           },
@@ -211,20 +197,6 @@ export type Database = {
             columns: ["collection_id"]
             isOneToOne: false
             referencedRelation: "collections"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "collection_items_pub_id_fkey"
-            columns: ["pub_id"]
-            isOneToOne: false
-            referencedRelation: "formatted_pubs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "collection_items_pub_id_fkey"
-            columns: ["pub_id"]
-            isOneToOne: false
-            referencedRelation: "location_pubs"
             referencedColumns: ["id"]
           },
           {
@@ -382,20 +354,6 @@ export type Database = {
             foreignKeyName: "favourites_pub_id_fkey"
             columns: ["pub_id"]
             isOneToOne: false
-            referencedRelation: "formatted_pubs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "favourites_pub_id_fkey"
-            columns: ["pub_id"]
-            isOneToOne: false
-            referencedRelation: "location_pubs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "favourites_pub_id_fkey"
-            columns: ["pub_id"]
-            isOneToOne: false
             referencedRelation: "pubs"
             referencedColumns: ["id"]
           },
@@ -536,20 +494,6 @@ export type Database = {
             foreignKeyName: "opening_hours_pub_id_fkey"
             columns: ["pub_id"]
             isOneToOne: false
-            referencedRelation: "formatted_pubs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "opening_hours_pub_id_fkey"
-            columns: ["pub_id"]
-            isOneToOne: false
-            referencedRelation: "location_pubs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "opening_hours_pub_id_fkey"
-            columns: ["pub_id"]
-            isOneToOne: false
             referencedRelation: "pubs"
             referencedColumns: ["id"]
           },
@@ -581,20 +525,6 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "pub_photos_pub_id_fkey"
-            columns: ["pub_id"]
-            isOneToOne: false
-            referencedRelation: "formatted_pubs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "pub_photos_pub_id_fkey"
-            columns: ["pub_id"]
-            isOneToOne: false
-            referencedRelation: "location_pubs"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "pub_photos_pub_id_fkey"
             columns: ["pub_id"]
@@ -768,20 +698,6 @@ export type Database = {
             foreignKeyName: "reviews_pub_id_fkey"
             columns: ["pub_id"]
             isOneToOne: false
-            referencedRelation: "formatted_pubs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reviews_pub_id_fkey"
-            columns: ["pub_id"]
-            isOneToOne: false
-            referencedRelation: "location_pubs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reviews_pub_id_fkey"
-            columns: ["pub_id"]
-            isOneToOne: false
             referencedRelation: "pubs"
             referencedColumns: ["id"]
           },
@@ -814,20 +730,6 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "saves_pub_id_fkey"
-            columns: ["pub_id"]
-            isOneToOne: false
-            referencedRelation: "formatted_pubs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "saves_pub_id_fkey"
-            columns: ["pub_id"]
-            isOneToOne: false
-            referencedRelation: "location_pubs"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "saves_pub_id_fkey"
             columns: ["pub_id"]
@@ -869,141 +771,7 @@ export type Database = {
       }
     }
     Views: {
-      formatted_pubs: {
-        Row: {
-          address: string | null
-          beer_garden: boolean | null
-          dart_board: boolean | null
-          description: string | null
-          dog_friendly: boolean | null
-          foosball_table: boolean | null
-          free_wifi: boolean | null
-          google_id: string | null
-          id: number | null
-          kid_friendly: boolean | null
-          live_sport: boolean | null
-          location: string | null
-          name: string | null
-          negative_review_beer_amount: number | null
-          negative_review_food_amount: number | null
-          negative_review_location_amount: number | null
-          negative_review_music_amount: number | null
-          negative_review_service_amount: number | null
-          negative_review_vibe_amount: number | null
-          num_reviews: number | null
-          opening_hours: Json | null
-          phone_number: string | null
-          photos: string[] | null
-          pool_table: boolean | null
-          rating: number | null
-          reservable: boolean | null
-          review_beer_amount: number | null
-          review_eights: number | null
-          review_fives: number | null
-          review_food_amount: number | null
-          review_fours: number | null
-          review_location_amount: number | null
-          review_music_amount: number | null
-          review_nines: number | null
-          review_ones: number | null
-          review_service_amount: number | null
-          review_sevens: number | null
-          review_sixes: number | null
-          review_tens: number | null
-          review_threes: number | null
-          review_twos: number | null
-          review_vibe_amount: number | null
-          rooftop: boolean | null
-          saved: boolean | null
-          website: string | null
-          wheelchair_accessible: boolean | null
-        }
-        Relationships: []
-      }
-      location_pubs: {
-        Row: {
-          address: string | null
-          beer_garden: boolean | null
-          brewery: boolean | null
-          created_at: string | null
-          dart_board: boolean | null
-          description: string | null
-          dog_friendly: boolean | null
-          foosball_table: boolean | null
-          free_wifi: boolean | null
-          geoj_location: string | null
-          google_id: string | null
-          hidden: boolean | null
-          id: number | null
-          kid_friendly: boolean | null
-          live_sport: boolean | null
-          location: unknown | null
-          name: string | null
-          phone_number: string | null
-          pool_table: boolean | null
-          primary_photo: string | null
-          reservable: boolean | null
-          rooftop: boolean | null
-          updated_at: string | null
-          website: string | null
-          wheelchair_accessible: boolean | null
-        }
-        Insert: {
-          address?: string | null
-          beer_garden?: boolean | null
-          brewery?: boolean | null
-          created_at?: string | null
-          dart_board?: boolean | null
-          description?: string | null
-          dog_friendly?: boolean | null
-          foosball_table?: boolean | null
-          free_wifi?: boolean | null
-          geoj_location?: never
-          google_id?: string | null
-          hidden?: boolean | null
-          id?: number | null
-          kid_friendly?: boolean | null
-          live_sport?: boolean | null
-          location?: unknown | null
-          name?: string | null
-          phone_number?: string | null
-          pool_table?: boolean | null
-          primary_photo?: string | null
-          reservable?: boolean | null
-          rooftop?: boolean | null
-          updated_at?: string | null
-          website?: string | null
-          wheelchair_accessible?: boolean | null
-        }
-        Update: {
-          address?: string | null
-          beer_garden?: boolean | null
-          brewery?: boolean | null
-          created_at?: string | null
-          dart_board?: boolean | null
-          description?: string | null
-          dog_friendly?: boolean | null
-          foosball_table?: boolean | null
-          free_wifi?: boolean | null
-          geoj_location?: never
-          google_id?: string | null
-          hidden?: boolean | null
-          id?: number | null
-          kid_friendly?: boolean | null
-          live_sport?: boolean | null
-          location?: unknown | null
-          name?: string | null
-          phone_number?: string | null
-          pool_table?: boolean | null
-          primary_photo?: string | null
-          reservable?: boolean | null
-          rooftop?: boolean | null
-          updated_at?: string | null
-          website?: string | null
-          wheelchair_accessible?: boolean | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       create_user: {
