@@ -162,7 +162,10 @@ export default function ProfileView({
                 <ProfileFavourites favourites={user.favourites} />
             )}
 
-            <ProfileRecentRatings recentRatings={user.recent_ratings} />
+            <ProfileRecentRatings
+                recentRatings={user.recent_ratings}
+                userId={user.id}
+            />
 
             <View style={styles.ratingsContainer}>
                 <RatingsSummary

@@ -42,6 +42,7 @@ export default function Feed() {
             </View>
             <FlatList
                 data={feed}
+                keyExtractor={item => item.id.toString()}
                 renderItem={({ item }) => <FeedListItem feedItem={item} />}
             />
         </SafeAreaView>

@@ -17,6 +17,7 @@ import { Feather } from '@expo/vector-icons';
 
 type ProfileRecentRatingsProps = {
     recentRatings: UserType['recent_ratings'];
+    userId: string;
 };
 
 const NO_IMAGE = require('@/assets/noimage.png');
@@ -25,6 +26,7 @@ const IMAGE_PADDING = 2;
 
 export default function ProfileRecentRatings({
     recentRatings,
+    userId,
 }: ProfileRecentRatingsProps) {
     const navigation =
         useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
@@ -117,7 +119,11 @@ export default function ProfileRecentRatings({
                 ))}
             </View>
 
-            <TouchableOpacity style={styles.viewAllContainer}>
+            <TouchableOpacity
+                style={styles.viewAllContainer}
+                onPress={() =>
+                    navigation.navigate('UserActivity', { userId: userId })
+                }>
                 <Text style={styles.viewAllText}>View all activity</Text>
 
                 <Feather

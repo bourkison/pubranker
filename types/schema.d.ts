@@ -411,6 +411,7 @@ export type Database = {
       feed: {
         Row: {
           created_at: string
+          follow_id: number | null
           id: number
           review_id: number | null
           review_like_id: number | null
@@ -420,6 +421,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          follow_id?: number | null
           id?: number
           review_id?: number | null
           review_like_id?: number | null
@@ -429,6 +431,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          follow_id?: number | null
           id?: number
           review_id?: number | null
           review_like_id?: number | null
@@ -437,6 +440,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "feed_follow_id_fkey"
+            columns: ["follow_id"]
+            isOneToOne: false
+            referencedRelation: "follows"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "feed_review_id_fkey"
             columns: ["review_id"]
@@ -1348,7 +1358,7 @@ export type Database = {
     }
     Enums: {
       collection_privacy_type: "PUBLIC" | "FRIENDS_ONLY" | "PRIVATE"
-      feed_type: "REVIEW" | "REVIEW_LIKE"
+      feed_type: "REVIEW" | "REVIEW_LIKE" | "FOLLOW"
     }
     CompositeTypes: {
       [_ in never]: never
