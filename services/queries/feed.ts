@@ -5,14 +5,31 @@ export type FeedType = {
     id: number;
     created_at: string;
     type: Tables<'feed'>['type'];
-    users: {
+    user: {
         id: string;
+        username: string;
+        profile_photo: string;
         followers: {
             id: number;
             created_by: string;
         }[];
     };
-    review_likes: Tables<'review_likes'> | null;
+    review_likes: {
+        id: number;
+        review: {
+            id: number;
+            user: {
+                id: string;
+                username: string;
+                profile_photo: string;
+            };
+            pub: {
+                id: number;
+                name: string;
+                primary_photo: string;
+            };
+        };
+    } | null;
     reviews: Tables<'reviews'> | null;
 };
 
@@ -20,19 +37,36 @@ const getFeedQueryString = `
 id,
 created_at,
 type,
-users:users_public!inner(
+user:users_public!inner(
     id,
+    username,
+    profile_photo,
     followers:follows!follows_user_id_fkey!inner(
         id,
         created_by
     )
 ),
 reviews(*),
-review_likes(*)
+review_likes(
+    id,
+    review:reviews(
+        id,
+        user:users_public(
+            id,
+            username,
+            profile_photo
+        ),
+        pub:pubs(
+            id,
+            name,
+            primary_photo
+        )
+    )
+)
 ` as const;
 
 export const getFeedQuery = (userId: string) =>
     supabase
         .from('feed')
         .select(getFeedQueryString)
-        .eq('users.followers.created_by', userId);
+        .eq('user.followers.created_by', userId);
