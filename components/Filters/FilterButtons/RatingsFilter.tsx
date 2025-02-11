@@ -10,7 +10,7 @@ import {
 } from '@/store/slices/explore';
 import { Ionicons } from '@expo/vector-icons';
 import { INITIAL_SEARCH_AMOUNT, PRIMARY_COLOR } from '@/constants';
-import { resetMapPubs } from '@/store/slices/map';
+import { useSharedMapContext } from '@/context/mapContext';
 
 export default function RangeFilter() {
     const storeOverallRating = useAppSelector(
@@ -20,13 +20,15 @@ export default function RangeFilter() {
 
     const dispatch = useAppDispatch();
 
+    const { resetMapPubs } = useSharedMapContext();
+
     // Keep local in sync with store.
     useEffect(() => {
         setOverallRating(storeOverallRating);
     }, [storeOverallRating]);
 
     const onSearch = () => {
-        dispatch(resetMapPubs());
+        resetMapPubs();
         dispatch(setStoreOverallRating(overallRating));
         dispatch(fetchExplorePubs({ amount: INITIAL_SEARCH_AMOUNT }));
         dispatch(setState('map'));

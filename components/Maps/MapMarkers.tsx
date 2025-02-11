@@ -18,8 +18,8 @@ import { convertBoxToCoordinates } from '@/services/geo';
 import { useWindowDimensions } from 'react-native';
 import PubMapMarker from './PubMapMarker';
 import { SECONDARY_COLOR } from '@/constants';
-import { useAppSelector } from '@/store/hooks';
 import GroupMapMarker from './GroupMapMarker';
+import { useSharedMapContext } from '@/context/mapContext';
 
 const markerAspectRatio = 207 / 263;
 
@@ -51,7 +51,7 @@ export default function MapMarkers({
         Array<MapPubType | { pubId: number; location: Point }[]>
     >([]);
 
-    const selectedPub = useAppSelector(state => state.map.selected);
+    const { selectedMapPub: selectedPub } = useSharedMapContext();
 
     useEffect(() => {
         // First let's ensure these pubs are within bounds.

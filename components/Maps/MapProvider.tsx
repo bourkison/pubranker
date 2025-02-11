@@ -18,13 +18,13 @@ type MapProviderProps = {
 };
 
 export default function MapProvider({ children }: MapProviderProps) {
-    const [pubs, setPubs] = useState<MapPubs[]>([]);
-    const [selected, setSelected] = useState<MapPubs | undefined>();
-    const [isLoadingSelected, setIsLoadingSelected] = useState(false);
-    const [previouslyFetched, setPreviouslyFetched] = useState<Feature<
-        MultiPolygon | Polygon
-    > | null>(null);
-    const [currentlySelected, setCurrentlySelected] =
+    const [fetchIncrementor, setFetchIncrementor] = useState(0); // Debugger to see how often we fetch.
+
+    const [mapPubs, setMapPubs] = useState<MapPubs[]>([]);
+    const [selectedMapPub, setSelectedMapPub] = useState<MapPubs | undefined>();
+    const [previouslyFetchedPolygon, setPreviouslyFetchedPolygon] =
+        useState<Feature<MultiPolygon | Polygon> | null>(null);
+    const [currentlySelectedPolygon, setCurrentlySelectedPolygon] =
         useState<Feature<Polygon> | null>(null);
 
     const filters = useAppSelector(state => state.explore.filters);
@@ -41,23 +41,29 @@ export default function MapProvider({ children }: MapProviderProps) {
             // (hence there's no need to fetch)
             const geojson = hasFetchedPreviously(
                 currentPolygon,
-                previouslyFetched,
+                previouslyFetchedPolygon,
             );
 
             if (!geojson) {
                 return;
             }
 
+            console.log('fetch count', fetchIncrementor);
+            setFetchIncrementor(fetchIncrementor + 1);
+
             // Haven't fetched previously, hence we can add what we previously
-            // Fetched (which is now currently in current), to our previouslyFetched polygon.
-            if (currentlySelected) {
-                setPreviouslyFetched(
-                    joinPolygons(currentlySelected, previouslyFetched),
+            // Fetched (which is now currently in current), to our previouslyFetchedPolygon polygon.
+            if (currentlySelectedPolygon) {
+                setPreviouslyFetchedPolygon(
+                    joinPolygons(
+                        currentlySelectedPolygon,
+                        previouslyFetchedPolygon,
+                    ),
                 );
             }
 
-            // Set currentlySelected for our next search.
-            setCurrentlySelected(currentPolygon);
+            // Set currentlySelectedPolygon for our next search.
+            setCurrentlySelectedPolygon(currentPolygon);
 
             const location = await Location.getCurrentPositionAsync();
 
@@ -81,7 +87,7 @@ export default function MapProvider({ children }: MapProviderProps) {
 
             // Fetch the pubs.
             const { data, error } = await query.select(
-                'id, name, location, address, primary_photo, dist_meters',
+                'id, name, location, address, primary_photo, dist_meters, rating, num_reviews',
             );
 
             if (error) {
@@ -106,13 +112,15 @@ export default function MapProvider({ children }: MapProviderProps) {
                     name: d.name,
                     address: d.address,
                     primary_photo: d.primary_photo,
+                    num_reviews: d.num_reviews,
+                    rating: d.rating,
                     dist_meters: d.dist_meters,
                     location: point(JSON.parse(d.location || '').coordinates)
                         .geometry,
                 }));
 
             // Only add new pubs.
-            let newPubs = pubs.slice();
+            let newPubs = mapPubs.slice();
 
             mappedData.forEach(d => {
                 if (newPubs.findIndex(p => p.id === d.id) === -1) {
@@ -120,28 +128,49 @@ export default function MapProvider({ children }: MapProviderProps) {
                 }
             });
 
-            setPubs(newPubs);
-            console.log('new pubs', newPubs);
+            setMapPubs(newPubs);
         },
         [
-            currentlySelected,
+            currentlySelectedPolygon,
             filters,
             overallRating,
-            pubs,
+            mapPubs,
             withinRange,
-            previouslyFetched,
+            previouslyFetchedPolygon,
+            fetchIncrementor,
         ],
     );
+
+    const selectMapPub = useCallback(
+        (id: number) => {
+            const p = mapPubs.find(pub => pub.id === id);
+
+            if (p) {
+                setSelectedMapPub(p);
+            }
+        },
+        [mapPubs],
+    );
+
+    const deselectMapPub = useCallback(() => {
+        setSelectedMapPub(undefined);
+    }, []);
+
+    const resetMapPubs = useCallback(() => {
+        setMapPubs([]);
+    }, []);
 
     return (
         <MapContext.Provider
             value={{
-                pubs,
-                selected,
-                isLoadingSelected,
-                previouslyFetched,
-                currentlySelected,
+                currentlySelectedPolygon,
+                previouslyFetchedPolygon,
+                mapPubs,
+                selectedMapPub,
+                selectMapPub,
                 fetchMapPubs,
+                deselectMapPub,
+                resetMapPubs,
             }}>
             {children}
         </MapContext.Provider>

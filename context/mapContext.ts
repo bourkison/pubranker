@@ -1,5 +1,4 @@
 import { BoundingBox } from '@/types';
-import { Tables } from '@/types/schema';
 import { Feature, MultiPolygon, Point, Polygon } from '@turf/helpers';
 import { createContext, useContext } from 'react';
 
@@ -10,15 +9,19 @@ export type MapPubs = {
     primary_photo: string;
     dist_meters: number;
     location: Point;
+    num_reviews: number;
+    rating: number;
 };
 
 type MapContextType = {
-    pubs: MapPubs[];
-    selected: MapPubs | undefined;
-    isLoadingSelected: boolean;
-    previouslyFetched: Feature<MultiPolygon | Polygon> | null;
-    currentlySelected: Feature<Polygon> | null;
+    currentlySelectedPolygon: Feature<Polygon> | null;
+    previouslyFetchedPolygon: Feature<MultiPolygon | Polygon> | null;
+    mapPubs: MapPubs[];
+    selectedMapPub: MapPubs | undefined;
     fetchMapPubs: (boundingBox: BoundingBox) => Promise<void>;
+    selectMapPub: (id: number) => void;
+    deselectMapPub: () => void;
+    resetMapPubs: () => void;
 };
 
 export const MapContext = createContext<MapContextType | null>(null);

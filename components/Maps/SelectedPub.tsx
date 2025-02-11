@@ -1,11 +1,8 @@
 import { distanceString, roundToNearest } from '@/services';
 import { supabase } from '@/services/supabase';
-import { PubSchema } from '@/types';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { deselectPub } from '@/store/slices/map';
-import { useAppDispatch } from '@/store/hooks';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
@@ -26,20 +23,30 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { GOLD_RATINGS_COLOR } from '@/constants';
+import { MapPubs, useSharedMapContext } from '@/context/mapContext';
 
 type SelectedPubProps = {
-    pub: PubSchema;
+    pub: MapPubs;
 };
 
 const IMAGE_SIZE = 128;
 const BORDER_RADIUS = 5;
+const NO_IMAGE = require('@/assets/noimage.png');
 
 export default function SelectedPub({ pub }: SelectedPubProps) {
-    const [imageUrl, setImageUrl] = useState('');
+    const image = useMemo<string>(() => {
+        if (pub.primary_photo) {
+            return supabase.storage.from('pubs').getPublicUrl(pub.primary_photo)
+                .data.publicUrl;
+        }
 
-    const dispatch = useAppDispatch();
+        return '';
+    }, [pub]);
+
     const navigation =
         useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
+
+    const { deselectMapPub } = useSharedMapContext();
 
     const sTranslateY = useSharedValue(0);
     const sOpacity = useDerivedValue(() =>
@@ -60,8 +67,8 @@ export default function SelectedPub({ pub }: SelectedPubProps) {
     }));
 
     const deselect = useCallback(() => {
-        dispatch(deselectPub());
-    }, [dispatch]);
+        deselectMapPub();
+    }, [deselectMapPub]);
 
     const panGesture = Gesture.Pan()
         .onStart(() => {
@@ -90,18 +97,6 @@ export default function SelectedPub({ pub }: SelectedPubProps) {
                 easing: Easing.inOut(Easing.quad),
             });
         });
-
-    useEffect(() => {
-        if (pub.photos[0]) {
-            const url = supabase.storage
-                .from('pubs')
-                .getPublicUrl(pub.photos[0]);
-
-            setImageUrl(url.data.publicUrl);
-        } else {
-            setImageUrl('');
-        }
-    }, [pub]);
 
     const CustomExitingAnimation: EntryExitAnimationFunction = (
         values: ExitAnimationsValues,
@@ -136,9 +131,9 @@ export default function SelectedPub({ pub }: SelectedPubProps) {
                     onPress={() =>
                         navigation.navigate('PubView', { pubId: pub.id })
                     }>
-                    {imageUrl ? (
+                    {image ? (
                         <Image
-                            source={{ uri: imageUrl }}
+                            source={image ? { uri: image } : NO_IMAGE}
                             style={styles.image}
                         />
                     ) : undefined}

@@ -13,7 +13,7 @@ import {
     MAX_WITHIN_RANGE,
     MIN_WITHIN_RANGE,
 } from '@/constants';
-import { resetMapPubs } from '@/store/slices/map';
+import { useSharedMapContext } from '@/context/mapContext';
 
 export default function RangeFilter() {
     const withinRange = useAppSelector(state => state.explore.withinRange);
@@ -21,13 +21,15 @@ export default function RangeFilter() {
 
     const dispatch = useAppDispatch();
 
+    const { resetMapPubs } = useSharedMapContext();
+
     // Keep local in sync with store.
     useEffect(() => {
         setRange(withinRange);
     }, [withinRange]);
 
     const onSearch = () => {
-        dispatch(resetMapPubs());
+        resetMapPubs();
         dispatch(setWithinRange(range));
         dispatch(fetchExplorePubs({ amount: INITIAL_SEARCH_AMOUNT }));
         dispatch(setState('map'));

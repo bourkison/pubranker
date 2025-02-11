@@ -1,16 +1,14 @@
 import { WITH_POLYGONS } from '@/constants';
-import { useAppSelector } from '@/store/hooks';
 import { getType } from '@turf/turf';
 import * as turf from '@turf/turf';
 import React, { useMemo } from 'react';
 import { Geojson, Polygon } from 'react-native-maps';
 import { hasFetchedPreviously } from '@/services/geo';
+import { useSharedMapContext } from '@/context/mapContext';
 
 export default function DebugPolygons() {
-    const previouslyFetched = useAppSelector(
-        state => state.map.previouslyFetched,
-    );
-    const currentSelected = useAppSelector(state => state.map.currentSelected);
+    const { previouslyFetchedPolygon, currentlySelectedPolygon } =
+        useSharedMapContext();
 
     const previouslySelectedLatLngPolygon = useMemo(() => {
         if (!WITH_POLYGONS) {
@@ -18,10 +16,10 @@ export default function DebugPolygons() {
         }
 
         try {
-            if (previouslyFetched) {
-                if (getType(previouslyFetched) === 'MultiPolygon') {
+            if (previouslyFetchedPolygon) {
+                if (getType(previouslyFetchedPolygon) === 'MultiPolygon') {
                     const multi =
-                        previouslyFetched as turf.helpers.Feature<turf.helpers.MultiPolygon>;
+                        previouslyFetchedPolygon as turf.helpers.Feature<turf.helpers.MultiPolygon>;
 
                     const response = multi.geometry.coordinates.map(
                         firstLayer => {
@@ -37,9 +35,9 @@ export default function DebugPolygons() {
                     );
 
                     return response;
-                } else if (getType(previouslyFetched) === 'Polygon') {
+                } else if (getType(previouslyFetchedPolygon) === 'Polygon') {
                     const poly =
-                        previouslyFetched as turf.helpers.Feature<turf.helpers.Polygon>;
+                        previouslyFetchedPolygon as turf.helpers.Feature<turf.helpers.Polygon>;
 
                     const response = [
                         poly.geometry.coordinates.map(firstLayer => {
@@ -62,7 +60,7 @@ export default function DebugPolygons() {
         } catch (err) {
             return [];
         }
-    }, [previouslyFetched]);
+    }, [previouslyFetchedPolygon]);
 
     const currentSelectedLatLngPolygon = useMemo(() => {
         if (!WITH_POLYGONS) {
@@ -70,12 +68,12 @@ export default function DebugPolygons() {
         }
 
         try {
-            if (!currentSelected) {
+            if (!currentlySelectedPolygon) {
                 throw new Error('No current selecteds');
             }
 
             const poly =
-                currentSelected as turf.helpers.Feature<turf.helpers.Polygon>;
+                currentlySelectedPolygon as turf.helpers.Feature<turf.helpers.Polygon>;
 
             const response = [
                 poly.geometry.coordinates.map(firstLayer => {
@@ -93,21 +91,24 @@ export default function DebugPolygons() {
             // console.warn('selected:', err);
             return [];
         }
-    }, [currentSelected]);
+    }, [currentlySelectedPolygon]);
 
     const differenceGeoJson = useMemo(() => {
         if (!WITH_POLYGONS) {
             return null;
         }
 
-        const g = hasFetchedPreviously(currentSelected, previouslyFetched);
+        const g = hasFetchedPreviously(
+            currentlySelectedPolygon,
+            previouslyFetchedPolygon,
+        );
 
         if (!g) {
             return null;
         }
 
         return turf.featureCollection([g]);
-    }, [currentSelected, previouslyFetched]);
+    }, [currentlySelectedPolygon, previouslyFetchedPolygon]);
 
     return (
         <>

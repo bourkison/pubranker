@@ -15,8 +15,6 @@ import {
 import * as Location from 'expo-location';
 import { RootState } from '@/store';
 import { MAX_WITHIN_RANGE } from '@/constants';
-import { addPubsToMap } from './map';
-import { point } from '@turf/helpers';
 
 const discoverAdapter = createEntityAdapter();
 
@@ -101,7 +99,7 @@ export const fetchExplorePubs = createAsyncThunk<
     { rejectValue: RejectWithValueType }
 >(
     'explore/fetchExplorePubs',
-    async ({ amount }, { getState, dispatch, rejectWithValue }) => {
+    async ({ amount }, { getState, rejectWithValue }) => {
         const state = getState() as RootState;
 
         try {
@@ -111,17 +109,6 @@ export const fetchExplorePubs = createAsyncThunk<
                 state.explore.searchText,
                 state.explore.withinRange,
                 state.explore.overallRating,
-            );
-
-            dispatch(
-                addPubsToMap(
-                    pubs.map(pub => ({
-                        id: pub.id,
-                        location: point(
-                            JSON.parse(pub.location || '').coordinates,
-                        ).geometry,
-                    })),
-                ),
             );
 
             return { pubs, count };
@@ -151,17 +138,6 @@ export const fetchMoreExplorePubs = createAsyncThunk<
                 state.explore.withinRange,
                 state.explore.overallRating,
                 state.explore.pubs.map(pub => pub.id),
-            );
-
-            dispatch(
-                addPubsToMap(
-                    pubs.map(pub => ({
-                        ...pub,
-                        location: point(
-                            JSON.parse(pub.location || '').coordinates,
-                        ).geometry,
-                    })),
-                ),
             );
 
             return { pubs };

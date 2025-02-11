@@ -10,11 +10,10 @@ import MapView, { Region } from 'react-native-maps';
 import * as Location from 'expo-location';
 import MapStyle from '@/json/map_style.json';
 import { StyleSheet, View } from 'react-native';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { useAppSelector } from '@/store/hooks';
 import DebugPolygons from './DebugPolygons';
 import BottomSheet from '@gorhom/bottom-sheet';
 import BottomSheetPubList from '@/components/Pubs/PubList';
-import { deselectPub, selectPub } from '@/store/slices/map';
 import SelectedPub from './SelectedPub';
 import { useSharedExploreContext } from '@/context/exploreContext';
 import MapMarkers from './MapMarkers';
@@ -32,19 +31,20 @@ export default function HomeMap() {
     const MapRef = useRef<MapView>(null);
 
     const [bottomMapPadding, setBottomMapPadding] = useState(0);
-
-    const selectedPub = useAppSelector(state => state.map.selected);
-    const mapPubs = useAppSelector(state => state.map.pubs);
     const explorePubs = useAppSelector(state => state.explore.pubs);
-
-    const dispatch = useAppDispatch();
 
     const { filterBarHeight, mapBottomSheetAnimatedValue } =
         useSharedExploreContext();
 
     const bottomSheetRef = useRef<BottomSheet>(null);
 
-    const { fetchMapPubs, previouslyFetched } = useSharedMapContext();
+    const {
+        fetchMapPubs,
+        mapPubs,
+        selectMapPub,
+        deselectMapPub,
+        selectedMapPub,
+    } = useSharedMapContext();
 
     useEffect(() => {
         (async () => {
@@ -84,7 +84,7 @@ export default function HomeMap() {
 
     const throttledSetRegion = useMemo(
         () =>
-            _.throttle((r: Region) => setRegion(r), 500, {
+            _.throttle((r: Region) => setRegion(r), 1_000, {
                 leading: false,
                 trailing: true,
             }),
@@ -107,7 +107,7 @@ export default function HomeMap() {
             longitudeDelta: ANIMATE_DELTA,
         });
 
-        dispatch(selectPub(pub.id));
+        selectMapPub(pub.id);
         bottomSheetRef.current?.collapse();
     };
 
@@ -162,13 +162,13 @@ export default function HomeMap() {
                 />
                 <DebugPolygons />
             </MapView>
-            {selectedPub !== undefined ? (
+            {selectedMapPub !== undefined ? (
                 <View
                     style={[
                         styles.selectedPubContainer,
                         { marginBottom: bottomMapPadding },
                     ]}>
-                    <SelectedPub pub={selectedPub} />
+                    <SelectedPub pub={selectedMapPub} />
                 </View>
             ) : undefined}
             <BottomSheet
@@ -182,8 +182,8 @@ export default function HomeMap() {
                 topInset={filterBarHeight}
                 onChange={index => {
                     // Deselect pub if user expands bottom sheet
-                    if (selectedPub && index !== 0) {
-                        dispatch(deselectPub());
+                    if (selectedMapPub && index !== 0) {
+                        deselectMapPub();
                     }
                 }}>
                 <View style={styles.listContainer}>

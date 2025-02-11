@@ -1261,6 +1261,7 @@ export type Database = {
           rating: number
           location: string
           dist_meters: number
+          num_reviews: number
         }[]
       }
       validate_favourites_limit_three: {

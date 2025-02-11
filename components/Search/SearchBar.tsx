@@ -7,7 +7,6 @@ import {
     // resetPubs,
 } from '@/store/slices/explore';
 import { PRIMARY_COLOR } from '@/constants';
-import { deselectPub } from '@/store/slices/map';
 import Animated, {
     Easing,
     FadeInDown,
@@ -20,6 +19,7 @@ import Animated, {
     withTiming,
 } from 'react-native-reanimated';
 import { useSharedSearchContext } from '@/context/searchContext';
+import { useSharedMapContext } from '@/context/mapContext';
 
 const AnimatedIonicon = Animated.createAnimatedComponent(Ionicons);
 
@@ -29,6 +29,8 @@ export default function SearchBar() {
 
     const { searchText, setSearchText, search, searchType } =
         useSharedSearchContext();
+
+    const { deselectMapPub } = useSharedMapContext();
 
     const [focused, setFocused] = useState(false);
 
@@ -40,7 +42,7 @@ export default function SearchBar() {
         // dispatch(setSearchText(''));
         // dispatch(resetPubs());
         dispatch(setState('suggestions'));
-        dispatch(deselectPub());
+        deselectMapPub();
 
         if (inputRef && inputRef.current) {
             inputRef.current.blur();
