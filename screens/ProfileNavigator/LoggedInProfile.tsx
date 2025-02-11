@@ -87,6 +87,7 @@ export default function LoggedInProfile() {
                     <Text style={styles.headerText}>{user.username}</Text>
                 </View>
 
+                {/* TODO: You will need to work with multiple navigations here, and hence fix up your types. */}
                 <TouchableOpacity style={styles.menuContainer}>
                     <Feather name="bell" size={15} />
                 </TouchableOpacity>

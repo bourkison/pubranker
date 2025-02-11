@@ -29,12 +29,12 @@ export default function Settings({
     const [location, setLocation] = useState(route.params.location);
     const [favourites, setFavourites] = useState(route.params.favourites);
 
-    const [favouritesChanged, setFavouritesChagned] = useState(false);
+    const [favouritesChanged, setFavouritesChanged] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
 
     const removeFavourite = useCallback(
         (index: number) => {
-            setFavouritesChagned(true);
+            setFavouritesChanged(true);
             const temp = favourites.slice();
 
             if (temp[index]) {
@@ -46,11 +46,16 @@ export default function Settings({
 
     const addFavourite = useCallback(
         (favourite: UserType['favourites'][number]) => {
-            setFavouritesChagned(true);
+            setFavouritesChanged(true);
             setFavourites([...favourites, favourite]);
         },
         [favourites],
     );
+
+    const changeFavourites = useCallback((f: UserType['favourites']) => {
+        setFavouritesChanged(true);
+        setFavourites(f);
+    }, []);
 
     const updateFavourites = useCallback(async () => {
         // First delete all favourites.
@@ -224,6 +229,7 @@ export default function Settings({
                         favourites={favourites}
                         onRemove={removeFavourite}
                         addFavourite={addFavourite}
+                        setFavourites={changeFavourites}
                     />
                 </View>
 

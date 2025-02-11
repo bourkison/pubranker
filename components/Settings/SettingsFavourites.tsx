@@ -8,11 +8,13 @@ import { AntDesign } from '@expo/vector-icons';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { useNavigation } from '@react-navigation/native';
+import Sortable from 'react-native-sortables';
 
 type SettingsFavouritesProps = {
     favourites: UserType['favourites'];
     onRemove: (index: number) => void;
     addFavourite: (pub: UserType['favourites'][number]) => void;
+    setFavourites: (favourites: UserType['favourites']) => void;
 };
 
 const NO_IMAGE = require('@/assets/noimage.png');
@@ -23,6 +25,7 @@ export default function SettingsFavourites({
     favourites,
     onRemove,
     addFavourite,
+    setFavourites,
 }: SettingsFavouritesProps) {
     const [elementWidth, setElementWidth] = useState(0);
     const navigation =
@@ -93,54 +96,60 @@ export default function SettingsFavourites({
                         layout: { width },
                     },
                 }) => setElementWidth(width)}>
-                {favourites.map((favourite, index) => (
-                    <Pressable
-                        key={favourite.id}
-                        style={[
-                            styles.pubContainer,
-                            { width: pubElementWidth },
-                        ]}
-                        onPress={() => console.log('Press')}>
-                        <Pressable
-                            style={styles.removeButton}
-                            onPress={() =>
-                                showActionSheetWithOptions(
-                                    {
-                                        options: ['Remove', 'Cancel'],
-                                        cancelButtonIndex: 1,
-                                        tintColor: FAIL_COLOR,
-                                        cancelButtonTintColor: '#000',
-                                    },
-                                    selected => {
-                                        if (selected === 0) {
-                                            deleteFavourite(index);
-                                        }
-                                    },
-                                )
-                            }>
-                            <Text style={styles.removeButtonText}>x</Text>
-                        </Pressable>
-
-                        <Image
-                            source={
-                                images[index]
-                                    ? { uri: images[index] }
-                                    : NO_IMAGE
-                            }
+                <Sortable.Grid
+                    columns={3}
+                    // @ts-ignore
+                    itemEntering={null}
+                    itemExiting={undefined}
+                    hapticsEnabled={true}
+                    data={favourites}
+                    onDragEnd={params => setFavourites(params.data)}
+                    renderItem={({ item, index }) => (
+                        <View
+                            key={item.id}
                             style={[
-                                styles.pubImage,
-                                {
-                                    width: pubImageWidth,
-                                    height: pubImageHeight,
-                                },
-                            ]}
-                        />
+                                styles.pubContainer,
+                                { width: pubElementWidth },
+                            ]}>
+                            <Pressable
+                                style={styles.removeButton}
+                                onPress={() =>
+                                    showActionSheetWithOptions(
+                                        {
+                                            options: ['Remove', 'Cancel'],
+                                            cancelButtonIndex: 1,
+                                            tintColor: FAIL_COLOR,
+                                            cancelButtonTintColor: '#000',
+                                        },
+                                        selected => {
+                                            if (selected === 0) {
+                                                deleteFavourite(index);
+                                            }
+                                        },
+                                    )
+                                }>
+                                <Text style={styles.removeButtonText}>x</Text>
+                            </Pressable>
 
-                        <Text style={styles.pubName}>
-                            {favourite.pubs.name}
-                        </Text>
-                    </Pressable>
-                ))}
+                            <Image
+                                source={
+                                    images[index]
+                                        ? { uri: images[index] }
+                                        : NO_IMAGE
+                                }
+                                style={[
+                                    styles.pubImage,
+                                    {
+                                        width: pubImageWidth,
+                                        height: pubImageHeight,
+                                    },
+                                ]}
+                            />
+
+                            <Text style={styles.pubName}>{item.pubs.name}</Text>
+                        </View>
+                    )}
+                />
                 {favourites.length < 3 && (
                     <View
                         style={[
@@ -159,6 +168,9 @@ export default function SettingsFavourites({
                                 {
                                     width: pubImageWidth,
                                     height: pubImageHeight,
+                                    marginLeft:
+                                        (3 - favourites.length) *
+                                        -(2 * pubElementWidth),
                                 },
                             ]}>
                             <AntDesign
@@ -170,6 +182,10 @@ export default function SettingsFavourites({
                     </View>
                 )}
             </View>
+
+            <Text style={styles.hintText}>
+                Hold and drag images to reorder.
+            </Text>
         </View>
     );
 }
@@ -228,5 +244,9 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(0, 0, 0, 0.2)',
         borderWidth: 1,
         borderStyle: 'dashed',
+    },
+    hintText: {
+        fontSize: 10,
+        marginTop: 15,
     },
 });
