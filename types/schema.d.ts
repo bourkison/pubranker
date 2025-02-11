@@ -408,20 +408,72 @@ export type Database = {
           },
         ]
       }
+      feed: {
+        Row: {
+          created_at: string
+          id: number
+          review_id: number | null
+          review_like_id: number | null
+          type: Database["public"]["Enums"]["feed_type"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          review_id?: number | null
+          review_like_id?: number | null
+          type: Database["public"]["Enums"]["feed_type"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          review_id?: number | null
+          review_like_id?: number | null
+          type?: Database["public"]["Enums"]["feed_type"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feed_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "reviews"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feed_review_like_id_fkey"
+            columns: ["review_like_id"]
+            isOneToOne: false
+            referencedRelation: "review_likes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feed_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       follows: {
         Row: {
           created_at: string
           created_by: string
+          id: number
           user_id: string
         }
         Insert: {
           created_at?: string
           created_by?: string
+          id?: number
           user_id: string
         }
         Update: {
           created_at?: string
           created_by?: string
+          id?: number
           user_id?: string
         }
         Relationships: [
@@ -938,7 +990,7 @@ export type Database = {
           id: string
           location?: string
           name: string
-          profile_photo: string
+          profile_photo?: string
           username: string
         }
         Update: {
@@ -1293,6 +1345,7 @@ export type Database = {
     }
     Enums: {
       collection_privacy_type: "PUBLIC" | "FRIENDS_ONLY" | "PRIVATE"
+      feed_type: "REVIEW" | "REVIEW_LIKE"
     }
     CompositeTypes: {
       [_ in never]: never
