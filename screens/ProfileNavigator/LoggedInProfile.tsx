@@ -70,7 +70,15 @@ export default function LoggedInProfile() {
                 <TouchableOpacity
                     style={styles.settingsContainer}
                     onPress={() =>
-                        navigation.navigate('Settings', { user, email })
+                        navigation.navigate('Settings', {
+                            email,
+                            name: user.name,
+                            username: user.username,
+                            bio: user.bio,
+                            profile_photo: user.profile_photo,
+                            favourites: user.favourites,
+                            location: user.location,
+                        })
                     }>
                     <Feather name="settings" size={14} />
                 </TouchableOpacity>

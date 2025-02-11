@@ -1,6 +1,6 @@
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
     View,
     Text,
@@ -15,6 +15,7 @@ import { FAIL_COLOR } from '@/constants';
 import { useAppDispatch } from '@/store/hooks';
 import { signOut as storeSignOut } from '@/store/slices/user';
 import UserAvatar from '@/components/User/UserAvatar';
+import SettingsFavourites from '@/components/Settings/SettingsFavourites';
 
 const RIGHT_COLUMN_COLOR = 'rgba(0, 0, 0, 0.6)';
 
@@ -22,8 +23,20 @@ export default function Settings({
     navigation,
     route,
 }: StackScreenProps<MainNavigatorStackParamList, 'Settings'>) {
-    const [displayName, setDisplayName] = useState(route.params.user.name);
-    const [location, setLocation] = useState(route.params.user.location);
+    const [displayName, setDisplayName] = useState(route.params.name);
+    const [location, setLocation] = useState(route.params.location);
+    const [favourites, setFavourites] = useState(route.params.favourites);
+
+    const removeFavourite = useCallback(
+        (index: number) => {
+            const temp = favourites.slice();
+
+            if (temp[index]) {
+                setFavourites(temp.filter(item => item.id !== temp[index].id));
+            }
+        },
+        [favourites],
+    );
 
     const dispatch = useAppDispatch();
 
@@ -52,7 +65,7 @@ export default function Settings({
                     <View style={styles.loggedInContainer}>
                         <Text style={styles.itemText}>Logged in as </Text>
                         <Text style={styles.usernameText}>
-                            {route.params.user.username}
+                            {route.params.username}
                         </Text>
                     </View>
 
@@ -144,15 +157,17 @@ export default function Settings({
 
                 <View style={styles.sectionContainer}>
                     <Text style={styles.sectionHeader}>Favourites</Text>
+
+                    <SettingsFavourites
+                        favourites={favourites}
+                        onRemove={removeFavourite}
+                    />
                 </View>
 
                 <View style={styles.sectionContainer}>
                     <Text style={styles.sectionHeader}>Avatar</Text>
 
-                    <UserAvatar
-                        photo={route.params.user.profile_photo}
-                        size={72}
-                    />
+                    <UserAvatar photo={route.params.profile_photo} size={72} />
                 </View>
             </ScrollView>
         </View>

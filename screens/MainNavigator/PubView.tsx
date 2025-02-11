@@ -391,7 +391,6 @@ export default function PubHome({
                                                     { pub: pub },
                                                 );
                                             }
-                                            console.log('select', selected);
                                         },
                                     )
                                 }>

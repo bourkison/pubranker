@@ -51,8 +51,13 @@ export type MainNavigatorStackParamList = {
         count: number;
     };
     Settings: {
-        user: UserType;
+        username: string;
+        name: string;
         email: string;
+        location: string;
+        bio: string;
+        profile_photo: string;
+        favourites: UserType['favourites'];
     };
 };
 
