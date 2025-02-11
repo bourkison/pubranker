@@ -27,7 +27,7 @@ export default function FeedReviewLikeItem({
                 })
             }>
             <Pressable style={styles.avatarPressable}>
-                <UserAvatar size={28} photo={user.profile_photo} />
+                <UserAvatar size={24} photo={user.profile_photo} />
             </Pressable>
             <View style={styles.textContentContainer}>
                 <Text style={styles.text}>
@@ -35,7 +35,7 @@ export default function FeedReviewLikeItem({
                     <Text style={styles.boldText}>
                         {reviewLike.review.user.username}
                     </Text>
-                    's review on{' '}
+                    's review of{' '}
                     <Text style={styles.boldText}>
                         {reviewLike.review.pub.name}
                     </Text>
@@ -66,8 +66,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     text: {
-        flexWrap: 'wrap',
-        flexShrink: 1,
+        fontSize: 12,
     },
     boldText: {
         fontWeight: '500',

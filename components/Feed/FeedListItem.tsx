@@ -1,7 +1,8 @@
 import { FeedType } from '@/services/queries/feed';
 import React, { useEffect } from 'react';
 import { View } from 'react-native';
-import FeedReviewLikeItem from './FeedReviewLikeItem';
+import FeedReviewLikeItem from '@/components/Feed/FeedReviewLikeItem';
+import FeedReviewItem from '@/components/Feed/FeedReviewItem';
 
 type EmptyFeedListItemProps = {
     id: number;
@@ -20,6 +21,8 @@ function EmptyFeedListItem({ id }: EmptyFeedListItemProps) {
 }
 
 export default function FeedListItem({ feedItem }: FeedListItemProps) {
+    console.log('feed Item', feedItem);
+
     if (feedItem.type === 'REVIEW_LIKE' && feedItem.review_likes) {
         return (
             <FeedReviewLikeItem
@@ -28,6 +31,13 @@ export default function FeedListItem({ feedItem }: FeedListItemProps) {
             />
         );
     } else if (feedItem.type === 'REVIEW_LIKE') {
+        console.log(feedItem.review);
+        return <EmptyFeedListItem id={feedItem.id} />;
+    }
+
+    if (feedItem.type === 'REVIEW' && feedItem.review) {
+        return <FeedReviewItem user={feedItem.user} review={feedItem.review} />;
+    } else if (feedItem.type === 'REVIEW') {
         return <EmptyFeedListItem id={feedItem.id} />;
     }
 

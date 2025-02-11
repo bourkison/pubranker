@@ -415,6 +415,7 @@ export type Database = {
           review_id: number | null
           review_like_id: number | null
           type: Database["public"]["Enums"]["feed_type"]
+          updated_at: string
           user_id: string
         }
         Insert: {
@@ -423,6 +424,7 @@ export type Database = {
           review_id?: number | null
           review_like_id?: number | null
           type: Database["public"]["Enums"]["feed_type"]
+          updated_at?: string
           user_id: string
         }
         Update: {
@@ -431,6 +433,7 @@ export type Database = {
           review_id?: number | null
           review_like_id?: number | null
           type?: Database["public"]["Enums"]["feed_type"]
+          updated_at?: string
           user_id?: string
         }
         Relationships: [

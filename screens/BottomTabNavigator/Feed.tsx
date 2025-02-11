@@ -17,7 +17,10 @@ export default function Feed() {
                 return;
             }
 
-            const { data, error } = await getFeedQuery(userData.user.id);
+            const { data, error } = await getFeedQuery(userData.user.id).order(
+                'updated_at',
+                { ascending: false },
+            );
 
             if (error) {
                 console.error(error);
@@ -25,6 +28,7 @@ export default function Feed() {
             }
 
             console.log('data', JSON.stringify(data));
+            // @ts-ignore
             setFeed(data);
         })();
     }, []);

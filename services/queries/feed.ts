@@ -30,7 +30,16 @@ export type FeedType = {
             };
         };
     } | null;
-    reviews: Tables<'reviews'> | null;
+    review: {
+        id: number;
+        content: string | null;
+        rating: number;
+        pub: {
+            id: number;
+            name: string;
+            primary_photo: string;
+        };
+    } | null;
 };
 
 const getFeedQueryString = `
@@ -46,7 +55,16 @@ user:users_public!inner(
         created_by
     )
 ),
-reviews(*),
+review:reviews(
+    id,
+    rating,
+    content,
+    pub:pubs(
+        id,
+        name,
+        primary_photo
+    )
+),
 review_likes(
     id,
     review:reviews(
