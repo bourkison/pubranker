@@ -3,7 +3,6 @@ import BottomTabNavigator from '@/nav/BottomTabNavigator';
 import React from 'react';
 import PubView from '@/screens/MainNavigator/PubView';
 import Suggestions from '@/screens/MainNavigator/Suggestions';
-import { PubSchema } from '@/types';
 import CreateReview from '@/screens/MainNavigator/CreateReview';
 import ViewReview from '@/screens/MainNavigator/ViewReview';
 import { Tables } from '@/types/schema';
@@ -17,6 +16,7 @@ import Settings from '@/screens/MainNavigator/Settings';
 import { UserType } from '@/services/queries/user';
 import AddFavourite from '@/screens/MainNavigator/AddFavourite';
 import UserActivity from '@/screens/MainNavigator/UserActivity';
+import { FetchPubType } from '@/services/queries/pub';
 
 export type MainNavigatorStackParamList = {
     Home: undefined;
@@ -24,7 +24,7 @@ export type MainNavigatorStackParamList = {
         pubId: number;
         onSaveToggle?: (id: number, value: boolean) => void;
     };
-    Suggestions: { pub: PubSchema };
+    Suggestions: { pub: FetchPubType };
     CreateReview: {
         pubId: number;
     };

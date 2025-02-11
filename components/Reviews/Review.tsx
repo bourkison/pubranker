@@ -9,7 +9,6 @@ import {
     TouchableHighlight,
 } from 'react-native';
 import { fromNowString } from '@/services';
-import { PubSchema } from '@/types';
 import UserAvatar from '@/components/User/UserAvatar';
 import { useSharedPubViewContext } from '@/context/pubViewContext';
 import { ListReviewType } from '@/services/queries/review';
@@ -18,10 +17,11 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import RatingsStarViewer from '@/components/Ratings/RatingsStarsViewer';
 import ReviewAttributes from '@/components/Reviews/ReviewAttributes';
+import { FetchPubType } from '@/services/queries/pub';
 
 type ReviewProps = {
     review: ListReviewType;
-    pub: PubSchema;
+    pub: FetchPubType;
     noBorder?: boolean;
 };
 

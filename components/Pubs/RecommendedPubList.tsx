@@ -3,7 +3,7 @@ import { ActivityIndicator, FlatList, View } from 'react-native';
 import RecommendedPub from '@/components/Pubs/RecommendedPub';
 import * as Location from 'expo-location';
 import { supabase } from '@/services/supabase';
-import { PubItemType } from '@/components/Pubs/PubItem';
+import { CollectionType } from '@/services/queries/collections';
 
 const METERS_WITHIN = 1000;
 const INITIAL_AMOUNT = 10;
@@ -12,7 +12,7 @@ type RecommendedPubListProps = {};
 
 export default function RecommendedPubList({}: RecommendedPubListProps) {
     const [isLoading, setIsLoading] = useState(false);
-    const [pubs, setPubs] = useState<PubItemType[]>([]);
+    const [pubs, setPubs] = useState<CollectionType['pubs']>([]);
 
     useEffect(() => {
         const initialLoad = async () => {

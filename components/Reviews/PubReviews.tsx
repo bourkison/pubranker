@@ -5,12 +5,12 @@ import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import Review from '@/components/Reviews/Review';
 import { v4 as uuidv4 } from 'uuid';
 import ReviewPubButton from '@/components/Reviews/ReviewPubButton';
-import { PubSchema } from '@/types';
 import { useSharedPubViewContext } from '@/context/pubViewContext';
 import { reviewListQuery } from '@/services/queries/review';
+import { FetchPubType } from '@/services/queries/pub';
 
 type PubReviewsProps = {
-    pub: PubSchema;
+    pub: FetchPubType;
 };
 
 export default function PubReviews({ pub }: PubReviewsProps) {

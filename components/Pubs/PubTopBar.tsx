@@ -1,27 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
-import {
-    checkIfOpen,
-    distanceString,
-    parseLocation,
-    parseOpeningHours,
-    roundToNearest,
-} from '@/services';
+import { checkIfOpen, distanceString, roundToNearest } from '@/services';
 import { timeString } from '@/services';
 import * as Location from 'expo-location';
 import { showLocation } from 'react-native-map-link';
-import { PubSchema } from '@/types';
+import { FetchPubType } from '@/services/queries/pub';
 
 type TopBarPubProps = {
-    pub: PubSchema;
+    pub: FetchPubType;
 };
 
 export default function PubTopBar({ pub }: TopBarPubProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [nextOpenCloseTime, setNextOpenCloseTime] = useState('');
 
-    const pubLocation = parseLocation(pub.location);
+    const pubLocation = pub.location;
     const [userLocation, setUserLocation] = useState<
         Location.LocationObject | undefined
     >(undefined);
@@ -43,8 +37,7 @@ export default function PubTopBar({ pub }: TopBarPubProps) {
     }, []);
 
     useEffect(() => {
-        const openingHours = parseOpeningHours(pub.opening_hours);
-        const { isOpen: o, nextHours } = checkIfOpen(openingHours);
+        const { isOpen: o, nextHours } = checkIfOpen(pub.opening_hours);
 
         setIsOpen(o);
 
@@ -68,7 +61,7 @@ export default function PubTopBar({ pub }: TopBarPubProps) {
                     <Ionicons name="star" />
                     <Text style={styles.reviewText}>
                         {roundToNearest(pub.rating, 0.1).toFixed(1)} (
-                        {pub.num_reviews})
+                        {pub.num_reviews[0].count})
                     </Text>
                 </View>
             </TouchableOpacity>
@@ -98,7 +91,8 @@ export default function PubTopBar({ pub }: TopBarPubProps) {
                     <FontAwesome name="map-marker" size={18} />
                     <Text style={styles.directionsText}>Directions</Text>
                     <Text style={styles.distanceText}>
-                        {distanceString(pub.dist_meters)}
+                        {/* TODO: Fix distance: */}
+                        {distanceString(0)}
                     </Text>
                 </View>
             </TouchableOpacity>

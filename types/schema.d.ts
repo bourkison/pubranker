@@ -604,156 +604,6 @@ export type Database = {
           },
         ]
       }
-      pub_schema: {
-        Row: {
-          address: string
-          beer_garden: boolean | null
-          dart_board: boolean | null
-          description: string
-          dist_meters: number
-          dog_friendly: boolean | null
-          foosball_table: boolean | null
-          free_wifi: boolean | null
-          google_id: string
-          id: number
-          kid_friendly: boolean | null
-          live_sport: boolean | null
-          location: string
-          name: string
-          num_reviews: number
-          opening_hours: Json
-          phone_number: string
-          photos: string[]
-          pool_table: boolean | null
-          rating: number
-          reservable: boolean | null
-          review_beer_amount: number
-          review_eights: number
-          review_fives: number
-          review_food_amount: number
-          review_fours: number
-          review_location_amount: number
-          review_music_amount: number
-          review_negative_beer_amount: number
-          review_negative_food_amount: number
-          review_negative_location_amount: number
-          review_negative_music_amount: number
-          review_negative_service_amount: number
-          review_negative_vibe_amount: number
-          review_nines: number
-          review_ones: number
-          review_service_amount: number
-          review_sevens: number
-          review_sixes: number
-          review_tens: number
-          review_threes: number
-          review_twos: number
-          review_vibe_amount: number
-          rooftop: boolean | null
-          saved: boolean
-          website: string
-          wheelchair_accessible: boolean | null
-        }
-        Insert: {
-          address: string
-          beer_garden?: boolean | null
-          dart_board?: boolean | null
-          description: string
-          dist_meters: number
-          dog_friendly?: boolean | null
-          foosball_table?: boolean | null
-          free_wifi?: boolean | null
-          google_id: string
-          id: number
-          kid_friendly?: boolean | null
-          live_sport?: boolean | null
-          location: string
-          name: string
-          num_reviews: number
-          opening_hours: Json
-          phone_number: string
-          photos: string[]
-          pool_table?: boolean | null
-          rating: number
-          reservable?: boolean | null
-          review_beer_amount: number
-          review_eights: number
-          review_fives: number
-          review_food_amount: number
-          review_fours: number
-          review_location_amount: number
-          review_music_amount: number
-          review_negative_beer_amount: number
-          review_negative_food_amount: number
-          review_negative_location_amount: number
-          review_negative_music_amount: number
-          review_negative_service_amount: number
-          review_negative_vibe_amount: number
-          review_nines: number
-          review_ones: number
-          review_service_amount: number
-          review_sevens: number
-          review_sixes: number
-          review_tens: number
-          review_threes: number
-          review_twos: number
-          review_vibe_amount: number
-          rooftop?: boolean | null
-          saved: boolean
-          website: string
-          wheelchair_accessible?: boolean | null
-        }
-        Update: {
-          address?: string
-          beer_garden?: boolean | null
-          dart_board?: boolean | null
-          description?: string
-          dist_meters?: number
-          dog_friendly?: boolean | null
-          foosball_table?: boolean | null
-          free_wifi?: boolean | null
-          google_id?: string
-          id?: number
-          kid_friendly?: boolean | null
-          live_sport?: boolean | null
-          location?: string
-          name?: string
-          num_reviews?: number
-          opening_hours?: Json
-          phone_number?: string
-          photos?: string[]
-          pool_table?: boolean | null
-          rating?: number
-          reservable?: boolean | null
-          review_beer_amount?: number
-          review_eights?: number
-          review_fives?: number
-          review_food_amount?: number
-          review_fours?: number
-          review_location_amount?: number
-          review_music_amount?: number
-          review_negative_beer_amount?: number
-          review_negative_food_amount?: number
-          review_negative_location_amount?: number
-          review_negative_music_amount?: number
-          review_negative_service_amount?: number
-          review_negative_vibe_amount?: number
-          review_nines?: number
-          review_ones?: number
-          review_service_amount?: number
-          review_sevens?: number
-          review_sixes?: number
-          review_tens?: number
-          review_threes?: number
-          review_twos?: number
-          review_vibe_amount?: number
-          rooftop?: boolean | null
-          saved?: boolean
-          website?: string
-          wheelchair_accessible?: boolean | null
-        }
-        Relationships: []
-      }
       pubs: {
         Row: {
           address: string
@@ -1163,61 +1013,6 @@ export type Database = {
         }
         Returns: string
       }
-      get_pub: {
-        Args: {
-          dist_long: number
-          dist_lat: number
-        }
-        Returns: {
-          address: string
-          beer_garden: boolean | null
-          dart_board: boolean | null
-          description: string
-          dist_meters: number
-          dog_friendly: boolean | null
-          foosball_table: boolean | null
-          free_wifi: boolean | null
-          google_id: string
-          id: number
-          kid_friendly: boolean | null
-          live_sport: boolean | null
-          location: string
-          name: string
-          num_reviews: number
-          opening_hours: Json
-          phone_number: string
-          photos: string[]
-          pool_table: boolean | null
-          rating: number
-          reservable: boolean | null
-          review_beer_amount: number
-          review_eights: number
-          review_fives: number
-          review_food_amount: number
-          review_fours: number
-          review_location_amount: number
-          review_music_amount: number
-          review_negative_beer_amount: number
-          review_negative_food_amount: number
-          review_negative_location_amount: number
-          review_negative_music_amount: number
-          review_negative_service_amount: number
-          review_negative_vibe_amount: number
-          review_nines: number
-          review_ones: number
-          review_service_amount: number
-          review_sevens: number
-          review_sixes: number
-          review_tens: number
-          review_threes: number
-          review_twos: number
-          review_vibe_amount: number
-          rooftop: boolean | null
-          saved: boolean
-          website: string
-          wheelchair_accessible: boolean | null
-        }[]
-      }
       get_pub_list_item: {
         Args: {
           lat: number
@@ -1236,7 +1031,19 @@ export type Database = {
           location: string
         }[]
       }
-      pubs_in_polygon: {
+      get_pub_location: {
+        Args: {
+          pub: unknown
+        }
+        Returns: Json
+      }
+      get_pub_rating: {
+        Args: {
+          pub: unknown
+        }
+        Returns: number
+      }
+      get_pubs_in_polygon: {
         Args: {
           geojson: string
           dist_long: number
@@ -1262,6 +1069,40 @@ export type Database = {
           location: string
           dist_meters: number
           num_reviews: number
+        }[]
+      }
+      get_pubs_with_distances: {
+        Args: {
+          order_lat: number
+          order_long: number
+          dist_lat: number
+          dist_long: number
+        }
+        Returns: {
+          id: number
+          name: string
+          address: string
+          phone_number: string
+          website: string
+          primary_photo: string
+          location: string
+          description: string
+          reservable: boolean
+          dog_friendly: boolean
+          live_sport: boolean
+          pool_table: boolean
+          dart_board: boolean
+          beer_garden: boolean
+          kid_friendly: boolean
+          free_wifi: boolean
+          rooftop: boolean
+          foosball_table: boolean
+          wheelchair_accessible: boolean
+          num_reviews: number
+          saved: boolean
+          dist_meters: number
+          rating: number
+          photos: string[]
         }[]
       }
       validate_favourites_limit_three: {

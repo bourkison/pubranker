@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { MapContext, MapPubs } from '@/context/mapContext';
+import { MapContext, MapPub } from '@/context/mapContext';
 import { Feature, MultiPolygon, point, polygon, Polygon } from '@turf/helpers';
 import {
     convertBoxToCoordinates,
@@ -20,8 +20,8 @@ type MapProviderProps = {
 export default function MapProvider({ children }: MapProviderProps) {
     const [fetchIncrementor, setFetchIncrementor] = useState(0); // Debugger to see how often we fetch.
 
-    const [mapPubs, setMapPubs] = useState<MapPubs[]>([]);
-    const [selectedMapPub, setSelectedMapPub] = useState<MapPubs | undefined>();
+    const [mapPubs, setMapPubs] = useState<MapPub[]>([]);
+    const [selectedMapPub, setSelectedMapPub] = useState<MapPub | undefined>();
     const [previouslyFetchedPolygon, setPreviouslyFetchedPolygon] =
         useState<Feature<MultiPolygon | Polygon> | null>(null);
     const [currentlySelectedPolygon, setCurrentlySelectedPolygon] =
@@ -67,7 +67,7 @@ export default function MapProvider({ children }: MapProviderProps) {
 
             const location = await Location.getCurrentPositionAsync();
 
-            let query = supabase.rpc('pubs_in_polygon', {
+            let query = supabase.rpc('get_pubs_in_polygon', {
                 geojson: JSON.stringify(geojson.geometry),
                 dist_lat: location.coords.latitude,
                 dist_long: location.coords.longitude,
@@ -95,7 +95,7 @@ export default function MapProvider({ children }: MapProviderProps) {
                 return;
             }
 
-            const mappedData: MapPubs[] = data
+            const mappedData: MapPub[] = data
                 .filter(d => {
                     if (!d.location) {
                         return false;
@@ -127,6 +127,8 @@ export default function MapProvider({ children }: MapProviderProps) {
                     newPubs.push(d);
                 }
             });
+
+            console.log('Pubs', newPubs.length);
 
             setMapPubs(newPubs);
         },

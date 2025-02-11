@@ -5,8 +5,6 @@ export type OpeningHoursObject = {
     time: string;
 };
 
-export type PubSchema = Database['public']['Tables']['pub_schema']['Row'];
-
 export type OpeningHoursType =
     Database['public']['Tables']['opening_hours']['Row'];
 
@@ -39,8 +37,6 @@ export type RejectWithValueType = {
     message?: string;
     code?: string;
 };
-
-export type UserType = Database['public']['Tables']['users_public']['Row'];
 
 type NonNullableFields<T> = {
     [P in keyof T]: NonNullable<T[P]>;

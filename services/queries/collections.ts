@@ -1,6 +1,5 @@
-import { PubItemType } from '@/components/Pubs/PubItem';
 import { supabase } from '../supabase';
-import { Tables } from '@/types/schema';
+import { Database, Tables } from '@/types/schema';
 
 export type ListCollectionType = {
     id: number;
@@ -45,7 +44,7 @@ export const listFollowedCollectionsQuery = () =>
 // --------------------------------
 
 export type CollectionType = Tables<'collections'> & {
-    pubs: PubItemType[];
+    pubs: Database['public']['Functions']['get_pub_list_item']['Returns'][number][];
     user: {
         id: string;
         name: string;

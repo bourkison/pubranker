@@ -1,7 +1,6 @@
 import { OpeningHoursType, PubFilters } from '@/types';
 import { Database } from '@/types/schema';
 import { PostgrestFilterBuilder } from '@supabase/postgrest-js';
-import * as turf from '@turf/turf';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
@@ -26,16 +25,6 @@ export const convertPointStringToObject = (
         lng: arr[0],
         lat: arr[1],
     };
-};
-
-export const parseLocation = (locationString: string): turf.helpers.Point => {
-    const location: turf.helpers.Point = JSON.parse(locationString);
-
-    if (!location?.coordinates || location.coordinates.length !== 2) {
-        throw new Error('Invalid coordinates array provided');
-    }
-
-    return location;
 };
 
 export const parseOpeningHours = (openingHours: any): OpeningHoursType[] => {
@@ -164,7 +153,7 @@ export const distanceString = (input: number): string => {
 export const applyFilters = (
     query: PostgrestFilterBuilder<
         Database['public'],
-        Database['public']['Functions']['nearby_pubs']['Returns'][number],
+        Database['public']['Functions']['get_pubs_with_distances']['Returns'][number],
         any
     >,
     filters: PubFilters,
@@ -302,50 +291,4 @@ export const checkIfOpen = (
 
     // @ts-ignore
     return { isOpen: false, nextHours: nextOpeningHours };
-};
-
-export const convertFormattedPubsToPubSchema = (
-    input: Database['public']['Views']['formatted_pubs']['Row'],
-): Database['public']['Tables']['pub_schema']['Row'] => {
-    return {
-        ...input,
-        address: input.address || '',
-        description: input.description || '',
-        dist_meters: 0, // TODO: calculate distance
-        google_id: input.google_id || '',
-        id: input.id || 0,
-        location: input.location || '',
-        name: input.name || '',
-        num_reviews: input.num_reviews || 0,
-        opening_hours: input.opening_hours || '',
-        phone_number: input.phone_number || '',
-        photos: input.photos || [],
-        rating: input.rating || 0,
-        review_beer_amount: input.review_beer_amount || 0,
-        review_food_amount: input.review_food_amount || 0,
-        review_location_amount: input.review_location_amount || 0,
-        review_music_amount: input.review_music_amount || 0,
-        review_negative_beer_amount: input.negative_review_beer_amount || 0,
-        review_negative_food_amount: input.negative_review_food_amount || 0,
-        review_negative_location_amount:
-            input.negative_review_location_amount || 0,
-        review_negative_music_amount: input.negative_review_music_amount || 0,
-        review_negative_service_amount:
-            input.negative_review_service_amount || 0,
-        review_negative_vibe_amount: input.negative_review_vibe_amount || 0,
-        review_service_amount: input.review_service_amount || 0,
-        review_tens: input.review_tens || 0,
-        review_nines: input.review_nines || 0,
-        review_eights: input.review_eights || 0,
-        review_sevens: input.review_sevens || 0,
-        review_sixes: input.review_sixes || 0,
-        review_fives: input.review_fives || 0,
-        review_fours: input.review_fours || 0,
-        review_threes: input.review_threes || 0,
-        review_twos: input.review_twos || 0,
-        review_ones: input.review_ones || 0,
-        review_vibe_amount: input.review_vibe_amount || 0,
-        saved: input.saved || false,
-        website: input.website || '',
-    };
 };

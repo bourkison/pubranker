@@ -14,7 +14,6 @@ import {
     Pressable,
 } from 'react-native';
 import * as Location from 'expo-location';
-import { PubItemType } from '@/components/Pubs/PubItem';
 import { PRIMARY_COLOR } from '@/constants';
 import {
     Ionicons,
@@ -95,7 +94,7 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
             // be in order of the collection_items.
             // collection_items is already in order from our query, so can just
             // loop through that.
-            const orderedPubs: PubItemType[] = [];
+            const orderedPubs: CollectionType['pubs'] = [];
 
             data.collection_items.forEach(orderedPub => {
                 const desiredPub = pubsData.find(

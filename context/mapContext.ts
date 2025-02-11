@@ -2,7 +2,7 @@ import { BoundingBox } from '@/types';
 import { Feature, MultiPolygon, Point, Polygon } from '@turf/helpers';
 import { createContext, useContext } from 'react';
 
-export type MapPubs = {
+export type MapPub = {
     id: number;
     name: string;
     address: string;
@@ -16,8 +16,8 @@ export type MapPubs = {
 type MapContextType = {
     currentlySelectedPolygon: Feature<Polygon> | null;
     previouslyFetchedPolygon: Feature<MultiPolygon | Polygon> | null;
-    mapPubs: MapPubs[];
-    selectedMapPub: MapPubs | undefined;
+    mapPubs: MapPub[];
+    selectedMapPub: MapPub | undefined;
     fetchMapPubs: (boundingBox: BoundingBox) => Promise<void>;
     selectMapPub: (id: number) => void;
     deselectMapPub: () => void;

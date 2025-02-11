@@ -10,14 +10,14 @@ import { useNavigation } from '@react-navigation/native';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { StackNavigationProp } from '@react-navigation/stack';
 import PubInfo from '@/components/Pubs/PubView/PubInfo';
-import { PubItemType } from './PubItem';
+import { CollectionType } from '@/services/queries/collections';
 
 const NO_IMAGE = require('@/assets/noimage.png');
 const WIDTH_PERCENTAGE = 0.8;
 const ASPECT_RATIO = 1.3333; // 4:3
 
 type RecommendedPubItemProps = {
-    pub: PubItemType;
+    pub: CollectionType['pubs'][number];
     onSaveToggle?: (id: number, value: boolean) => void;
 };
 
@@ -37,7 +37,7 @@ export default function RecommendedPubItem({
         if (pub.photos[0]) {
             const url = supabase.storage
                 .from('pubs')
-                .getPublicUrl(pub.photos[0]);
+                .getPublicUrl(pub.photos[0] || '');
 
             setImageUrl(url.data.publicUrl);
         }
@@ -56,7 +56,13 @@ export default function RecommendedPubItem({
                     { height: COMPONENT_WIDTH / ASPECT_RATIO },
                 ]}
             />
-            <PubInfo pub={pub} />
+            <PubInfo
+                name={pub.name}
+                address={pub.address}
+                distMeters={pub.dist_meters}
+                numReviews={pub.num_reviews}
+                rating={pub.rating}
+            />
         </Pressable>
     );
 }

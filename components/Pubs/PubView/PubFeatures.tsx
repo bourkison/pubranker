@@ -1,16 +1,16 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Octicons } from '@expo/vector-icons';
-import { PubSchema } from '@/types';
 import PubMap from '@/components/Pubs/PubView/PubMap';
 import DraughtBeersList from '@/components/Beers/DraughtBeersList';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import PubFeature from '@/components/Pubs/PubFeature';
+import { FetchPubType } from '@/services/queries/pub';
 
 type PubFeaturesProps = {
-    pub: PubSchema;
+    pub: FetchPubType;
 };
 
 export default function PubFeatures({ pub }: PubFeaturesProps) {
@@ -46,7 +46,7 @@ export default function PubFeatures({ pub }: PubFeaturesProps) {
                 />
             </View>
 
-            <DraughtBeersList pub={pub} />
+            <DraughtBeersList pubId={pub.id} />
 
             <PubMap pub={pub} />
         </>

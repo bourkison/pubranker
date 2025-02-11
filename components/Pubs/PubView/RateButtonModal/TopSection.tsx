@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons, Feather, MaterialIcons } from '@expo/vector-icons';
-import { PubSchema } from '@/types';
 import { useAppDispatch } from '@/store/hooks';
 import { supabase } from '@/services/supabase';
 import { setPubSave } from '@/store/slices/explore';
+import { FetchPubType } from '@/services/queries/pub';
 
 type TopSectionProps = {
-    pub: PubSchema;
+    pub: FetchPubType;
     navigateToAddToCollection: () => void;
 };
 
@@ -22,7 +22,7 @@ export default function TopSection({
     const [saved, setSaved] = useState(false);
 
     useEffect(() => {
-        setSaved(pub.saved);
+        setSaved(pub.saved[0].count > 0);
     }, [pub]);
 
     const toggleSaveLocal = useCallback(async () => {

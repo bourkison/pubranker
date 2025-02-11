@@ -7,7 +7,6 @@ import {
     TouchableHighlight,
     TouchableOpacity,
 } from 'react-native';
-import { PubItemType } from '@/components/Pubs/PubItem';
 import { Ionicons } from '@expo/vector-icons';
 import { distanceString, roundToNearest } from '@/services';
 import { GOLD_RATINGS_COLOR } from '@/constants';
@@ -16,11 +15,12 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { useSharedCollectionContext } from '@/context/collectionContext';
+import { CollectionType } from '@/services/queries/collections';
 
 const NO_IMAGE = require('@/assets/noimage.png');
 
 type BottomSheetPubItemProps = {
-    pub: PubItemType;
+    pub: CollectionType['pubs'][number];
     onSaveCommence?: (id: number) => void;
     onSaveComplete?: (success: boolean, id: number) => void;
     onUnsaveCommence?: (id: number) => void;
@@ -54,7 +54,7 @@ export default function SavedListItem({
     useEffect(() => {
         const url = supabase.storage
             .from('pubs')
-            .getPublicUrl(pub.primary_photo);
+            .getPublicUrl(pub.primary_photo || '');
 
         setImageUrl(url.data.publicUrl);
     }, [pub]);
@@ -181,6 +181,7 @@ export default function SavedListItem({
                     </View>
                     <View style={styles.distanceContainer}>
                         <Text style={styles.distanceText}>
+                            {/* TODO: Fix: */}
                             {distanceString(pub.dist_meters)}
                         </Text>
                     </View>

@@ -14,19 +14,38 @@ export default function NearFilter() {
                 <View style={styles.bottomSheetContainer}>
                     <View>
                         <Text style={styles.bottomSheetHeader}>Near</Text>
-                        <SearchSuggestionItem type="nearby" title="You" />
+                        <SearchSuggestionItem
+                            result={{
+                                type: 'nearby',
+                                title: 'You',
+                                subtitle: '',
+                                onPress: () => {},
+                            }}
+                        />
 
                         <SearchSuggestionItem
-                            type="park"
-                            title="Hackney Downs"
+                            result={{
+                                type: 'park',
+                                title: 'Hackney Downs',
+                                subtitle: '',
+                                onPress: () => {},
+                            }}
                         />
                         <SearchSuggestionItem
-                            type="station"
-                            title="Hackney Central"
+                            result={{
+                                type: 'station',
+                                title: 'Hackney Central',
+                                subtitle: '',
+                                onPress: () => {},
+                            }}
                         />
                         <SearchSuggestionItem
-                            type="station"
-                            title="Hackney Downs"
+                            result={{
+                                type: 'station',
+                                title: 'Hackney Downs',
+                                subtitle: '',
+                                onPress: () => {},
+                            }}
                         />
                     </View>
                 </View>

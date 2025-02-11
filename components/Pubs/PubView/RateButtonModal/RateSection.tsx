@@ -1,18 +1,18 @@
 import React, { useCallback, useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { supabase } from '@/services/supabase';
-import { PubSchema } from '@/types';
 import RatingsSelector from '@/components/Ratings/RatingsSelector';
 import {
     ListReviewType,
     reviewListQueryString,
 } from '@/services/queries/review';
+import { FetchPubType } from '@/services/queries/pub';
 
 const STAR_SIZE = 40;
 const STAR_PADDING = 4;
 
 type RateSectionProps = {
-    pub: PubSchema;
+    pub: FetchPubType;
     userReview: ListReviewType | null;
     setUserReview: React.Dispatch<React.SetStateAction<ListReviewType | null>>;
 };

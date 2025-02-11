@@ -1,21 +1,20 @@
-import { parseLocation } from '@/services';
-import { PubSchema } from '@/types';
 import React, { useMemo, useRef } from 'react';
 import MapView, { MapMarker } from 'react-native-maps';
 import MapStyle from '@/json/map_style.json';
 import { StyleSheet, useWindowDimensions } from 'react-native';
 import PubMapMarker from '@/components/Maps/PubMapMarker';
 import { SECONDARY_COLOR } from '@/constants';
+import { FetchPubType } from '@/services/queries/pub';
 
 type PubMapProps = {
-    pub: PubSchema;
+    pub: FetchPubType;
 };
 
 const MAP_PADDING = 30;
 
 export default function PubMap({ pub }: PubMapProps) {
     const { width } = useWindowDimensions();
-    const pubLocation = useMemo(() => parseLocation(pub.location), [pub]);
+    const pubLocation = useMemo(() => pub.location, [pub]);
 
     const mapRef = useRef<MapView>(null);
 

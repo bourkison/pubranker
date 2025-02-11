@@ -23,10 +23,10 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { GOLD_RATINGS_COLOR } from '@/constants';
-import { MapPubs, useSharedMapContext } from '@/context/mapContext';
+import { MapPub, useSharedMapContext } from '@/context/mapContext';
 
 type SelectedPubProps = {
-    pub: MapPubs;
+    pub: MapPub;
 };
 
 const IMAGE_SIZE = 128;

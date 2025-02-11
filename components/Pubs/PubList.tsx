@@ -1,13 +1,13 @@
 import React, { useCallback } from 'react';
-import PubItem, { PubItemType } from '@/components/Pubs/PubItem';
+import PubItem from '@/components/Pubs/PubItem';
 import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { fetchMoreExplorePubs } from '@/store/slices/explore';
+import { ExplorePub, fetchMoreExplorePubs } from '@/store/slices/explore';
 
 type BottomSheetPubListProps = {
-    pubs: PubItemType[];
+    pubs: ExplorePub[];
 };
 
 export default function BottomSheetPubList({ pubs }: BottomSheetPubListProps) {

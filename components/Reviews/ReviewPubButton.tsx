@@ -9,16 +9,16 @@ import {
     ActivityIndicator,
 } from 'react-native';
 import Review from '@/components/Reviews/Review';
-import { PubSchema } from '@/types';
 import { useSharedPubViewContext } from '@/context/pubViewContext';
 import { PRIMARY_COLOR } from '@/constants';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { v4 as uuidv4 } from 'uuid';
 import { reviewListQuery } from '@/services/queries/review';
+import { FetchPubType } from '@/services/queries/pub';
 
 type ReviewPubButtonProps = {
-    pub: PubSchema;
+    pub: FetchPubType;
 };
 
 export default function ReviewPubButton({ pub }: ReviewPubButtonProps) {

@@ -1,14 +1,14 @@
 import ImageScroller from '@/components/Utility/ImageScroller';
-import { supabase } from '@/services/supabase';
-import { PubSchema } from '@/types';
+import { FetchPubType } from '@/services/queries/pub';
+// import { supabase } from '@/services/supabase';
 import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 
-type PubImagesProps = {
-    pub: PubSchema;
+type PubGalleryProps = {
+    pub: FetchPubType;
 };
 
-export default function PubImages({ pub }: PubImagesProps) {
+export default function PubGallery({ pub }: PubGalleryProps) {
     const imageFlatListRef = useRef<FlatList>(null);
     const [imageUrls, setImageUrls] = useState<string[]>([]);
 
@@ -16,10 +16,13 @@ export default function PubImages({ pub }: PubImagesProps) {
         let urls: string[] = [];
         setImageUrls([]);
 
-        pub.photos.forEach(photo => {
-            const url = supabase.storage.from('pubs').getPublicUrl(photo);
-            urls.push(url.data.publicUrl);
-        });
+        // TODO: Fix.
+        // pub.photos.forEach(photo => {
+        //     const url = supabase.storage
+        //         .from('pubs')
+        //         .getPublicUrl(photo?.key || '');
+        //     urls.push(url.data.publicUrl);
+        // });
 
         setImageUrls(urls);
     }, [pub]);

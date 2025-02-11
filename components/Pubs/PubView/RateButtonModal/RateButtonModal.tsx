@@ -1,5 +1,4 @@
 import { PRIMARY_COLOR } from '@/constants';
-import { PubSchema } from '@/types';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { Text, StyleSheet, Pressable, View } from 'react-native';
 import { Ionicons, SimpleLineIcons } from '@expo/vector-icons';
@@ -10,9 +9,10 @@ import { useSharedPubViewContext } from '@/context/pubViewContext';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
+import { FetchPubType } from '@/services/queries/pub';
 
 type RateButtonProps = {
-    pub: PubSchema;
+    pub: FetchPubType;
 };
 
 export default function RateButtonModal({ pub }: RateButtonProps) {

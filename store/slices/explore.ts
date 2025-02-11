@@ -1,11 +1,6 @@
 import { applyFilters } from '@/services';
 import { supabase } from '@/services/supabase';
-import {
-    BoolOrUnset,
-    PubSchema,
-    PubFilters,
-    RejectWithValueType,
-} from '@/types';
+import { BoolOrUnset, PubFilters, RejectWithValueType } from '@/types';
 import {
     createAsyncThunk,
     createEntityAdapter,
@@ -17,6 +12,35 @@ import { RootState } from '@/store';
 import { MAX_WITHIN_RANGE } from '@/constants';
 
 const discoverAdapter = createEntityAdapter();
+
+export type ExplorePub = {
+    id: number;
+    name: string;
+    address: string;
+    phone_number: string;
+    website: string;
+    primary_photo: string;
+    location: string;
+    description: string;
+
+    reservable: boolean | null;
+    dog_friendly: boolean | null;
+    live_sport: boolean | null;
+    pool_table: boolean | null;
+    dart_board: boolean | null;
+    beer_garden: boolean | null;
+    kid_friendly: boolean | null;
+    free_wifi: boolean | null;
+    rooftop: boolean | null;
+    foosball_table: boolean | null;
+    wheelchair_accessible: boolean | null;
+
+    num_reviews: number;
+    saved: boolean;
+    dist_meters: number;
+    rating: number;
+    photos: string[];
+};
 
 const INITIAL_FILTERS = {
     dogFriendly: 'unset',
@@ -35,7 +59,7 @@ const INITIAL_FILTERS = {
 } as PubFilters;
 
 const initialState = discoverAdapter.getInitialState({
-    pubs: [] as PubSchema[],
+    pubs: [] as ExplorePub[],
     resultsAmount: 0,
     isLoading: false,
     moreToLoad: true,
@@ -56,11 +80,11 @@ const queryDb = async (
     withinRange: number,
     overallRating: number,
     idsToExclude: number[] = [],
-): Promise<{ pubs: PubSchema[]; count: number }> => {
+): Promise<{ pubs: ExplorePub[]; count: number }> => {
     const currentLocation = await Location.getCurrentPositionAsync();
 
     let query = supabase.rpc(
-        'nearby_pubs',
+        'get_pubs_with_distances',
         {
             order_lat: currentLocation.coords.latitude,
             order_long: currentLocation.coords.longitude,
@@ -94,7 +118,7 @@ const queryDb = async (
 };
 
 export const fetchExplorePubs = createAsyncThunk<
-    { pubs: PubSchema[]; count: number },
+    { pubs: ExplorePub[]; count: number },
     { amount: number },
     { rejectValue: RejectWithValueType }
 >(
@@ -122,12 +146,12 @@ export const fetchExplorePubs = createAsyncThunk<
 );
 
 export const fetchMoreExplorePubs = createAsyncThunk<
-    { pubs: PubSchema[] },
+    { pubs: ExplorePub[] },
     { amount: number },
     { rejectValue: RejectWithValueType }
 >(
     'discover/fetchMoreExplorePubs',
-    async ({ amount }, { getState, dispatch, rejectWithValue }) => {
+    async ({ amount }, { getState, rejectWithValue }) => {
         const state = getState() as RootState;
 
         try {

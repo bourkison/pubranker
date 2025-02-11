@@ -15,14 +15,11 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { Ionicons } from '@expo/vector-icons';
-import { Database } from '@/types/schema';
 import { useSharedCollectionContext } from '@/context/collectionContext';
-
-export type PubItemType =
-    Database['public']['Functions']['get_pub_list_item']['Returns'][number];
+import { ExplorePub } from '@/store/slices/explore';
 
 type BottomSheetPubItemProps = {
-    pub: PubItemType;
+    pub: ExplorePub;
     onSaveCommence?: (id: number) => void;
     onSaveComplete?: (success: boolean, id: number) => void;
     onUnsaveCommence?: (id: number) => void;
@@ -203,7 +200,13 @@ export default function PubItem({
                 onPress={() =>
                     navigation.navigate('PubView', { pubId: pub.id })
                 }>
-                <PubInfo pub={pub} />
+                <PubInfo
+                    name={pub.name}
+                    address={pub.address}
+                    numReviews={pub.num_reviews}
+                    distMeters={pub.dist_meters}
+                    rating={pub.rating}
+                />
             </Pressable>
         </View>
     );

@@ -3,31 +3,40 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { distanceString, roundToNearest } from '@/services';
 import { GOLD_RATINGS_COLOR } from '@/constants';
-import { PubItemType } from '@/components/Pubs/PubItem';
 
 type PubInfoProps = {
-    pub: PubItemType;
+    numReviews: number;
+    rating: number;
+    distMeters: number;
+    name: string;
+    address: string;
 };
 
-export default function PubInfo({ pub }: PubInfoProps) {
+export default function PubInfo({
+    numReviews,
+    rating,
+    distMeters,
+    name,
+    address,
+}: PubInfoProps) {
     return (
         <View style={styles.infoContainer}>
             <View style={styles.reviewContainer}>
                 <Ionicons name="star" size={12} color={GOLD_RATINGS_COLOR} />
                 <Text style={styles.ratingText}>
-                    {roundToNearest(pub.rating, 0.1).toFixed(1)}
+                    {roundToNearest(rating, 0.1).toFixed(1)}
                 </Text>
-                <Text style={styles.numReviewsText}>({pub.num_reviews})</Text>
+                <Text style={styles.numReviewsText}>({numReviews})</Text>
             </View>
             <View style={styles.titleContainer}>
-                <Text style={styles.titleText}>{pub.name}</Text>
+                <Text style={styles.titleText}>{name}</Text>
             </View>
             <View style={styles.addressContainer}>
-                <Text style={styles.addressText}>{pub.address}</Text>
+                <Text style={styles.addressText}>{address}</Text>
             </View>
             <View style={styles.distanceContainer}>
                 <Text style={styles.distanceText}>
-                    {distanceString(pub.dist_meters)}
+                    {distanceString(distMeters)}
                 </Text>
             </View>
         </View>

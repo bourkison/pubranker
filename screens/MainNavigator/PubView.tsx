@@ -33,11 +33,7 @@ import Animated, {
     withTiming,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
-import {
-    convertFormattedPubsToPubSchema,
-    distanceString,
-    roundToNearest,
-} from '@/services';
+import { distanceString, roundToNearest } from '@/services';
 import { Ionicons, SimpleLineIcons } from '@expo/vector-icons';
 import PubTopBar from '@/components/Pubs/PubTopBar';
 import PubDescription from '@/components/Pubs/PubView/PubDescription';
@@ -48,7 +44,6 @@ import PubReviews from '@/components/Reviews/PubReviews';
 import PubGallery from '@/components/Pubs/PubView/PubGallery';
 import PubDetails from '@/components/Pubs/PubView/PubDetails';
 import { useActionSheet } from '@expo/react-native-action-sheet';
-import { PubSchema } from '@/types';
 import { PubViewContext } from '@/context/pubViewContext';
 import { ListReviewType } from '@/services/queries/review';
 import { useAppDispatch } from '@/store/hooks';
@@ -56,12 +51,13 @@ import { setPubSave } from '@/store/slices/explore';
 import RatingsSummary from '@/components/Ratings/RatingsSummary';
 import RateButtonModal from '@/components/Pubs/PubView/RateButtonModal/RateButtonModal';
 import { useSharedCollectionContext } from '@/context/collectionContext';
+import { FetchPubType, pubQuery } from '@/services/queries/pub';
 
 // TODO: Rather than all this shit with animations
 // Could this not just be one flat list, with the image being outside of the component and absolutely position
 // Then a transparent list header component the same size of the image
 
-export default function PubHome({
+export default function PubView({
     route,
     navigation,
 }: StackScreenProps<MainNavigatorStackParamList, 'PubView'>) {
@@ -71,7 +67,7 @@ export default function PubHome({
     const [userReview, setUserReview] = useState<ListReviewType | null>(null);
 
     const [isLoading, setIsLoading] = useState(false);
-    const [pub, setPub] = useState<PubSchema>();
+    const [pub, setPub] = useState<FetchPubType>();
     const [saved, setSaved] = useState(false);
 
     const { width, height } = useWindowDimensions();
@@ -88,9 +84,11 @@ export default function PubHome({
         const fetchPub = async () => {
             setIsLoading(true);
 
-            const { data, error } = await supabase
-                .from('formatted_pubs')
-                .select()
+            const { data: userData } = await supabase.auth.getUser();
+
+            let userId = userData.user?.id || '';
+
+            const { data, error } = await pubQuery(userId)
                 .eq('id', route.params.pubId)
                 .limit(1)
                 .single();
@@ -102,8 +100,11 @@ export default function PubHome({
             }
 
             setIsLoading(false);
-            setPub(convertFormattedPubsToPubSchema(data));
-            setSaved(convertFormattedPubsToPubSchema(data).saved);
+            // @ts-ignore
+            setPub(data);
+
+            // @ts-ignore
+            setSaved(data.saved[0].count > 0);
         };
 
         fetchPub();
@@ -114,7 +115,9 @@ export default function PubHome({
             return;
         }
 
-        const url = supabase.storage.from('pubs').getPublicUrl(pub.photos[0]);
+        const url = supabase.storage
+            .from('pubs')
+            .getPublicUrl(pub.primary_photo || '');
         setHeaderImageUrl(url.data.publicUrl);
     }, [pub]);
 
@@ -449,7 +452,12 @@ export default function PubHome({
                                                             pub.rating,
                                                             0.1,
                                                         ).toFixed(1)}{' '}
-                                                        ({pub.num_reviews})
+                                                        (
+                                                        {
+                                                            pub.num_reviews[0]
+                                                                .count
+                                                        }
+                                                        )
                                                     </Text>
                                                 </View>
                                                 <View
@@ -461,9 +469,8 @@ export default function PubHome({
                                                         style={
                                                             styles.distanceText
                                                         }>
-                                                        {distanceString(
-                                                            pub.dist_meters,
-                                                        )}
+                                                        {/* TODO: Fix to calculate distance: */}
+                                                        {distanceString(0)}
                                                     </Text>
                                                 </View>
                                             </View>
@@ -509,16 +516,16 @@ export default function PubHome({
                                     header="Ratings"
                                     totalRating={pub.rating}
                                     ratings={[
-                                        pub.review_ones,
-                                        pub.review_twos,
-                                        pub.review_threes,
-                                        pub.review_fours,
-                                        pub.review_fives,
-                                        pub.review_sixes,
-                                        pub.review_sevens,
-                                        pub.review_eights,
-                                        pub.review_nines,
-                                        pub.review_tens,
+                                        pub.review_ones[0].count,
+                                        pub.review_twos[0].count,
+                                        pub.review_threes[0].count,
+                                        pub.review_fours[0].count,
+                                        pub.review_fives[0].count,
+                                        pub.review_sixes[0].count,
+                                        pub.review_sevens[0].count,
+                                        pub.review_eights[0].count,
+                                        pub.review_nines[0].count,
+                                        pub.review_tens[0].count,
                                     ]}
                                     ratingsHeight={80}
                                 />
@@ -551,11 +558,13 @@ export default function PubHome({
                                 <TopTabs
                                     data={[
                                         {
-                                            title: `Reviews (${pub.num_reviews})`,
+                                            title: `Reviews (${pub.num_reviews[0].count})`,
                                             component: <PubReviews pub={pub} />,
                                         },
                                         {
-                                            title: `User Photos (${pub.photos.length})`,
+                                            title: `User Photos (${
+                                                pub.photos?.length || 0
+                                            })`,
                                             component: <PubGallery pub={pub} />,
                                         },
                                         {

@@ -3,15 +3,14 @@ import { Database } from '@/types/schema';
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
 import BeerPill from '@/components/Beers/BeerPill';
-import { PubSchema } from '@/types';
 
 type DraughtBeersListProps = {
-    pub: PubSchema;
+    pubId: number;
 };
 
 type Beer = Database['public']['Tables']['beers']['Row'];
 
-export default function DraughtBeersList({ pub }: DraughtBeersListProps) {
+export default function DraughtBeersList({ pubId }: DraughtBeersListProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [beers, setBeers] = useState<Beer[]>([]);
 
@@ -25,7 +24,7 @@ export default function DraughtBeersList({ pub }: DraughtBeersListProps) {
                 await supabase
                     .from('beer_pub_relationships')
                     .select()
-                    .eq('pub_id', pub.id);
+                    .eq('pub_id', pubId);
 
             if (relationshipsError) {
                 // TODO: Handle error
@@ -55,7 +54,7 @@ export default function DraughtBeersList({ pub }: DraughtBeersListProps) {
         };
 
         fetchBeers();
-    }, [pub]);
+    }, [pubId]);
 
     return (
         <>

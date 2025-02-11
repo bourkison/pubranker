@@ -1,4 +1,4 @@
-import { PubSchema } from '@/types';
+import { FetchPubType } from '@/services/queries/pub';
 import React, { useCallback, useState } from 'react';
 import {
     View,
@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 
 type PubDescriptionProps = {
-    pub: PubSchema;
+    pub: FetchPubType;
 };
 
 const MAX_LINES_LENGTH = 4;

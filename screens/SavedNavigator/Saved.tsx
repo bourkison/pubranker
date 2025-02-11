@@ -15,12 +15,12 @@ import { supabase } from '@/services/supabase';
 import * as Location from 'expo-location';
 import { Text } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { PubItemType } from '@/components/Pubs/PubItem';
 import { User } from '@supabase/supabase-js';
 import { StackScreenProps } from '@react-navigation/stack';
 import { SavedNavigatorStackParamList } from '@/nav/SavedNavigator';
 import CreateCollectionIcon from '@/components/Collections/CreateCollectionIcon';
 import SavedListItem from '@/components/Saves/SavedListItem';
+import { CollectionType } from '@/services/queries/collections';
 
 export default function SavedPubs({
     navigation,
@@ -28,7 +28,7 @@ export default function SavedPubs({
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
-    const [pubs, setPubs] = useState<PubItemType[]>([]);
+    const [pubs, setPubs] = useState<CollectionType['pubs']>([]);
     const [collectionsAmount, setCollectionsAmount] = useState(0);
 
     const { width } = useWindowDimensions();
@@ -65,7 +65,7 @@ export default function SavedPubs({
                     return;
                 }
 
-                const orderedPubs: PubItemType[] = [];
+                const orderedPubs: CollectionType['pubs'] = [];
 
                 savesData.forEach(save => {
                     const pub = data.find(p => p.id === save.pub_id);
