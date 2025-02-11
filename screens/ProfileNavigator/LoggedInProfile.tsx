@@ -50,7 +50,6 @@ export default function LoggedInProfile() {
 
             setUser(publicUser);
             setIsLoading(false);
-            console.log('user', publicUser);
         };
 
         fetchData();

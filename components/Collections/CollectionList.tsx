@@ -162,8 +162,6 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
     }, [collection, userId, isFollowing, isLoading]);
 
     const toggleFollow = useCallback(async () => {
-        console.log('follow press');
-
         if (!collection || isFollowing) {
             return;
         }
@@ -256,7 +254,7 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
                                     />
 
                                     <Text style={styles.userNameText}>
-                                        {collection.user.name}
+                                        {collection.user.username}
                                     </Text>
                                 </Pressable>
 

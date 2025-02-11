@@ -7,6 +7,7 @@ import {
     TouchableOpacity,
     NativeSyntheticEvent,
     TextLayoutEventData,
+    Pressable,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '@/services/supabase';
@@ -15,6 +16,9 @@ import * as Haptics from 'expo-haptics';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-reanimated';
 import { ReviewType } from '@/services/queries/review';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 
 type CommentProps = {
     comment: ReviewType['comments'][number];
@@ -38,6 +42,9 @@ export default function Comment({
     const [isLiking, setIsLiking] = useState(false);
     const [textShown, setTextShown] = useState(false);
     const [lengthMore, setLengthMore] = useState(false);
+
+    const navigation =
+        useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
 
     const onTextLayout = useCallback(
         (e: NativeSyntheticEvent<TextLayoutEventData>) => {
@@ -115,14 +122,18 @@ export default function Comment({
     return (
         <GestureDetector gesture={gesture}>
             <View style={styles.container}>
-                <View style={styles.userContainer}>
+                <Pressable
+                    style={styles.userContainer}
+                    onPress={() =>
+                        navigation.push('Profile', { userId: comment.user.id })
+                    }>
                     <UserAvatar
                         photo={comment.user.profile_photo || ''}
-                        size={18}
+                        size={22}
                     />
 
                     <Text style={styles.usernameText}>{comment.user.name}</Text>
-                </View>
+                </Pressable>
                 <Text
                     style={styles.contentText}
                     numberOfLines={textShown ? undefined : MAX_LINES_LENGTH}

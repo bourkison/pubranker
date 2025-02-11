@@ -278,19 +278,25 @@ export default function ViewReview({
                                 }) => setContentWidth(w)}>
                                 <View style={[styles.pubInfoContainer]}>
                                     <View style={styles.pubInfoLeftColumn}>
-                                        <View style={styles.userContainer}>
+                                        <Pressable
+                                            style={styles.userContainer}
+                                            onPress={() =>
+                                                navigation.push('Profile', {
+                                                    userId: review.user.id,
+                                                })
+                                            }>
                                             <UserAvatar
                                                 photo={
                                                     review.user.profile_photo ||
                                                     ''
                                                 }
-                                                size={18}
+                                                size={24}
                                             />
 
                                             <Text style={styles.usernameText}>
                                                 {review.user.name}
                                             </Text>
-                                        </View>
+                                        </Pressable>
 
                                         <Pressable
                                             style={styles.pubNameContainer}

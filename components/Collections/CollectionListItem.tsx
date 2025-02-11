@@ -100,7 +100,7 @@ export default function CollectionListItem({
                     />
 
                     <Text style={styles.userNameText}>
-                        {collection.user.name}
+                        {collection.user.username}
                     </Text>
                 </View>
             </View>

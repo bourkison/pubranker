@@ -29,12 +29,36 @@ export default function Settings({
     const [location, setLocation] = useState(route.params.location);
     const [favourites, setFavourites] = useState(route.params.favourites);
 
-    const [favouritesChanged, setFavouritesChanged] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+
+    const favouritesChanged = useCallback(() => {
+        if (route.params.favourites.length !== favourites.length) {
+            return true;
+        }
+
+        for (let i = 0; i < favourites.length; i++) {
+            if (favourites[i].pubs.id !== route.params.favourites[i].pubs.id) {
+                return true;
+            }
+        }
+
+        return false;
+    }, [route, favourites]);
+
+    const userChanged = useCallback(() => {
+        if (displayName !== route.params.name) {
+            return true;
+        }
+
+        if (location !== route.params.location) {
+            return true;
+        }
+
+        return false;
+    }, [displayName, location, route]);
 
     const removeFavourite = useCallback(
         (index: number) => {
-            setFavouritesChanged(true);
             const temp = favourites.slice();
 
             if (temp[index]) {
@@ -46,61 +70,104 @@ export default function Settings({
 
     const addFavourite = useCallback(
         (favourite: UserType['favourites'][number]) => {
-            setFavouritesChanged(true);
             setFavourites([...favourites, favourite]);
         },
         [favourites],
     );
 
-    const changeFavourites = useCallback((f: UserType['favourites']) => {
-        setFavouritesChanged(true);
-        setFavourites(f);
-    }, []);
-
     const updateFavourites = useCallback(async () => {
-        // First delete all favourites.
-        const { data: userData, error: userError } =
-            await supabase.auth.getUser();
+        return new Promise<void>(async (resolve, reject) => {
+            // First delete all favourites.
+            const { data: userData, error: userError } =
+                await supabase.auth.getUser();
 
-        if (userError) {
-            console.error('User error', userError);
-            return;
-        }
+            if (userError) {
+                console.error('User error', userError);
+                reject(userError);
+                return;
+            }
 
-        const { error: deleteError } = await supabase
-            .from('favourites')
-            .delete()
-            .eq('user_id', userData.user.id);
+            const { error: deleteError } = await supabase
+                .from('favourites')
+                .delete()
+                .eq('user_id', userData.user.id);
 
-        if (deleteError) {
-            console.error('Error deleting', deleteError);
-            return;
-        }
+            if (deleteError) {
+                console.error('Error deleting', deleteError);
+                reject(deleteError);
+                return;
+            }
 
-        const { error } = await supabase.from('favourites').upsert(
-            favourites.map((favourite, index) => ({
-                pub_id: favourite.pubs.id,
-                user_id: userData.user.id,
-                count: index + 1,
-            })),
-        );
+            const { error } = await supabase.from('favourites').upsert(
+                favourites.map((favourite, index) => ({
+                    pub_id: favourite.pubs.id,
+                    user_id: userData.user.id,
+                    count: index + 1,
+                })),
+            );
 
-        if (error) {
-            console.error('Error uploading', error);
-            return;
-        }
+            if (error) {
+                console.error('Error uploading', error);
+                reject(error);
+                return;
+            }
+
+            resolve();
+        });
     }, [favourites]);
+
+    const updateUser = useCallback(async () => {
+        return new Promise<void>(async (resolve, reject) => {
+            const { data: userData, error: userError } =
+                await supabase.auth.getUser();
+
+            if (userError) {
+                console.error(userError);
+                reject(userError);
+                return;
+            }
+
+            const { error } = await supabase
+                .from('users_public')
+                .update({
+                    name: displayName,
+                    location: location,
+                })
+                .eq('id', userData.user.id);
+
+            if (error) {
+                console.error(error);
+                reject(error);
+                return;
+            }
+
+            resolve();
+        });
+    }, [displayName, location]);
 
     const saveChanges = useCallback(async () => {
         setIsSaving(true);
+        let promises: Promise<void>[] = [];
 
-        if (favouritesChanged) {
-            await updateFavourites();
+        if (favouritesChanged()) {
+            promises.push(updateFavourites());
         }
+
+        if (userChanged()) {
+            promises.push(updateUser());
+        }
+
+        await Promise.allSettled(promises);
 
         setIsSaving(false);
         navigation.goBack();
-    }, [updateFavourites, favouritesChanged, navigation]);
+    }, [
+        updateFavourites,
+        favouritesChanged,
+        navigation,
+        updateUser,
+        userChanged,
+    ]);
 
     const dispatch = useAppDispatch();
 
@@ -229,7 +296,7 @@ export default function Settings({
                         favourites={favourites}
                         onRemove={removeFavourite}
                         addFavourite={addFavourite}
-                        setFavourites={changeFavourites}
+                        setFavourites={setFavourites}
                     />
                 </View>
 
