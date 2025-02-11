@@ -63,7 +63,10 @@ export default function Review({ review, noBorder }: ReviewProps) {
             <View>
                 <View style={styles.headerContainer}>
                     <View style={styles.avatarContainer}>
-                        <UserAvatar size={24} photo="" />
+                        <UserAvatar
+                            size={32}
+                            photo={review.user.profile_photo || ''}
+                        />
                     </View>
                     <View style={styles.headerTextContainer}>
                         <Text style={styles.nameText}>{review.user.name}</Text>

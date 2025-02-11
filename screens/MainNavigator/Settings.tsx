@@ -14,10 +14,11 @@ import { Feather } from '@expo/vector-icons';
 import { FAIL_COLOR } from '@/constants';
 import { useAppDispatch } from '@/store/hooks';
 import { signOut as storeSignOut } from '@/store/slices/user';
-import UserAvatar from '@/components/User/UserAvatar';
 import SettingsFavourites from '@/components/Settings/SettingsFavourites';
 import { UserType } from '@/services/queries/user';
 import { supabase } from '@/services/supabase';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import AvatarUpload from '@/components/Settings/AvatarUpload';
 
 const RIGHT_COLUMN_COLOR = 'rgba(0, 0, 0, 0.6)';
 
@@ -28,8 +29,13 @@ export default function Settings({
     const [displayName, setDisplayName] = useState(route.params.name);
     const [location, setLocation] = useState(route.params.location);
     const [favourites, setFavourites] = useState(route.params.favourites);
+    const [profilePhoto, setProfilePhoto] = useState(
+        route.params.profile_photo,
+    );
 
     const [isSaving, setIsSaving] = useState(false);
+
+    const { bottom } = useSafeAreaInsets();
 
     const favouritesChanged = useCallback(() => {
         if (route.params.favourites.length !== favourites.length) {
@@ -194,6 +200,7 @@ export default function Settings({
 
             <ScrollView
                 style={styles.scrollContainer}
+                contentContainerStyle={{ paddingBottom: bottom }}
                 keyboardDismissMode="interactive">
                 <View>
                     <View style={styles.loggedInContainer}>
@@ -209,7 +216,7 @@ export default function Settings({
                         onPress={() => console.log('Password')}>
                         <>
                             <Text style={styles.itemText}>
-                                Password and authentication
+                                Password and account
                             </Text>
                             <Feather
                                 name="chevron-right"
@@ -303,7 +310,60 @@ export default function Settings({
                 <View style={styles.sectionContainer}>
                     <Text style={styles.sectionHeader}>Avatar</Text>
 
-                    <UserAvatar photo={route.params.profile_photo} size={72} />
+                    <View style={styles.avatarContainer}>
+                        <AvatarUpload
+                            profilePhoto={profilePhoto}
+                            setProfilePhoto={setProfilePhoto}
+                        />
+                    </View>
+                </View>
+
+                <View style={styles.sectionContainer}>
+                    <Text style={styles.sectionHeader}>
+                        Additional Settings
+                    </Text>
+
+                    <TouchableHighlight
+                        style={styles.itemContainer}
+                        underlayColor={'#E5E7EB'}
+                        onPress={() => console.log('Notifications')}>
+                        <>
+                            <Text style={styles.itemText}>Notifications</Text>
+                            <Feather
+                                name="chevron-right"
+                                size={18}
+                                color={RIGHT_COLUMN_COLOR}
+                            />
+                        </>
+                    </TouchableHighlight>
+
+                    <TouchableHighlight
+                        style={styles.itemContainer}
+                        underlayColor={'#E5E7EB'}
+                        onPress={() => console.log('Privacy Policy')}>
+                        <>
+                            <Text style={styles.itemText}>Privacy policy</Text>
+                            <Feather
+                                name="chevron-right"
+                                size={18}
+                                color={RIGHT_COLUMN_COLOR}
+                            />
+                        </>
+                    </TouchableHighlight>
+
+                    <TouchableHighlight
+                        style={styles.itemContainer}
+                        underlayColor={'#E5E7EB'}
+                        onPress={() => console.log('Terms of Use')}>
+                        <>
+                            <Text style={styles.itemText}>Terms of use</Text>
+                            <Feather
+                                name="chevron-right"
+                                size={18}
+                                color={RIGHT_COLUMN_COLOR}
+                            />
+                        </>
+                    </TouchableHighlight>
                 </View>
             </ScrollView>
         </View>
@@ -391,5 +451,9 @@ const styles = StyleSheet.create({
     },
     inlineRightColumnText: {
         marginRight: 3,
+    },
+    avatarContainer: {
+        marginTop: 20,
+        marginHorizontal: 20,
     },
 });
