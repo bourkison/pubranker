@@ -160,6 +160,9 @@ export default function MapProvider({ children }: MapProviderProps) {
 
     const resetMapPubs = useCallback(() => {
         setMapPubs([]);
+        setPreviouslyFetchedPolygon(null);
+        setCurrentlySelectedPolygon(null);
+        setSelectedMapPub(undefined);
     }, []);
 
     return (

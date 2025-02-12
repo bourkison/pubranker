@@ -75,23 +75,6 @@ export default function HomeMap() {
 
     const [region, setRegion] = useState<Region>(initialRegion);
 
-    // const throttledSetRegion = useMemo(
-    //     () =>
-    //         _.throttle((r: Region) => setRegion(r), 1_000, {
-    //             leading: false,
-    //             trailing: true,
-    //         }),
-    //     [setRegion],
-    // );
-
-    // const regionChange = useCallback(
-    //     (r: Region) => {
-    //         throttledSetRegion(r);
-    //         // setRegion(r);
-    //     },
-    //     [throttledSetRegion],
-    // );
-
     const pubSelectedOnMap = (pub: { id: number; location: Point }) => {
         MapRef.current?.animateToRegion({
             latitude: pub.location.coordinates[1] - 0.15 * ANIMATE_DELTA,
@@ -136,7 +119,6 @@ export default function HomeMap() {
                     );
                 }}
                 style={[styles.map]}
-                // onRegionChange={regionChange}
                 customMapStyle={MapStyle}
                 mapPadding={{
                     bottom: bottomMapPadding,
