@@ -11,11 +11,17 @@ import {
     ActivityIndicator,
     TouchableHighlight,
 } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 
 type CollectionContext = Tables<'collections'> & {
     is_added: {
         count: number;
     }[];
+    user: {
+        username: string;
+        profile_photo: string;
+        id: string;
+    };
 };
 
 export default function AddToList({
@@ -41,7 +47,13 @@ export default function AddToList({
 
             const { data, error } = await supabase
                 .from('collections')
-                .select('*, is_added:collection_items(count)')
+                .select(
+                    `
+                    *, 
+                    is_added:collection_items(count), 
+                    user:users_public!collections_user_id_fkey1(id, username, profile_photo)
+                    `,
+                )
                 .eq('user_id', userData.user.id)
                 .eq('is_added.pub_id', route.params.pubId);
 
@@ -97,6 +109,19 @@ export default function AddToList({
                         </View>
                     )
                 }
+                ListHeaderComponent={
+                    <TouchableHighlight style={styles.newListContainer}>
+                        <>
+                            <Text>New list</Text>
+
+                            <Feather
+                                name="chevron-right"
+                                size={18}
+                                color={'rgba(0, 0, 0, 0.6)'}
+                            />
+                        </>
+                    </TouchableHighlight>
+                }
                 renderItem={({ item }) => (
                     <TouchableHighlight
                         disabled={isAdding}
@@ -141,5 +166,14 @@ const styles = StyleSheet.create({
     listContainer: {
         paddingVertical: 10,
         paddingHorizontal: 5,
+    },
+    newListContainer: {
+        flexDirection: 'row',
+        paddingVertical: 15,
+        paddingHorizontal: 20,
+        justifyContent: 'space-between',
+        borderBottomWidth: 1,
+        borderColor: '#E5E7EB',
+        alignItems: 'center',
     },
 });

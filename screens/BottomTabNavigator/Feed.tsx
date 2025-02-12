@@ -1,8 +1,9 @@
 import FeedListItem from '@/components/Feed/FeedListItem';
+import Header from '@/components/Utility/Header';
 import { FeedType, getFeedQuery } from '@/services/queries/feed';
 import { supabase } from '@/services/supabase';
 import React, { useEffect, useState } from 'react';
-import { FlatList, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { FlatList, SafeAreaView, StyleSheet } from 'react-native';
 
 export default function Feed() {
     const [feed, setFeed] = useState<FeedType[]>([]);
@@ -34,11 +35,7 @@ export default function Feed() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.headerContainer}>
-                <View style={styles.headerTextContainer}>
-                    <Text style={styles.headerText}>Feed</Text>
-                </View>
-            </View>
+            <Header header="Feed" />
             <FlatList
                 data={feed}
                 keyExtractor={item => item.id.toString()}
@@ -51,21 +48,5 @@ export default function Feed() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-    },
-    headerContainer: {
-        paddingVertical: 10,
-        alignItems: 'center',
-        flexDirection: 'row',
-        borderBottomWidth: 1,
-        borderColor: '#E5E7EB',
-    },
-    headerTextContainer: {
-        flex: 1,
-    },
-    headerText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        fontFamily: 'Jost',
-        textAlign: 'center',
     },
 });

@@ -14,6 +14,7 @@ import { Ionicons, SimpleLineIcons } from '@expo/vector-icons';
 import ProfileView from '@/components/User/ProfileView';
 import { userQuery, UserType } from '@/services/queries/user';
 import { supabase } from '@/services/supabase';
+import Header from '@/components/Utility/Header';
 
 export default function Profile({
     route,
@@ -136,21 +137,21 @@ export default function Profile({
 
     return (
         <SafeAreaView style={styles.flexOne}>
-            <View style={styles.headerContainer}>
-                <TouchableOpacity
-                    style={styles.settingsContainer}
-                    onPress={() => navigation.goBack()}>
-                    <Ionicons name="arrow-back-outline" size={14} />
-                </TouchableOpacity>
-
-                <View style={styles.headerTextContainer}>
-                    <Text style={styles.headerText}>{user.username}</Text>
-                </View>
-
-                <TouchableOpacity style={styles.menuContainer}>
-                    <SimpleLineIcons name="options" size={14} />
-                </TouchableOpacity>
-            </View>
+            <Header
+                header={user.username}
+                leftColumn={
+                    <TouchableOpacity
+                        style={styles.settingsContainer}
+                        onPress={() => navigation.goBack()}>
+                        <Ionicons name="arrow-back-outline" size={14} />
+                    </TouchableOpacity>
+                }
+                rightColumn={
+                    <TouchableOpacity style={styles.menuContainer}>
+                        <SimpleLineIcons name="options" size={14} />
+                    </TouchableOpacity>
+                }
+            />
 
             <ScrollView style={styles.flexOne}>
                 <ProfileView
@@ -171,13 +172,7 @@ const styles = StyleSheet.create({
     flexOne: {
         flex: 1,
     },
-    headerContainer: {
-        paddingVertical: 10,
-        alignItems: 'center',
-        flexDirection: 'row',
-        borderBottomWidth: 1,
-        borderColor: '#E5E7EB',
-    },
+
     settingsContainer: {
         paddingLeft: ICON_PADDING,
     },

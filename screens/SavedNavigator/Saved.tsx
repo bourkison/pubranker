@@ -21,6 +21,7 @@ import { SavedNavigatorStackParamList } from '@/nav/SavedNavigator';
 import CreateCollectionIcon from '@/components/Collections/CreateCollectionIcon';
 import SavedListItem from '@/components/Saves/SavedListItem';
 import { CollectionType } from '@/services/queries/collections';
+import Header from '@/components/Utility/Header';
 
 export default function SavedPubs({
     navigation,
@@ -169,19 +170,20 @@ export default function SavedPubs({
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.headerContainer}>
-                <TouchableOpacity style={styles.settingsContainer}>
-                    <Feather name="settings" size={18} color="#00000000" />
-                </TouchableOpacity>
+            <Header
+                header="Favourites"
+                leftColumn={
+                    <TouchableOpacity style={styles.settingsContainer}>
+                        <Feather name="settings" size={18} color="#00000000" />
+                    </TouchableOpacity>
+                }
+                rightColumn={
+                    <View style={styles.menuContainer}>
+                        <CreateCollectionIcon />
+                    </View>
+                }
+            />
 
-                <View style={styles.headerTextContainer}>
-                    <Text style={styles.headerText}>Favourites</Text>
-                </View>
-
-                <View style={styles.menuContainer}>
-                    <CreateCollectionIcon />
-                </View>
-            </View>
             <FlatList
                 ListEmptyComponent={
                     <View>
@@ -258,26 +260,10 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '300',
     },
-    headerContainer: {
-        paddingVertical: 10,
-        alignItems: 'center',
-        flexDirection: 'row',
-        borderBottomWidth: 1,
-        borderColor: '#E5E7EB',
-    },
     settingsContainer: {
         paddingLeft: ICON_PADDING,
     },
     menuContainer: {
         paddingRight: ICON_PADDING,
-    },
-    headerTextContainer: {
-        flex: 1,
-    },
-    headerText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        fontFamily: 'Jost',
-        textAlign: 'center',
     },
 });
