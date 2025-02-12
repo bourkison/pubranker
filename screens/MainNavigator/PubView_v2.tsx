@@ -2,23 +2,36 @@ import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { FetchPubType, pubQuery } from '@/services/queries/pub';
 import { supabase } from '@/services/supabase';
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
     View,
     Text,
-    FlatList,
     ActivityIndicator,
     useWindowDimensions,
     Image,
     StyleSheet,
     TouchableOpacity,
+    Pressable,
 } from 'react-native';
 import * as Location from 'expo-location';
 import { distance, point } from '@turf/turf';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, SimpleLineIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { distanceString, roundToNearest } from '@/services';
-import { GOLD_RATINGS_COLOR } from '@/constants';
+import {
+    GOLD_RATINGS_COLOR,
+    PRIMARY_COLOR,
+    PUB_HOME_IMAGE_ASPECT_RATIO,
+} from '@/constants';
+import Animated, {
+    interpolateColor,
+    useAnimatedScrollHandler,
+    useAnimatedStyle,
+    useSharedValue,
+} from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useActionSheet } from '@expo/react-native-action-sheet';
+import { useSharedCollectionContext } from '@/context/collectionContext';
 
 const GRADIENT_HEIGHT = 128;
 
@@ -28,9 +41,20 @@ export default function PubView({
 }: StackScreenProps<MainNavigatorStackParamList, 'PubView'>) {
     const [pub, setPub] = useState<FetchPubType>();
     const [isLoading, setIsLoading] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
     const [distMeters, setDistMeters] = useState(0);
 
-    const { width, height } = useWindowDimensions();
+    const { width } = useWindowDimensions();
+    const insets = useSafeAreaInsets();
+    const { showActionSheetWithOptions } = useActionSheet();
+    const { showAddToCollection } = useSharedCollectionContext();
+
+    const scrollY = useSharedValue(0);
+
+    const imageHeight = useMemo<number>(
+        () => width / PUB_HOME_IMAGE_ASPECT_RATIO,
+        [width],
+    );
 
     const headerImage = useMemo<string>(() => {
         return supabase.storage.from('pubs').getPublicUrl('56/star_hd_1.png')
@@ -91,6 +115,106 @@ export default function PubView({
         })();
     }, [route]);
 
+    const setSaved = useCallback(
+        (s: boolean) => {
+            if (!pub) {
+                return;
+            }
+
+            setPub({ ...pub, saved: [{ count: s ? 1 : 0 }] });
+        },
+        [pub],
+    );
+
+    const toggleLike = useCallback(async () => {
+        if (isSaving || !pub) {
+            return;
+        }
+
+        setIsSaving(true);
+
+        const { data: userData, error: userError } =
+            await supabase.auth.getUser();
+
+        if (userError) {
+            console.error(userError);
+            return;
+        }
+
+        if (!pub.saved) {
+            setSaved(true);
+
+            const { error } = await supabase.from('saves').insert({
+                pub_id: pub.id,
+            });
+
+            setIsSaving(false);
+
+            if (!error) {
+                showAddToCollection(pub.id);
+
+                if (route.params.onSaveToggle) {
+                    route.params.onSaveToggle(pub.id, true);
+                }
+            } else {
+                setSaved(false);
+
+                console.error(error);
+            }
+        } else {
+            setSaved(false);
+
+            const { error } = await supabase
+                .from('saves')
+                .delete()
+                .eq('pub_id', pub.id)
+                .eq('user_id', userData.user.id);
+
+            setIsSaving(false);
+
+            if (!error) {
+                if (route.params.onSaveToggle) {
+                    route.params.onSaveToggle(pub.id, false);
+                }
+            } else {
+                setSaved(true);
+                console.error(error);
+            }
+        }
+    }, [pub, isSaving, showAddToCollection, route, setSaved]);
+
+    // ------- ANIMATED -----------
+
+    const onFlatListScroll = useAnimatedScrollHandler(
+        event => (scrollY.value = event.contentOffset.y),
+    );
+
+    const rButtonStyle = useAnimatedStyle(() => {
+        const pointFullBackground = imageHeight - insets.top;
+        -styles.button.height;
+        const pointStartInterpolation = pointFullBackground - 100;
+
+        console.log(
+            'scr',
+            scrollY.value,
+            'pfb',
+            pointFullBackground,
+            'psi',
+            pointStartInterpolation,
+        );
+
+        return {
+            backgroundColor: interpolateColor(
+                scrollY.value,
+                [pointStartInterpolation, pointFullBackground],
+                ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.99)'],
+                // [crossOverPoint - 25, crossOverPoint + 50],
+                // ['rgba(255, 255, 255, 0.99)', 'rgba(255, 255, 255, 0)'],
+                'RGB',
+            ),
+        };
+    });
+
     if (isLoading) {
         return <ActivityIndicator />;
     }
@@ -110,23 +234,81 @@ export default function PubView({
                     source={{ uri: headerImage }}
                     style={{
                         width: width,
-                        height: width,
+                        height: width / PUB_HOME_IMAGE_ASPECT_RATIO,
                     }}
                 />
             </View>
-            <FlatList
+
+            {/* This is our absolute positioned buttons */}
+            <Animated.View
+                style={[
+                    rButtonStyle,
+                    styles.buttonsContainer,
+                    { paddingTop: insets.top + 5 },
+                ]}>
+                <Pressable
+                    style={styles.button}
+                    onPress={() => navigation.goBack()}>
+                    <Ionicons
+                        name="arrow-back-outline"
+                        color={PRIMARY_COLOR}
+                        size={14}
+                    />
+                </Pressable>
+                <Pressable
+                    style={styles.button}
+                    onPress={() =>
+                        showActionSheetWithOptions(
+                            {
+                                options: [
+                                    saved ? 'Unsave' : 'Save',
+                                    'Write Review',
+                                    'Suggest an edit',
+                                    'View on map',
+                                    'Cancel',
+                                ],
+                                cancelButtonIndex: 4,
+                                tintColor: PRIMARY_COLOR,
+                                cancelButtonTintColor: PRIMARY_COLOR,
+                            },
+                            selected => {
+                                if (selected === 0) {
+                                    toggleLike();
+                                    return;
+                                }
+
+                                if (selected === 2) {
+                                    navigation.navigate('Suggestions', {
+                                        pub: pub,
+                                    });
+                                }
+                            },
+                        )
+                    }>
+                    <SimpleLineIcons
+                        name="options"
+                        color={PRIMARY_COLOR}
+                        size={14}
+                    />
+                </Pressable>
+            </Animated.View>
+            <Animated.FlatList
                 data={Array(1)}
+                onScroll={onFlatListScroll}
                 ListHeaderComponent={
                     <>
+                        {/* This drops the content by the image height allowing  */}
+                        {/* us to see the image */}
                         <View
                             style={[
                                 styles.transparentImage,
                                 {
                                     width: width,
-                                    height: width - GRADIENT_HEIGHT,
+                                    height: imageHeight - GRADIENT_HEIGHT,
                                 },
                             ]}
                         />
+                        {/* Gradient of the pub title */}
                         <LinearGradient
                             colors={['transparent', 'rgba(0, 0, 0, 0.4)']}
                             style={styles.gradient}>
@@ -181,7 +363,7 @@ export default function PubView({
                     </>
                 }
                 renderItem={() => (
-                    <View>
+                    <View style={styles.contentContainer}>
                         <Text>
                             Lorem ipsum dolor sit amet consectetur adipisicing
                             elit. Perferendis mollitia sit recusandae? Libero
@@ -477,5 +659,27 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 10,
+    },
+    buttonsContainer: {
+        position: 'absolute',
+        justifyContent: 'space-between',
+        flexDirection: 'row',
+        width: '100%',
+        paddingHorizontal: 20,
+        zIndex: 100,
+        top: 0,
+        paddingBottom: 5,
+    },
+    button: {
+        height: 28,
+        width: 28,
+        borderRadius: 14,
+        backgroundColor: '#fff',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 100,
+    },
+    contentContainer: {
+        backgroundColor: 'blue',
     },
 });
