@@ -11,6 +11,8 @@ import { BottomSheetBackdrop, BottomSheetModal } from '@gorhom/bottom-sheet';
 import { FetchPubType } from '@/services/queries/pub';
 import PubFeature from './PubFeature';
 import { PRIMARY_COLOR } from '@/constants';
+import { TablesInsert } from '@/types/schema';
+import { supabase } from '@/services/supabase';
 
 type CreateSuggestionProps = {
     pub: FetchPubType;
@@ -19,12 +21,14 @@ type CreateSuggestionProps = {
 const FEATURE_MARGIN_BOTTOM = 5;
 const FEATURE_MARGIN_HORIZONTAL = 4;
 
-export default function CreateSuggestion({}: CreateSuggestionProps) {
+export default function CreateSuggestion({ pub }: CreateSuggestionProps) {
     const bottomSheetRef = useRef<BottomSheetModal>(null);
 
     const expandModal = useCallback(() => {
         bottomSheetRef.current?.present();
     }, []);
+
+    const [isCreating, setIsCreating] = useState(false);
 
     const [reservable, setReservable] = useState<boolean | null>(null);
     const [freeWifi, setFreeWifi] = useState<boolean | null>(null);
@@ -56,6 +60,149 @@ export default function CreateSuggestion({}: CreateSuggestionProps) {
 
         func(true);
     };
+
+    const resetModal = useCallback(() => {
+        setReservable(null);
+        setFreeWifi(null);
+        setDogFriendly(null);
+        setKidFriendly(null);
+        setRooftop(null);
+        setGarden(null);
+        setPoolTables(null);
+        setDarts(null);
+        setFoosball(null);
+        setLiveSport(null);
+        setWheelchairAccessible(null);
+
+        bottomSheetRef.current?.dismiss();
+    }, []);
+
+    const uploadSuggestion = useCallback(async () => {
+        if (isCreating) {
+            return;
+        }
+
+        setIsCreating(true);
+        const uploads: TablesInsert<'suggestions'>[] = [];
+
+        if (reservable !== null) {
+            uploads.push({
+                pub_id: pub.id,
+                type: 'RESERVABLE',
+                value: reservable,
+            });
+        }
+
+        if (freeWifi !== null) {
+            uploads.push({
+                pub_id: pub.id,
+                type: 'FREE_WIFI',
+                value: freeWifi,
+            });
+        }
+
+        if (dogFriendly !== null) {
+            uploads.push({
+                pub_id: pub.id,
+                type: 'DOG_FRIENDLY',
+                value: dogFriendly,
+            });
+        }
+
+        if (kidFriendly !== null) {
+            uploads.push({
+                pub_id: pub.id,
+                type: 'KID_FRIENDLY',
+                value: kidFriendly,
+            });
+        }
+
+        if (rooftop !== null) {
+            uploads.push({
+                pub_id: pub.id,
+                type: 'ROOFTOP',
+                value: rooftop,
+            });
+        }
+
+        if (garden !== null) {
+            uploads.push({
+                pub_id: pub.id,
+                type: 'GARDEN',
+                value: garden,
+            });
+        }
+
+        if (poolTables !== null) {
+            uploads.push({
+                pub_id: pub.id,
+                type: 'POOL_TABLE',
+                value: poolTables,
+            });
+        }
+
+        if (darts !== null) {
+            uploads.push({
+                pub_id: pub.id,
+                type: 'DARTS',
+                value: darts,
+            });
+        }
+
+        if (foosball !== null) {
+            uploads.push({
+                pub_id: pub.id,
+                type: 'FOOSBALL',
+                value: foosball,
+            });
+        }
+
+        if (liveSport) {
+            uploads.push({
+                pub_id: pub.id,
+                type: 'LIVE_SPORT',
+                value: liveSport,
+            });
+        }
+
+        if (wheelchairAccessible) {
+            uploads.push({
+                pub_id: pub.id,
+                type: 'WHEELCHAIR_ACCESSIBLE',
+                value: wheelchairAccessible,
+            });
+        }
+
+        if (uploads.length === 0) {
+            return;
+        }
+
+        const { error } = await supabase.from('suggestions').insert(uploads);
+
+        if (error) {
+            console.error(error);
+            setIsCreating(false);
+            return;
+        }
+
+        setIsCreating(false);
+        resetModal();
+    }, [
+        darts,
+        dogFriendly,
+        foosball,
+        freeWifi,
+        wheelchairAccessible,
+        liveSport,
+        poolTables,
+        garden,
+        rooftop,
+        reservable,
+        kidFriendly,
+        pub,
+        isCreating,
+        resetModal,
+    ]);
 
     return (
         <>
@@ -209,7 +356,9 @@ export default function CreateSuggestion({}: CreateSuggestionProps) {
                     </View>
 
                     <View style={styles.createButtonContainer}>
-                        <Pressable style={styles.createButton}>
+                        <Pressable
+                            style={styles.createButton}
+                            onPress={uploadSuggestion}>
                             <Text style={styles.createText}>Upload</Text>
                         </Pressable>
                     </View>
