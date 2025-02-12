@@ -1,10 +1,4 @@
-import React, {
-    useCallback,
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
-} from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import MapView, { Region } from 'react-native-maps';
 import * as Location from 'expo-location';
@@ -17,7 +11,6 @@ import BottomSheetPubList from '@/components/Pubs/PubList';
 import SelectedPub from './SelectedPub';
 import { useSharedExploreContext } from '@/context/exploreContext';
 import MapMarkers from './MapMarkers';
-import _ from 'lodash';
 import { Point } from '@turf/helpers';
 import { useSharedMapContext } from '@/context/mapContext';
 
@@ -82,22 +75,22 @@ export default function HomeMap() {
 
     const [region, setRegion] = useState<Region>(initialRegion);
 
-    const throttledSetRegion = useMemo(
-        () =>
-            _.throttle((r: Region) => setRegion(r), 1_000, {
-                leading: false,
-                trailing: true,
-            }),
-        [setRegion],
-    );
+    // const throttledSetRegion = useMemo(
+    //     () =>
+    //         _.throttle((r: Region) => setRegion(r), 1_000, {
+    //             leading: false,
+    //             trailing: true,
+    //         }),
+    //     [setRegion],
+    // );
 
-    const regionChange = useCallback(
-        (r: Region) => {
-            throttledSetRegion(r);
-            // setRegion(r);
-        },
-        [throttledSetRegion],
-    );
+    // const regionChange = useCallback(
+    //     (r: Region) => {
+    //         throttledSetRegion(r);
+    //         // setRegion(r);
+    //     },
+    //     [throttledSetRegion],
+    // );
 
     const pubSelectedOnMap = (pub: { id: number; location: Point }) => {
         MapRef.current?.animateToRegion({
@@ -143,7 +136,7 @@ export default function HomeMap() {
                     );
                 }}
                 style={[styles.map]}
-                onRegionChange={regionChange}
+                // onRegionChange={regionChange}
                 customMapStyle={MapStyle}
                 mapPadding={{
                     bottom: bottomMapPadding,

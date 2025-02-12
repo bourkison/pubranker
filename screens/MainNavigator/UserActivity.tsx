@@ -24,7 +24,9 @@ export default function UserActivity({
     useEffect(() => {
         (async () => {
             setIsLoading(true);
-            const { data, error } = await getUserFeedQuery(route.params.userId);
+            const { data, error } = await getUserFeedQuery(
+                route.params.userId,
+            ).order('updated_at', { ascending: false });
 
             if (error) {
                 setIsLoading(false);
