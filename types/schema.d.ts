@@ -739,6 +739,38 @@ export type Database = {
           },
         ]
       }
+      suggestions: {
+        Row: {
+          created_at: string
+          id: number
+          pub_id: number
+          type: Database["public"]["Enums"]["suggestion_type"]
+          value: boolean
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          pub_id: number
+          type: Database["public"]["Enums"]["suggestion_type"]
+          value: boolean
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          pub_id?: number
+          type?: Database["public"]["Enums"]["suggestion_type"]
+          value?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suggestions_pub_id_fkey"
+            columns: ["pub_id"]
+            isOneToOne: false
+            referencedRelation: "pubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users_public: {
         Row: {
           bio: string
@@ -883,6 +915,18 @@ export type Database = {
     Enums: {
       collection_privacy_type: "PUBLIC" | "FRIENDS_ONLY" | "PRIVATE"
       feed_type: "REVIEW" | "REVIEW_LIKE" | "FOLLOW"
+      suggestion_type:
+        | "RESERVABLE"
+        | "FREE_WIFI"
+        | "DOG_FRIENDLY"
+        | "KID_FRIENDLY"
+        | "ROOFTOP"
+        | "GARDEN"
+        | "POOL_TABLE"
+        | "DARTS"
+        | "FOOSBALL"
+        | "LIVE_SPORT"
+        | "WHEELCHAIR_ACCESSIBLE"
     }
     CompositeTypes: {
       [_ in never]: never
