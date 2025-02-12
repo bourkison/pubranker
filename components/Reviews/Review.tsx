@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import { fromNowString } from '@/services';
 import UserAvatar from '@/components/User/UserAvatar';
-import { useSharedPubViewContext } from '@/context/pubViewContext';
 import { ListReviewType } from '@/services/queries/review';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -34,8 +33,6 @@ export default function Review({ review, noBorder }: ReviewProps) {
     const navigation =
         useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
 
-    const { calculateWithinScrollBounds } = useSharedPubViewContext();
-
     const onTextLayout = useCallback(
         (e: NativeSyntheticEvent<TextLayoutEventData>) => {
             setLengthMore(e.nativeEvent.lines.length >= MAX_LINES_LENGTH);
@@ -58,8 +55,7 @@ export default function Review({ review, noBorder }: ReviewProps) {
             ]}
             onPress={() =>
                 navigation.navigate('ViewReview', { reviewId: review.id })
-            }
-            onLayout={() => calculateWithinScrollBounds(false)}>
+            }>
             <View>
                 <View style={styles.headerContainer}>
                     <View style={styles.avatarContainer}>

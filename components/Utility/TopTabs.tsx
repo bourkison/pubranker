@@ -1,5 +1,4 @@
 import { SECONDARY_COLOR } from '@/constants';
-import { useSharedPubViewContext } from '@/context/pubViewContext';
 import React, { useEffect, useState } from 'react';
 import {
     View,
@@ -38,17 +37,8 @@ type TopTabsPageProps = {
 };
 
 function TopTabsPage({ component }: TopTabsPageProps) {
-    const { calculateWithinScrollBounds } = useSharedPubViewContext();
-
     // TODO: onLayout still not showing updated height with measure function.
-    return (
-        <Animated.View
-            onLayout={() => {
-                calculateWithinScrollBounds(true);
-            }}>
-            {component}
-        </Animated.View>
-    );
+    return <Animated.View>{component}</Animated.View>;
 }
 
 export default function TopTabs({ data }: TopTabsProps) {
@@ -84,6 +74,7 @@ export default function TopTabs({ data }: TopTabsProps) {
     const rStyle = useAnimatedStyle(() => ({
         transform: [{ translateX: sIndicatorTranslateX.value }],
         width: sIndicatorWidth.value,
+        zIndex: 99,
     }));
 
     useEffect(() => {
@@ -273,6 +264,7 @@ const styles = StyleSheet.create({
     container: {
         paddingTop: 25,
         marginHorizontal: 20,
+        zIndex: 3,
     },
     itemsContainer: {
         flexDirection: 'row',
@@ -293,13 +285,13 @@ const styles = StyleSheet.create({
     indicator: {
         borderBottomWidth: 3,
         borderColor: SECONDARY_COLOR,
-        zIndex: 5,
+        zIndex: 100,
     },
     separator: {
         marginHorizontal: 30,
         borderTopWidth: 1,
         borderColor: '#E5E7EB',
         marginTop: -2,
-        zIndex: -1,
+        zIndex: 0,
     },
 });

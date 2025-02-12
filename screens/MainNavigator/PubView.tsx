@@ -1,90 +1,92 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
+import { FetchPubType, pubQuery } from '@/services/queries/pub';
+import { supabase } from '@/services/supabase';
 import { StackScreenProps } from '@react-navigation/stack';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
     View,
     Text,
+    ActivityIndicator,
+    useWindowDimensions,
     Image,
     StyleSheet,
-    useWindowDimensions,
-    Pressable,
     TouchableOpacity,
-    ActivityIndicator,
+    Pressable,
 } from 'react-native';
-import { supabase } from '@/services/supabase';
+import * as Location from 'expo-location';
+import { distance, point } from '@turf/turf';
+import { Ionicons, SimpleLineIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { distanceString, roundToNearest } from '@/services';
 import {
     GOLD_RATINGS_COLOR,
     PRIMARY_COLOR,
-    PUB_HOME_IMAGE_ASPECT_RATIO,
+    PUB_VIEW_IMAGE_ASPECT_RATIO,
 } from '@/constants';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
-    Easing,
-    Extrapolation,
-    interpolate,
     interpolateColor,
-    measure,
-    runOnUI,
-    useAnimatedRef,
+    useAnimatedScrollHandler,
     useAnimatedStyle,
-    useDerivedValue,
     useSharedValue,
-    withDecay,
-    withTiming,
 } from 'react-native-reanimated';
-import { LinearGradient } from 'expo-linear-gradient';
-import { distanceString, roundToNearest } from '@/services';
-import { Ionicons, SimpleLineIcons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useActionSheet } from '@expo/react-native-action-sheet';
+import { useSharedCollectionContext } from '@/context/collectionContext';
 import PubTopBar from '@/components/Pubs/PubTopBar';
 import PubDescription from '@/components/Pubs/PubView/PubDescription';
-import FeaturesSection from '@/components/Pubs/PubView/Features/FeaturesSection';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import TopTabs from '@/components/Utility/TopTabs';
-import PubReviews from '@/components/Reviews/PubReviews';
-import PubGallery from '@/components/Pubs/PubView/PubGallery';
-import PubDetails from '@/components/Pubs/PubView/PubDetails';
-import { useActionSheet } from '@expo/react-native-action-sheet';
-import { PubViewContext } from '@/context/pubViewContext';
-import { ListReviewType } from '@/services/queries/review';
-import { useAppDispatch } from '@/store/hooks';
-import { setPubSave } from '@/store/slices/explore';
 import RatingsSummary from '@/components/Ratings/RatingsSummary';
 import RateButtonModal from '@/components/Pubs/PubView/RateButtonModal/RateButtonModal';
-import { useSharedCollectionContext } from '@/context/collectionContext';
-import { FetchPubType, pubQuery } from '@/services/queries/pub';
-import * as Location from 'expo-location';
-import { distance, point } from '@turf/turf';
+import FeaturesSection from '@/components/Pubs/PubView/Features/FeaturesSection';
+import TopTabs from '@/components/Utility/TopTabs';
+import PubGallery from '@/components/Pubs/PubView/PubGallery';
+import PubReviews from '@/components/Reviews/PubReviews';
+import PubDetails from '@/components/Pubs/PubView/PubDetails';
+import { ListReviewType } from '@/services/queries/review';
+import { PubViewContext } from '@/context/pubViewContext';
 
-// TODO: Rather than all this shit with animations
-// Could this not just be one flat list, with the image being outside of the component and absolutely position
-// Then a transparent list header component the same size of the image
+const GRADIENT_HEIGHT = 128;
 
 export default function PubView({
     route,
     navigation,
 }: StackScreenProps<MainNavigatorStackParamList, 'PubView'>) {
-    const [headerImageUrl, setHeaderImageUrl] = useState('');
-
+    const [pub, setPub] = useState<FetchPubType>();
+    const [isLoading, setIsLoading] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [distMeters, setDistMeters] = useState(0);
     const [reviews, setReviews] = useState<ListReviewType[]>([]);
     const [userReview, setUserReview] = useState<ListReviewType | null>(null);
 
-    const [isLoading, setIsLoading] = useState(false);
-    const [pub, setPub] = useState<FetchPubType>();
-    const [distMeters, setDistMeters] = useState(0);
-    const [saved, setSaved] = useState(false);
-
-    const { width, height } = useWindowDimensions();
-
-    const dispatch = useAppDispatch();
-    const { showAddToCollection } = useSharedCollectionContext();
-    const [isSaving, setIsSaving] = useState(false);
-
+    const { width } = useWindowDimensions();
+    const insets = useSafeAreaInsets();
     const { showActionSheetWithOptions } = useActionSheet();
+    const { showAddToCollection } = useSharedCollectionContext();
 
-    const animatedContainerRef = useAnimatedRef();
+    const scrollY = useSharedValue(0);
+
+    const imageHeight = useMemo<number>(
+        () => width / PUB_VIEW_IMAGE_ASPECT_RATIO,
+        [width],
+    );
+
+    const headerImage = useMemo<string>(() => {
+        if (pub?.primary_photo) {
+            return supabase.storage.from('pubs').getPublicUrl(pub.primary_photo)
+                .data.publicUrl;
+        }
+        return '';
+    }, [pub]);
+
+    const saved = useMemo<boolean>(() => {
+        if (!pub) {
+            return false;
+        }
+
+        return pub.saved[0].count > 0;
+    }, [pub]);
 
     useEffect(() => {
-        const fetchPub = async () => {
+        (async () => {
             setIsLoading(true);
 
             const { data: userData } = await supabase.auth.getUser();
@@ -102,13 +104,10 @@ export default function PubView({
                 return;
             }
 
-            setIsLoading(false);
-
+            // Have to ts-ignore below as typescript is not picking up
+            // The functions in our query as valid columns.
             // @ts-ignore
             const p: FetchPubType = data as FetchPubType;
-
-            setPub(p);
-            setSaved(p.saved[0].count > 0);
 
             // Next get the distance
             const l = await Location.getCurrentPositionAsync();
@@ -120,169 +119,22 @@ export default function PubView({
                     { units: 'meters' },
                 ),
             );
-        };
 
-        fetchPub();
+            setIsLoading(false);
+            setPub(p);
+        })();
     }, [route]);
 
-    useEffect(() => {
-        if (!pub) {
-            return;
-        }
-
-        const url = supabase.storage
-            .from('pubs')
-            .getPublicUrl(pub.primary_photo || '');
-        setHeaderImageUrl(url.data.publicUrl);
-    }, [pub]);
-
-    const insets = useSafeAreaInsets();
-
-    // We want initial image height to be 4:3, but 1:1 underneath.
-    // Render 1:1 but than move the translateY by the difference between heights.
-    const initTranslateY = useMemo(() => {
-        const fourByThreeHeight = width / PUB_HOME_IMAGE_ASPECT_RATIO;
-        return fourByThreeHeight - width;
-    }, [width]);
-
-    const calculateScreenOverflow = () => {
-        'worklet';
-        const measurement = measure(animatedContainerRef);
-
-        if (!measurement) {
-            return;
-        }
-
-        const { height: contentContainerHeight } = measurement;
-
-        const screenHeightBeingUsed = height - width; // Height of content container if no translation and not including overflow
-        const screenOverflow =
-            contentContainerHeight - screenHeightBeingUsed + initTranslateY;
-
-        return screenOverflow;
-    };
-
-    const sTranslateY = useSharedValue(0);
-    const contextY = useSharedValue(0);
-
-    const dTranslateY = useDerivedValue(() => {
-        const screenOverflow = calculateScreenOverflow();
-
-        if (!screenOverflow) {
-            console.warn('no screen overflow');
-            return sTranslateY.value;
-        }
-
-        return interpolate(
-            sTranslateY.value,
-            [
-                -screenOverflow - 70,
-                -screenOverflow - 50,
-                -screenOverflow,
-                0,
-                -initTranslateY * 0.8,
-                -initTranslateY * 2,
-            ],
-            [
-                -screenOverflow - 50,
-                -screenOverflow - 40,
-                -screenOverflow,
-                0,
-                -initTranslateY / 2,
-                -initTranslateY,
-            ],
-            {
-                extrapolateLeft: Extrapolation.CLAMP,
-                extrapolateRight: Extrapolation.CLAMP,
-            },
-        );
-    });
-
-    const rContentContainerStyle = useAnimatedStyle(() => ({
-        transform: [{ translateY: dTranslateY.value + initTranslateY }],
-    }));
-
-    const rOverlayStyle = useAnimatedStyle(() => ({
-        transform: [{ translateY: dTranslateY.value + initTranslateY }],
-    }));
-
-    const rButtonStyle = useAnimatedStyle(() => {
-        const imageHeight = -(width / PUB_HOME_IMAGE_ASPECT_RATIO);
-        const crossOverPoint = imageHeight + insets.top + styles.button.height;
-
-        return {
-            backgroundColor: interpolateColor(
-                dTranslateY.value,
-                [crossOverPoint - 25, crossOverPoint + 50],
-                ['rgba(255, 255, 255, 0.99)', 'rgba(255, 255, 255, 0)'],
-                'RGB',
-            ),
-        };
-    });
-
-    const withinScrollBoundsWorklet = (withAnimation: boolean) => {
-        'worklet';
-        const screenOverflow = calculateScreenOverflow();
-
-        if (!screenOverflow) {
-            return;
-        }
-
-        if (sTranslateY.value > 0) {
-            sTranslateY.value = withAnimation
-                ? withTiming(0, {
-                      duration: 300,
-                      easing: Easing.inOut(Easing.quad),
-                  })
-                : 0;
-        } else if (sTranslateY.value < -screenOverflow) {
-            sTranslateY.value = withAnimation
-                ? withTiming(-screenOverflow, {
-                      duration: 300,
-                      easing: Easing.inOut(Easing.quad),
-                  })
-                : -screenOverflow;
-        }
-    };
-
-    const panGesture = Gesture.Pan()
-        .activeOffsetY([-5, 5])
-        .onStart(() => {
-            contextY.value = sTranslateY.value;
-        })
-        .onUpdate(e => {
-            sTranslateY.value = e.translationY + contextY.value;
-        })
-        .onFinalize(e => {
-            const screenOverflow = calculateScreenOverflow();
-
-            if (!screenOverflow) {
+    const setSaved = useCallback(
+        (s: boolean) => {
+            if (!pub) {
                 return;
             }
 
-            if (sTranslateY.value > 0) {
-                withinScrollBoundsWorklet(true);
-                return;
-            }
-
-            if (sTranslateY.value < -screenOverflow) {
-                withinScrollBoundsWorklet(true);
-                return;
-            }
-
-            sTranslateY.value = withDecay(
-                {
-                    velocity: e.velocityY,
-                    deceleration: 0.998,
-                    clamp: [-screenOverflow, -initTranslateY],
-                },
-                () => withinScrollBoundsWorklet(true),
-            );
-        });
-
-    const calculateWithinScrollBounds = (withAnimation: boolean) => {
-        runOnUI(withinScrollBoundsWorklet)(withAnimation);
-    };
+            setPub({ ...pub, saved: [{ count: s ? 1 : 0 }] });
+        },
+        [pub],
+    );
 
     const toggleLike = useCallback(async () => {
         if (isSaving || !pub) {
@@ -311,8 +163,6 @@ export default function PubView({
             if (!error) {
                 showAddToCollection(pub.id);
 
-                dispatch(setPubSave({ id: pub.id, value: true }));
-
                 if (route.params.onSaveToggle) {
                     route.params.onSaveToggle(pub.id, true);
                 }
@@ -333,8 +183,6 @@ export default function PubView({
             setIsSaving(false);
 
             if (!error) {
-                dispatch(setPubSave({ id: pub.id, value: false }));
-
                 if (route.params.onSaveToggle) {
                     route.params.onSaveToggle(pub.id, false);
                 }
@@ -343,183 +191,214 @@ export default function PubView({
                 console.error(error);
             }
         }
-    }, [pub, dispatch, isSaving, showAddToCollection, route]);
+    }, [pub, isSaving, showAddToCollection, route, setSaved]);
+
+    // ------- ANIMATED -----------
+
+    const onFlatListScroll = useAnimatedScrollHandler(
+        event => (scrollY.value = event.contentOffset.y),
+    );
+
+    const rButtonStyle = useAnimatedStyle(() => {
+        // We need to have full background as we get to the buttons
+        // when scrolling.
+        const pointFullBackground =
+            imageHeight - insets.top - styles.button.height;
+
+        // We should start this process around a third of the way
+        // to this point.
+        const pointStartInterpolation = pointFullBackground / 3;
+
+        return {
+            backgroundColor: interpolateColor(
+                scrollY.value,
+                [pointStartInterpolation, pointFullBackground],
+                ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.99)'],
+                'RGB',
+            ),
+        };
+    });
+
+    const rImageContainerStyle = useAnimatedStyle(() => {
+        if (scrollY.value >= 0) {
+            return {
+                transform: [{ scaleY: 1 }, { scaleX: 1 }],
+            };
+        }
+
+        const imageHeightShouldBe = imageHeight - scrollY.value;
+
+        return {
+            transform: [
+                { translateY: -scrollY.value / 2 },
+                { scaleY: imageHeightShouldBe / imageHeight },
+                { scaleX: imageHeightShouldBe / imageHeight },
+            ],
+        };
+    });
 
     if (isLoading) {
         return <ActivityIndicator />;
     }
 
     if (!pub) {
-        return <Text>Pub error</Text>;
+        return (
+            <View>
+                <Text>404 No pub</Text>
+            </View>
+        );
     }
 
     return (
         <PubViewContext.Provider
             value={{
-                calculateWithinScrollBounds,
                 reviews,
                 setReviews,
                 userReview,
                 setUserReview,
             }}>
             <View style={styles.container}>
-                <GestureDetector gesture={panGesture}>
-                    <View>
-                        <Animated.View
-                            style={[
-                                rButtonStyle,
-                                styles.buttonsContainer,
-                                { paddingTop: insets.top + 5 },
-                            ]}>
-                            <Pressable
-                                style={styles.button}
-                                onPress={() => navigation.goBack()}>
-                                <Ionicons
-                                    name="arrow-back-outline"
-                                    color={PRIMARY_COLOR}
-                                    size={14}
-                                />
-                            </Pressable>
-                            <Pressable
-                                style={styles.button}
-                                onPress={() =>
-                                    showActionSheetWithOptions(
-                                        {
-                                            options: [
-                                                saved ? 'Unsave' : 'Save',
-                                                'Write Review',
-                                                'Suggest an edit',
-                                                'View on map',
-                                                'Cancel',
-                                            ],
-                                            cancelButtonIndex: 4,
-                                            tintColor: PRIMARY_COLOR,
-                                            cancelButtonTintColor:
-                                                PRIMARY_COLOR,
-                                        },
-                                        selected => {
-                                            if (selected === 0) {
-                                                toggleLike();
-                                                return;
-                                            }
+                <Animated.View
+                    style={[styles.imageContainer, rImageContainerStyle]}>
+                    <Image
+                        source={{ uri: headerImage }}
+                        style={{
+                            width: width,
+                            height: width / PUB_VIEW_IMAGE_ASPECT_RATIO,
+                        }}
+                    />
+                </Animated.View>
 
-                                            if (selected === 2) {
-                                                navigation.navigate(
-                                                    'Suggestions',
-                                                    { pub: pub },
-                                                );
-                                            }
-                                        },
-                                    )
-                                }>
-                                <SimpleLineIcons
-                                    name="options"
-                                    color={PRIMARY_COLOR}
-                                    size={14}
-                                />
-                            </Pressable>
-                        </Animated.View>
-                        <View style={styles.imageContainer}>
-                            <Image
-                                source={{ uri: headerImageUrl }}
-                                style={{
-                                    width: width,
-                                    height: width,
-                                }}
+                {/* This is our absolute positioned buttons */}
+                <Animated.View
+                    style={[
+                        rButtonStyle,
+                        styles.buttonsContainer,
+                        { paddingTop: insets.top + 5 },
+                    ]}>
+                    <Pressable
+                        style={styles.button}
+                        onPress={() => navigation.goBack()}>
+                        <Ionicons
+                            name="arrow-back-outline"
+                            color={PRIMARY_COLOR}
+                            size={14}
+                        />
+                    </Pressable>
+                    <Pressable
+                        style={styles.button}
+                        onPress={() =>
+                            showActionSheetWithOptions(
+                                {
+                                    options: [
+                                        saved ? 'Unsave' : 'Save',
+                                        'Write Review',
+                                        'Suggest an edit',
+                                        'View on map',
+                                        'Cancel',
+                                    ],
+                                    cancelButtonIndex: 4,
+                                    tintColor: PRIMARY_COLOR,
+                                    cancelButtonTintColor: PRIMARY_COLOR,
+                                },
+                                selected => {
+                                    if (selected === 0) {
+                                        toggleLike();
+                                        return;
+                                    }
+
+                                    if (selected === 2) {
+                                        navigation.navigate('Suggestions', {
+                                            pub: pub,
+                                        });
+                                    }
+                                },
+                            )
+                        }>
+                        <SimpleLineIcons
+                            name="options"
+                            color={PRIMARY_COLOR}
+                            size={14}
+                        />
+                    </Pressable>
+                </Animated.View>
+                <Animated.FlatList
+                    data={Array(1)}
+                    onScroll={onFlatListScroll}
+                    ListHeaderComponent={
+                        <>
+                            {/* This drops the content by the image height allowing  */}
+                            {/* us to see the image */}
+                            <View
+                                style={[
+                                    styles.transparentImage,
+                                    {
+                                        width: width,
+                                        height: imageHeight - GRADIENT_HEIGHT,
+                                    },
+                                ]}
                             />
-
-                            <Animated.View
-                                style={[styles.imageOverlay, rOverlayStyle]}>
-                                <LinearGradient
-                                    colors={[
-                                        'transparent',
-                                        'rgba(0, 0, 0, 0.4)',
-                                    ]}
-                                    style={styles.gradient}>
-                                    <View style={styles.headerContainer}>
-                                        <View
-                                            style={
-                                                styles.headerContentContainer
-                                            }>
-                                            <Text style={styles.titleText}>
-                                                {pub.name}
-                                            </Text>
+                            {/* Gradient of the pub title */}
+                            <LinearGradient
+                                colors={['transparent', 'rgba(0, 0, 0, 0.4)']}
+                                style={styles.gradient}>
+                                <View style={styles.headerContainer}>
+                                    <View style={styles.headerContentContainer}>
+                                        <Text style={styles.titleText}>
+                                            {pub.name}
+                                        </Text>
+                                        <View style={styles.bottomRowContainer}>
+                                            <View
+                                                style={styles.ratingsContainer}>
+                                                <Ionicons
+                                                    name="star"
+                                                    size={10}
+                                                    color={GOLD_RATINGS_COLOR}
+                                                />
+                                                <Text
+                                                    style={styles.ratingsText}>
+                                                    {roundToNearest(
+                                                        pub.rating,
+                                                        0.1,
+                                                    ).toFixed(1)}{' '}
+                                                    ({pub.num_reviews[0].count})
+                                                </Text>
+                                            </View>
                                             <View
                                                 style={
-                                                    styles.bottomRowContainer
+                                                    styles.distanceContainer
                                                 }>
-                                                <View
-                                                    style={
-                                                        styles.ratingsContainer
-                                                    }>
-                                                    <Ionicons
-                                                        name="star"
-                                                        size={10}
-                                                        color={
-                                                            GOLD_RATINGS_COLOR
-                                                        }
-                                                    />
-                                                    <Text
-                                                        style={
-                                                            styles.ratingsText
-                                                        }>
-                                                        {roundToNearest(
-                                                            pub.rating,
-                                                            0.1,
-                                                        ).toFixed(1)}{' '}
-                                                        (
-                                                        {
-                                                            pub.num_reviews[0]
-                                                                .count
-                                                        }
-                                                        )
-                                                    </Text>
-                                                </View>
-                                                <View
-                                                    style={
-                                                        styles.distanceContainer
-                                                    }>
-                                                    <Text
-                                                        numberOfLines={1}
-                                                        style={
-                                                            styles.distanceText
-                                                        }>
-                                                        {distanceString(
-                                                            distMeters,
-                                                        )}
-                                                    </Text>
-                                                </View>
+                                                <Text
+                                                    numberOfLines={1}
+                                                    style={styles.distanceText}>
+                                                    {distanceString(distMeters)}
+                                                </Text>
                                             </View>
                                         </View>
-                                        <View style={styles.heartContainer}>
-                                            <TouchableOpacity
-                                                onPress={toggleLike}>
-                                                {saved ? (
-                                                    <Ionicons
-                                                        name="heart"
-                                                        size={14}
-                                                        color="#dc2626"
-                                                    />
-                                                ) : (
-                                                    <Ionicons
-                                                        name="heart-outline"
-                                                        size={14}
-                                                        color="#dc2626"
-                                                    />
-                                                )}
-                                            </TouchableOpacity>
-                                        </View>
                                     </View>
-                                </LinearGradient>
-                            </Animated.View>
-                        </View>
-                        <Animated.View
-                            // @ts-ignore
-                            ref={animatedContainerRef}
-                            style={[
-                                styles.contentContainer,
-                                rContentContainerStyle,
-                            ]}>
+                                    <View style={styles.heartContainer}>
+                                        <TouchableOpacity>
+                                            {saved ? (
+                                                <Ionicons
+                                                    name="heart"
+                                                    size={14}
+                                                    color="#dc2626"
+                                                />
+                                            ) : (
+                                                <Ionicons
+                                                    name="heart-outline"
+                                                    size={14}
+                                                    color="#dc2626"
+                                                />
+                                            )}
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                            </LinearGradient>
+                        </>
+                    }
+                    renderItem={() => (
+                        <View style={styles.contentContainer}>
                             <View>
                                 <PubTopBar pub={pub} distMeters={distMeters} />
                             </View>
@@ -606,9 +485,9 @@ export default function PubView({
                                     ]}
                                 />
                             </View>
-                        </Animated.View>
-                    </View>
-                </GestureDetector>
+                        </View>
+                    )}
+                />
             </View>
         </PubViewContext.Provider>
     );
@@ -616,55 +495,16 @@ export default function PubView({
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         backgroundColor: '#FFF',
-        height: '100%',
     },
-    contentContainer: {
-        backgroundColor: '#fff',
-        paddingBottom: 25,
-    },
-    buttonsContainer: {
-        position: 'absolute',
-        justifyContent: 'space-between',
-        flexDirection: 'row',
-        width: '100%',
-        paddingHorizontal: 20,
-        zIndex: 100,
-        top: 0,
-        paddingBottom: 5,
-    },
-    headerContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    headerContentContainer: {},
-    heartContainer: {
-        height: 28,
-        width: 28,
-        borderRadius: 14,
-        backgroundColor: '#fff',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: 10,
-    },
-    button: {
-        height: 28,
-        width: 28,
-        borderRadius: 14,
-        backgroundColor: '#fff',
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 100,
+    transparentImage: {
+        opacity: 0,
     },
     imageContainer: {
-        position: 'relative',
-    },
-    imageOverlay: {
         position: 'absolute',
-        bottom: 0,
-        width: '100%',
+        top: 0,
+        left: 0,
+        right: 0,
     },
     gradient: {
         flex: 1,
@@ -673,6 +513,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         paddingBottom: 5,
     },
+    headerContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    headerContentContainer: {},
     titleText: {
         fontSize: 24,
         color: '#FFF',
@@ -702,6 +548,38 @@ const styles = StyleSheet.create({
         fontSize: 10,
         color: '#fff',
         fontWeight: '300',
+    },
+    heartContainer: {
+        height: 28,
+        width: 28,
+        borderRadius: 14,
+        backgroundColor: '#fff',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 10,
+    },
+    buttonsContainer: {
+        position: 'absolute',
+        justifyContent: 'space-between',
+        flexDirection: 'row',
+        width: '100%',
+        paddingHorizontal: 20,
+        zIndex: 100,
+        top: 0,
+        paddingBottom: 5,
+    },
+    button: {
+        height: 28,
+        width: 28,
+        borderRadius: 14,
+        backgroundColor: '#fff',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 100,
+    },
+    contentContainer: {
+        backgroundColor: 'white',
+        paddingBottom: 25,
     },
     summaryContainer: {},
     rateButtonContainer: {
