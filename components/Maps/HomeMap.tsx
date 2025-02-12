@@ -7,7 +7,7 @@ import { StyleSheet, View } from 'react-native';
 import { useAppSelector } from '@/store/hooks';
 import DebugPolygons from './DebugPolygons';
 import BottomSheet from '@gorhom/bottom-sheet';
-import BottomSheetPubList from '@/components/Pubs/PubList';
+import BottomSheetPubList from '@/components/Pubs/BottomSheetPubList';
 import SelectedPub from './SelectedPub';
 import { useSharedExploreContext } from '@/context/exploreContext';
 import MapMarkers from './MapMarkers';

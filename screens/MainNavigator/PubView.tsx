@@ -37,7 +37,7 @@ import { distanceString, roundToNearest } from '@/services';
 import { Ionicons, SimpleLineIcons } from '@expo/vector-icons';
 import PubTopBar from '@/components/Pubs/PubTopBar';
 import PubDescription from '@/components/Pubs/PubView/PubDescription';
-import PubFeatures from '@/components/Pubs/PubView/PubFeatures';
+import FeaturesSection from '@/components/Pubs/PubView/Features/FeaturesSection';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import TopTabs from '@/components/Utility/TopTabs';
 import PubReviews from '@/components/Reviews/PubReviews';
@@ -556,7 +556,7 @@ export default function PubView({
                             <View style={styles.seperator} />
 
                             <View>
-                                <PubFeatures pub={pub} />
+                                <FeaturesSection pub={pub} />
                             </View>
 
                             <View>

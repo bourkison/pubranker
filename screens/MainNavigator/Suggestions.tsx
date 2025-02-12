@@ -5,7 +5,7 @@ import { View, Text, StyleSheet, SafeAreaView, Pressable } from 'react-native';
 import { Ionicons, SimpleLineIcons } from '@expo/vector-icons';
 import { PRIMARY_COLOR } from '@/constants';
 import { useActionSheet } from '@expo/react-native-action-sheet';
-import PubFeature from '@/components/Pubs/PubFeature';
+import PubFeature from '@/components/Pubs/PubView/Features/PubFeature';
 
 export default function Suggestions({
     route,

@@ -5,7 +5,7 @@ import * as Location from 'expo-location';
 import { supabase } from '@/services/supabase';
 import { CollectionType } from '@/services/queries/collections';
 
-const METERS_WITHIN = 1000;
+const METERS_WITHIN = 100_000_000;
 const INITIAL_AMOUNT = 10;
 
 type RecommendedPubListProps = {};
@@ -33,6 +33,8 @@ export default function RecommendedPubList({}: RecommendedPubListProps) {
                 console.error(error);
                 return;
             }
+
+            console.log('pub list', data);
 
             setPubs(data);
             setIsLoading(false);
