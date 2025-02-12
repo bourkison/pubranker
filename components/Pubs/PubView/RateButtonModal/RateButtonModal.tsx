@@ -16,7 +16,6 @@ type RateButtonProps = {
 };
 
 export default function RateButtonModal({ pub }: RateButtonProps) {
-    // const [isLoading, setIsLoading] = useState(false);
     const bottomSheetRef = useRef<BottomSheetModal>(null);
     const navigation =
         useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();

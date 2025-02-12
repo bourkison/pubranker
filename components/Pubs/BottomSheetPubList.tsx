@@ -4,7 +4,11 @@ import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { ExplorePub, fetchMoreExplorePubs } from '@/store/slices/explore';
+import {
+    ExplorePub,
+    fetchMoreExplorePubs,
+    setPubSave,
+} from '@/store/slices/explore';
 
 type BottomSheetPubListProps = {
     pubs: ExplorePub[];
@@ -40,7 +44,17 @@ export default function BottomSheetPubList({ pubs }: BottomSheetPubListProps) {
             }
             data={pubs}
             keyExtractor={item => item.id.toString()}
-            renderItem={({ item }) => <PubItem pub={item} />}
+            renderItem={({ item }) => (
+                <PubItem
+                    pub={item}
+                    onSaveComplete={() =>
+                        dispatch(setPubSave({ id: item.id, value: true }))
+                    }
+                    onUnsaveComplete={() =>
+                        dispatch(setPubSave({ id: item.id, value: false }))
+                    }
+                />
+            )}
             onEndReached={loadMorePubs}
             ListFooterComponent={
                 isLoadingMore ? <ActivityIndicator /> : undefined

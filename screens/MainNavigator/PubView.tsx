@@ -141,6 +141,8 @@ export default function PubView({
             return;
         }
 
+        console.log('TOGGLE LIKE');
+
         setIsSaving(true);
 
         const { data: userData, error: userError } =
@@ -151,7 +153,7 @@ export default function PubView({
             return;
         }
 
-        if (!pub.saved) {
+        if (!saved) {
             setSaved(true);
 
             const { error } = await supabase.from('saves').insert({
@@ -160,16 +162,16 @@ export default function PubView({
 
             setIsSaving(false);
 
-            if (!error) {
-                showAddToCollection(pub.id);
-
-                if (route.params.onSaveToggle) {
-                    route.params.onSaveToggle(pub.id, true);
-                }
-            } else {
+            if (error) {
                 setSaved(false);
-
                 console.error(error);
+                return;
+            }
+
+            showAddToCollection(pub.id);
+
+            if (route.params.onSaveToggle) {
+                route.params.onSaveToggle(pub.id, true);
             }
         } else {
             setSaved(false);
@@ -182,16 +184,17 @@ export default function PubView({
 
             setIsSaving(false);
 
-            if (!error) {
-                if (route.params.onSaveToggle) {
-                    route.params.onSaveToggle(pub.id, false);
-                }
-            } else {
+            if (error) {
                 setSaved(true);
                 console.error(error);
+                return;
+            }
+
+            if (route.params.onSaveToggle) {
+                route.params.onSaveToggle(pub.id, false);
             }
         }
-    }, [pub, isSaving, showAddToCollection, route, setSaved]);
+    }, [pub, isSaving, showAddToCollection, route, setSaved, saved]);
 
     // ------- ANIMATED -----------
 
@@ -258,6 +261,7 @@ export default function PubView({
                 setUserReview,
             }}>
             <View style={styles.container}>
+                {/* Top image with expanding container */}
                 <Animated.View
                     style={[styles.imageContainer, rImageContainerStyle]}>
                     <Image
@@ -325,6 +329,7 @@ export default function PubView({
                 <Animated.FlatList
                     data={Array(1)}
                     onScroll={onFlatListScroll}
+                    showsVerticalScrollIndicator={false}
                     ListHeaderComponent={
                         <>
                             {/* This drops the content by the image height allowing  */}
@@ -377,7 +382,7 @@ export default function PubView({
                                         </View>
                                     </View>
                                     <View style={styles.heartContainer}>
-                                        <TouchableOpacity>
+                                        <TouchableOpacity onPress={toggleLike}>
                                             {saved ? (
                                                 <Ionicons
                                                     name="heart"
