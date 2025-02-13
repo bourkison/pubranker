@@ -42,13 +42,12 @@ export default function CollectionsHome({
             const { data, error } = await listFollowedCollectionsQuery()
                 .eq('user_id', userData.user.id)
                 .order('updated_at', { ascending: false })
-                // TODO: This order is useless as its referencing when the pub was created_at
-                .order('created_at', {
-                    referencedTable: 'collections.pubs',
+                .order('order', {
+                    referencedTable: 'collections.collection_items',
                     ascending: true,
                 })
                 .limit(INITIAL_LOAD_AMOUNT)
-                .limit(8, { referencedTable: 'collections.pubs' });
+                .limit(8, { referencedTable: 'collections.collection_items' });
 
             if (error) {
                 setIsLoading(false);

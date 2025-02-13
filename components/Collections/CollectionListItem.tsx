@@ -31,11 +31,11 @@ export default function CollectionListItem({
     useEffect(() => {
         const images: (string | null)[] = [];
 
-        collection.pubs.forEach(pub => {
-            if (pub.primary_photo) {
+        collection.collection_items.forEach(collectionItem => {
+            if (collectionItem.pub.primary_photo) {
                 const url = supabase.storage
                     .from('pubs')
-                    .getPublicUrl(pub.primary_photo);
+                    .getPublicUrl(collectionItem.pub.primary_photo);
 
                 images.push(url.data.publicUrl);
             } else {

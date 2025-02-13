@@ -2,13 +2,7 @@ import { SavedNavigatorStackParamList } from '@/nav/SavedNavigator';
 import { Ionicons } from '@expo/vector-icons';
 import { StackScreenProps } from '@react-navigation/stack';
 import React from 'react';
-import {
-    SafeAreaView,
-    Text,
-    View,
-    TouchableOpacity,
-    StyleSheet,
-} from 'react-native';
+import { SafeAreaView, View, TouchableOpacity, StyleSheet } from 'react-native';
 import { PRIMARY_COLOR } from '@/constants';
 import CollectionList from '@/components/Collections/CollectionList';
 import Header from '@/components/Utility/Header';

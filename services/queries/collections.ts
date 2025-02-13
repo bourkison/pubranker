@@ -5,9 +5,12 @@ export type ListCollectionType = {
     id: number;
     name: string;
     description: string | null;
-    pubs: {
-        id: number;
-        primary_photo: string | null;
+    collection_items: {
+        order: number;
+        pub: {
+            id: number;
+            primary_photo: string | null;
+        };
     }[];
     pubs_count: {
         count: number;
@@ -27,9 +30,12 @@ collections(
     id,
     name,
     description,
-    pubs(
-        id,
-        primary_photo
+    collection_items(
+        order,
+        pub:pubs(
+            id,
+            primary_photo
+        )
     ),
     pubs_count:pubs(count),
     user:users_public!collections_user_id_fkey1(id, name, username, profile_photo)
