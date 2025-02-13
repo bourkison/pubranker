@@ -311,9 +311,7 @@ export default function PubView({
                                     }
 
                                     if (selected === 2) {
-                                        navigation.navigate('Suggestions', {
-                                            pub: pub,
-                                        });
+                                        // TODO: Suggestion
                                     }
                                 },
                             )

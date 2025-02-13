@@ -53,7 +53,6 @@ export type RootStackParamList = {
         pubId: number;
         onSaveToggle?: (id: number, value: boolean) => void;
     };
-    Suggestions: { pub: FetchPubType };
     CreateReview: {
         pubId: number;
     };

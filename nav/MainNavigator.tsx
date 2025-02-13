@@ -2,7 +2,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 import BottomTabNavigator from '@/nav/BottomTabNavigator';
 import React from 'react';
 import PubView from '@/screens/MainNavigator/PubView';
-import Suggestions from '@/screens/MainNavigator/Suggestions';
 import CreateReview from '@/screens/MainNavigator/CreateReview';
 import ViewReview from '@/screens/MainNavigator/ViewReview';
 import CreateComment from '@/screens/MainNavigator/CreateComment';
@@ -30,11 +29,6 @@ export default function MainNavigator() {
             <Stack.Screen
                 name="PubView"
                 component={PubView}
-                options={{ headerShown: false }}
-            />
-            <Stack.Screen
-                name="Suggestions"
-                component={Suggestions}
                 options={{ headerShown: false }}
             />
             <Stack.Screen
