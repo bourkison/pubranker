@@ -92,7 +92,7 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
 
             const { data, error } = await collectionQuery(userData.user.id)
                 .eq('id', collectionId)
-                .order('created_at', {
+                .order('order', {
                     referencedTable: 'collection_items',
                     ascending: true,
                 })
@@ -105,6 +105,8 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
                 return;
             }
 
+            console.log('TEST', JSON.stringify(data));
+
             // @ts-ignore
             let coll: CollectionType = data as CollectionType;
 
@@ -112,14 +114,19 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
 
             coll = {
                 ...coll,
-                pubs: coll.pubs.map(pub => ({
-                    ...pub,
-                    dist_meters: distance(
-                        point([coords.longitude, coords.latitude]),
-                        point(pub.location.coordinates),
-                        { units: 'meters' },
-                    ),
-                })),
+                collection_items: coll.collection_items.map(
+                    collection_item => ({
+                        ...collection_item,
+                        pub: {
+                            ...collection_item.pub,
+                            dist_meters: distance(
+                                point([coords.longitude, coords.latitude]),
+                                point(collection_item.pub.location.coordinates),
+                                { units: 'meters' },
+                            ),
+                        },
+                    }),
+                ),
             };
 
             setCollection(coll);
@@ -133,15 +140,17 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
                 return;
             }
 
-            const pubs = collection.pubs.slice();
+            const collectionItems = collection.collection_items.slice();
 
-            const index = pubs.findIndex(pub => pub.id === id);
+            const index = collectionItems.findIndex(
+                collection_index => collection_index.pub.id === id,
+            );
 
             if (index > -1) {
-                pubs[index].saved[0].count = isSave ? 1 : 0;
+                collectionItems[index].pub.saved[0].count = isSave ? 1 : 0;
             }
 
-            setCollection({ ...collection, pubs });
+            setCollection({ ...collection, collection_items: collectionItems });
         },
         [collection],
     );
@@ -229,8 +238,8 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
 
     return (
         <FlatList
-            data={collection?.pubs || []}
-            keyExtractor={item => item.id.toString()}
+            data={collection?.collection_items || []}
+            keyExtractor={item => item.pub.id.toString()}
             ListEmptyComponent={
                 isLoading ? (
                     <ActivityIndicator />
@@ -243,8 +252,10 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
             ListHeaderComponent={
                 collection && (
                     <>
-                        {collection.pubs.length && (
-                            <CollectionMap pubs={collection.pubs} />
+                        {collection.collection_items.length && (
+                            <CollectionMap
+                                collectionItems={collection.collection_items}
+                            />
                         )}
                         <View style={styles.listHeaderContainer}>
                             <View style={styles.topListHeaderContainer}>
@@ -406,7 +417,7 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
             }
             renderItem={({ item }) => (
                 <SavedListItem
-                    pub={item}
+                    pub={item.pub}
                     onSaveCommence={id => toggleSave(id, true)}
                     onSaveComplete={(success, id) =>
                         !success ? toggleSave(id, false) : undefined

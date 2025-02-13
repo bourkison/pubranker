@@ -44,19 +44,21 @@ export const listFollowedCollectionsQuery = () =>
 // --------------------------------
 
 export type CollectionType = Tables<'collections'> & {
-    pubs: {
-        id: number;
-        name: string;
-        address: string;
-        primary_photo: string;
-        location: {
-            coordinates: [number, number];
-            type: string;
+    collection_items: {
+        pub: {
+            id: number;
+            name: string;
+            address: string;
+            primary_photo: string;
+            location: {
+                coordinates: [number, number];
+                type: string;
+            };
+            saved: { count: number }[];
+            rating: number;
+            num_reviews: { count: number }[];
+            dist_meters: number;
         };
-        saved: { count: number }[];
-        rating: number;
-        num_reviews: { count: number }[];
-        dist_meters: number;
     }[];
     user: {
         id: string;
@@ -71,21 +73,24 @@ export type CollectionType = Tables<'collections'> & {
 
 const collectionQueryString = `
 *,
-collection_items(pub_id, created_at),
+collection_items(
+    created_at,
+    order,
+    pub:pubs(
+        id, 
+        name, 
+        address,
+        num_reviews:reviews(count),
+        primary_photo, 
+        saved:saves(count),
+        location:get_pub_location, 
+        rating:get_pub_rating
+    )
+),
 user:users_public!collections_user_id_fkey1(id, name, username, profile_photo),
 is_followed:collection_follows(count),
 is_liked:collection_likes(count),
-likes:collection_likes(count),
-pubs(
-    id, 
-    name, 
-    address,
-    num_reviews:reviews(count),
-    primary_photo, 
-    saved:saves(count),
-    location:get_pub_location, 
-    rating:get_pub_rating
-)
+likes:collection_likes(count)
 ` as const;
 
 export const collectionQuery = (userId: string) =>
@@ -94,4 +99,4 @@ export const collectionQuery = (userId: string) =>
         .select(collectionQueryString)
         .eq('is_followed.user_id', userId)
         .eq('is_liked.user_id', userId)
-        .eq('pubs.saved.user_id', userId);
+        .eq('collection_items.pub.saved.user_id', userId);

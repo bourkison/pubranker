@@ -20,7 +20,7 @@ import { CollectionType } from '@/services/queries/collections';
 const NO_IMAGE = require('@/assets/noimage.png');
 
 type BottomSheetPubItemProps = {
-    pub: CollectionType['pubs'][number];
+    pub: CollectionType['collection_items'][number]['pub'];
     onSaveCommence?: (id: number) => void;
     onSaveComplete?: (success: boolean, id: number) => void;
     onUnsaveCommence?: (id: number) => void;

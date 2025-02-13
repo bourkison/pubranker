@@ -31,6 +31,8 @@ const NO_IMAGE = require('@/assets/noimage.png');
 const SELECTED_PUB_COLUMNS = 3;
 const IMAGE_PADDING = 10;
 
+const ICON_SIZE = 26;
+
 export default function CreateCollection({
     navigation,
 }: StackScreenProps<MainNavigatorStackParamList, 'CreateCollection'>) {
@@ -144,7 +146,7 @@ export default function CreateCollection({
                 pubs.map((pub, index) => ({
                     collection_id: data.id,
                     pub_id: pub.id,
-                    order: index,
+                    order: index + 1,
                 })),
             );
 
@@ -280,7 +282,7 @@ export default function CreateCollection({
                             <View style={styles.settingsIconContainer}>
                                 <Entypo
                                     name="globe"
-                                    size={36}
+                                    size={ICON_SIZE}
                                     color={ICON_COLOR}
                                 />
 
@@ -292,7 +294,7 @@ export default function CreateCollection({
                             <View style={styles.settingsIconContainer}>
                                 <MaterialIcons
                                     name="people"
-                                    size={36}
+                                    size={ICON_SIZE}
                                     color={ICON_COLOR}
                                 />
 
@@ -306,7 +308,7 @@ export default function CreateCollection({
                             <View style={styles.settingsIconContainer}>
                                 <Entypo
                                     name="lock"
-                                    size={36}
+                                    size={ICON_SIZE}
                                     color={ICON_COLOR}
                                 />
 
@@ -322,7 +324,7 @@ export default function CreateCollection({
                             <View style={styles.settingsIconContainer}>
                                 <FontAwesome6
                                     name="ranking-star"
-                                    size={34}
+                                    size={ICON_SIZE - 2}
                                     color={ICON_COLOR}
                                 />
 
@@ -332,7 +334,7 @@ export default function CreateCollection({
                             <View style={styles.settingsIconContainer}>
                                 <FontAwesome5
                                     name="random"
-                                    size={36}
+                                    size={ICON_SIZE}
                                     color={ICON_COLOR}
                                 />
 
@@ -350,7 +352,7 @@ export default function CreateCollection({
                             <View style={styles.settingsIconContainer}>
                                 <MaterialIcons
                                     name="person"
-                                    size={36}
+                                    size={ICON_SIZE}
                                     color={ICON_COLOR}
                                 />
 
@@ -362,7 +364,7 @@ export default function CreateCollection({
                             <View style={styles.settingsIconContainer}>
                                 <MaterialIcons
                                     name="people"
-                                    size={36}
+                                    size={ICON_SIZE}
                                     color={ICON_COLOR}
                                 />
 

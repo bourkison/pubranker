@@ -7,20 +7,20 @@ import PubMapMarker from '../Maps/PubMapMarker';
 import { SECONDARY_COLOR } from '@/constants';
 
 type CollectionMapType = {
-    pubs: CollectionType['pubs'];
+    collectionItems: CollectionType['collection_items'];
 };
 
 const ASPECT_RATIO = 0.8;
 
-export default function CollectionMap({ pubs }: CollectionMapType) {
+export default function CollectionMap({ collectionItems }: CollectionMapType) {
     const MapRef = useRef<MapView>(null);
 
     const points = useMemo<[number, number][]>(
         () =>
-            pubs
-                .map(pub => pub.location.coordinates)
+            collectionItems
+                .map(collectionItem => collectionItem.pub.location.coordinates)
                 .filter(pub => pub !== undefined),
-        [pubs],
+        [collectionItems],
     );
 
     const { width } = useWindowDimensions();

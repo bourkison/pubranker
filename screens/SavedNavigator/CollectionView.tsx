@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { PRIMARY_COLOR } from '@/constants';
 import CollectionList from '@/components/Collections/CollectionList';
+import Header from '@/components/Utility/Header';
 
 export default function CollectionView({
     navigation,
@@ -18,19 +19,17 @@ export default function CollectionView({
 }: StackScreenProps<SavedNavigatorStackParamList, 'CollectionView'>) {
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.headerContainer}>
-                <TouchableOpacity
-                    style={styles.settingsContainer}
-                    onPress={() => navigation.goBack()}>
-                    <Ionicons name="arrow-back-outline" size={14} />
-                </TouchableOpacity>
-
-                <View style={styles.headerTextContainer}>
-                    <Text style={styles.headerText}>List</Text>
-                </View>
-
-                <View style={styles.menuContainer} />
-            </View>
+            <Header
+                header="List"
+                leftColumn={
+                    <TouchableOpacity
+                        style={styles.settingsContainer}
+                        onPress={() => navigation.goBack()}>
+                        <Ionicons name="arrow-back-outline" size={14} />
+                    </TouchableOpacity>
+                }
+                rightColumn={<View style={styles.menuContainer} />}
+            />
 
             <CollectionList collectionId={route.params.collectionId} />
         </SafeAreaView>
@@ -42,22 +41,6 @@ const ICON_PADDING = 10;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-    },
-    headerContainer: {
-        paddingVertical: 10,
-        alignItems: 'center',
-        flexDirection: 'row',
-        borderBottomWidth: 1,
-        borderColor: '#E5E7EB',
-    },
-    headerTextContainer: {
-        flex: 1,
-    },
-    headerText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        fontFamily: 'Jost',
-        textAlign: 'center',
     },
     settingsContainer: {
         paddingLeft: ICON_PADDING,
