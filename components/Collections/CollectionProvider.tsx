@@ -5,7 +5,6 @@ import { Feather, Ionicons } from '@expo/vector-icons';
 import { SECONDARY_COLOR } from '@/constants';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
-import { StackScreenProps } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 
 type CollectionProviderProps = {
@@ -71,7 +70,6 @@ export default function CollectionProvider({
                 showAddToCollection,
                 setBottomTabHeight,
                 setIsOnBottomTabsPage,
-                setNavigation,
             }}>
             {children}
             {selectedPub !== null ? (
