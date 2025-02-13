@@ -1,16 +1,15 @@
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
-import { StackScreenProps } from '@react-navigation/stack';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, Pressable } from 'react-native';
 import { Ionicons, SimpleLineIcons } from '@expo/vector-icons';
 import { PRIMARY_COLOR } from '@/constants';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import PubFeature from '@/components/Pubs/PubView/Features/PubFeature';
+import { RootStackScreenProps } from '@/types/nav';
 
 export default function Suggestions({
     route,
     navigation,
-}: StackScreenProps<MainNavigatorStackParamList, 'Suggestions'>) {
+}: RootStackScreenProps<'Suggestions'>) {
     const [reservable, setReservable] = useState(route.params.pub.reservable);
     const [freeWifi, setFreeWifi] = useState(route.params.pub.free_wifi);
     const [dogFriendly, setDogFriendly] = useState(

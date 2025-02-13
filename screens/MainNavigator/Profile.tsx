@@ -1,5 +1,3 @@
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
-import { StackScreenProps } from '@react-navigation/stack';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
     View,
@@ -15,11 +13,12 @@ import ProfileView from '@/components/User/ProfileView';
 import { userQuery, UserType } from '@/services/queries/user';
 import { supabase } from '@/services/supabase';
 import Header from '@/components/Utility/Header';
+import { RootStackScreenProps } from '@/types/nav';
 
 export default function Profile({
     route,
     navigation,
-}: StackScreenProps<MainNavigatorStackParamList, 'Profile'>) {
+}: RootStackScreenProps<'Profile'>) {
     const [isLoading, setIsLoading] = useState(false);
     const [user, setUser] = useState<UserType>();
     const [isLoggedInUser, setIsLoggedInUser] = useState(false);

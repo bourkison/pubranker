@@ -1,7 +1,5 @@
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { supabase } from '@/services/supabase';
 import { Tables } from '@/types/schema';
-import { StackScreenProps } from '@react-navigation/stack';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
     View,
@@ -15,6 +13,7 @@ import {
 import { Feather, Entypo, MaterialIcons } from '@expo/vector-icons';
 import Header from '@/components/Utility/Header';
 import * as Haptics from 'expo-haptics';
+import { RootStackScreenProps } from '@/types/nav';
 
 type CollectionContext = Tables<'collections'> & {
     is_added: {
@@ -31,7 +30,7 @@ type CollectionContext = Tables<'collections'> & {
 export default function AddToList({
     route,
     navigation,
-}: StackScreenProps<MainNavigatorStackParamList, 'AddToList'>) {
+}: RootStackScreenProps<'AddToList'>) {
     const [isLoading, setIsLoading] = useState(false);
     const [isAdding, setIsAdding] = useState(false);
     const [collections, setCollections] = useState<CollectionContext[]>([]);

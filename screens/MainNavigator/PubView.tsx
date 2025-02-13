@@ -1,7 +1,5 @@
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { FetchPubType, pubQuery } from '@/services/queries/pub';
 import { supabase } from '@/services/supabase';
-import { StackScreenProps } from '@react-navigation/stack';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
     View,
@@ -43,13 +41,14 @@ import PubReviews from '@/components/Reviews/PubReviews';
 import PubDetails from '@/components/Pubs/PubView/PubDetails';
 import { ListReviewType } from '@/services/queries/review';
 import { PubViewContext } from '@/context/pubViewContext';
+import { RootStackScreenProps } from '@/types/nav';
 
 const GRADIENT_HEIGHT = 128;
 
 export default function PubView({
     route,
     navigation,
-}: StackScreenProps<MainNavigatorStackParamList, 'PubView'>) {
+}: RootStackScreenProps<'PubView'>) {
     const [pub, setPub] = useState<FetchPubType>();
     const [isLoading, setIsLoading] = useState(false);
     const [isSaving, setIsSaving] = useState(false);

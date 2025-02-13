@@ -1,5 +1,3 @@
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
-import { StackScreenProps } from '@react-navigation/stack';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
     View,
@@ -18,11 +16,12 @@ import {
     getFollowingQuery,
 } from '@/services/queries/follows';
 import FollowListItem from '@/components/Follows/FollowListItem';
+import { RootStackScreenProps } from '@/types/nav';
 
 export default function FollowersFollowingView({
     route,
     navigation,
-}: StackScreenProps<MainNavigatorStackParamList, 'FollowersFollowingView'>) {
+}: RootStackScreenProps<'FollowersFollowingView'>) {
     const [isLoading, setIsLoading] = useState(false);
     const [follows, setFollows] = useState<FollowsType[]>([]);
 

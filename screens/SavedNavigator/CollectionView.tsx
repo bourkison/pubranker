@@ -1,16 +1,15 @@
-import { SavedNavigatorStackParamList } from '@/nav/SavedNavigator';
 import { Ionicons } from '@expo/vector-icons';
-import { StackScreenProps } from '@react-navigation/stack';
 import React from 'react';
 import { SafeAreaView, View, TouchableOpacity, StyleSheet } from 'react-native';
 import { PRIMARY_COLOR } from '@/constants';
 import CollectionList from '@/components/Collections/CollectionList';
 import Header from '@/components/Utility/Header';
+import { SavedNavigatorScreenProps } from '@/types/nav';
 
 export default function CollectionView({
     navigation,
     route,
-}: StackScreenProps<SavedNavigatorStackParamList, 'CollectionView'>) {
+}: SavedNavigatorScreenProps<'CollectionView'>) {
     return (
         <SafeAreaView style={styles.container}>
             <Header

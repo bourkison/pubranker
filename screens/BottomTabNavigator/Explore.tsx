@@ -31,13 +31,14 @@ import { useSharedCollectionContext } from '@/context/collectionContext';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import SearchProvider from '@/components/Search/SearchProvider';
 import MapProvider from '@/components/Maps/MapProvider';
+import { HomeNavigatorBottomTabProps } from '@/types/nav';
 // import { Ionicons } from '@expo/vector-icons';
 
 const COLLAPSE_ON_SCROLL_AMOUNT = 100;
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
-export default function Explore() {
+export default function Explore({}: HomeNavigatorBottomTabProps<'Explore'>) {
     const { height } = useWindowDimensions();
 
     const [filterBarHeight, setFilterBarHeight] = useState(0);

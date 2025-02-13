@@ -13,17 +13,14 @@ import { Feather } from '@expo/vector-icons';
 import { userQuery } from '@/services/queries/user';
 import { UserType } from '@/services/queries/user';
 import ProfileView from '@/components/User/ProfileView';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
+import { ProfileNavigatorScreenProps } from '@/types/nav';
 
-export default function LoggedInProfile() {
+export default function LoggedInProfile({
+    navigation,
+}: ProfileNavigatorScreenProps<'ProfileHome'>) {
     const [user, setUser] = useState<UserType>();
     const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-
-    const navigation =
-        useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
 
     useEffect(() => {
         const fetchData = async () => {

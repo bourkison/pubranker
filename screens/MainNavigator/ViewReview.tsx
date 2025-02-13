@@ -1,5 +1,3 @@
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
-import { StackScreenProps } from '@react-navigation/stack';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
     View,
@@ -24,6 +22,7 @@ import * as Haptics from 'expo-haptics';
 import ReviewAttributes from '@/components/Reviews/ReviewAttributes';
 import { reviewQuery, ReviewType } from '@/services/queries/review';
 import { v4 as uuidv4 } from 'uuid';
+import { RootStackScreenProps } from '@/types/nav';
 
 const NO_IMAGE = require('@/assets/noimage.png');
 
@@ -34,7 +33,7 @@ const IMAGE_MARGIN = 8;
 export default function ViewReview({
     route,
     navigation,
-}: StackScreenProps<MainNavigatorStackParamList, 'ViewReview'>) {
+}: RootStackScreenProps<'ViewReview'>) {
     const [isLoading, setIsLoading] = useState(false);
     const [review, setReview] = useState<ReviewType>();
 

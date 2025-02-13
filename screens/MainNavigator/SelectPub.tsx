@@ -1,5 +1,3 @@
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
-import { StackScreenProps } from '@react-navigation/stack';
 import React, { useCallback, useState } from 'react';
 import {
     View,
@@ -15,11 +13,12 @@ import { supabase } from '@/services/supabase';
 import SearchSuggestionItem from '@/components/Search/SearchSuggestionItem';
 import { ResultType } from '@/context/searchContext';
 import Header from '@/components/Utility/Header';
+import { RootStackScreenProps } from '@/types/nav';
 
 export default function SelectPub({
     navigation,
     route,
-}: StackScreenProps<MainNavigatorStackParamList, 'SelectPub'>) {
+}: RootStackScreenProps<'SelectPub'>) {
     const [searchText, setSearchText] = useState('');
     const [results, setResults] = useState<ResultType[]>([]);
     const [isSearching, setIsSearching] = useState(false);

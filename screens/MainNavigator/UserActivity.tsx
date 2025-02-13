@@ -1,5 +1,3 @@
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
-import { StackScreenProps } from '@react-navigation/stack';
 import React, { useEffect, useState } from 'react';
 import {
     SafeAreaView,
@@ -13,11 +11,12 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { FeedType, getUserFeedQuery } from '@/services/queries/feed';
 import FeedListItem from '@/components/Feed/FeedListItem';
+import { RootStackScreenProps } from '@/types/nav';
 
 export default function UserActivity({
     navigation,
     route,
-}: StackScreenProps<MainNavigatorStackParamList, 'UserActivity'>) {
+}: RootStackScreenProps<'UserActivity'>) {
     const [feed, setFeed] = useState<FeedType[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 

@@ -2,11 +2,14 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import LoggedInProfile from '@/screens/ProfileNavigator/LoggedInProfile';
 import Notifications from '@/screens/ProfileNavigator/Notifications';
-import { ProfileNavigatorStackParamList } from '@/types/nav';
+import {
+    HomeNavigatorBottomTabProps,
+    ProfileNavigatorStackParamList,
+} from '@/types/nav';
 
 const Stack = createStackNavigator<ProfileNavigatorStackParamList>();
 
-export default function ProfileNavigator() {
+export default function ProfileNavigator({}: HomeNavigatorBottomTabProps<'LoggedInProfile'>) {
     return (
         <Stack.Navigator initialRouteName="ProfileHome">
             <Stack.Screen

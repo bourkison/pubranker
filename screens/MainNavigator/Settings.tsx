@@ -1,5 +1,3 @@
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
-import { StackScreenProps } from '@react-navigation/stack';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
     View,
@@ -20,13 +18,14 @@ import { supabase } from '@/services/supabase';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AvatarUpload from '@/components/Settings/AvatarUpload';
 import Header from '@/components/Utility/Header';
+import { RootStackScreenProps } from '@/types/nav';
 
 const RIGHT_COLUMN_COLOR = 'rgba(0, 0, 0, 0.6)';
 
 export default function Settings({
     navigation,
     route,
-}: StackScreenProps<MainNavigatorStackParamList, 'Settings'>) {
+}: RootStackScreenProps<'Settings'>) {
     const [displayName, setDisplayName] = useState(route.params.name);
     const [location, setLocation] = useState(route.params.location);
     const [favourites, setFavourites] = useState(route.params.favourites);

@@ -1,10 +1,8 @@
 import CollectionListItem from '@/components/Collections/CollectionListItem';
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import {
     ListCollectionType,
     listFollowedCollectionsQuery,
 } from '@/services/queries/collections';
-import { StackScreenProps } from '@react-navigation/stack';
 import React, { useEffect, useState } from 'react';
 import {
     View,
@@ -16,11 +14,12 @@ import {
     TouchableOpacity,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { RootStackScreenProps } from '@/types/nav';
 
 export default function UserCollections({
     route,
     navigation,
-}: StackScreenProps<MainNavigatorStackParamList, 'UserCollections'>) {
+}: RootStackScreenProps<'UserCollections'>) {
     const [collections, setCollections] = useState<ListCollectionType[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 

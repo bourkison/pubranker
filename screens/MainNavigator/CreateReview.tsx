@@ -1,9 +1,7 @@
 import RatingsSelector from '@/components/Ratings/RatingsSelector';
 import { SECONDARY_COLOR } from '@/constants';
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { supabase } from '@/services/supabase';
 import { Database } from '@/types/schema';
-import { StackScreenProps } from '@react-navigation/stack';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
     View,
@@ -17,6 +15,7 @@ import {
 } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
+import { RootStackScreenProps } from '@/types/nav';
 
 const NO_IMAGE = require('@/assets/noimage.png');
 
@@ -28,7 +27,7 @@ const ICON_SIZE = 32;
 export default function CreateReview({
     route,
     navigation,
-}: StackScreenProps<MainNavigatorStackParamList, 'CreateReview'>) {
+}: RootStackScreenProps<'CreateReview'>) {
     const [isLoading, setIsLoading] = useState(false);
     const [pub, setPub] =
         useState<Database['public']['Tables']['pubs']['Row']>();

@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { StackScreenProps } from '@react-navigation/stack';
 import React from 'react';
 import {
     SafeAreaView,
@@ -8,13 +7,13 @@ import {
     TouchableOpacity,
     StyleSheet,
 } from 'react-native';
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import CollectionList from '@/components/Collections/CollectionList';
+import { RootStackScreenProps } from '@/types/nav';
 
 export default function UserCollectionView({
     navigation,
     route,
-}: StackScreenProps<MainNavigatorStackParamList, 'UserCollectionView'>) {
+}: RootStackScreenProps<'UserCollectionView'>) {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.headerContainer}>

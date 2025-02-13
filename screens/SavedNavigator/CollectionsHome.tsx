@@ -9,8 +9,6 @@ import {
     ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { StackScreenProps } from '@react-navigation/stack';
-import { SavedNavigatorStackParamList } from '@/nav/SavedNavigator';
 import CreateCollectionIcon from '@/components/Collections/CreateCollectionIcon';
 import {
     ListCollectionType,
@@ -18,12 +16,13 @@ import {
 } from '@/services/queries/collections';
 import CollectionListItem from '@/components/Collections/CollectionListItem';
 import { supabase } from '@/services/supabase';
+import { SavedNavigatorScreenProps } from '@/types/nav';
 
 const INITIAL_LOAD_AMOUNT = 10;
 
 export default function CollectionsHome({
     navigation,
-}: StackScreenProps<SavedNavigatorStackParamList, 'CollectionsHome'>) {
+}: SavedNavigatorScreenProps<'CollectionsHome'>) {
     const [isLoading, setIsLoading] = useState(false);
     const [collections, setCollections] = useState<ListCollectionType[]>([]);
 

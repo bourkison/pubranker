@@ -1,3 +1,4 @@
+import { UserType } from '@/services/queries/user';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import {
     CompositeScreenProps,
@@ -14,7 +15,7 @@ export type ProfileNavigatorScreenProps<
     T extends keyof ProfileNavigatorStackParamList,
 > = CompositeScreenProps<
     StackScreenProps<ProfileNavigatorStackParamList, T>,
-    RootStackScreenProps<keyof RootStackParamList>
+    HomeNavigatorBottomTabProps<keyof HomeNavigatorBottomTabParamList>
 >;
 
 type SavedNavigatorStackParamList = {
@@ -29,7 +30,7 @@ export type SavedNavigatorScreenProps<
     T extends keyof SavedNavigatorStackParamList,
 > = CompositeScreenProps<
     StackScreenProps<SavedNavigatorStackParamList, T>,
-    RootStackScreenProps<keyof RootStackParamList>
+    HomeNavigatorBottomTabProps<keyof HomeNavigatorBottomTabParamList>
 >;
 
 type HomeNavigatorBottomTabParamList = {
@@ -40,7 +41,7 @@ type HomeNavigatorBottomTabParamList = {
 };
 
 export type HomeNavigatorBottomTabProps<
-    T extends keyof SavedNavigatorStackParamList,
+    T extends keyof HomeNavigatorBottomTabParamList,
 > = CompositeScreenProps<
     BottomTabScreenProps<HomeNavigatorBottomTabParamList, T>,
     RootStackScreenProps<keyof RootStackParamList>

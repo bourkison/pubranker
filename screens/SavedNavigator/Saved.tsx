@@ -16,16 +16,15 @@ import * as Location from 'expo-location';
 import { Text } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { User } from '@supabase/supabase-js';
-import { StackScreenProps } from '@react-navigation/stack';
-import { SavedNavigatorStackParamList } from '@/nav/SavedNavigator';
 import SavedListItem from '@/components/Saves/SavedListItem';
 import { CollectionType } from '@/services/queries/collections';
 import Header from '@/components/Utility/Header';
 import { distance, point } from '@turf/turf';
+import { SavedNavigatorScreenProps } from '@/types/nav';
 
 export default function SavedPubs({
     navigation,
-}: StackScreenProps<SavedNavigatorStackParamList, 'SavedHome'>) {
+}: SavedNavigatorScreenProps<'SavedHome'>) {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);

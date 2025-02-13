@@ -1,7 +1,5 @@
 import Header from '@/components/Utility/Header';
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { Enums } from '@/types/schema';
-import { StackScreenProps } from '@react-navigation/stack';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
     View,
@@ -24,6 +22,7 @@ import * as Haptics from 'expo-haptics';
 import { PRIMARY_COLOR } from '@/constants';
 import Sortable from 'react-native-sortables';
 import { supabase } from '@/services/supabase';
+import { RootStackScreenProps } from '@/types/nav';
 
 const ICON_COLOR = 'rgba(0, 0, 0, 0.8)';
 const NO_IMAGE = require('@/assets/noimage.png');
@@ -35,7 +34,7 @@ const ICON_SIZE = 26;
 
 export default function CreateCollection({
     navigation,
-}: StackScreenProps<MainNavigatorStackParamList, 'CreateCollection'>) {
+}: RootStackScreenProps<'CreateCollection'>) {
     const [elementWidth, setElementWidth] = useState(0);
     const [pubs, setPubs] = useState<
         { id: number; name: string; primary_photo: string | null }[]
@@ -156,7 +155,13 @@ export default function CreateCollection({
             return;
         }
 
-        navigation.navigate('CollectionView', { collectionId: data.id });
+        navigation.navigate('Home', {
+            screen: 'Favourites',
+            params: {
+                screen: 'CollectionView',
+                params: { collectionId: data.id },
+            },
+        });
     }, [
         name,
         description,

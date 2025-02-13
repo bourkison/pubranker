@@ -1,8 +1,7 @@
 import { PRIMARY_COLOR } from '@/constants';
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { supabase } from '@/services/supabase';
+import { RootStackScreenProps } from '@/types/nav';
 import { useFocusEffect } from '@react-navigation/native';
-import { StackScreenProps } from '@react-navigation/stack';
 import React, { useCallback, useRef, useState } from 'react';
 import {
     View,
@@ -16,7 +15,7 @@ import {
 export default function CreateComment({
     navigation,
     route,
-}: StackScreenProps<MainNavigatorStackParamList, 'CreateComment'>) {
+}: RootStackScreenProps<'CreateComment'>) {
     const [isCreating, setIsCreating] = useState(false);
     const [content, setContent] = useState('');
 

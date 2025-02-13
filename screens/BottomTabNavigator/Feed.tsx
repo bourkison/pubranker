@@ -2,10 +2,11 @@ import FeedListItem from '@/components/Feed/FeedListItem';
 import Header from '@/components/Utility/Header';
 import { FeedType, getFeedQuery } from '@/services/queries/feed';
 import { supabase } from '@/services/supabase';
+import { HomeNavigatorBottomTabProps } from '@/types/nav';
 import React, { useEffect, useState } from 'react';
 import { FlatList, SafeAreaView, StyleSheet } from 'react-native';
 
-export default function Feed() {
+export default function Feed({}: HomeNavigatorBottomTabProps<'Feed'>) {
     const [feed, setFeed] = useState<FeedType[]>([]);
 
     useEffect(() => {
