@@ -47,8 +47,6 @@ export default function DraughtBeersList({ pubId }: DraughtBeersListProps) {
                 return;
             }
 
-            console.log(relationships, data);
-
             setBeers(data);
             setIsLoading(false);
         };

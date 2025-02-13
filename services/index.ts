@@ -229,7 +229,6 @@ export const checkIfOpen = (
                 nextOpeningHours.unix() - dayjs().unix() &&
                 open.unix() - dayjs().unix() > 0)
         ) {
-            console.log('OPEN', nextOpeningHours);
             nextOpeningHours = open;
         }
     }

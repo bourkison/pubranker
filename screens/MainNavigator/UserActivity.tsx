@@ -32,8 +32,6 @@ export default function UserActivity({
                 console.error(error);
                 return;
             }
-
-            console.log('data', JSON.stringify(data));
             // @ts-ignore
             setFeed(data);
         })();

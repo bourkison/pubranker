@@ -53,8 +53,6 @@ export default function CollectionsHome({
                 return;
             }
 
-            console.log('response', data[0].collections.user);
-
             setCollections(data.map(follow => follow.collections));
             setIsLoading(false);
         };

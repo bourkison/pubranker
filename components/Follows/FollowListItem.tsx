@@ -66,8 +66,6 @@ export default function FollowListItem({
             return;
         }
 
-        console.log('unfollowing with', user.user_id, data.user.id);
-
         const { error: unfollowError } = await supabase
             .from('follows')
             .delete()

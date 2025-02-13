@@ -122,11 +122,9 @@ export default function Explore({}: HomeNavigatorBottomTabProps<'Explore'>) {
 
     // Run animations on ScrollView when changes occur.
     useEffect(() => {
-        console.log('EXPLORE STATE UPDATE', exploreState, previousExploreState);
         sScrollViewTranslateY.value = 0;
 
         if (exploreState === 'suggestions') {
-            console.log('setting');
             sScrollViewOpacity.value = 1;
         } else {
             sScrollViewOpacity.value = 0;

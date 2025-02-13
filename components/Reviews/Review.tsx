@@ -33,9 +33,8 @@ export default function Review({ review, noBorder }: ReviewProps) {
     const onTextLayout = useCallback(
         (e: NativeSyntheticEvent<TextLayoutEventData>) => {
             setLengthMore(e.nativeEvent.lines.length >= MAX_LINES_LENGTH);
-            console.log('TEXT', review);
         },
-        [review],
+        [],
     );
 
     const toggleText = () => {

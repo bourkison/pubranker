@@ -95,7 +95,6 @@ export default function PubItem({
             });
 
             setImageUrls(urls);
-            console.log('urls', urls);
         }
     }, [pub, imageUrls]);
 

@@ -140,8 +140,6 @@ export default function PubView({
             return;
         }
 
-        console.log('TOGGLE LIKE');
-
         setIsSaving(true);
 
         const { data: userData, error: userError } =

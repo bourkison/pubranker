@@ -59,8 +59,6 @@ export default function CollectionView({
                 return;
             }
 
-            console.log('TEST', JSON.stringify(data));
-
             // @ts-ignore
             let coll: CollectionType = data as CollectionType;
 

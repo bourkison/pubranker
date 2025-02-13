@@ -39,7 +39,6 @@ export default function CreateCollectionIcon() {
     }));
 
     const openSheet = useCallback(() => {
-        console.log(bottomSheetRef.current);
         bottomSheetRef.current?.present();
     }, []);
 

@@ -30,7 +30,6 @@ export default function FeedListItem({ feedItem }: FeedListItemProps) {
             />
         );
     } else if (feedItem.type === 'REVIEW_LIKE') {
-        console.log(feedItem.review);
         return <EmptyFeedListItem id={feedItem.id} />;
     }
 

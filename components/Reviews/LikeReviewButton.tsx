@@ -58,7 +58,6 @@ export default function LikeReviewButton({
         }
 
         setIsLiking(false);
-        console.log('success');
         onUnlikeComplete && onUnlikeComplete(true);
     }, [
         reviewId,

@@ -202,13 +202,6 @@ const exploreSlice = createSlice({
         ) {
             const index = state.pubs.findIndex(x => x.id === action.payload.id);
 
-            console.log(
-                'updating',
-                action.payload.id,
-                action.payload.value,
-                index,
-            );
-
             if (index > -1) {
                 state.pubs[index].saved = action.payload.value;
             }

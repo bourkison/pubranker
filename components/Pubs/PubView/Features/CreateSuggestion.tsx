@@ -48,8 +48,6 @@ export default function CreateSuggestion({ pub }: CreateSuggestionProps) {
         value: boolean | null,
         func: (val: boolean | null) => void,
     ) => {
-        console.log('toggle', value);
-
         if (value === true) {
             return func(false);
         }

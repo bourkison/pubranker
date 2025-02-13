@@ -71,8 +71,6 @@ export default function ViewReview({
 
             setIsLoading(false);
 
-            console.log('data', JSON.stringify(data));
-
             if (error) {
                 console.error(error);
                 return;

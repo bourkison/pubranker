@@ -217,7 +217,6 @@ export default function SavedPubs({
                     <RefreshControl
                         onRefresh={() => {
                             setIsRefreshing(false);
-                            console.log('refresh');
                         }}
                         refreshing={isRefreshing}
                     />

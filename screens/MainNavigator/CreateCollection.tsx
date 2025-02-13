@@ -55,6 +55,7 @@ export default function CreateCollection({
 
         if (error) {
             console.error(error);
+            setIsCreating(false);
             return;
         }
 
@@ -70,6 +71,7 @@ export default function CreateCollection({
 
         if (itemError) {
             console.error(itemError);
+            setIsCreating(false);
             return;
         }
 
@@ -92,7 +94,7 @@ export default function CreateCollection({
     ]);
 
     return (
-        <View>
+        <View style={styles.container}>
             <Header
                 header="New list"
                 leftColumn={

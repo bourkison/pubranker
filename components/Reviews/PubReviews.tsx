@@ -45,8 +45,6 @@ export default function PubReviews({ pub }: PubReviewsProps) {
                 return;
             }
 
-            console.log('reviews', data.length, JSON.stringify(data));
-
             // setReviews(data);
             setIsLoading(false);
             setHasLoaded(true);
@@ -59,8 +57,6 @@ export default function PubReviews({ pub }: PubReviewsProps) {
         if (!hasLoaded) {
             fetchReviews();
         }
-
-        // console.log(pub.review_stars_one, pub.review_stars_two);
     }, [pub, reviews, setIsLoading, setReviews, hasLoaded]);
 
     return (

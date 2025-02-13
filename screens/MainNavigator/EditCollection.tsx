@@ -57,11 +57,11 @@ export default function EditCollection({
             })
             .eq('id', route.params.collection.id)
             .select()
-            .limit(1)
             .single();
 
         if (error) {
-            console.error(error);
+            console.error('error updating', error);
+            setIsUpdating(false);
             return;
         }
 
@@ -73,6 +73,7 @@ export default function EditCollection({
 
         if (deleteError) {
             console.error('Error deleting', deleteError);
+            setIsUpdating(false);
             return;
         }
 
@@ -88,7 +89,8 @@ export default function EditCollection({
             );
 
         if (itemError) {
-            console.error(error);
+            console.error('end test', itemError);
+            setIsUpdating(false);
             return;
         }
 
@@ -112,7 +114,7 @@ export default function EditCollection({
     ]);
 
     return (
-        <View>
+        <View style={styles.container}>
             <Header
                 header="Update list"
                 leftColumn={

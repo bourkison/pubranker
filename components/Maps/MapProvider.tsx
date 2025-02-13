@@ -128,8 +128,6 @@ export default function MapProvider({ children }: MapProviderProps) {
                 }
             });
 
-            console.log('Pubs', newPubs.length);
-
             setMapPubs(newPubs);
         },
         [
