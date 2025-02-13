@@ -2,7 +2,7 @@ import Header from '@/components/Utility/Header';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { Enums } from '@/types/schema';
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
     View,
     Text,
@@ -11,6 +11,7 @@ import {
     TextInput,
     ScrollView,
     Pressable,
+    Image,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
@@ -21,19 +22,60 @@ import {
 } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { PRIMARY_COLOR } from '@/constants';
+import Sortable from 'react-native-sortables';
+import { supabase } from '@/services/supabase';
 
 const ICON_COLOR = 'rgba(0, 0, 0, 0.8)';
+const NO_IMAGE = require('@/assets/noimage.png');
+
+const SELECTED_PUB_COLUMNS = 3;
+const IMAGE_PADDING = 10;
 
 export default function CreateCollection({
     navigation,
 }: StackScreenProps<MainNavigatorStackParamList, 'CreateCollection'>) {
-    const [listName, setListName] = useState('');
+    const [elementWidth, setElementWidth] = useState(0);
+    const [pubs, setPubs] = useState<
+        { id: number; name: string; primary_photo: string | null }[]
+    >([]);
+
+    const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [publicity, setPublicity] =
         useState<Enums<'collection_privacy_type'>>('PUBLIC');
-
     const [ranked, setRanked] = useState(false);
     const [collaborative, setCollaborative] = useState(false);
+
+    const [isCreating, setIsCreating] = useState(false);
+
+    const { bottom } = useSafeAreaInsets();
+
+    const pubElementWidth = useMemo<number>(
+        () => elementWidth / SELECTED_PUB_COLUMNS,
+        [elementWidth],
+    );
+
+    const pubImageWidth = useMemo<number>(
+        () => pubElementWidth - 2 * IMAGE_PADDING,
+        [pubElementWidth],
+    );
+
+    const pubImageHeight = useMemo<number>(
+        () => pubImageWidth / 1,
+        [pubImageWidth],
+    );
+
+    const navigateToSelect = useCallback(
+        () =>
+            navigation.navigate('SelectPub', {
+                header: 'Select a pub',
+                onAdd: pub => {
+                    setPubs([...pubs, pub]);
+                },
+                excludedIds: pubs.map(pub => pub.id),
+            }),
+        [navigation, pubs],
+    );
 
     const togglePublicity = useCallback(() => {
         Haptics.selectionAsync();
@@ -47,12 +89,82 @@ export default function CreateCollection({
         }
     }, [publicity]);
 
-    const { bottom } = useSafeAreaInsets();
+    const pubImage = useCallback(
+        (index: number) => {
+            if (pubs[index].primary_photo) {
+                return {
+                    uri: supabase.storage
+                        .from('pubs')
+                        .getPublicUrl(pubs[index].primary_photo).data.publicUrl,
+                };
+            }
+
+            return NO_IMAGE;
+        },
+        [pubs],
+    );
+
+    const createCollection = useCallback(async () => {
+        if (!name || isCreating) {
+            return;
+        }
+
+        setIsCreating(true);
+
+        const { data: userData, error: userError } =
+            await supabase.auth.getUser();
+
+        if (userError) {
+            console.error('cant create user error', userError);
+            setIsCreating(false);
+            return;
+        }
+
+        const { data, error } = await supabase
+            .from('collections')
+            .insert({
+                name: name,
+                user_id: userData.user.id,
+                public: publicity,
+                collaborative: collaborative,
+                ranked: ranked,
+            })
+            .select()
+            .limit(1)
+            .single();
+
+        if (error) {
+            console.error(error);
+            return;
+        }
+
+        const { error: itemError } = await supabase
+            .from('collection_items')
+            .insert(
+                pubs.map((pub, index) => ({
+                    collection_id: data.id,
+                    pub_id: pub.id,
+                    order: index,
+                })),
+            );
+
+        if (itemError) {
+            console.error(itemError);
+            return;
+        }
+
+        navigation.navigate('CollectionView', { collectionId: data.id });
+    }, [name, publicity, collaborative, ranked, isCreating, navigation, pubs]);
 
     return (
         <ScrollView
             style={styles.container}
             contentContainerStyle={styles.container}
+            onLayout={({
+                nativeEvent: {
+                    layout: { width },
+                },
+            }) => setElementWidth(width)}
             bounces={false}
             keyboardDismissMode="on-drag">
             <Header
@@ -65,7 +177,9 @@ export default function CreateCollection({
                     </TouchableOpacity>
                 }
                 rightColumn={
-                    <TouchableOpacity style={styles.saveContainer}>
+                    <TouchableOpacity
+                        style={styles.saveContainer}
+                        onPress={createCollection}>
                         <Text style={styles.saveText}>Save</Text>
                     </TouchableOpacity>
                 }
@@ -82,8 +196,8 @@ export default function CreateCollection({
                             placeholderTextColor="rgba(0, 0, 0, 0.4)"
                             style={styles.nameInputText}
                             placeholder="Add list name"
-                            value={listName}
-                            onChangeText={setListName}
+                            value={name}
+                            onChangeText={setName}
                         />
                     </View>
                 </View>
@@ -107,15 +221,48 @@ export default function CreateCollection({
                         />
                     </View>
                 </View>
+            </View>
 
-                <Pressable style={styles.addPubSection}>
+            <Pressable style={styles.addPubSection} onPress={navigateToSelect}>
+                <View style={styles.addPubTextSection}>
                     <Text style={styles.sectionHeaderText}>Pubs</Text>
 
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={navigateToSelect}>
                         <Text style={styles.addPubsText}>Add pubs...</Text>
                     </TouchableOpacity>
-                </Pressable>
-            </View>
+                </View>
+
+                <ScrollView>
+                    <Sortable.Grid
+                        columns={3}
+                        hapticsEnabled={true}
+                        data={pubs}
+                        keyExtractor={pub => pub.id.toString()}
+                        onDragEnd={params => setPubs(params.data)}
+                        renderItem={({ item, index }) => (
+                            <Pressable
+                                style={[
+                                    styles.pubContainer,
+                                    { width: pubElementWidth },
+                                ]}>
+                                <Image
+                                    source={pubImage(index)}
+                                    style={[
+                                        styles.pubImage,
+                                        {
+                                            width: pubImageWidth,
+                                            height: pubImageHeight,
+                                        },
+                                    ]}
+                                />
+
+                                <Text style={styles.pubName}>{item.name}</Text>
+                            </Pressable>
+                        )}
+                    />
+                </ScrollView>
+            </Pressable>
+
             <View>
                 <View
                     style={[
@@ -254,7 +401,6 @@ const styles = StyleSheet.create({
     contentContainer: {
         paddingTop: 15,
         paddingLeft: 25,
-        flex: 1,
     },
     section: {
         borderColor: '#E5E7EB',
@@ -287,12 +433,14 @@ const styles = StyleSheet.create({
     },
     addPubSection: {
         marginTop: 15,
+        paddingHorizontal: 10,
         flex: 1,
     },
     addPubsText: {
         color: PRIMARY_COLOR,
         fontSize: 16,
-        marginTop: 20,
+        marginTop: 15,
+        marginBottom: 15,
         fontWeight: '600',
     },
     settingsSection: {
@@ -316,5 +464,23 @@ const styles = StyleSheet.create({
         fontSize: 12,
         marginTop: 6,
         letterSpacing: -0.2,
+    },
+    pubImage: {
+        borderRadius: 2,
+        zIndex: 1,
+    },
+    pubName: {
+        paddingHorizontal: 2,
+        marginTop: 2,
+        fontSize: 10,
+        textAlign: 'center',
+    },
+    pubContainer: {
+        zIndex: 1,
+        alignItems: 'center',
+        marginVertical: 5,
+    },
+    addPubTextSection: {
+        marginLeft: 20,
     },
 });

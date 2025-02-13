@@ -9,7 +9,7 @@ import store from '@/store';
 import 'react-native-gesture-handler';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
-import { StyleSheet, View } from 'react-native';
+import { LogBox, StyleSheet, View } from 'react-native';
 import { useFonts } from 'expo-font';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { StatusBar } from 'expo-status-bar';
@@ -19,6 +19,10 @@ import CollectionProvider from '@/components/Collections/CollectionProvider';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 dayjs.extend(advancedFormat);
+
+LogBox.ignoreLogs([
+    'Non-serializable values were found in the navigation state',
+]);
 
 export default function App() {
     const [fontsLoaded] = useFonts({

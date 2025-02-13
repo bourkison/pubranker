@@ -54,7 +54,7 @@ export default function Settings({
         }
 
         return favourites
-            .map(favourite => favourite.count)
+            .map(favourite => favourite.order)
             .reduce((acc, curr) => (acc += curr));
     }, [favourites]);
 
@@ -99,7 +99,7 @@ export default function Settings({
         (pub: { id: number; name: string; primary_photo: string | null }) => {
             const favourite: UserType['favourites'][number] = {
                 id: maxIdVal + 1,
-                count: maxCountVal + 1,
+                order: maxCountVal + 1,
                 pubs: pub,
             };
 

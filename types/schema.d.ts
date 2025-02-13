@@ -174,6 +174,7 @@ export type Database = {
           collection_id: number
           created_at: string
           id: number
+          order: number
           pub_id: number
           user_id: string
         }
@@ -181,6 +182,7 @@ export type Database = {
           collection_id?: number
           created_at?: string
           id?: number
+          order?: number
           pub_id?: number
           user_id?: string
         }
@@ -188,6 +190,7 @@ export type Database = {
           collection_id?: number
           created_at?: string
           id?: number
+          order?: number
           pub_id?: number
           user_id?: string
         }
@@ -256,6 +259,7 @@ export type Database = {
           id: number
           name: string
           public: Database["public"]["Enums"]["collection_privacy_type"]
+          ranked: boolean
           updated_at: string
           user_id: string
         }
@@ -266,6 +270,7 @@ export type Database = {
           id?: number
           name: string
           public?: Database["public"]["Enums"]["collection_privacy_type"]
+          ranked?: boolean
           updated_at?: string
           user_id: string
         }
@@ -276,6 +281,7 @@ export type Database = {
           id?: number
           name?: string
           public?: Database["public"]["Enums"]["collection_privacy_type"]
+          ranked?: boolean
           updated_at?: string
           user_id?: string
         }
@@ -362,23 +368,23 @@ export type Database = {
       }
       favourites: {
         Row: {
-          count: number
           created_at: string
           id: number
+          order: number
           pub_id: number
           user_id: string
         }
         Insert: {
-          count?: number
           created_at?: string
           id?: number
+          order?: number
           pub_id: number
           user_id?: string
         }
         Update: {
-          count?: number
           created_at?: string
           id?: number
+          order?: number
           pub_id?: number
           user_id?: string
         }

@@ -17,7 +17,7 @@ export type UserType = Tables<'users_public'> & {
     }[];
     favourites: {
         id: number;
-        count: number;
+        order: number;
         pubs: {
             id: number;
             primary_photo: string | null;
@@ -55,7 +55,7 @@ recent_ratings:reviews(
 ),
 favourites(
     id,
-    count,
+    order,
     pubs(
         id,
         primary_photo,
@@ -100,7 +100,7 @@ export const userQuery = (userId: string) =>
             referencedTable: 'recent_ratings',
             ascending: false,
         })
-        .order('count', {
+        .order('order', {
             referencedTable: 'favourites',
             ascending: true,
         })

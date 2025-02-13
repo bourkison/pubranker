@@ -102,8 +102,7 @@ export default function SettingsFavourites({
                 }) => setElementWidth(width)}>
                 <Sortable.Grid
                     columns={3}
-                    // @ts-ignore
-                    itemEntering={null}
+                    itemEntering={undefined}
                     itemExiting={undefined}
                     hapticsEnabled={true}
                     data={favourites}
