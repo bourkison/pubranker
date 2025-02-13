@@ -161,8 +161,14 @@ export default function CollectionView({
 
         if (error) {
             console.error(error);
+            return;
         }
-    }, [collection]);
+
+        navigation.navigate('Home', {
+            screen: 'Favourites',
+            params: { screen: 'CollectionsHome' },
+        });
+    }, [collection, navigation]);
 
     const showActions = useCallback(() => {
         if (isOwnedCollection) {
@@ -174,7 +180,7 @@ export default function CollectionView({
                 },
                 selected => {
                     if (selected === 0) {
-                        navigation.navigate('CreateCollection', {
+                        navigation.navigate('EditCollection', {
                             collection,
                         });
                     } else if (selected === 1) {

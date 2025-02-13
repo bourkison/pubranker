@@ -102,7 +102,8 @@ export type RootStackParamList = {
     UserActivity: {
         userId: string;
     };
-    CreateCollection: {
+    CreateCollection: undefined;
+    EditCollection: {
         collection?: CollectionType;
     };
 };
