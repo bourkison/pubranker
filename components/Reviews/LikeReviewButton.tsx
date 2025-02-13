@@ -2,7 +2,6 @@ import React, { useCallback, useState } from 'react';
 import { TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '@/services/supabase';
-import { Color } from '@/types';
 
 type LikeReviewButtonProps = {
     liked: boolean;

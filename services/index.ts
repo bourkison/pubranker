@@ -111,53 +111,48 @@ export const applyFilters = (
         });
     }
 
-    if (filters.dogFriendly !== 'unset') {
+    if (filters.dogFriendly !== null) {
         query = query.eq('dog_friendly', filters.dogFriendly);
     }
 
-    if (filters.liveSport !== 'unset') {
+    if (filters.liveSport !== null) {
         query = query.eq('live_sport', filters.liveSport);
     }
 
-    if (filters.darts !== 'unset') {
+    if (filters.darts !== null) {
         query = query.eq('dart_board', filters.darts);
     }
 
-    if (filters.pool !== 'unset') {
-        query = query.eq('pool_table', filters.pool);
+    if (filters.poolTable !== null) {
+        query = query.eq('pool_table', filters.poolTable);
     }
 
-    if (filters.sundayRoast !== 'unset') {
-        // TODO:
-        console.warn('No sunday roast filter yet');
-    }
-
-    if (filters.garden !== 'unset') {
+    if (filters.garden !== null) {
         query = query.eq('beer_garden', filters.garden);
     }
 
-    if (filters.kidFriendly !== 'unset') {
+    if (filters.kidFriendly !== null) {
         query = query.eq('kid_friendly', filters.kidFriendly);
     }
 
-    if (filters.liveMusic !== 'unset') {
+    if (filters.liveMusic !== null) {
         query = query.eq('live_music', filters.liveMusic);
     }
 
-    if (filters.boardGames !== 'unset') {
+    if (filters.boardGames !== null) {
         // TODO:
         console.warn('No board games filter yet');
     }
 
-    if (filters.freeWifi !== 'unset') {
+    if (filters.freeWifi !== null) {
         query = query.eq('free_wifi', filters.freeWifi);
     }
 
-    if (filters.roof !== 'unset') {
-        query = query.eq('rooftop', filters.roof);
+    if (filters.rooftop !== null) {
+        query = query.eq('rooftop', filters.rooftop);
     }
 
-    if (filters.foosball !== 'unset') {
+    if (filters.foosball !== null) {
         query = query.eq('foosball_table', filters.foosball);
     }
 

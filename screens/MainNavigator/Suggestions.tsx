@@ -143,7 +143,7 @@ export default function Suggestions({
                 />
                 <PubFeature
                     title="Live Sport"
-                    input={foosball}
+                    input={liveSport}
                     onPress={() => toggleFeature(liveSport, setLiveSport)}
                 />
                 <PubFeature

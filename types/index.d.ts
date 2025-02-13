@@ -15,22 +15,21 @@ export type BoundingBox = {
     maxLong: number;
 };
 
-export type BoolOrUnset = boolean | 'unset';
-
 export type PubFilters = {
-    dogFriendly: BoolOrUnset;
-    liveSport: BoolOrUnset;
-    darts: BoolOrUnset;
-    pool: BoolOrUnset;
-    sundayRoast: BoolOrUnset;
-    garden: BoolOrUnset;
-    kidFriendly: BoolOrUnset;
-    liveMusic: BoolOrUnset;
-    boardGames: BoolOrUnset;
-    freeWifi: BoolOrUnset;
-    roof: BoolOrUnset;
-    foosball: BoolOrUnset;
-    wheelchairAccessible: BoolOrUnset;
+    reservable: boolean | null;
+    dogFriendly: boolean | null;
+    liveSport: boolean | null;
+    darts: boolean | null;
+    poolTable: boolean | null;
+    sundayRoast: boolean | null;
+    garden: boolean | null;
+    kidFriendly: boolean | null;
+    liveMusic: boolean | null;
+    boardGames: boolean | null;
+    freeWifi: boolean | null;
+    rooftop: boolean | null;
+    foosball: boolean | null;
+    wheelchairAccessible: boolean | null;
 };
 
 export type RejectWithValueType = {

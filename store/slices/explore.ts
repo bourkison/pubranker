@@ -1,6 +1,6 @@
 import { applyFilters } from '@/services';
 import { supabase } from '@/services/supabase';
-import { BoolOrUnset, PubFilters, RejectWithValueType } from '@/types';
+import { PubFilters, RejectWithValueType } from '@/types';
 import {
     createAsyncThunk,
     createEntityAdapter,
@@ -43,19 +43,19 @@ export type ExplorePub = {
 };
 
 const INITIAL_FILTERS = {
-    dogFriendly: 'unset',
-    liveSport: 'unset',
-    darts: 'unset',
-    pool: 'unset',
-    sundayRoast: 'unset',
-    garden: 'unset',
-    kidFriendly: 'unset',
-    liveMusic: 'unset',
-    boardGames: 'unset',
-    freeWifi: 'unset',
-    roof: 'unset',
-    foosball: 'unset',
-    wheelchairAccessible: 'unset',
+    reservable: null,
+    dogFriendly: null,
+    liveSport: null,
+    darts: null,
+    poolTable: null,
+    garden: null,
+    kidFriendly: null,
+    liveMusic: null,
+    boardGames: null,
+    freeWifi: null,
+    rooftop: null,
+    foosball: null,
+    wheelchairAccessible: null,
 } as PubFilters;
 
 const initialState = discoverAdapter.getInitialState({
@@ -183,7 +183,10 @@ const exploreSlice = createSlice({
         },
         setFilter(
             state,
-            action: PayloadAction<{ key: keyof PubFilters; val: BoolOrUnset }>,
+            action: PayloadAction<{
+                key: keyof PubFilters;
+                val: boolean | null;
+            }>,
         ) {
             state.filters[action.payload.key] = action.payload.val;
         },
