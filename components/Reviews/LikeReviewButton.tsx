@@ -12,7 +12,6 @@ type LikeReviewButtonProps = {
     onLikeComplete?: (success: boolean) => void;
     onUnlikeCommence?: () => void;
     onUnlikeComplete?: (success: boolean) => void;
-    unlikedColor?: Color;
 };
 
 export default function LikeReviewButton({
@@ -23,7 +22,6 @@ export default function LikeReviewButton({
     onLikeComplete,
     onUnlikeCommence,
     onUnlikeComplete,
-    unlikedColor = '#dc2626',
 }: LikeReviewButtonProps) {
     const [isLiking, setIsLiking] = useState(false);
 
@@ -75,13 +73,9 @@ export default function LikeReviewButton({
     return (
         <TouchableOpacity onPress={toggleLike} disabled={isLiking}>
             {liked ? (
-                <Ionicons name="heart" size={size} color="#dc2626" />
+                <Ionicons name="heart" size={size} color="#000" />
             ) : (
-                <Ionicons
-                    name="heart-outline"
-                    size={size}
-                    color={unlikedColor}
-                />
+                <Ionicons name="heart-outline" size={size} color="#000" />
             )}
         </TouchableOpacity>
     );
