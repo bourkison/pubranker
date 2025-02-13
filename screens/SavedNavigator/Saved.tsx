@@ -164,15 +164,13 @@ export default function SavedPubs({
         <SafeAreaView style={styles.container}>
             <Header
                 header="Favourites"
-                leftColumn={
-                    <TouchableOpacity style={styles.settingsContainer}>
-                        <Feather name="settings" size={18} color="#00000000" />
-                    </TouchableOpacity>
-                }
+                leftColumn={<View style={styles.cancelContainer} />}
                 rightColumn={
-                    <View style={styles.menuContainer}>
-                        <CreateCollectionIcon />
-                    </View>
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('CreateCollection')}
+                        style={styles.createContainer}>
+                        <Feather name="plus" size={14} />
+                    </TouchableOpacity>
                 }
             />
 
@@ -252,10 +250,13 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '300',
     },
-    settingsContainer: {
+    cancelContainer: {
         paddingLeft: ICON_PADDING,
+        flex: 1,
     },
-    menuContainer: {
+    createContainer: {
         paddingRight: ICON_PADDING,
+        flex: 1,
+        alignItems: 'flex-end',
     },
 });

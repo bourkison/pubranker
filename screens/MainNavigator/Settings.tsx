@@ -19,6 +19,7 @@ import { UserType } from '@/services/queries/user';
 import { supabase } from '@/services/supabase';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AvatarUpload from '@/components/Settings/AvatarUpload';
+import Header from '@/components/Utility/Header';
 
 const RIGHT_COLUMN_COLOR = 'rgba(0, 0, 0, 0.6)';
 
@@ -179,24 +180,24 @@ export default function Settings({
 
     return (
         <View style={styles.container}>
-            <View style={styles.headerContainer}>
-                <TouchableOpacity
-                    style={styles.cancelContainer}
-                    onPress={() => navigation.goBack()}>
-                    <Text>Back</Text>
-                </TouchableOpacity>
-
-                <View style={styles.headerTextContainer}>
-                    <Text style={styles.headerText}>Settings</Text>
-                </View>
-
-                <TouchableOpacity
-                    style={styles.saveContainer}
-                    disabled={isSaving}
-                    onPress={saveChanges}>
-                    <Text>Save</Text>
-                </TouchableOpacity>
-            </View>
+            <Header
+                leftColumn={
+                    <TouchableOpacity
+                        style={styles.cancelContainer}
+                        onPress={() => navigation.goBack()}>
+                        <Text>Back</Text>
+                    </TouchableOpacity>
+                }
+                header="Settings"
+                rightColumn={
+                    <TouchableOpacity
+                        style={styles.saveContainer}
+                        disabled={isSaving}
+                        onPress={saveChanges}>
+                        <Text>Save</Text>
+                    </TouchableOpacity>
+                }
+            />
 
             <ScrollView
                 style={styles.scrollContainer}

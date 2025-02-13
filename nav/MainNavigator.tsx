@@ -17,6 +17,7 @@ import { UserType } from '@/services/queries/user';
 import AddFavourite from '@/screens/MainNavigator/AddFavourite';
 import UserActivity from '@/screens/MainNavigator/UserActivity';
 import { FetchPubType } from '@/services/queries/pub';
+import CreateCollection from '@/screens/MainNavigator/CreateCollection';
 
 export type MainNavigatorStackParamList = {
     Home: undefined;
@@ -68,6 +69,7 @@ export type MainNavigatorStackParamList = {
     UserActivity: {
         userId: string;
     };
+    CreateCollection: undefined;
 };
 
 const Stack = createStackNavigator<MainNavigatorStackParamList>();
@@ -144,6 +146,11 @@ export default function MainNavigator() {
                 name="UserActivity"
                 component={UserActivity}
                 options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="CreateCollection"
+                component={CreateCollection}
+                options={{ headerShown: false, presentation: 'modal' }}
             />
         </Stack.Navigator>
     );

@@ -111,6 +111,10 @@ export const applyFilters = (
         });
     }
 
+    if (filters.reservable !== null) {
+        query = query.eq('reservable', filters.reservable);
+    }
+
     if (filters.dogFriendly !== null) {
         query = query.eq('dog_friendly', filters.dogFriendly);
     }

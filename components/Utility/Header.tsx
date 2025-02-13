@@ -82,7 +82,7 @@ export default function Header({
 
 const styles = StyleSheet.create({
     container: {
-        paddingVertical: 10,
+        paddingVertical: 15,
         alignItems: 'center',
         flexDirection: 'row',
         borderBottomWidth: 1,
