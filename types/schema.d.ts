@@ -215,6 +215,39 @@ export type Database = {
           },
         ]
       }
+      collection_likes: {
+        Row: {
+          collection_id: number
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          collection_id: number
+          created_at?: string
+          user_id?: string
+        }
+        Update: {
+          collection_id?: number
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_likes_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       collections: {
         Row: {
           collaborative: boolean
@@ -741,24 +774,30 @@ export type Database = {
       }
       suggestions: {
         Row: {
+          accepted: boolean
           created_at: string
           id: number
           pub_id: number
           type: Database["public"]["Enums"]["suggestion_type"]
+          user_id: string
           value: boolean
         }
         Insert: {
+          accepted?: boolean
           created_at?: string
           id?: number
           pub_id: number
           type: Database["public"]["Enums"]["suggestion_type"]
+          user_id?: string
           value: boolean
         }
         Update: {
+          accepted?: boolean
           created_at?: string
           id?: number
           pub_id?: number
           type?: Database["public"]["Enums"]["suggestion_type"]
+          user_id?: string
           value?: boolean
         }
         Relationships: [
@@ -767,6 +806,13 @@ export type Database = {
             columns: ["pub_id"]
             isOneToOne: false
             referencedRelation: "pubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "suggestions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_public"
             referencedColumns: ["id"]
           },
         ]

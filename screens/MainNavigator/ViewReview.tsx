@@ -47,6 +47,14 @@ export default function ViewReview({
         [contentWidth],
     );
 
+    const liked = useMemo<boolean>(() => {
+        if (!review) {
+            return false;
+        }
+
+        return review.liked[0].count > 0;
+    }, [review]);
+
     useEffect(() => {
         const fetchReview = async () => {
             setIsLoading(true);
@@ -367,14 +375,14 @@ export default function ViewReview({
                                     <LikeReviewButton
                                         reviewId={review.id}
                                         size={18}
-                                        liked={review.liked[0].count > 0}
+                                        liked={liked}
                                         onLikeCommence={setToLiked}
                                         onUnlikeCommence={setToUnliked}
                                         onLikeComplete={success =>
-                                            !success ? setToUnliked : undefined
+                                            !success && setToUnliked()
                                         }
                                         onUnlikeComplete={success =>
-                                            !success ? setToLiked : undefined
+                                            !success && setToLiked()
                                         }
                                     />
                                     <Text style={styles.likedText}>

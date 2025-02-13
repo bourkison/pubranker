@@ -28,6 +28,7 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { distance, point } from '@turf/turf';
+import LikeCollectionButton from '@/components/Collections/LikeCollectionButton';
 
 type CollectionListProps = {
     collectionId: number;
@@ -41,6 +42,38 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
 
     const navigation =
         useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
+
+    const followButtonDisabled = useMemo<boolean>(() => {
+        if (!collection) {
+            return true;
+        }
+
+        if (!userId) {
+            return true;
+        }
+
+        if (userId === collection.user_id) {
+            return true;
+        }
+
+        if (isFollowing) {
+            return true;
+        }
+
+        if (isLoading) {
+            return true;
+        }
+
+        return false;
+    }, [collection, userId, isFollowing, isLoading]);
+
+    const liked = useMemo<boolean>(() => {
+        if (!collection) {
+            return false;
+        }
+
+        return collection.is_liked[0].count > 0;
+    }, [collection]);
 
     useEffect(() => {
         (async () => {
@@ -89,8 +122,6 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
                 })),
             };
 
-            console.log('DATA: ', coll);
-
             setCollection(coll);
             setIsLoading(false);
         })();
@@ -114,30 +145,6 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
         },
         [collection],
     );
-
-    const followButtonDisabled = useMemo<boolean>(() => {
-        if (!collection) {
-            return true;
-        }
-
-        if (!userId) {
-            return true;
-        }
-
-        if (userId === collection.user_id) {
-            return true;
-        }
-
-        if (isFollowing) {
-            return true;
-        }
-
-        if (isLoading) {
-            return true;
-        }
-
-        return false;
-    }, [collection, userId, isFollowing, isLoading]);
 
     const toggleFollow = useCallback(async () => {
         if (!collection || isFollowing) {
@@ -195,6 +202,30 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
 
         setIsFollowing(false);
     }, [collection, isFollowing]);
+
+    const setToLiked = useCallback(() => {
+        if (!collection) {
+            return;
+        }
+
+        setCollection({
+            ...collection,
+            is_liked: [{ count: 1 }],
+            likes: [{ count: collection.likes[0].count + 1 }],
+        });
+    }, [collection]);
+
+    const setToUnliked = useCallback(() => {
+        if (!collection) {
+            return;
+        }
+
+        setCollection({
+            ...collection,
+            is_liked: [{ count: 0 }],
+            likes: [{ count: collection.likes[0].count - 1 }],
+        });
+    }, [collection]);
 
     return (
         <FlatList
@@ -276,71 +307,98 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
                                 </Text>
                             )}
 
-                            <View style={styles.privacyContainer}>
-                                {collection.public === 'PRIVATE' ? (
-                                    <View style={styles.privacyItem}>
-                                        <Entypo
-                                            name="lock"
-                                            size={12}
-                                            color="#000"
-                                        />
+                            <View style={styles.likePrivacyContainer}>
+                                <View style={styles.likeContainer}>
+                                    <LikeCollectionButton
+                                        size={16}
+                                        liked={liked}
+                                        onLikeCommence={setToLiked}
+                                        onUnlikeCommence={setToUnliked}
+                                        onLikeComplete={success =>
+                                            !success && setToUnliked()
+                                        }
+                                        onUnlikeComplete={success =>
+                                            !success && setToLiked()
+                                        }
+                                        collectionId={collection.id}
+                                    />
+                                    <Text style={styles.likeText}>
+                                        {collection.likes[0].count} likes
+                                    </Text>
+                                </View>
 
-                                        <Text style={styles.privacyItemText}>
-                                            Private
-                                        </Text>
-                                    </View>
-                                ) : collection.public === 'FRIENDS_ONLY' ? (
-                                    <View style={styles.privacyItem}>
-                                        <MaterialIcons
-                                            name="people"
-                                            size={14}
-                                            color="#000"
-                                        />
-                                        <Text style={styles.privacyItemText}>
-                                            Friends only
-                                        </Text>
-                                    </View>
-                                ) : (
-                                    <View style={styles.privacyItem}>
-                                        <Entypo
-                                            name="globe"
-                                            size={12}
-                                            color="#000"
-                                        />
+                                <View style={styles.privacyContainer}>
+                                    {collection.public === 'PRIVATE' ? (
+                                        <View style={styles.privacyItem}>
+                                            <Entypo
+                                                name="lock"
+                                                size={12}
+                                                color="#000"
+                                            />
 
-                                        <Text style={styles.privacyItemText}>
-                                            Public
-                                        </Text>
-                                    </View>
-                                )}
-
-                                {collection.public !== 'PRIVATE' &&
-                                collection.collaborative ? (
-                                    <View style={styles.privacyItem}>
-                                        <MaterialIcons
-                                            name="people"
-                                            size={14}
-                                            color="#000"
-                                        />
-                                        <Text style={styles.privacyItemText}>
-                                            Collaborative
-                                        </Text>
-                                    </View>
-                                ) : (
-                                    collection.public !== 'PRIVATE' && (
+                                            <Text
+                                                style={styles.privacyItemText}>
+                                                Private
+                                            </Text>
+                                        </View>
+                                    ) : collection.public === 'FRIENDS_ONLY' ? (
                                         <View style={styles.privacyItem}>
                                             <MaterialIcons
-                                                name="person"
+                                                name="people"
                                                 size={14}
                                                 color="#000"
                                             />
                                             <Text
                                                 style={styles.privacyItemText}>
-                                                Non-Collaborative
+                                                Friends only
                                             </Text>
                                         </View>
-                                    )
-                                )}
+                                    ) : (
+                                        <View style={styles.privacyItem}>
+                                            <Entypo
+                                                name="globe"
+                                                size={12}
+                                                color="#000"
+                                            />
+
+                                            <Text
+                                                style={styles.privacyItemText}>
+                                                Public
+                                            </Text>
+                                        </View>
+                                    )}
+
+                                    {collection.public !== 'PRIVATE' &&
+                                    collection.collaborative ? (
+                                        <View style={styles.privacyItem}>
+                                            <MaterialIcons
+                                                name="people"
+                                                size={14}
+                                                color="#000"
+                                            />
+                                            <Text
+                                                style={styles.privacyItemText}>
+                                                Collaborative
+                                            </Text>
+                                        </View>
+                                    ) : (
+                                        collection.public !== 'PRIVATE' && (
+                                            <View style={styles.privacyItem}>
+                                                <MaterialIcons
+                                                    name="person"
+                                                    size={14}
+                                                    color="#000"
+                                                />
+                                                <Text
+                                                    style={
+                                                        styles.privacyItemText
+                                                    }>
+                                                    Non-Collaborative
+                                                </Text>
+                                            </View>
+                                        )
+                                    )}
+                                </View>
                             </View>
                         </View>
                     </>
@@ -404,10 +462,25 @@ const styles = StyleSheet.create({
         color: PRIMARY_COLOR,
         fontWeight: '500',
     },
-    privacyContainer: {
-        marginTop: 15,
+    likePrivacyContainer: {
+        justifyContent: 'space-between',
+        alignItems: 'center',
         flexDirection: 'row',
-        justifyContent: 'flex-end',
+        marginTop: 15,
+    },
+    likeContainer: {
+        alignItems: 'center',
+        flexDirection: 'row',
+        justifyContent: 'center',
+    },
+    likeText: {
+        fontSize: 12,
+        marginLeft: 3,
+    },
+    privacyContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     privacyItem: {
         flexDirection: 'row',
