@@ -1,12 +1,58 @@
-import { NavigatorScreenParams } from '@react-navigation/native';
+import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import {
+    CompositeScreenProps,
+    NavigatorScreenParams,
+} from '@react-navigation/native';
+import { StackScreenProps } from '@react-navigation/stack';
+
+type ProfileNavigatorStackParamList = {
+    ProfileHome: undefined;
+    Notifications: undefined;
+};
+
+export type ProfileNavigatorScreenProps<
+    T extends keyof ProfileNavigatorStackParamList,
+> = CompositeScreenProps<
+    StackScreenProps<ProfileNavigatorStackParamList, T>,
+    RootStackScreenProps<keyof RootStackParamList>
+>;
+
+type SavedNavigatorStackParamList = {
+    SavedHome: undefined;
+    CollectionsHome: undefined;
+    CollectionView: {
+        collectionId: number;
+    };
+};
+
+export type SavedNavigatorScreenProps<
+    T extends keyof SavedNavigatorStackParamList,
+> = CompositeScreenProps<
+    StackScreenProps<SavedNavigatorStackParamList, T>,
+    RootStackScreenProps<keyof RootStackParamList>
+>;
+
+type HomeNavigatorBottomTabParamList = {
+    Explore: undefined;
+    Favourites: NavigatorScreenParams<SavedNavigatorStackParamList>;
+    LoggedInProfile: NavigatorScreenParams<ProfileNavigatorStackParamList>;
+    Feed: undefined;
+};
+
+export type HomeNavigatorBottomTabProps<
+    T extends keyof SavedNavigatorStackParamList,
+> = CompositeScreenProps<
+    BottomTabScreenProps<HomeNavigatorBottomTabParamList, T>,
+    RootStackScreenProps<keyof RootStackParamList>
+>;
 
 export type RootStackParamList = {
-    Home: NavigatorScreenParams<BottomTabNavigatorParamList>;
+    Home: NavigatorScreenParams<HomeNavigatorBottomTabParamList>;
     PubView: {
         pubId: number;
         onSaveToggle?: (id: number, value: boolean) => void;
     };
-    Suggestions: { pub: PubSchema };
+    Suggestions: { pub: FetchPubType };
     CreateReview: {
         pubId: number;
     };
@@ -43,30 +89,19 @@ export type RootStackParamList = {
         profile_photo: string;
         favourites: UserType['favourites'];
     };
-    AddFavourite: {
-        favourites: UserType['favourites'];
-        onAdd: (pub: UserType['favourites'][number]) => void;
+    SelectPub: {
+        header: string;
+        excludedIds: number[];
+        onAdd: (pub: {
+            id: number;
+            name: string;
+            primary_photo: string | null;
+        }) => void;
     };
-};
-
-type BottomTabNavigatorParamList = {
-    Explore: undefined;
-    Favourites: NavigatorScreenParams<SavedNavigatorStackParamList>;
-    LoggedInProfile: NavigatorScreenParams<ProfileNavigatorStackParamList>;
-    Feed: undefined;
-};
-
-type ProfileNavigatorStackParamList = {
-    ProfileHome: undefined;
-    Notifications: undefined;
-};
-
-type SavedNavigatorStackParamList = {
-    SavedHome: undefined;
-    CollectionsHome: undefined;
-    CollectionView: {
-        collectionId: number;
+    UserActivity: {
+        userId: string;
     };
+    CreateCollection: undefined;
 };
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> =

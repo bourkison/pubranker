@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { requestBackgroundPermissionsAsync } from 'expo-location';
@@ -7,27 +7,17 @@ import { SECONDARY_COLOR } from '@/constants';
 import Feed from '@/screens/BottomTabNavigator/Feed';
 import SavedNavigator from '@/nav/SavedNavigator';
 import { useSharedCollectionContext } from '@/context/collectionContext';
-import { StackScreenProps } from '@react-navigation/stack';
-import { MainNavigatorStackParamList } from './MainNavigator';
 import { useFocusEffect } from '@react-navigation/native';
 import ProfileNavigator from '@/nav/ProfileNavigator';
+import {
+    HomeNavigatorBottomTabParamList,
+    RootStackScreenProps,
+} from '@/types/nav';
 
-export type BottomTabNavigatorParamList = {
-    Explore: undefined;
-    Favourites: undefined;
-    LoggedInProfile: undefined;
-    Feed: undefined;
-};
+const Tab = createBottomTabNavigator<HomeNavigatorBottomTabParamList>();
 
-const Tab = createBottomTabNavigator<BottomTabNavigatorParamList>();
-
-export default function BottomTabNavigator({
-    navigation,
-}: StackScreenProps<MainNavigatorStackParamList, 'Home'>) {
-    const { setIsOnBottomTabsPage, setNavigation } =
-        useSharedCollectionContext();
-
-    useEffect(() => setNavigation(navigation), [navigation, setNavigation]);
+export default function BottomTabNavigator({}: RootStackScreenProps<'Home'>) {
+    const { setIsOnBottomTabsPage } = useSharedCollectionContext();
 
     useFocusEffect(() => {
         setIsOnBottomTabsPage(true);

@@ -18,7 +18,6 @@ import { Feather } from '@expo/vector-icons';
 import { User } from '@supabase/supabase-js';
 import { StackScreenProps } from '@react-navigation/stack';
 import { SavedNavigatorStackParamList } from '@/nav/SavedNavigator';
-import CreateCollectionIcon from '@/components/Collections/CreateCollectionIcon';
 import SavedListItem from '@/components/Saves/SavedListItem';
 import { CollectionType } from '@/services/queries/collections';
 import Header from '@/components/Utility/Header';

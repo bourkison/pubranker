@@ -2,11 +2,7 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import LoggedInProfile from '@/screens/ProfileNavigator/LoggedInProfile';
 import Notifications from '@/screens/ProfileNavigator/Notifications';
-
-export type ProfileNavigatorStackParamList = {
-    ProfileHome: undefined;
-    Notifications: undefined;
-};
+import { ProfileNavigatorStackParamList } from '@/types/nav';
 
 const Stack = createStackNavigator<ProfileNavigatorStackParamList>();
 

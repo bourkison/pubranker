@@ -25,8 +25,6 @@ import CollectionMap from '@/components/Collections/CollectionMap';
 import UserAvatar from '@/components/User/UserAvatar';
 import SavedListItem from '@/components/Saves/SavedListItem';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { distance, point } from '@turf/turf';
 import LikeCollectionButton from '@/components/Collections/LikeCollectionButton';
 
@@ -40,8 +38,7 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
     const [collection, setCollection] = useState<CollectionType>();
     const [userId, setUserId] = useState('');
 
-    const navigation =
-        useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
+    const navigation = useNavigation();
 
     const followButtonDisabled = useMemo<boolean>(() => {
         if (!collection) {
@@ -136,6 +133,8 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
 
     const toggleSave = useCallback(
         (id: number, isSave: boolean) => {
+            // TODO: This isn't updating view.
+
             if (!collection) {
                 return;
             }
@@ -147,7 +146,7 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
             );
 
             if (index > -1) {
-                collectionItems[index].pub.saved[0].count = isSave ? 1 : 0;
+                collectionItems[index].pub.saved = [{ count: isSave ? 1 : 0 }];
             }
 
             setCollection({ ...collection, collection_items: collectionItems });
@@ -235,6 +234,17 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
             likes: [{ count: collection.likes[0].count - 1 }],
         });
     }, [collection]);
+
+    const isSaved = useCallback(
+        (index: number) => {
+            if (!collection || !collection.collection_items[index]) {
+                return false;
+            }
+
+            return collection.collection_items[index].pub.saved[0].count > 0;
+        },
+        [collection],
+    );
 
     return (
         <FlatList
@@ -415,9 +425,10 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
                     </>
                 )
             }
-            renderItem={({ item }) => (
+            renderItem={({ item, index }) => (
                 <SavedListItem
                     pub={item.pub}
+                    saved={isSaved(index)}
                     onSaveCommence={id => toggleSave(id, true)}
                     onSaveComplete={(success, id) =>
                         !success ? toggleSave(id, false) : undefined

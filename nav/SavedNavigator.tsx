@@ -3,14 +3,7 @@ import React from 'react';
 import Saved from '@/screens/SavedNavigator/Saved';
 import CollectionsHome from '@/screens/SavedNavigator/CollectionsHome';
 import CollectionView from '@/screens/SavedNavigator/CollectionView';
-
-export type SavedNavigatorStackParamList = {
-    SavedHome: undefined;
-    CollectionsHome: undefined;
-    CollectionView: {
-        collectionId: number;
-    };
-};
+import { SavedNavigatorStackParamList } from '@/types/nav';
 
 const Stack = createStackNavigator<SavedNavigatorStackParamList>();
 

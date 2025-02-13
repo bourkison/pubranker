@@ -14,13 +14,13 @@ import { supabase } from '@/services/supabase';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
-import { useSharedCollectionContext } from '@/context/collectionContext';
 import { CollectionType } from '@/services/queries/collections';
 
 const NO_IMAGE = require('@/assets/noimage.png');
 
 type BottomSheetPubItemProps = {
     pub: CollectionType['collection_items'][number]['pub'];
+    saved: boolean;
     onSaveCommence?: (id: number) => void;
     onSaveComplete?: (success: boolean, id: number) => void;
     onUnsaveCommence?: (id: number) => void;
@@ -32,6 +32,7 @@ const WIDTH_PERCENTAGE = 0.3;
 
 export default function SavedListItem({
     pub,
+    saved,
     onSaveCommence,
     onSaveComplete,
     onUnsaveCommence,
@@ -41,8 +42,6 @@ export default function SavedListItem({
     const [imageUrl, setImageUrl] = useState('');
     const [isSaving, setIsSaving] = useState(false);
 
-    const { showAddToCollection } = useSharedCollectionContext();
-
     const navigation =
         useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
 
@@ -50,8 +49,6 @@ export default function SavedListItem({
         () => containerWidth * WIDTH_PERCENTAGE,
         [containerWidth],
     );
-
-    const saved = useMemo<boolean>(() => pub.saved[0].count > 0, [pub]);
 
     useEffect(() => {
         const url = supabase.storage
@@ -91,7 +88,6 @@ export default function SavedListItem({
                 onSaveComplete && onSaveComplete(false, pub.id);
             }
 
-            showAddToCollection(pub.id);
             onSaveComplete && onSaveComplete(true, pub.id);
         } else {
             onUnsaveCommence && onUnsaveCommence(pub.id);
@@ -118,7 +114,6 @@ export default function SavedListItem({
         onSaveComplete,
         onUnsaveCommence,
         onUnsaveComplete,
-        showAddToCollection,
         saved,
     ]);
 

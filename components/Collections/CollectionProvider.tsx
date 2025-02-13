@@ -6,7 +6,7 @@ import { SECONDARY_COLOR } from '@/constants';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { StackScreenProps } from '@react-navigation/stack';
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
+import { useNavigation } from '@react-navigation/native';
 
 type CollectionProviderProps = {
     children: JSX.Element;
@@ -29,10 +29,8 @@ export default function CollectionProvider({
 
     const [selectedPub, setSelectedPub] = useState<null | number>(null);
     const [timer, setTimer] = useState<NodeJS.Timeout>();
-    const [navigation, setNavigation] =
-        useState<
-            StackScreenProps<MainNavigatorStackParamList, 'Home'>['navigation']
-        >();
+
+    const navigation = useNavigation();
 
     const showAddToCollection = useCallback(
         (id: number, duration = DEFAULT_DURATION) => {

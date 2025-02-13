@@ -126,6 +126,7 @@ export default function CreateCollection({
             .from('collections')
             .insert({
                 name: name,
+                description: description,
                 user_id: userData.user.id,
                 public: publicity,
                 collaborative: collaborative,
@@ -156,7 +157,16 @@ export default function CreateCollection({
         }
 
         navigation.navigate('CollectionView', { collectionId: data.id });
-    }, [name, publicity, collaborative, ranked, isCreating, navigation, pubs]);
+    }, [
+        name,
+        description,
+        publicity,
+        collaborative,
+        ranked,
+        isCreating,
+        navigation,
+        pubs,
+    ]);
 
     return (
         <ScrollView
