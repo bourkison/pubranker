@@ -1,3 +1,4 @@
+import { CollectionType } from '@/services/queries/collections';
 import { UserType } from '@/services/queries/user';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import {
@@ -101,7 +102,9 @@ export type RootStackParamList = {
     UserActivity: {
         userId: string;
     };
-    CreateCollection: undefined;
+    CreateCollection: {
+        collection?: CollectionType;
+    };
 };
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> =

@@ -334,7 +334,10 @@ export default function CreateCollection({
 
                     <Pressable
                         style={styles.settingsColumn}
-                        onPress={() => setRanked(!ranked)}>
+                        onPress={() => {
+                            Haptics.selectionAsync();
+                            setRanked(!ranked);
+                        }}>
                         {ranked ? (
                             <View style={styles.settingsIconContainer}>
                                 <FontAwesome6
@@ -362,7 +365,10 @@ export default function CreateCollection({
 
                     <Pressable
                         style={styles.settingsColumn}
-                        onPress={() => setCollaborative(!collaborative)}>
+                        onPress={() => {
+                            Haptics.selectionAsync();
+                            setCollaborative(!collaborative);
+                        }}>
                         {!collaborative ? (
                             <View style={styles.settingsIconContainer}>
                                 <MaterialIcons

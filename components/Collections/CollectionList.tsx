@@ -1,9 +1,6 @@
-import {
-    collectionQuery,
-    CollectionType,
-} from '@/services/queries/collections';
+import { CollectionType } from '@/services/queries/collections';
 import { supabase } from '@/services/supabase';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
     View,
     Text,
@@ -13,7 +10,6 @@ import {
     ActivityIndicator,
     Pressable,
 } from 'react-native';
-import * as Location from 'expo-location';
 import { PRIMARY_COLOR } from '@/constants';
 import {
     Ionicons,
@@ -25,18 +21,26 @@ import CollectionMap from '@/components/Collections/CollectionMap';
 import UserAvatar from '@/components/User/UserAvatar';
 import SavedListItem from '@/components/Saves/SavedListItem';
 import { StackActions, useNavigation } from '@react-navigation/native';
-import { distance, point } from '@turf/turf';
 import LikeCollectionButton from '@/components/Collections/LikeCollectionButton';
 
 type CollectionListProps = {
-    collectionId: number;
+    collection?: CollectionType;
+    setFollow: (follow: boolean) => void;
+    setLiked: (like: boolean) => void;
+    toggleSave: (id: number, save: boolean) => void;
+    userId: string;
+    isLoading: boolean;
 };
 
-export default function CollectionList({ collectionId }: CollectionListProps) {
-    const [isLoading, setIsLoading] = useState(false);
+export default function CollectionList({
+    collection,
+    isLoading,
+    userId,
+    toggleSave,
+    setFollow,
+    setLiked,
+}: CollectionListProps) {
     const [isFollowing, setIsFollowing] = useState(false);
-    const [collection, setCollection] = useState<CollectionType>();
-    const [userId, setUserId] = useState('');
 
     const navigation = useNavigation();
 
@@ -71,88 +75,6 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
 
         return collection.is_liked[0].count > 0;
     }, [collection]);
-
-    useEffect(() => {
-        (async () => {
-            setIsLoading(true);
-
-            const { data: userData, error: userError } =
-                await supabase.auth.getUser();
-
-            if (userError) {
-                console.error(userError);
-                setIsLoading(false);
-                return;
-            }
-
-            setUserId(userData.user.id);
-
-            const { data, error } = await collectionQuery(userData.user.id)
-                .eq('id', collectionId)
-                .order('order', {
-                    referencedTable: 'collection_items',
-                    ascending: true,
-                })
-                .limit(1)
-                .single();
-
-            if (error) {
-                console.error(error);
-                setIsLoading(false);
-                return;
-            }
-
-            console.log('TEST', JSON.stringify(data));
-
-            // @ts-ignore
-            let coll: CollectionType = data as CollectionType;
-
-            const { coords } = await Location.getCurrentPositionAsync();
-
-            coll = {
-                ...coll,
-                collection_items: coll.collection_items.map(
-                    collection_item => ({
-                        ...collection_item,
-                        pub: {
-                            ...collection_item.pub,
-                            dist_meters: distance(
-                                point([coords.longitude, coords.latitude]),
-                                point(collection_item.pub.location.coordinates),
-                                { units: 'meters' },
-                            ),
-                        },
-                    }),
-                ),
-            };
-
-            setCollection(coll);
-            setIsLoading(false);
-        })();
-    }, [collectionId]);
-
-    const toggleSave = useCallback(
-        (id: number, isSave: boolean) => {
-            // TODO: This isn't updating view.
-
-            if (!collection) {
-                return;
-            }
-
-            const collectionItems = collection.collection_items.slice();
-
-            const index = collectionItems.findIndex(
-                collection_index => collection_index.pub.id === id,
-            );
-
-            if (index > -1) {
-                collectionItems[index].pub.saved = [{ count: isSave ? 1 : 0 }];
-            }
-
-            setCollection({ ...collection, collection_items: collectionItems });
-        },
-        [collection],
-    );
 
     const toggleFollow = useCallback(async () => {
         if (!collection || isFollowing) {
@@ -189,7 +111,7 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
                 return;
             }
 
-            setCollection({ ...collection, is_followed: [{ count: 0 }] });
+            setFollow(false);
         } else {
             // FOLLOW.
             const { error: followError } = await supabase
@@ -205,35 +127,14 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
                 return;
             }
 
-            setCollection({ ...collection, is_followed: [{ count: 1 }] });
+            setFollow(true);
         }
 
         setIsFollowing(false);
-    }, [collection, isFollowing]);
+    }, [collection, isFollowing, setFollow]);
 
-    const setToLiked = useCallback(() => {
-        if (!collection) {
-            return;
-        }
-
-        setCollection({
-            ...collection,
-            is_liked: [{ count: 1 }],
-            likes: [{ count: collection.likes[0].count + 1 }],
-        });
-    }, [collection]);
-
-    const setToUnliked = useCallback(() => {
-        if (!collection) {
-            return;
-        }
-
-        setCollection({
-            ...collection,
-            is_liked: [{ count: 0 }],
-            likes: [{ count: collection.likes[0].count - 1 }],
-        });
-    }, [collection]);
+    const setToLiked = useCallback(() => setLiked(true), [setLiked]);
+    const setToUnliked = useCallback(() => setLiked(false), [setLiked]);
 
     const isSaved = useCallback(
         (index: number) => {

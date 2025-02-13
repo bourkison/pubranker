@@ -1,15 +1,146 @@
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { SafeAreaView, View, TouchableOpacity, StyleSheet } from 'react-native';
 import { PRIMARY_COLOR } from '@/constants';
 import CollectionList from '@/components/Collections/CollectionList';
 import Header from '@/components/Utility/Header';
 import { SavedNavigatorScreenProps } from '@/types/nav';
+import {
+    collectionQuery,
+    CollectionType,
+} from '@/services/queries/collections';
+import { supabase } from '@/services/supabase';
+import * as Location from 'expo-location';
+import { distance, point } from '@turf/turf';
 
 export default function CollectionView({
     navigation,
     route,
 }: SavedNavigatorScreenProps<'CollectionView'>) {
+    const [collection, setCollection] = useState<CollectionType>();
+    const [isLoading, setIsLoading] = useState(false);
+    const [userId, setUserId] = useState('');
+
+    useEffect(() => {
+        (async () => {
+            setIsLoading(true);
+
+            const { data: userData, error: userError } =
+                await supabase.auth.getUser();
+
+            if (userError) {
+                console.error(userError);
+                setIsLoading(false);
+                return;
+            }
+
+            setUserId(userData.user.id);
+
+            const { data, error } = await collectionQuery(userData.user.id)
+                .eq('id', route.params.collectionId)
+                .order('order', {
+                    referencedTable: 'collection_items',
+                    ascending: true,
+                })
+                .limit(1)
+                .single();
+
+            if (error) {
+                console.error(error);
+                setIsLoading(false);
+                return;
+            }
+
+            console.log('TEST', JSON.stringify(data));
+
+            // @ts-ignore
+            let coll: CollectionType = data as CollectionType;
+
+            const { coords } = await Location.getCurrentPositionAsync();
+
+            coll = {
+                ...coll,
+                collection_items: coll.collection_items.map(
+                    collection_item => ({
+                        ...collection_item,
+                        pub: {
+                            ...collection_item.pub,
+                            dist_meters: distance(
+                                point([coords.longitude, coords.latitude]),
+                                point(collection_item.pub.location.coordinates),
+                                { units: 'meters' },
+                            ),
+                        },
+                    }),
+                ),
+            };
+
+            setCollection(coll);
+            setIsLoading(false);
+        })();
+    }, [route]);
+
+    const toggleSave = useCallback(
+        (id: number, isSave: boolean) => {
+            if (!collection) {
+                return;
+            }
+
+            const collectionItems = collection.collection_items.slice();
+
+            const index = collectionItems.findIndex(
+                collection_index => collection_index.pub.id === id,
+            );
+
+            if (index > -1) {
+                collectionItems[index].pub.saved = [{ count: isSave ? 1 : 0 }];
+            }
+
+            setCollection({ ...collection, collection_items: collectionItems });
+        },
+        [collection],
+    );
+
+    const setFollow = useCallback(
+        (follow: boolean) => {
+            if (!collection) {
+                return;
+            }
+
+            if (follow) {
+                setCollection({ ...collection, is_followed: [{ count: 1 }] });
+                return;
+            }
+
+            setCollection({ ...collection, is_followed: [{ count: 0 }] });
+        },
+        [collection],
+    );
+
+    const setLiked = useCallback(
+        (like: boolean) => {
+            if (!collection) {
+                return;
+            }
+
+            if (like) {
+                setCollection({
+                    ...collection,
+                    is_liked: [{ count: 1 }],
+                    likes: [{ count: collection.likes[0].count + 1 }],
+                });
+                return;
+            }
+
+            setCollection({
+                ...collection,
+                is_liked: [{ count: 0 }],
+                likes: [{ count: collection.likes[0].count - 1 }],
+            });
+        },
+        [collection],
+    );
+
     return (
         <SafeAreaView style={styles.container}>
             <Header
@@ -24,7 +155,14 @@ export default function CollectionView({
                 rightColumn={<View style={styles.menuContainer} />}
             />
 
-            <CollectionList collectionId={route.params.collectionId} />
+            <CollectionList
+                collection={collection}
+                isLoading={isLoading}
+                userId={userId}
+                toggleSave={toggleSave}
+                setFollow={setFollow}
+                setLiked={setLiked}
+            />
         </SafeAreaView>
     );
 }

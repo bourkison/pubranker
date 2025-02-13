@@ -8,8 +8,7 @@ import {
     FlatList,
     ActivityIndicator,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import CreateCollectionIcon from '@/components/Collections/CreateCollectionIcon';
+import { Ionicons, Feather } from '@expo/vector-icons';
 import {
     ListCollectionType,
     listFollowedCollectionsQuery,
@@ -77,7 +76,10 @@ export default function CollectionsHome({
                 </View>
 
                 <View style={styles.menuContainer}>
-                    <CreateCollectionIcon />
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('CreateCollection')}>
+                        <Feather name="plus" size={14} />
+                    </TouchableOpacity>
                 </View>
             </View>
 
