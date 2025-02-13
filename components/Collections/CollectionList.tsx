@@ -27,6 +27,7 @@ import SavedListItem from '@/components/Saves/SavedListItem';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
+import { distance, point } from '@turf/turf';
 
 type CollectionListProps = {
     collectionId: number;
@@ -56,9 +57,8 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
 
             setUserId(userData.user.id);
 
-            const { data, error } = await collectionQuery()
+            const { data, error } = await collectionQuery(userData.user.id)
                 .eq('id', collectionId)
-                .eq('is_followed.user_id', userData.user.id)
                 .order('created_at', {
                     referencedTable: 'collection_items',
                     ascending: true,
@@ -72,47 +72,26 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
                 return;
             }
 
+            // @ts-ignore
+            let coll: CollectionType = data as CollectionType;
+
             const { coords } = await Location.getCurrentPositionAsync();
 
-            const { data: pubsData, error: pubsError } = await supabase
-                .rpc('get_pub_list_item', {
-                    lat: coords.latitude,
-                    long: coords.longitude,
-                })
-                .in(
-                    'id',
-                    data.collection_items.map(c => c.pub_id),
-                );
+            coll = {
+                ...coll,
+                pubs: coll.pubs.map(pub => ({
+                    ...pub,
+                    dist_meters: distance(
+                        point([coords.longitude, coords.latitude]),
+                        point(pub.location.coordinates),
+                        { units: 'meters' },
+                    ),
+                })),
+            };
 
-            if (pubsError) {
-                console.error(pubsError);
-                setIsLoading(false);
-                return;
-            }
+            console.log('DATA: ', coll);
 
-            // Above query returns in order of pub_id - so must convert to
-            // be in order of the collection_items.
-            // collection_items is already in order from our query, so can just
-            // loop through that.
-            const orderedPubs: CollectionType['pubs'] = [];
-
-            data.collection_items.forEach(orderedPub => {
-                const desiredPub = pubsData.find(
-                    unOrderedPub => orderedPub.pub_id === unOrderedPub.id,
-                );
-
-                if (!desiredPub) {
-                    return;
-                }
-
-                orderedPubs.push(desiredPub);
-            });
-
-            setCollection({
-                ...data,
-                pubs: orderedPubs,
-            });
-
+            setCollection(coll);
             setIsLoading(false);
         })();
     }, [collectionId]);
@@ -128,7 +107,7 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
             const index = pubs.findIndex(pub => pub.id === id);
 
             if (index > -1) {
-                pubs[index].saved = isSave;
+                pubs[index].saved[0].count = isSave ? 1 : 0;
             }
 
             setCollection({ ...collection, pubs });

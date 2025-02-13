@@ -10,13 +10,17 @@ import {
     FlatList,
     ActivityIndicator,
     TouchableHighlight,
+    TouchableOpacity,
 } from 'react-native';
-import { Feather } from '@expo/vector-icons';
+import { Feather, Entypo, MaterialIcons } from '@expo/vector-icons';
+import Header from '@/components/Utility/Header';
+import * as Haptics from 'expo-haptics';
 
 type CollectionContext = Tables<'collections'> & {
     is_added: {
         count: number;
     }[];
+    pubs: { count: number }[];
     user: {
         username: string;
         profile_photo: string;
@@ -32,8 +36,12 @@ export default function AddToList({
     const [isAdding, setIsAdding] = useState(false);
     const [collections, setCollections] = useState<CollectionContext[]>([]);
 
+    const [selectedCollections, setSelectedCollections] = useState<number[]>(
+        [],
+    );
+
     useEffect(() => {
-        const fetchCollections = async () => {
+        (async () => {
             setIsLoading(true);
 
             const { data: userData, error: userError } =
@@ -50,7 +58,8 @@ export default function AddToList({
                 .select(
                     `
                     *, 
-                    is_added:collection_items(count), 
+                    is_added:collection_items(count),
+                    pubs:collection_items(count),
                     user:users_public!collections_user_id_fkey1(id, username, profile_photo)
                     `,
                 )
@@ -65,38 +74,76 @@ export default function AddToList({
             }
 
             setCollections(data);
-        };
-
-        fetchCollections();
+        })();
     }, [route]);
 
-    const addToCollection = useCallback(
-        async (collectionId: number) => {
-            setIsAdding(true);
+    const toggleSelect = useCallback(
+        (id: number) => {
+            Haptics.selectionAsync();
 
-            const { error } = await supabase.from('collection_items').insert({
-                collection_id: collectionId,
-                pub_id: route.params.pubId,
-            });
+            if (selectedCollections.includes(id)) {
+                // REMOVE.
+                const index = selectedCollections.findIndex(x => id === x);
 
-            if (error) {
-                console.error(error);
-                setIsAdding(false);
+                if (index === -1) {
+                    return;
+                }
+
+                const array = selectedCollections.slice();
+                array.splice(index, 1);
+                setSelectedCollections(array);
+
                 return;
             }
 
-            navigation.goBack();
+            setSelectedCollections([...selectedCollections, id]);
         },
-        [route, navigation],
+        [selectedCollections],
     );
+
+    const addToCollection = useCallback(async () => {
+        if (selectedCollections.length === 0) {
+            return;
+        }
+
+        setIsAdding(true);
+
+        const { error } = await supabase.from('collection_items').insert(
+            selectedCollections.map(c => ({
+                collection_id: c,
+                pub_id: route.params.pubId,
+            })),
+        );
+
+        if (error) {
+            console.error(error);
+            setIsAdding(false);
+            return;
+        }
+
+        navigation.goBack();
+    }, [route, navigation, selectedCollections]);
 
     return (
         <View style={styles.container}>
-            <View style={styles.headerContainer}>
-                <View style={styles.headerTextContainer}>
-                    <Text style={styles.headerText}>Add to List</Text>
-                </View>
-            </View>
+            <Header
+                header="Add to List"
+                leftColumn={
+                    <TouchableOpacity
+                        style={styles.cancelContainer}
+                        onPress={() => navigation.goBack()}>
+                        <Text style={styles.cancelText}>Back</Text>
+                    </TouchableOpacity>
+                }
+                rightColumn={
+                    <TouchableOpacity
+                        disabled={isAdding || selectedCollections.length === 0}
+                        style={styles.addContainer}
+                        onPress={addToCollection}>
+                        <Text style={styles.addText}>Add</Text>
+                    </TouchableOpacity>
+                }
+            />
 
             <FlatList
                 data={collections}
@@ -110,9 +157,9 @@ export default function AddToList({
                     )
                 }
                 ListHeaderComponent={
-                    <TouchableHighlight style={styles.newListContainer}>
+                    <TouchableHighlight style={styles.listContainer}>
                         <>
-                            <Text>New list</Text>
+                            <Text style={styles.titleText}>New list</Text>
 
                             <Feather
                                 name="chevron-right"
@@ -122,21 +169,81 @@ export default function AddToList({
                         </>
                     </TouchableHighlight>
                 }
-                renderItem={({ item }) => (
-                    <TouchableHighlight
-                        disabled={isAdding}
-                        style={styles.listContainer}
-                        underlayColor="#E5E7EB"
-                        activeOpacity={1}
-                        onPress={() => addToCollection(item.id)}>
-                        <Text>
-                            {item.name}{' '}
-                            {item.is_added[0].count > 0
-                                ? '(already added)'
-                                : ''}
-                        </Text>
-                    </TouchableHighlight>
-                )}
+                renderItem={({ item }) => {
+                    const isSelected = selectedCollections.includes(item.id);
+                    const isAdded = item.is_added[0].count > 0;
+
+                    return (
+                        <TouchableHighlight
+                            disabled={isAdding || item.is_added[0].count > 0}
+                            style={[
+                                styles.listContainer,
+                                isSelected ? styles.selectedList : undefined,
+                            ]}
+                            underlayColor="#E5E7EB"
+                            activeOpacity={1}
+                            onPress={() => toggleSelect(item.id)}>
+                            <>
+                                <View>
+                                    <View style={styles.topRowContainer}>
+                                        <Text style={styles.titleText}>
+                                            {item.name}{' '}
+                                        </Text>
+                                        <Text style={styles.mutedText}>
+                                            {isAdded ? '(already added)' : ''}
+                                        </Text>
+                                    </View>
+                                    <View>
+                                        <Text style={styles.subtitleText}>
+                                            {item.pubs[0].count} pubs
+                                        </Text>
+                                    </View>
+                                </View>
+
+                                <View style={styles.iconsContainer}>
+                                    {isSelected && (
+                                        <View
+                                            style={
+                                                styles.selectedIconContainer
+                                            }>
+                                            <Entypo
+                                                name="check"
+                                                size={18}
+                                                color="#000"
+                                            />
+                                        </View>
+                                    )}
+
+                                    {!isAdded && (
+                                        <View
+                                            style={styles.publicIconContainer}>
+                                            {item.public === 'PUBLIC' ? (
+                                                <Entypo
+                                                    name="globe"
+                                                    size={12}
+                                                    color="#000"
+                                                />
+                                            ) : item.public ===
+                                              'FRIENDS_ONLY' ? (
+                                                <MaterialIcons
+                                                    name="people"
+                                                    size={14}
+                                                    color="#000"
+                                                />
+                                            ) : (
+                                                <Entypo
+                                                    name="lock"
+                                                    size={12}
+                                                    color="#000"
+                                                />
+                                            )}
+                                        </View>
+                                    )}
+                                </View>
+                            </>
+                        </TouchableHighlight>
+                    );
+                }}
                 keyExtractor={item => item.id.toString()}
             />
         </View>
@@ -147,27 +254,22 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    headerContainer: {
-        paddingVertical: 12,
-        alignItems: 'center',
-        flexDirection: 'row',
-        borderBottomWidth: 1,
-        borderColor: '#E5E7EB',
-    },
-    headerText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        fontFamily: 'Jost',
-        textAlign: 'center',
-    },
-    headerTextContainer: {
+    cancelContainer: {
         flex: 1,
+        paddingHorizontal: 10,
+    },
+    cancelText: {
+        fontWeight: '300',
+    },
+    addContainer: {
+        flex: 1,
+        alignItems: 'flex-end',
+        paddingHorizontal: 10,
+    },
+    addText: {
+        fontWeight: '500',
     },
     listContainer: {
-        paddingVertical: 10,
-        paddingHorizontal: 5,
-    },
-    newListContainer: {
         flexDirection: 'row',
         paddingVertical: 15,
         paddingHorizontal: 20,
@@ -175,5 +277,35 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderColor: '#E5E7EB',
         alignItems: 'center',
+    },
+    selectedList: {
+        backgroundColor: '#E5E7EB',
+    },
+    mutedText: {
+        color: 'rgba(0, 0, 0, 0.4)',
+        fontSize: 10,
+    },
+    titleText: {
+        fontSize: 14,
+        fontWeight: '500',
+        verticalAlign: 'middle',
+    },
+    subtitleText: {
+        fontSize: 10,
+        marginTop: 3,
+    },
+    topRowContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    iconsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    publicIconContainer: {},
+    selectedIconContainer: {
+        marginRight: 5,
     },
 });

@@ -34,10 +34,10 @@ export default function RecommendedPubItem({
         useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
 
     useEffect(() => {
-        if (pub.photos[0]) {
+        if (pub.primary_photo) {
             const url = supabase.storage
                 .from('pubs')
-                .getPublicUrl(pub.photos[0] || '');
+                .getPublicUrl(pub.primary_photo || '');
 
             setImageUrl(url.data.publicUrl);
         }
@@ -60,7 +60,7 @@ export default function RecommendedPubItem({
                 name={pub.name}
                 address={pub.address}
                 distMeters={pub.dist_meters}
-                numReviews={pub.num_reviews}
+                numReviews={pub.num_reviews[0].count}
                 rating={pub.rating}
             />
         </Pressable>

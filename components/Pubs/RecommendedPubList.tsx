@@ -34,8 +34,6 @@ export default function RecommendedPubList({}: RecommendedPubListProps) {
                 return;
             }
 
-            console.log('pub list', data);
-
             setPubs(data);
             setIsLoading(false);
         };

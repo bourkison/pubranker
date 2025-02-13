@@ -9,18 +9,18 @@ export type FetchPubType = Tables<'pubs'> & {
     rating: number;
     opening_hours: Tables<'opening_hours'>[];
     photos: Tables<'pub_photos'>[];
-    saved: [{ count: number }];
-    review_ones: [{ count: number }];
-    review_twos: [{ count: number }];
-    review_threes: [{ count: number }];
-    review_fours: [{ count: number }];
-    review_fives: [{ count: number }];
-    review_sixes: [{ count: number }];
-    review_sevens: [{ count: number }];
-    review_eights: [{ count: number }];
-    review_nines: [{ count: number }];
-    review_tens: [{ count: number }];
-    num_reviews: [{ count: number }];
+    saved: { count: number }[];
+    review_ones: { count: number }[];
+    review_twos: { count: number }[];
+    review_threes: { count: number }[];
+    review_fours: { count: number }[];
+    review_fives: { count: number }[];
+    review_sixes: { count: number }[];
+    review_sevens: { count: number }[];
+    review_eights: { count: number }[];
+    review_nines: { count: number }[];
+    review_tens: { count: number }[];
+    num_reviews: { count: number }[];
 };
 
 // photos:pub_photos!pub_photos_pub_id_fkey,

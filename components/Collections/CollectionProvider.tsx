@@ -123,7 +123,7 @@ export default function CollectionProvider({
 
 const styles = StyleSheet.create({
     topContainer: {
-        zIndex: 2,
+        zIndex: 100,
     },
     container: {
         position: 'absolute',

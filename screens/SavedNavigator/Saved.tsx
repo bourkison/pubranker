@@ -22,6 +22,7 @@ import CreateCollectionIcon from '@/components/Collections/CreateCollectionIcon'
 import SavedListItem from '@/components/Saves/SavedListItem';
 import { CollectionType } from '@/services/queries/collections';
 import Header from '@/components/Utility/Header';
+import { distance, point } from '@turf/turf';
 
 export default function SavedPubs({
     navigation,
@@ -39,52 +40,43 @@ export default function SavedPubs({
             return new Promise<void>(async (resolve, reject) => {
                 const { data: savesData, error: savesError } = await supabase
                     .from('saves')
-                    .select()
+                    .select(
+                        `*, 
+                        pubs(
+                            id, 
+                            name, 
+                            address,
+                            num_reviews:reviews(count),
+                            primary_photo, 
+                            saved:saves(count),
+                            location:get_pub_location, 
+                            rating:get_pub_rating
+                        )`,
+                    )
                     .eq('user_id', userData.id)
                     .order('created_at', { ascending: false });
 
                 if (savesError) {
+                    console.error('SAVES ERROR', savesError);
                     reject(savesError);
                     return;
                 }
 
                 const { coords } = await Location.getCurrentPositionAsync();
 
-                const { data, error } = await supabase
-                    .rpc('get_pub_list_item', {
-                        lat: coords.latitude,
-                        long: coords.longitude,
-                    })
-                    .in(
-                        'id',
-                        savesData.map(save => save.pub_id),
-                    );
+                // @ts-ignore
+                let temp: CollectionType['pubs'] = savesData.map(s => s.pubs);
 
-                if (error) {
-                    console.error(error);
-                    reject();
-                    return;
-                }
+                temp = temp.map(pub => ({
+                    ...pub,
+                    dist_meters: distance(
+                        point([coords.longitude, coords.latitude]),
+                        point(pub.location.coordinates),
+                        { units: 'meters' },
+                    ),
+                }));
 
-                const orderedPubs: CollectionType['pubs'] = [];
-
-                savesData.forEach(save => {
-                    const pub = data.find(p => p.id === save.pub_id);
-
-                    if (!pub) {
-                        console.warn('pub not found', save.pub_id);
-                        return;
-                    }
-
-                    orderedPubs.push(pub);
-                });
-
-                if (error) {
-                    reject(error);
-                    return;
-                }
-
-                setPubs(data);
+                setPubs(temp);
                 resolve();
             });
         };
@@ -140,7 +132,7 @@ export default function SavedPubs({
             const index = p.findIndex(pub => pub.id === id);
 
             if (index > -1) {
-                p[index].saved = isSave;
+                p[index].saved[0].count = isSave ? 1 : 0;
             }
 
             setPubs(p);

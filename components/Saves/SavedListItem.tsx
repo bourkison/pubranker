@@ -51,6 +51,8 @@ export default function SavedListItem({
         [containerWidth],
     );
 
+    const saved = useMemo<boolean>(() => pub.saved[0].count > 0, [pub]);
+
     useEffect(() => {
         const url = supabase.storage
             .from('pubs')
@@ -75,7 +77,7 @@ export default function SavedListItem({
             return;
         }
 
-        if (!pub.saved) {
+        if (!saved) {
             onSaveCommence && onSaveCommence(pub.id);
 
             const { error } = await supabase.from('saves').insert({
@@ -117,6 +119,7 @@ export default function SavedListItem({
         onUnsaveCommence,
         onUnsaveComplete,
         showAddToCollection,
+        saved,
     ]);
 
     return (
@@ -147,7 +150,7 @@ export default function SavedListItem({
                         onPress={toggleLike}
                         disabled={isSaving}
                         style={styles.saveButton}>
-                        {pub.saved ? (
+                        {saved ? (
                             <Ionicons name="heart" size={12} color="#dc2626" />
                         ) : (
                             <Ionicons
@@ -170,7 +173,7 @@ export default function SavedListItem({
                             {roundToNearest(pub.rating, 0.1).toFixed(1)}
                         </Text>
                         <Text style={styles.numReviewsText}>
-                            ({pub.num_reviews})
+                            ({pub.num_reviews[0].count})
                         </Text>
                     </View>
                     <View style={styles.titleContainer}>
@@ -181,7 +184,6 @@ export default function SavedListItem({
                     </View>
                     <View style={styles.distanceContainer}>
                         <Text style={styles.distanceText}>
-                            {/* TODO: Fix: */}
                             {distanceString(pub.dist_meters)}
                         </Text>
                     </View>

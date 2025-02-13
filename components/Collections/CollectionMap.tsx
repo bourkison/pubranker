@@ -18,17 +18,7 @@ export default function CollectionMap({ pubs }: CollectionMapType) {
     const points = useMemo<[number, number][]>(
         () =>
             pubs
-                .map(pub => {
-                    const temp = JSON.parse(pub.location)?.coordinates as
-                        | [number, number]
-                        | undefined;
-
-                    if (temp === undefined) {
-                        console.warn('Error getting coordinates of pub');
-                    }
-
-                    return temp;
-                })
+                .map(pub => pub.location.coordinates)
                 .filter(pub => pub !== undefined),
         [pubs],
     );
