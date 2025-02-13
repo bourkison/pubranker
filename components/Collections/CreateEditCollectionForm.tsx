@@ -166,6 +166,7 @@ export default function CreateEditCollectionForm({
 
                     <View style={styles.descriptionInputContainer}>
                         <TextInput
+                            textAlignVertical="top"
                             style={styles.descriptionInputText}
                             numberOfLines={5}
                             multiline={true}

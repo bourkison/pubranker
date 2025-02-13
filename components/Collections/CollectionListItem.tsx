@@ -120,15 +120,17 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 30,
-        marginBottom: 30,
+        marginBottom: 15,
     },
     nameText: {
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: '500',
+        letterSpacing: -0.2,
     },
     countText: {
         fontSize: 12,
         fontWeight: '300',
+        letterSpacing: -0.2,
     },
     scrollableContainer: {
         paddingHorizontal: 30,
@@ -141,7 +143,7 @@ const styles = StyleSheet.create({
     },
     descriptionContainer: {
         paddingHorizontal: 30,
-        marginTop: 30,
+        marginTop: 15,
     },
     descriptionText: {
         fontSize: 12,

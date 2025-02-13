@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
     View,
     Text,
@@ -23,10 +23,11 @@ export default function CollectionsHome({
     navigation,
 }: SavedNavigatorScreenProps<'CollectionsHome'>) {
     const [isLoading, setIsLoading] = useState(false);
+    const [isRefreshing, setIsRefreshing] = useState(false);
     const [collections, setCollections] = useState<ListCollectionType[]>([]);
 
     useEffect(() => {
-        const fetchCollections = async () => {
+        (async () => {
             setIsLoading(true);
 
             const { data: userData, error: userError } =
@@ -55,9 +56,38 @@ export default function CollectionsHome({
 
             setCollections(data.map(follow => follow.collections));
             setIsLoading(false);
-        };
+        })();
+    }, []);
 
-        fetchCollections();
+    const refresh = useCallback(async () => {
+        setIsRefreshing(true);
+
+        const { data: userData, error: userError } =
+            await supabase.auth.getUser();
+
+        if (userError) {
+            console.error(userError);
+            return;
+        }
+
+        const { data, error } = await listFollowedCollectionsQuery()
+            .eq('user_id', userData.user.id)
+            .order('updated_at', { ascending: false })
+            .order('order', {
+                referencedTable: 'collections.collection_items',
+                ascending: true,
+            })
+            .limit(INITIAL_LOAD_AMOUNT)
+            .limit(8, { referencedTable: 'collections.collection_items' });
+
+        if (error) {
+            setIsRefreshing(false);
+            console.error(error);
+            return;
+        }
+
+        setCollections(data.map(follow => follow.collections));
+        setIsRefreshing(false);
     }, []);
 
     return (
@@ -96,6 +126,8 @@ export default function CollectionsHome({
                 }
                 data={collections}
                 contentContainerStyle={styles.listContainer}
+                onRefresh={refresh}
+                refreshing={isRefreshing}
                 renderItem={({ item }) => (
                     <CollectionListItem
                         collection={item}

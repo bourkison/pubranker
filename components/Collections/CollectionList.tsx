@@ -362,8 +362,9 @@ const styles = StyleSheet.create({
     },
     userNameText: {
         marginLeft: 5,
-        fontWeight: '300',
+        fontWeight: '500',
         fontSize: 14,
+        letterSpacing: -0.2,
     },
     collectionNameText: {
         fontSize: 18,

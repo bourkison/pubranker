@@ -33,71 +33,71 @@ export default function SavedPubs({
 
     const { width } = useWindowDimensions();
 
+    const fetchSavedPromise = useCallback((userData: User) => {
+        return new Promise<void>(async (resolve, reject) => {
+            const { data: savesData, error: savesError } = await supabase
+                .from('saves')
+                .select(
+                    `*, 
+                    pubs(
+                        id, 
+                        name, 
+                        address,
+                        num_reviews:reviews(count),
+                        primary_photo, 
+                        saved:saves(count),
+                        location:get_pub_location, 
+                        rating:get_pub_rating
+                    )`,
+                )
+                .eq('user_id', userData.id)
+                .order('created_at', { ascending: false });
+
+            if (savesError) {
+                console.error('SAVES ERROR', savesError);
+                reject(savesError);
+                return;
+            }
+
+            const { coords } = await Location.getCurrentPositionAsync();
+
+            // @ts-ignore
+            let temp: CollectionType['pubs'] = savesData.map(s => s.pubs);
+
+            temp = temp.map(pub => ({
+                ...pub,
+                dist_meters: distance(
+                    point([coords.longitude, coords.latitude]),
+                    point(pub.location.coordinates),
+                    { units: 'meters' },
+                ),
+            }));
+
+            setPubs(temp);
+            resolve();
+        });
+    }, []);
+
+    const fetchCollectionsPromise = useCallback((userData: User) => {
+        return new Promise<void>(async (resolve, reject) => {
+            const { count: collectionsCount, error: collectionsError } =
+                await supabase
+                    .from('collection_follows')
+                    .select('count', { count: 'exact' })
+                    .eq('user_id', userData.id);
+
+            if (collectionsError) {
+                reject(collectionsError);
+                return;
+            }
+
+            setCollectionsAmount(collectionsCount ?? 0);
+            resolve();
+        });
+    }, []);
+
     useEffect(() => {
-        const fetchSavedPromise = (userData: User) => {
-            return new Promise<void>(async (resolve, reject) => {
-                const { data: savesData, error: savesError } = await supabase
-                    .from('saves')
-                    .select(
-                        `*, 
-                        pubs(
-                            id, 
-                            name, 
-                            address,
-                            num_reviews:reviews(count),
-                            primary_photo, 
-                            saved:saves(count),
-                            location:get_pub_location, 
-                            rating:get_pub_rating
-                        )`,
-                    )
-                    .eq('user_id', userData.id)
-                    .order('created_at', { ascending: false });
-
-                if (savesError) {
-                    console.error('SAVES ERROR', savesError);
-                    reject(savesError);
-                    return;
-                }
-
-                const { coords } = await Location.getCurrentPositionAsync();
-
-                // @ts-ignore
-                let temp: CollectionType['pubs'] = savesData.map(s => s.pubs);
-
-                temp = temp.map(pub => ({
-                    ...pub,
-                    dist_meters: distance(
-                        point([coords.longitude, coords.latitude]),
-                        point(pub.location.coordinates),
-                        { units: 'meters' },
-                    ),
-                }));
-
-                setPubs(temp);
-                resolve();
-            });
-        };
-
-        const fetchCollectionsPromise = (userData: User) => {
-            return new Promise<void>(async (resolve, reject) => {
-                const { count: collectionsCount, error: collectionsError } =
-                    await supabase
-                        .from('collection_follows')
-                        .select('count', { count: 'exact' })
-                        .eq('user_id', userData.id);
-
-                if (collectionsError) {
-                    reject(collectionsError);
-                    return;
-                }
-
-                setCollectionsAmount(collectionsCount ?? 0);
-                resolve();
-            });
-        };
-
-        const fetchSaved = async () => {
+        (async () => {
             setIsLoading(true);
             setIsLoggedIn(false);
 
@@ -118,10 +118,31 @@ export default function SavedPubs({
             ]);
 
             setIsLoading(false);
-        };
+        })();
+    }, [fetchSavedPromise, fetchCollectionsPromise]);
 
-        fetchSaved();
-    }, []);
+    const refresh = useCallback(async () => {
+        setIsRefreshing(true);
+
+        const { data: userData, error: userError } =
+            await supabase.auth.getUser();
+
+        if (userError) {
+            console.warn(userError);
+            setIsLoggedIn(false);
+            setIsLoading(false);
+            return;
+        }
+
+        setIsLoggedIn(true);
+
+        await Promise.allSettled([
+            fetchSavedPromise(userData.user),
+            fetchCollectionsPromise(userData.user),
+        ]);
+
+        setIsRefreshing(false);
+    }, [fetchSavedPromise, fetchCollectionsPromise]);
 
     const toggleSave = useCallback(
         (id: number, isSave: boolean) => {
@@ -213,14 +234,8 @@ export default function SavedPubs({
                     </View>
                 )}
                 keyExtractor={item => item.id.toString()}
-                refreshControl={
-                    <RefreshControl
-                        onRefresh={() => {
-                            setIsRefreshing(false);
-                        }}
-                        refreshing={isRefreshing}
-                    />
-                }
+                refreshing={isRefreshing}
+                onRefresh={refresh}
             />
         </SafeAreaView>
     );
