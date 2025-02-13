@@ -34,18 +34,36 @@ const ICON_SIZE = 26;
 
 export default function CreateCollection({
     navigation,
+    route,
 }: RootStackScreenProps<'CreateCollection'>) {
     const [elementWidth, setElementWidth] = useState(0);
     const [pubs, setPubs] = useState<
         { id: number; name: string; primary_photo: string | null }[]
-    >([]);
+    >(
+        route.params.collection
+            ? route.params.collection.collection_items.map(collectionItem => ({
+                  id: collectionItem.pub.id,
+                  name: collectionItem.pub.name,
+                  primary_photo: collectionItem.pub.primary_photo,
+              }))
+            : [],
+    );
 
-    const [name, setName] = useState('');
-    const [description, setDescription] = useState('');
-    const [publicity, setPublicity] =
-        useState<Enums<'collection_privacy_type'>>('PUBLIC');
-    const [ranked, setRanked] = useState(false);
-    const [collaborative, setCollaborative] = useState(false);
+    const [name, setName] = useState(
+        route.params.collection ? route.params.collection.name : '',
+    );
+    const [description, setDescription] = useState(
+        route.params.collection ? route.params.collection.description : '',
+    );
+    const [publicity, setPublicity] = useState<
+        Enums<'collection_privacy_type'>
+    >(route.params.collection ? route.params.collection.public : 'PUBLIC');
+    const [ranked, setRanked] = useState(
+        route.params.collection ? route.params.collection.ranked : false,
+    );
+    const [collaborative, setCollaborative] = useState(
+        route.params.collection ? route.params.collection.collaborative : false,
+    );
 
     const [isCreating, setIsCreating] = useState(false);
 

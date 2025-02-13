@@ -1,6 +1,6 @@
-import { Ionicons } from '@expo/vector-icons';
-import React, { useCallback, useEffect, useState } from 'react';
-import { SafeAreaView, View, TouchableOpacity, StyleSheet } from 'react-native';
+import { Ionicons, SimpleLineIcons } from '@expo/vector-icons';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { SafeAreaView, TouchableOpacity, StyleSheet } from 'react-native';
 import { PRIMARY_COLOR } from '@/constants';
 import CollectionList from '@/components/Collections/CollectionList';
 import Header from '@/components/Utility/Header';
@@ -12,6 +12,7 @@ import {
 import { supabase } from '@/services/supabase';
 import * as Location from 'expo-location';
 import { distance, point } from '@turf/turf';
+import { useActionSheet } from '@expo/react-native-action-sheet';
 
 export default function CollectionView({
     navigation,
@@ -20,6 +21,13 @@ export default function CollectionView({
     const [collection, setCollection] = useState<CollectionType>();
     const [isLoading, setIsLoading] = useState(false);
     const [userId, setUserId] = useState('');
+
+    const { showActionSheetWithOptions } = useActionSheet();
+
+    const isOwnedCollection = useMemo<boolean>(
+        () => userId === collection?.user_id,
+        [userId, collection],
+    );
 
     useEffect(() => {
         (async () => {
@@ -141,6 +149,64 @@ export default function CollectionView({
         [collection],
     );
 
+    const deleteCollection = useCallback(async () => {
+        if (!collection) {
+            return;
+        }
+
+        const { error } = await supabase
+            .from('collections')
+            .delete()
+            .eq('id', collection.id);
+
+        if (error) {
+            console.error(error);
+        }
+    }, [collection]);
+
+    const showActions = useCallback(() => {
+        if (isOwnedCollection) {
+            showActionSheetWithOptions(
+                {
+                    options: ['Edit', 'Delete', 'Cancel'],
+                    cancelButtonIndex: 2,
+                    tintColor: '#000',
+                },
+                selected => {
+                    if (selected === 0) {
+                        navigation.navigate('CreateCollection', {
+                            collection,
+                        });
+                    } else if (selected === 1) {
+                        deleteCollection();
+                    }
+                },
+            );
+
+            return;
+        }
+
+        showActionSheetWithOptions(
+            {
+                options: ['Report', 'Cancel'],
+                cancelButtonIndex: 1,
+                tintColor: '#000',
+            },
+            selected => {
+                if (selected === 0) {
+                    // TODO: Add report.
+                    console.log('REPORT');
+                }
+            },
+        );
+    }, [
+        isOwnedCollection,
+        navigation,
+        showActionSheetWithOptions,
+        collection,
+        deleteCollection,
+    ]);
+
     return (
         <SafeAreaView style={styles.container}>
             <Header
@@ -152,7 +218,17 @@ export default function CollectionView({
                         <Ionicons name="arrow-back-outline" size={14} />
                     </TouchableOpacity>
                 }
-                rightColumn={<View style={styles.menuContainer} />}
+                rightColumn={
+                    <TouchableOpacity
+                        style={styles.menuContainer}
+                        onPress={showActions}>
+                        <SimpleLineIcons
+                            name="options"
+                            color={PRIMARY_COLOR}
+                            size={14}
+                        />
+                    </TouchableOpacity>
+                }
             />
 
             <CollectionList

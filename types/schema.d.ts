@@ -255,7 +255,7 @@ export type Database = {
         Row: {
           collaborative: boolean
           created_at: string
-          description: string | null
+          description: string
           id: number
           name: string
           public: Database["public"]["Enums"]["collection_privacy_type"]
@@ -266,7 +266,7 @@ export type Database = {
         Insert: {
           collaborative?: boolean
           created_at?: string
-          description?: string | null
+          description?: string
           id?: number
           name: string
           public?: Database["public"]["Enums"]["collection_privacy_type"]
@@ -277,7 +277,7 @@ export type Database = {
         Update: {
           collaborative?: boolean
           created_at?: string
-          description?: string | null
+          description?: string
           id?: number
           name?: string
           public?: Database["public"]["Enums"]["collection_privacy_type"]
