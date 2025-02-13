@@ -15,6 +15,7 @@ import SelectPub from '@/screens/MainNavigator/SelectPub';
 import UserActivity from '@/screens/MainNavigator/UserActivity';
 import CreateCollection from '@/screens/MainNavigator/CreateCollection';
 import { RootStackParamList } from '@/types/nav';
+import EditCollection from '@/screens/MainNavigator/EditCollection';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -89,6 +90,11 @@ export default function MainNavigator() {
             <Stack.Screen
                 name="CreateCollection"
                 component={CreateCollection}
+                options={{ headerShown: false, presentation: 'modal' }}
+            />
+            <Stack.Screen
+                name="EditCollection"
+                component={EditCollection}
                 options={{ headerShown: false, presentation: 'modal' }}
             />
         </Stack.Navigator>

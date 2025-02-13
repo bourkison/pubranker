@@ -55,7 +55,7 @@ export type CollectionType = Tables<'collections'> & {
             id: number;
             name: string;
             address: string;
-            primary_photo: string;
+            primary_photo: string | null;
             location: {
                 coordinates: [number, number];
                 type: string;

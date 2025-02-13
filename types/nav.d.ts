@@ -104,7 +104,7 @@ export type RootStackParamList = {
     };
     CreateCollection: undefined;
     EditCollection: {
-        collection?: CollectionType;
+        collection: CollectionType;
     };
 };
 

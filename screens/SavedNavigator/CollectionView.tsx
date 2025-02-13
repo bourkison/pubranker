@@ -180,6 +180,10 @@ export default function CollectionView({
                 },
                 selected => {
                     if (selected === 0) {
+                        if (!collection) {
+                            return;
+                        }
+
                         navigation.navigate('EditCollection', {
                             collection,
                         });
