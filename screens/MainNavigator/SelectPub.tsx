@@ -1,6 +1,6 @@
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
     View,
     Text,
@@ -14,34 +14,15 @@ import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '@/services/supabase';
 import SearchSuggestionItem from '@/components/Search/SearchSuggestionItem';
 import { ResultType } from '@/context/searchContext';
+import Header from '@/components/Utility/Header';
 
-export default function AddFavourite({
+export default function SelectPub({
     navigation,
     route,
-}: StackScreenProps<MainNavigatorStackParamList, 'AddFavourite'>) {
+}: StackScreenProps<MainNavigatorStackParamList, 'SelectPub'>) {
     const [searchText, setSearchText] = useState('');
     const [results, setResults] = useState<ResultType[]>([]);
     const [isSearching, setIsSearching] = useState(false);
-
-    const maxIdVal = useMemo<number>(() => {
-        if (route.params.favourites.length === 0) {
-            return 0;
-        }
-
-        return route.params.favourites
-            .map(favourite => favourite.id)
-            .reduce((acc, curr) => (acc += curr));
-    }, [route]);
-
-    const maxCountVal = useMemo<number>(() => {
-        if (route.params.favourites.length === 0) {
-            return 0;
-        }
-
-        return route.params.favourites
-            .map(favourite => favourite.count)
-            .reduce((acc, curr) => (acc += curr));
-    }, [route]);
 
     const search = useCallback(async () => {
         setIsSearching(true);
@@ -65,25 +46,16 @@ export default function AddFavourite({
         // Furthermore, map the pub to be a search result.
         setResults(
             data
-                .filter(
-                    d =>
-                        !route.params.favourites
-                            .map(favourite => favourite.pubs.id)
-                            .includes(d.id),
-                )
+                .filter(d => !route.params.excludedIds.includes(d.id))
                 .map(d => ({
                     title: d.name,
                     subtitle: '',
                     type: 'pub',
                     onPress: () => {
                         route.params.onAdd({
-                            id: maxIdVal + 1,
-                            count: maxCountVal + 1,
-                            pubs: {
-                                id: d.id,
-                                name: d.name,
-                                primary_photo: d.primary_photo,
-                            },
+                            id: d.id,
+                            name: d.name,
+                            primary_photo: d.primary_photo,
                         });
 
                         navigation.goBack();
@@ -92,25 +64,25 @@ export default function AddFavourite({
         );
 
         setIsSearching(false);
-    }, [searchText, route, maxCountVal, maxIdVal, navigation]);
+    }, [searchText, route, navigation]);
 
     return (
         <View style={styles.container}>
-            <View style={styles.headerContainer}>
-                <TouchableOpacity
-                    style={styles.cancelContainer}
-                    onPress={() => navigation.goBack()}>
-                    <Text>Back</Text>
-                </TouchableOpacity>
-
-                <View style={styles.headerTextContainer}>
-                    <Text style={styles.headerText}>Select a Pub</Text>
-                </View>
-
-                <View style={styles.cancelContainer}>
-                    <Text style={styles.hiddenText}>Back</Text>
-                </View>
-            </View>
+            <Header
+                header={route.params.header}
+                leftColumn={
+                    <TouchableOpacity
+                        style={styles.cancelContainer}
+                        onPress={() => navigation.goBack()}>
+                        <Text>Back</Text>
+                    </TouchableOpacity>
+                }
+                rightColumn={
+                    <View style={styles.cancelContainer}>
+                        <Text style={styles.hiddenText}>Back</Text>
+                    </View>
+                }
+            />
 
             <FlatList
                 data={results}
@@ -155,15 +127,6 @@ export default function AddFavourite({
 
 const styles = StyleSheet.create({
     container: { flex: 1 },
-    headerContainer: {
-        paddingVertical: 20,
-        paddingHorizontal: 5,
-        alignItems: 'center',
-        flexDirection: 'row',
-        borderBottomWidth: 1,
-        borderColor: '#E5E7EB',
-        justifyContent: 'space-between',
-    },
     cancelContainer: {
         flex: 1,
         paddingHorizontal: 10,
@@ -171,14 +134,6 @@ const styles = StyleSheet.create({
     },
     hiddenText: {
         color: 'transparent',
-    },
-    headerTextContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    headerText: {
-        fontWeight: '500',
     },
     contentContainer: {},
     searchBarContainer: {

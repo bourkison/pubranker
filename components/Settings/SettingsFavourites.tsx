@@ -13,7 +13,11 @@ import Sortable from 'react-native-sortables';
 type SettingsFavouritesProps = {
     favourites: UserType['favourites'];
     onRemove: (index: number) => void;
-    addFavourite: (pub: UserType['favourites'][number]) => void;
+    addFavourite: (pub: {
+        id: number;
+        name: string;
+        primary_photo: string | null;
+    }) => void;
     setFavourites: (favourites: UserType['favourites']) => void;
 };
 
@@ -158,8 +162,11 @@ export default function SettingsFavourites({
                         ]}>
                         <Pressable
                             onPress={() =>
-                                navigation.navigate('AddFavourite', {
-                                    favourites,
+                                navigation.navigate('SelectPub', {
+                                    header: 'Select a pub',
+                                    excludedIds: favourites.map(
+                                        favourite => favourite.pubs.id,
+                                    ),
                                     onAdd: pub => addFavourite(pub),
                                 })
                             }

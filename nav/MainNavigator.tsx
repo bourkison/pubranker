@@ -14,7 +14,7 @@ import UserCollectionView from '@/screens/MainNavigator/UserCollectionView';
 import FollowersFollowingView from '@/screens/MainNavigator/FollowersFollowingView';
 import Settings from '@/screens/MainNavigator/Settings';
 import { UserType } from '@/services/queries/user';
-import AddFavourite from '@/screens/MainNavigator/AddFavourite';
+import SelectPub from '@/screens/MainNavigator/SelectPub';
 import UserActivity from '@/screens/MainNavigator/UserActivity';
 import { FetchPubType } from '@/services/queries/pub';
 import CreateCollection from '@/screens/MainNavigator/CreateCollection';
@@ -62,9 +62,14 @@ export type MainNavigatorStackParamList = {
         profile_photo: string;
         favourites: UserType['favourites'];
     };
-    AddFavourite: {
-        favourites: UserType['favourites'];
-        onAdd: (pub: UserType['favourites'][number]) => void;
+    SelectPub: {
+        header: string;
+        excludedIds: number[];
+        onAdd: (pub: {
+            id: number;
+            name: string;
+            primary_photo: string | null;
+        }) => void;
     };
     UserActivity: {
         userId: string;
@@ -138,8 +143,8 @@ export default function MainNavigator() {
                 options={{ headerShown: false, presentation: 'modal' }}
             />
             <Stack.Screen
-                name="AddFavourite"
-                component={AddFavourite}
+                name="SelectPub"
+                component={SelectPub}
                 options={{ headerShown: false, presentation: 'modal' }}
             />
             <Stack.Screen

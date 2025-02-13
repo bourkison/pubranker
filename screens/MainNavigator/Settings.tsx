@@ -1,6 +1,6 @@
 import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
     View,
     Text,
@@ -37,6 +37,26 @@ export default function Settings({
     const [isSaving, setIsSaving] = useState(false);
 
     const { bottom } = useSafeAreaInsets();
+
+    const maxIdVal = useMemo<number>(() => {
+        if (favourites.length === 0) {
+            return 0;
+        }
+
+        return favourites
+            .map(favourite => favourite.id)
+            .reduce((acc, curr) => (acc += curr));
+    }, [favourites]);
+
+    const maxCountVal = useMemo<number>(() => {
+        if (favourites.length === 0) {
+            return 0;
+        }
+
+        return favourites
+            .map(favourite => favourite.count)
+            .reduce((acc, curr) => (acc += curr));
+    }, [favourites]);
 
     const favouritesChanged = useCallback(() => {
         if (route.params.favourites.length !== favourites.length) {
@@ -76,10 +96,16 @@ export default function Settings({
     );
 
     const addFavourite = useCallback(
-        (favourite: UserType['favourites'][number]) => {
+        (pub: { id: number; name: string; primary_photo: string | null }) => {
+            const favourite: UserType['favourites'][number] = {
+                id: maxIdVal + 1,
+                count: maxCountVal + 1,
+                pubs: pub,
+            };
+
             setFavourites([...favourites, favourite]);
         },
-        [favourites],
+        [favourites, maxIdVal, maxCountVal],
     );
 
     const updateFavourites = useCallback(async () => {

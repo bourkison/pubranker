@@ -145,7 +145,7 @@ export default function CreateCollection({
                             <View style={styles.settingsIconContainer}>
                                 <MaterialIcons
                                     name="people"
-                                    size={38}
+                                    size={36}
                                     color={ICON_COLOR}
                                 />
 
@@ -175,7 +175,7 @@ export default function CreateCollection({
                             <View style={styles.settingsIconContainer}>
                                 <FontAwesome6
                                     name="ranking-star"
-                                    size={36}
+                                    size={34}
                                     color={ICON_COLOR}
                                 />
 
@@ -201,8 +201,8 @@ export default function CreateCollection({
                         onPress={() => setCollaborative(!collaborative)}>
                         {!collaborative ? (
                             <View style={styles.settingsIconContainer}>
-                                <Entypo
-                                    name="lock"
+                                <MaterialIcons
+                                    name="person"
                                     size={36}
                                     color={ICON_COLOR}
                                 />
@@ -215,7 +215,7 @@ export default function CreateCollection({
                             <View style={styles.settingsIconContainer}>
                                 <MaterialIcons
                                     name="people"
-                                    size={38}
+                                    size={36}
                                     color={ICON_COLOR}
                                 />
 
