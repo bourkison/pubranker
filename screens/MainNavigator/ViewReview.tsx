@@ -23,6 +23,7 @@ import ReviewAttributes from '@/components/Reviews/ReviewAttributes';
 import { reviewQuery, ReviewType } from '@/services/queries/review';
 import { v4 as uuidv4 } from 'uuid';
 import { RootStackScreenProps } from '@/types/nav';
+import { StackActions } from '@react-navigation/native';
 
 const NO_IMAGE = require('@/assets/noimage.png');
 
@@ -287,11 +288,17 @@ export default function ViewReview({
                                     <View style={styles.pubInfoLeftColumn}>
                                         <Pressable
                                             style={styles.userContainer}
-                                            onPress={() =>
-                                                navigation.push('Profile', {
-                                                    userId: review.user.id,
-                                                })
-                                            }>
+                                            onPress={() => {
+                                                const pushAction =
+                                                    StackActions.push(
+                                                        'Profile',
+                                                        {
+                                                            userId: review.user
+                                                                .id,
+                                                        },
+                                                    );
+                                                navigation.dispatch(pushAction);
+                                            }}>
                                             <UserAvatar
                                                 photo={
                                                     review.user.profile_photo ||
@@ -307,11 +314,16 @@ export default function ViewReview({
 
                                         <Pressable
                                             style={styles.pubNameContainer}
-                                            onPress={() =>
-                                                navigation.push('PubView', {
-                                                    pubId: review.pub_id,
-                                                })
-                                            }>
+                                            onPress={() => {
+                                                const pushAction =
+                                                    StackActions.push(
+                                                        'PubView',
+                                                        {
+                                                            pubId: review.pub_id,
+                                                        },
+                                                    );
+                                                navigation.dispatch(pushAction);
+                                            }}>
                                             <Text style={styles.pubNameText}>
                                                 {review.pub.name}
                                             </Text>

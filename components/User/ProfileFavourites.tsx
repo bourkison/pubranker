@@ -1,8 +1,6 @@
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { UserType } from '@/services/queries/user';
 import { supabase } from '@/services/supabase';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { StackActions, useNavigation } from '@react-navigation/native';
 import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, Image } from 'react-native';
 
@@ -17,8 +15,7 @@ const IMAGE_PADDING = 2;
 export default function ProfileFavourites({
     favourites,
 }: ProfileFavouritesProps) {
-    const navigation =
-        useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
+    const navigation = useNavigation();
 
     const [elementWidth, setElementWidth] = useState(0);
 
@@ -70,11 +67,12 @@ export default function ProfileFavourites({
                             styles.pubContainer,
                             { width: pubElementWidth },
                         ]}
-                        onPress={() =>
-                            navigation.push('PubView', {
+                        onPress={() => {
+                            const pushAction = StackActions.push('PubView', {
                                 pubId: favourite.pubs.id,
-                            })
-                        }>
+                            });
+                            navigation.dispatch(pushAction);
+                        }}>
                         <Image
                             source={
                                 images[index]

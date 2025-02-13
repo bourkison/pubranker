@@ -9,8 +9,6 @@ import {
 } from 'react-native';
 import UserAvatar from '../User/UserAvatar';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 
 type FeedReviewLikeItemProps = {
     user: FeedType['user'];
@@ -21,8 +19,7 @@ export default function FeedReviewLikeItem({
     user,
     reviewLike,
 }: FeedReviewLikeItemProps) {
-    const navigation =
-        useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
+    const navigation = useNavigation();
 
     return (
         <TouchableHighlight

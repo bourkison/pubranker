@@ -21,8 +21,6 @@ import Animated, {
 import { PRIMARY_COLOR } from '@/constants';
 import { supabase } from '@/services/supabase';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { SavedNavigatorStackParamList } from '@/nav/SavedNavigator';
 
 export default function CreateCollectionIcon() {
     const bottomSheetRef = useRef<BottomSheetModal>(null);
@@ -30,8 +28,7 @@ export default function CreateCollectionIcon() {
     const [isCreating, setIsCreating] = useState(false);
 
     const sAnimatedUnderline = useSharedValue(0);
-    const navigation =
-        useNavigation<StackNavigationProp<SavedNavigatorStackParamList>>();
+    const navigation = useNavigation();
 
     const rStyle = useAnimatedStyle(() => ({
         backgroundColor: interpolateColor(
@@ -79,7 +76,14 @@ export default function CreateCollectionIcon() {
             }
 
             bottomSheetRef.current?.dismiss();
-            navigation.navigate('CollectionView', { collectionId: data.id });
+
+            navigation.navigate('Home', {
+                screen: 'Favourites',
+                params: {
+                    screen: 'CollectionView',
+                    params: { collectionId: data.id },
+                },
+            });
         };
 
         create();

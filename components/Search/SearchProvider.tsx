@@ -1,8 +1,6 @@
 import { ResultType, SearchContext, SearchType } from '@/context/searchContext';
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { supabase } from '@/services/supabase';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useCallback, useMemo, useState } from 'react';
 
 type SearchProviderProps = {
@@ -18,8 +16,7 @@ export default function SearchProvider({ children }: SearchProviderProps) {
     const [isLoading, setIsLoading] = useState(false);
 
     const [internalResults, setInternalResults] = useState<ResultType[]>([]);
-    const navigation =
-        useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
+    const navigation = useNavigation();
 
     const results = useMemo<ResultType[]>(() => {
         if (

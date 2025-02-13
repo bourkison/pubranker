@@ -12,8 +12,6 @@ import { distanceString, roundToNearest } from '@/services';
 import { GOLD_RATINGS_COLOR } from '@/constants';
 import { supabase } from '@/services/supabase';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { CollectionType } from '@/services/queries/collections';
 
 const NO_IMAGE = require('@/assets/noimage.png');
@@ -42,8 +40,7 @@ export default function SavedListItem({
     const [imageUrl, setImageUrl] = useState('');
     const [isSaving, setIsSaving] = useState(false);
 
-    const navigation =
-        useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
+    const navigation = useNavigation();
 
     const IMAGE_WIDTH = useMemo(
         () => containerWidth * WIDTH_PERCENTAGE,

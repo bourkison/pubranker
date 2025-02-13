@@ -9,8 +9,6 @@ import {
 } from 'react-native';
 import UserAvatar from '@/components/User/UserAvatar';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 
 type FeedFollowItemProps = {
     user: FeedType['user'];
@@ -18,8 +16,7 @@ type FeedFollowItemProps = {
 };
 
 export default function FeedFollowItem({ follow, user }: FeedFollowItemProps) {
-    const navigation =
-        useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
+    const navigation = useNavigation();
 
     return (
         <TouchableHighlight

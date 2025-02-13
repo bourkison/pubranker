@@ -16,9 +16,7 @@ import * as Haptics from 'expo-haptics';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-reanimated';
 import { ReviewType } from '@/services/queries/review';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
+import { StackActions, useNavigation } from '@react-navigation/native';
 
 type CommentProps = {
     comment: ReviewType['comments'][number];
@@ -43,8 +41,7 @@ export default function Comment({
     const [textShown, setTextShown] = useState(false);
     const [lengthMore, setLengthMore] = useState(false);
 
-    const navigation =
-        useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
+    const navigation = useNavigation();
 
     const onTextLayout = useCallback(
         (e: NativeSyntheticEvent<TextLayoutEventData>) => {
@@ -124,9 +121,12 @@ export default function Comment({
             <View style={styles.container}>
                 <Pressable
                     style={styles.userContainer}
-                    onPress={() =>
-                        navigation.push('Profile', { userId: comment.user.id })
-                    }>
+                    onPress={() => {
+                        const pushAction = StackActions.push('Profile', {
+                            userId: comment.user.id,
+                        });
+                        navigation.dispatch(pushAction);
+                    }}>
                     <UserAvatar
                         photo={comment.user.profile_photo || ''}
                         size={22}

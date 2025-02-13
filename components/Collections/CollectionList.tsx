@@ -24,7 +24,7 @@ import {
 import CollectionMap from '@/components/Collections/CollectionMap';
 import UserAvatar from '@/components/User/UserAvatar';
 import SavedListItem from '@/components/Saves/SavedListItem';
-import { useNavigation } from '@react-navigation/native';
+import { StackActions, useNavigation } from '@react-navigation/native';
 import { distance, point } from '@turf/turf';
 import LikeCollectionButton from '@/components/Collections/LikeCollectionButton';
 
@@ -271,11 +271,16 @@ export default function CollectionList({ collectionId }: CollectionListProps) {
                             <View style={styles.topListHeaderContainer}>
                                 <Pressable
                                     style={styles.userContainer}
-                                    onPress={() =>
-                                        navigation.push('Profile', {
-                                            userId: collection.user.id,
-                                        })
-                                    }>
+                                    onPress={() => {
+                                        const pushAction = StackActions.push(
+                                            'Profile',
+                                            {
+                                                userId: collection.user.id,
+                                            },
+                                        );
+
+                                        navigation.dispatch(pushAction);
+                                    }}>
                                     <UserAvatar
                                         photo={
                                             collection.user.profile_photo || ''

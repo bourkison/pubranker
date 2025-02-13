@@ -10,9 +10,7 @@ import {
     TouchableOpacity,
 } from 'react-native';
 import RatingsStarViewer from '@/components/Ratings/RatingsStarsViewer';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
+import { StackActions, useNavigation } from '@react-navigation/native';
 import { Feather } from '@expo/vector-icons';
 
 type ProfileRecentRatingsProps = {
@@ -28,8 +26,7 @@ export default function ProfileRecentRatings({
     recentRatings,
     userId,
 }: ProfileRecentRatingsProps) {
-    const navigation =
-        useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
+    const navigation = useNavigation();
 
     const [elementWidth, setElementWidth] = useState(0);
 
@@ -82,11 +79,12 @@ export default function ProfileRecentRatings({
                 )}
                 {recentRatings.map((rating, index) => (
                     <Pressable
-                        onPress={() =>
-                            navigation.push('PubView', {
+                        onPress={() => {
+                            const pushAction = StackActions.push('PubView', {
                                 pubId: rating.pubs.id,
-                            })
-                        }
+                            });
+                            navigation.dispatch(pushAction);
+                        }}
                         style={[
                             styles.pubContainer,
                             { width: pubElementWidth },

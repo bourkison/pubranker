@@ -10,10 +10,9 @@ import {
 import UserAvatar from '@/components/User/UserAvatar';
 import { Ionicons, FontAwesome6 } from '@expo/vector-icons';
 import { PRIMARY_COLOR } from '@/constants';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
+import { StackActions, useNavigation } from '@react-navigation/native';
 import { supabase } from '@/services/supabase';
+import { RootStackScreenProps } from '@/types/nav';
 
 type ListFollowItemProps = {
     user: FollowsType;
@@ -27,7 +26,7 @@ export default function FollowListItem({
     toggleFollow,
 }: ListFollowItemProps) {
     const navigation =
-        useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
+        useNavigation<RootStackScreenProps<'Home'>['navigation']>();
 
     const [isFollowing, setIsFollowing] = useState(false);
 
@@ -89,9 +88,12 @@ export default function FollowListItem({
         <TouchableHighlight
             style={styles.container}
             underlayColor="#E5E7EB"
-            onPress={() =>
-                navigation.push('Profile', { userId: user.user.id })
-            }>
+            onPress={() => {
+                const pushAction = StackActions.push('Profile', {
+                    userId: user.user.id,
+                });
+                navigation.dispatch(pushAction);
+            }}>
             <>
                 <View style={styles.leftColumnContainer}>
                     <UserAvatar

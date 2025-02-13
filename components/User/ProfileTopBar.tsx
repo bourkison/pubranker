@@ -1,6 +1,4 @@
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { StackActions, useNavigation } from '@react-navigation/native';
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 
@@ -17,8 +15,7 @@ export default function ProfileTopBar({
     following,
     userId,
 }: ProfileTopBarProps) {
-    const navigation =
-        useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
+    const navigation = useNavigation();
 
     const reviewsText = useMemo<string>(() => {
         if (reviews === 1) {
@@ -52,13 +49,17 @@ export default function ProfileTopBar({
 
             <Pressable
                 style={styles.topBarColumn}
-                onPress={() =>
-                    navigation.push('FollowersFollowingView', {
-                        userId: userId,
-                        type: 'followers',
-                        count: followers,
-                    })
-                }>
+                onPress={() => {
+                    const pushAction = StackActions.push(
+                        'FollowersFollowingView',
+                        {
+                            userId: userId,
+                            type: 'followers',
+                            count: followers,
+                        },
+                    );
+                    navigation.dispatch(pushAction);
+                }}>
                 <View style={styles.topBarValueContainer}>
                     <Text style={styles.topBarValueText}>
                         {followers.toString()}
@@ -72,13 +73,17 @@ export default function ProfileTopBar({
 
             <Pressable
                 style={styles.topBarColumn}
-                onPress={() =>
-                    navigation.push('FollowersFollowingView', {
-                        userId: userId,
-                        type: 'following',
-                        count: following,
-                    })
-                }>
+                onPress={() => {
+                    const pushAction = StackActions.push(
+                        'FollowersFollowingView',
+                        {
+                            userId: userId,
+                            type: 'following',
+                            count: following,
+                        },
+                    );
+                    navigation.dispatch(pushAction);
+                }}>
                 <View style={styles.topBarValueContainer}>
                     <Text style={styles.topBarValueText}>
                         {following.toString()}

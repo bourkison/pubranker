@@ -5,8 +5,6 @@ import { useActionSheet } from '@expo/react-native-action-sheet';
 import React, { useState, useMemo, useCallback } from 'react';
 import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { useNavigation } from '@react-navigation/native';
 import Sortable from 'react-native-sortables';
 
@@ -32,8 +30,7 @@ export default function SettingsFavourites({
     setFavourites,
 }: SettingsFavouritesProps) {
     const [elementWidth, setElementWidth] = useState(0);
-    const navigation =
-        useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
+    const navigation = useNavigation();
 
     const pubElementWidth = useMemo<number>(
         () => elementWidth / MAX_FAVOURITES,

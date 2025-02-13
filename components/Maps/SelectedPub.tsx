@@ -4,8 +4,6 @@ import React, { useCallback, useMemo } from 'react';
 import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import Animated, {
     Easing,
     EntryExitAnimationFunction,
@@ -43,8 +41,7 @@ export default function SelectedPub({ pub }: SelectedPubProps) {
         return '';
     }, [pub]);
 
-    const navigation =
-        useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
+    const navigation = useNavigation();
 
     const { deselectMapPub } = useSharedMapContext();
 

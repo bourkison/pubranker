@@ -12,8 +12,6 @@ import UserAvatar from '../User/UserAvatar';
 import RatingsStarViewer from '../Ratings/RatingsStarsViewer';
 import { supabase } from '@/services/supabase';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 
 type FeedReviewItemProps = {
     user: FeedType['user'];
@@ -27,8 +25,7 @@ const NO_IMAGE = require('@/assets/noimage.png');
 
 export default function FeedReviewItem({ user, review }: FeedReviewItemProps) {
     const [elementWidth, setElementWidth] = useState(0);
-    const navigation =
-        useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
+    const navigation = useNavigation();
 
     const image = useMemo<string>(() => {
         if (review.pub.primary_photo) {

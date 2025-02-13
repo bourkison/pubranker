@@ -2,9 +2,7 @@ import { UserType } from '@/services/queries/user';
 import React from 'react';
 import { View, Text, StyleSheet, TouchableHighlight } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
+import { StackActions, useNavigation } from '@react-navigation/native';
 
 type ProfileLinksProps = {
     user: UserType;
@@ -13,8 +11,7 @@ type ProfileLinksProps = {
 const RIGHT_COLUMN_COLOR = 'rgba(0, 0, 0, 0.6)';
 
 export default function ProfileLinks({ user }: ProfileLinksProps) {
-    const navigation =
-        useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
+    const navigation = useNavigation();
 
     return (
         <View style={styles.container}>
@@ -61,9 +58,12 @@ export default function ProfileLinks({ user }: ProfileLinksProps) {
             <TouchableHighlight
                 style={styles.itemContainer}
                 underlayColor="#E5E7EB"
-                onPress={() =>
-                    navigation.push('UserCollections', { userId: user.id })
-                }>
+                onPress={() => {
+                    const pushAction = StackActions.push('UserCollections', {
+                        userId: user.id,
+                    });
+                    navigation.dispatch(pushAction);
+                }}>
                 <>
                     <Text style={styles.itemHeader}>Lists</Text>
 
@@ -83,13 +83,17 @@ export default function ProfileLinks({ user }: ProfileLinksProps) {
             <TouchableHighlight
                 style={styles.itemContainer}
                 underlayColor="#E5E7EB"
-                onPress={() =>
-                    navigation.push('FollowersFollowingView', {
-                        type: 'following',
-                        userId: user.id,
-                        count: user.following[0].count,
-                    })
-                }>
+                onPress={() => {
+                    const pushAction = StackActions.push(
+                        'FollowersFollowingView',
+                        {
+                            type: 'following',
+                            userId: user.id,
+                            count: user.following[0].count,
+                        },
+                    );
+                    navigation.dispatch(pushAction);
+                }}>
                 <>
                     <Text style={styles.itemHeader}>Following</Text>
 
@@ -109,13 +113,17 @@ export default function ProfileLinks({ user }: ProfileLinksProps) {
             <TouchableHighlight
                 style={styles.itemContainer}
                 underlayColor="#E5E7EB"
-                onPress={() =>
-                    navigation.push('FollowersFollowingView', {
-                        type: 'followers',
-                        userId: user.id,
-                        count: user.followers[0].count,
-                    })
-                }>
+                onPress={() => {
+                    const pushAction = StackActions.push(
+                        'FollowersFollowingView',
+                        {
+                            type: 'followers',
+                            userId: user.id,
+                            count: user.followers[0].count,
+                        },
+                    );
+                    navigation.dispatch(pushAction);
+                }}>
                 <>
                     <Text style={styles.itemHeader}>Followers</Text>
 

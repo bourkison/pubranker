@@ -7,8 +7,6 @@ import TopSection from './TopSection';
 import RateSection from './RateSection';
 import { useSharedPubViewContext } from '@/context/pubViewContext';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { FetchPubType } from '@/services/queries/pub';
 
 type RateButtonProps = {
@@ -17,8 +15,7 @@ type RateButtonProps = {
 
 export default function RateButtonModal({ pub }: RateButtonProps) {
     const bottomSheetRef = useRef<BottomSheetModal>(null);
-    const navigation =
-        useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
+    const navigation = useNavigation();
 
     const { userReview, setUserReview } = useSharedPubViewContext();
 

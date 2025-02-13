@@ -12,8 +12,6 @@ import {
 } from 'react-native';
 import PubInfo from './PubView/PubInfo';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import { Ionicons } from '@expo/vector-icons';
 import { useSharedCollectionContext } from '@/context/collectionContext';
 import { ExplorePub } from '@/store/slices/explore';
@@ -80,8 +78,7 @@ export default function PubItem({
     const [isSaving, setIsSaving] = useState(false);
 
     const { width } = useWindowDimensions();
-    const navigation =
-        useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
+    const navigation = useNavigation();
 
     const { showAddToCollection } = useSharedCollectionContext();
 

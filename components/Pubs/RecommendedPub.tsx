@@ -7,8 +7,6 @@ import {
     useWindowDimensions,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
-import { StackNavigationProp } from '@react-navigation/stack';
 import PubInfo from '@/components/Pubs/PubView/PubInfo';
 import { CollectionType } from '@/services/queries/collections';
 
@@ -30,8 +28,7 @@ export default function RecommendedPubItem({
     const { width } = useWindowDimensions();
     const COMPONENT_WIDTH = width * WIDTH_PERCENTAGE;
 
-    const navigation =
-        useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
+    const navigation = useNavigation();
 
     useEffect(() => {
         if (pub.photos[0]) {

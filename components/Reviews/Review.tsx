@@ -12,8 +12,6 @@ import { fromNowString } from '@/services';
 import UserAvatar from '@/components/User/UserAvatar';
 import { ListReviewType } from '@/services/queries/review';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { MainNavigatorStackParamList } from '@/nav/MainNavigator';
 import RatingsStarViewer from '@/components/Ratings/RatingsStarsViewer';
 import ReviewAttributes from '@/components/Reviews/ReviewAttributes';
 import { FetchPubType } from '@/services/queries/pub';
@@ -30,8 +28,7 @@ export default function Review({ review, noBorder }: ReviewProps) {
     const [textShown, setTextShown] = useState(false);
     const [lengthMore, setLengthMore] = useState(false);
 
-    const navigation =
-        useNavigation<StackNavigationProp<MainNavigatorStackParamList>>();
+    const navigation = useNavigation();
 
     const onTextLayout = useCallback(
         (e: NativeSyntheticEvent<TextLayoutEventData>) => {
