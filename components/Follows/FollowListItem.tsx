@@ -17,6 +17,7 @@ import { RootStackScreenProps } from '@/types/nav';
 type ListFollowItemProps = {
     user: FollowsType;
     index: number;
+    loggedInUserId?: string;
     toggleFollow: (isFollow: boolean, index: number) => void;
 };
 
@@ -24,6 +25,7 @@ export default function FollowListItem({
     user,
     index,
     toggleFollow,
+    loggedInUserId,
 }: ListFollowItemProps) {
     const navigation =
         useNavigation<RootStackScreenProps<'Home'>['navigation']>();
@@ -103,31 +105,33 @@ export default function FollowListItem({
                     </Text>
                 </View>
 
-                {user.user.is_followed[0].count > 0 ? (
-                    <TouchableOpacity
-                        style={styles.rightColumnContainer}
-                        onPress={unfollow}
-                        disabled={isFollowing}>
-                        <Ionicons
-                            name="checkmark"
-                            size={16}
-                            color={PRIMARY_COLOR}
-                        />
-                        <Text style={styles.followText}>Followed</Text>
-                    </TouchableOpacity>
-                ) : (
-                    <TouchableOpacity
-                        style={styles.rightColumnContainer}
-                        disabled={isFollowing}
-                        onPress={follow}>
-                        <FontAwesome6
-                            name="plus"
-                            size={14}
-                            color={PRIMARY_COLOR}
-                        />
-                        <Text style={styles.followText}>Follow</Text>
-                    </TouchableOpacity>
-                )}
+                {loggedInUserId !== user.user.id &&
+                    (user.user.is_followed[0].count > 0 ? (
+                        <TouchableOpacity
+                            style={styles.rightColumnContainer}
+                            onPress={unfollow}
+                            disabled={isFollowing}>
+                            <Ionicons
+                                name="checkmark"
+                                size={16}
+                                color={PRIMARY_COLOR}
+                            />
+                            <Text style={styles.followText}>Followed</Text>
+                        </TouchableOpacity>
+                    ) : (
+                        <TouchableOpacity
+                            style={styles.rightColumnContainer}
+                            disabled={isFollowing}
+                            onPress={follow}>
+                            <FontAwesome6
+                                name="plus"
+                                size={14}
+                                color={PRIMARY_COLOR}
+                            />
+                            <Text style={styles.followText}>Follow</Text>
+                        </TouchableOpacity>
+                    ))}
+                {}
             </>
         </TouchableHighlight>
     );

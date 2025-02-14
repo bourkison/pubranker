@@ -1,10 +1,13 @@
 import { supabase } from '../supabase';
-import { Tables } from '@/types/schema';
+import { Enums, Tables } from '@/types/schema';
 
 export type ListCollectionType = {
     id: number;
     name: string;
     description: string | null;
+    public: Enums<'collection_privacy_type'>;
+    collaborative: boolean;
+    ranked: boolean;
     collection_items: {
         order: number;
         pub: {
@@ -30,6 +33,9 @@ collections(
     id,
     name,
     description,
+    public,
+    collaborative,
+    ranked,
     collection_items(
         order,
         pub:pubs(

@@ -24,12 +24,14 @@ export default function FollowersFollowingView({
 }: RootStackScreenProps<'FollowersFollowingView'>) {
     const [isLoading, setIsLoading] = useState(false);
     const [follows, setFollows] = useState<FollowsType[]>([]);
+    const [userId, setUserId] = useState<string>();
 
     useEffect(() => {
         (async () => {
             setIsLoading(true);
 
             const { data: userData } = await supabase.auth.getUser();
+            setUserId(userData.user?.id);
 
             if (route.params.type === 'followers') {
                 const { data, error } = await getFollowersQuery(
@@ -116,6 +118,7 @@ export default function FollowersFollowingView({
                 renderItem={({ item, index }) => (
                     <FollowListItem
                         user={item}
+                        loggedInUserId={userId}
                         index={index}
                         toggleFollow={toggleFollow}
                     />

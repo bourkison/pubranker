@@ -11,6 +11,7 @@ import {
     Pressable,
 } from 'react-native';
 import UserAvatar from '../User/UserAvatar';
+import { Entypo, MaterialIcons } from '@expo/vector-icons';
 
 const NO_IMAGE = require('@/assets/noimage.png');
 
@@ -21,6 +22,8 @@ type CollectionListItemProps = {
 
 const IMAGE_ASPECT_RATIO = 1.3333;
 const IMAGE_WIDTH = 100;
+
+const PRIVACY_ICON_SIZE = 12;
 
 export default function CollectionListItem({
     collection,
@@ -93,15 +96,54 @@ export default function CollectionListItem({
                     </View>
                 ) : undefined}
 
-                <View style={styles.userContainer}>
-                    <UserAvatar
-                        size={20}
-                        photo={collection.user.profile_photo || ''}
-                    />
+                <View style={styles.bottomContainer}>
+                    <View style={styles.userContainer}>
+                        <UserAvatar
+                            size={20}
+                            photo={collection.user.profile_photo || ''}
+                        />
 
-                    <Text style={styles.userNameText}>
-                        {collection.user.username}
-                    </Text>
+                        <Text style={styles.userNameText}>
+                            {collection.user.username}
+                        </Text>
+                    </View>
+
+                    <View style={styles.privacyContainer}>
+                        {collection.public === 'PRIVATE' ? (
+                            <View style={styles.privacyItem}>
+                                <Text style={styles.privacyItemText}>
+                                    Private
+                                </Text>
+                                <Entypo
+                                    name="lock"
+                                    size={PRIVACY_ICON_SIZE - 2}
+                                    color="#000"
+                                />
+                            </View>
+                        ) : collection.public === 'FRIENDS_ONLY' ? (
+                            <View style={styles.privacyItem}>
+                                <Text style={styles.privacyItemText}>
+                                    Friends only
+                                </Text>
+                                <MaterialIcons
+                                    name="people"
+                                    size={PRIVACY_ICON_SIZE}
+                                    color="#000"
+                                />
+                            </View>
+                        ) : (
+                            <View style={styles.privacyItem}>
+                                <Text style={styles.privacyItemText}>
+                                    Public
+                                </Text>
+                                <Entypo
+                                    name="globe"
+                                    size={PRIVACY_ICON_SIZE - 2}
+                                    color="#000"
+                                />
+                            </View>
+                        )}
+                    </View>
                 </View>
             </View>
         </TouchableHighlight>
@@ -148,14 +190,36 @@ const styles = StyleSheet.create({
     descriptionText: {
         fontSize: 12,
     },
-    userContainer: {
+    bottomContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
         marginTop: 20,
+        paddingHorizontal: 30,
+    },
+    userContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 30,
+        justifyContent: 'center',
     },
     userNameText: {
         fontSize: 12,
         marginLeft: 3,
+    },
+    privacyContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    privacyItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    privacyItemText: {
+        fontSize: 10,
+        fontWeight: '300',
+        letterSpacing: -0.4,
+        marginRight: 3,
     },
 });

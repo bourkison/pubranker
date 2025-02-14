@@ -19,14 +19,14 @@ export default function ProfileLinks({ user }: ProfileLinksProps) {
                 style={styles.itemContainer}
                 underlayColor="#E5E7EB"
                 onPress={() =>
-                    navigation.navigate('UserRatings', { userId: user.id })
+                    navigation.navigate('UserReviews', { userId: user.id })
                 }>
                 <>
-                    <Text style={styles.itemHeader}>Ratings</Text>
+                    <Text style={styles.itemHeader}>Reviews</Text>
 
                     <View style={styles.subheaderContainer}>
                         <Text style={styles.subheaderText}>
-                            {user.ratings[0].count}
+                            {user.reviews[0].count}
                         </Text>
                         <Feather
                             name="chevron-right"
@@ -41,14 +41,14 @@ export default function ProfileLinks({ user }: ProfileLinksProps) {
                 style={styles.itemContainer}
                 underlayColor="#E5E7EB"
                 onPress={() =>
-                    navigation.navigate('UserReviews', { userId: user.id })
+                    navigation.navigate('UserRatings', { userId: user.id })
                 }>
                 <>
-                    <Text style={styles.itemHeader}>Reviews</Text>
+                    <Text style={styles.itemHeader}>Ratings</Text>
 
                     <View style={styles.subheaderContainer}>
                         <Text style={styles.subheaderText}>
-                            {user.reviews[0].count}
+                            {user.ratings[0].count}
                         </Text>
                         <Feather
                             name="chevron-right"

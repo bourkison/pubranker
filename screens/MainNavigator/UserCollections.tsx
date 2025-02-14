@@ -16,6 +16,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { RootStackScreenProps } from '@/types/nav';
 import Header from '@/components/Utility/Header';
+import { supabase } from '@/services/supabase';
 
 export default function UserCollections({
     route,
@@ -28,6 +29,13 @@ export default function UserCollections({
         (async () => {
             setIsLoading(true);
 
+            const { data: testData, error: testError } = await supabase
+                .from('collections')
+                .select()
+                .eq('user_id', route.params.userId);
+
+            console.log('COLLECTION DATA', testData, testError);
+
             const { data, error } = await listFollowedCollectionsQuery()
                 .eq('user_id', route.params.userId)
                 .order('updated_at', { ascending: false });
@@ -37,6 +45,8 @@ export default function UserCollections({
                 console.error(error);
                 return;
             }
+
+            console.log('FOLLOW DATA', data);
 
             setCollections(data.map(d => d.collections));
             setIsLoading(false);
@@ -98,9 +108,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    listContainer: {
-        flex: 1,
-    },
+    listContainer: {},
     backContainer: {
         paddingLeft: ICON_PADDING,
     },
