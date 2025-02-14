@@ -35,7 +35,11 @@ export default function ProfileTopBar({
 
     return (
         <View style={styles.topBarContainer}>
-            <View style={styles.topBarColumn}>
+            <Pressable
+                style={styles.topBarColumn}
+                onPress={() =>
+                    navigation.navigate('UserReviews', { userId: userId })
+                }>
                 <View style={styles.topBarValueContainer}>
                     <Text style={styles.topBarValueText}>
                         {reviews.toString()}
@@ -45,7 +49,7 @@ export default function ProfileTopBar({
                 <View style={styles.topBarHeaderContainer}>
                     <Text style={styles.topBarHeaderText}>{reviewsText}</Text>
                 </View>
-            </View>
+            </Pressable>
 
             <Pressable
                 style={styles.topBarColumn}

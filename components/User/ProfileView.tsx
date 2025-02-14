@@ -9,6 +9,7 @@ import { supabase } from '@/services/supabase';
 import ProfileLinks from '@/components/User/ProfileLinks';
 import ProfileRecentRatings from '@/components/User/ProfileRecentRatings';
 import ProfileFavourites from '@/components/User/ProfileFavourites';
+import { FontAwesome6 } from '@expo/vector-icons';
 
 type ProfileViewProps = {
     user: UserType;
@@ -144,6 +145,13 @@ export default function ProfileView({
                     <Text style={styles.nameText}>{user.name}</Text>
                 </View>
 
+                {user.location && (
+                    <View style={styles.locationContainer}>
+                        <FontAwesome6 name="map-pin" color="#000" size={10} />
+                        <Text style={styles.locationText}>{user.location}</Text>
+                    </View>
+                )}
+
                 {user.bio && (
                     <View style={styles.bioContainer}>
                         <Text style={styles.bioText}>{user.bio}</Text>
@@ -250,6 +258,16 @@ const styles = StyleSheet.create({
     nameContainer: {},
     nameText: {
         fontWeight: '600',
+    },
+    locationContainer: {
+        marginTop: 10,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    locationText: {
+        fontSize: 10,
+        marginLeft: 4,
     },
     bioContainer: {
         marginTop: 10,
