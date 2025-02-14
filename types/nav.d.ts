@@ -116,6 +116,14 @@ export type RootStackParamList = {
     UserReviews: {
         userId: string;
     };
+    AddCollaborator: {
+        excludedIds: string[];
+        onAdd: (user: {
+            id: string;
+            username: string;
+            profile_photo: string | null;
+        }) => void;
+    };
 };
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> =

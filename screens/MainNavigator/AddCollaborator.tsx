@@ -1,24 +1,24 @@
+import SearchSuggestionItem from '@/components/Search/SearchSuggestionItem';
+import Header from '@/components/Utility/Header';
+import { ResultType } from '@/context/searchContext';
+import { supabase } from '@/services/supabase';
+import { RootStackScreenProps } from '@/types/nav';
 import React, { useCallback, useState } from 'react';
 import {
     View,
     Text,
     StyleSheet,
     TouchableOpacity,
-    TextInput,
     FlatList,
+    TextInput,
     ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { supabase } from '@/services/supabase';
-import SearchSuggestionItem from '@/components/Search/SearchSuggestionItem';
-import { ResultType } from '@/context/searchContext';
-import Header from '@/components/Utility/Header';
-import { RootStackScreenProps } from '@/types/nav';
 
-export default function SelectPub({
+export default function AddCollaborator({
     navigation,
     route,
-}: RootStackScreenProps<'SelectPub'>) {
+}: RootStackScreenProps<'AddCollaborator'>) {
     const [searchText, setSearchText] = useState('');
     const [results, setResults] = useState<ResultType[]>([]);
     const [isSearching, setIsSearching] = useState(false);
@@ -28,9 +28,9 @@ export default function SelectPub({
         setResults([]);
 
         const { data, error } = await supabase
-            .from('pubs')
-            .select('id, name, primary_photo')
-            .textSearch('name', searchText, {
+            .from('users_public')
+            .select('id, username, profile_photo')
+            .textSearch('username', searchText, {
                 type: 'websearch',
                 config: 'english',
             });
@@ -41,34 +41,28 @@ export default function SelectPub({
             return;
         }
 
-        // Only show results of pubs that aren't already in favourites
-        // Furthermore, map the pub to be a search result.
         setResults(
             data
                 .filter(d => !route.params.excludedIds.includes(d.id))
                 .map(d => ({
-                    title: d.name,
+                    title: d.username,
                     subtitle: '',
-                    type: 'pub',
+                    type: 'user',
                     onPress: () => {
                         route.params.onAdd({
                             id: d.id,
-                            name: d.name,
-                            primary_photo: d.primary_photo,
+                            username: d.username,
+                            profile_photo: d.profile_photo,
                         });
-
-                        navigation.goBack();
                     },
                 })),
         );
-
-        setIsSearching(false);
-    }, [searchText, route, navigation]);
+    }, [route, searchText]);
 
     return (
         <View style={styles.container}>
             <Header
-                header={route.params.header}
+                header="Add Collaborator"
                 leftColumn={
                     <TouchableOpacity
                         style={styles.cancelContainer}
@@ -95,7 +89,7 @@ export default function SelectPub({
                                 size={14}
                             />
                             <TextInput
-                                placeholder="Search for a pub"
+                                placeholder="Search for a user"
                                 style={styles.searchInput}
                                 value={searchText}
                                 onChangeText={setSearchText}
@@ -110,7 +104,7 @@ export default function SelectPub({
                         <ActivityIndicator />
                     ) : (
                         <View>
-                            <Text>No pubs</Text>
+                            <Text>No users</Text>
                         </View>
                     )
                 }
@@ -125,7 +119,7 @@ export default function SelectPub({
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1 },
+    container: {},
     cancelContainer: {
         flex: 1,
         paddingHorizontal: 10,
@@ -134,7 +128,16 @@ const styles = StyleSheet.create({
     hiddenText: {
         color: 'transparent',
     },
-    contentContainer: {},
+    itemContainer: {
+        paddingHorizontal: 10,
+    },
+    searchInput: {
+        paddingVertical: 8,
+        flex: 1,
+    },
+    searchIcon: {
+        marginRight: 5,
+    },
     searchBarContainer: {
         backgroundColor: '#E5E7EB',
         paddingVertical: 10,
@@ -150,15 +153,5 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         borderWidth: 1,
         borderColor: '#E5E7EB',
-    },
-    searchInput: {
-        paddingVertical: 8,
-        flex: 1,
-    },
-    searchIcon: {
-        marginRight: 5,
-    },
-    itemContainer: {
-        paddingHorizontal: 10,
     },
 });

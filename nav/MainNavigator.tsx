@@ -18,6 +18,7 @@ import { RootStackParamList } from '@/types/nav';
 import EditCollection from '@/screens/MainNavigator/EditCollection';
 import UserRatings from '@/screens/MainNavigator/UserRatings';
 import UserReviews from '@/screens/MainNavigator/UserReviews';
+import AddCollaborator from '@/screens/MainNavigator/AddCollaborator';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -107,6 +108,11 @@ export default function MainNavigator() {
             <Stack.Screen
                 name="EditCollection"
                 component={EditCollection}
+                options={{ headerShown: false, presentation: 'modal' }}
+            />
+            <Stack.Screen
+                name="AddCollaborator"
+                component={AddCollaborator}
                 options={{ headerShown: false, presentation: 'modal' }}
             />
         </Stack.Navigator>

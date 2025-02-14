@@ -49,7 +49,7 @@ export default function UserAvatar({
                 },
                 withShadow ? styles.shadow : undefined,
             ]}>
-            {image ? (
+            {image !== '' ? (
                 <Image
                     source={{ uri: image }}
                     style={{

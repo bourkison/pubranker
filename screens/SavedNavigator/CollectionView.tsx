@@ -15,7 +15,13 @@ import { distance, point } from '@turf/turf';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import { FetchPubType, pubQuery } from '@/services/queries/pub';
 
-type ActionSheetOptions = 'Edit' | 'Add Pub' | 'Delete' | 'Cancel' | 'Report';
+type ActionSheetOptions =
+    | 'Edit'
+    | 'Add Pub'
+    | 'Delete'
+    | 'Cancel'
+    | 'Report'
+    | 'Add Collaborator';
 
 export default function CollectionView({
     navigation,
@@ -33,12 +39,26 @@ export default function CollectionView({
     );
 
     const menuActionSheetOptions = useMemo<ActionSheetOptions[]>(() => {
+        if (!collection) {
+            return [];
+        }
+
         if (isOwnedCollection) {
+            if (collection.collaborative) {
+                return [
+                    'Add Collaborator',
+                    'Add Pub',
+                    'Edit',
+                    'Delete',
+                    'Cancel',
+                ];
+            }
+
             return ['Add Pub', 'Edit', 'Delete', 'Cancel'];
         }
 
         return ['Report', 'Cancel'];
-    }, [isOwnedCollection]);
+    }, [collection, isOwnedCollection]);
 
     useEffect(() => {
         (async () => {
@@ -179,9 +199,46 @@ export default function CollectionView({
         });
     }, [collection, navigation]);
 
-    const addPubToCollection = useCallback(() => {
-        console.log('ADDP UB');
+    const addCollaborator = useCallback(
+        async (user: {
+            id: string;
+            username: string;
+            profile_photo: string | null;
+        }) => {
+            if (!collection) {
+                return;
+            }
 
+            const { error } = await supabase
+                .from('collection_collaborations')
+                .insert({
+                    collection_id: collection.id,
+                    user_id: user.id,
+                });
+
+            if (error) {
+                console.error(error);
+                return;
+            }
+
+            setCollection({
+                ...collection,
+                collaborators: [
+                    ...collection.collaborators,
+                    {
+                        user: {
+                            id: user.id,
+                            username: user.username,
+                            profile_photo: user.profile_photo,
+                        },
+                    },
+                ],
+            });
+        },
+        [collection],
+    );
+
+    const addPubToCollection = useCallback(() => {
         if (!collection) {
             return;
         }
@@ -266,6 +323,15 @@ export default function CollectionView({
                     addPubToCollection();
                 } else if (menuActionSheetOptions[selected] === 'Delete') {
                     deleteCollection();
+                } else if (
+                    menuActionSheetOptions[selected] === 'Add Collaborator'
+                ) {
+                    navigation.navigate('AddCollaborator', {
+                        excludedIds: collection.collaborators.map(
+                            c => c.user.id,
+                        ),
+                        onAdd: addCollaborator,
+                    });
                 }
             },
         );
@@ -276,6 +342,7 @@ export default function CollectionView({
         showActionSheetWithOptions,
         collection,
         deleteCollection,
+        addCollaborator,
     ]);
 
     const removeCollectionItem = useCallback(
