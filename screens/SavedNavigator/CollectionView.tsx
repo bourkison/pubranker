@@ -185,7 +185,7 @@ export default function CollectionView({
                         navigation.navigate('EditCollection', {
                             collection,
                         });
-                    } else if (selected === 2) {
+                    } else if (selected === 1) {
                         deleteCollection();
                     }
                 },

@@ -5,7 +5,6 @@ import {
     ActivityIndicator,
     View,
     StyleSheet,
-    RefreshControl,
     TouchableOpacity,
     useWindowDimensions,
 } from 'react-native';
@@ -17,10 +16,27 @@ import { Text } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { User } from '@supabase/supabase-js';
 import SavedListItem from '@/components/Saves/SavedListItem';
-import { CollectionType } from '@/services/queries/collections';
 import Header from '@/components/Utility/Header';
 import { distance, point } from '@turf/turf';
 import { SavedNavigatorScreenProps } from '@/types/nav';
+import { Tables } from '@/types/schema';
+
+export type SavedType = Tables<'saves'> & {
+    pub: {
+        id: number;
+        name: string;
+        address: string;
+        primary_photo: string | null;
+        location: {
+            coordinates: [number, number];
+            type: string;
+        };
+        dist_meters: number;
+        rating: number;
+        num_reviews: { count: number }[];
+        saved: { count: number }[];
+    };
+};
 
 export default function SavedPubs({
     navigation,
@@ -28,7 +44,7 @@ export default function SavedPubs({
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
-    const [pubs, setPubs] = useState<CollectionType['pubs']>([]);
+    const [pubs, setPubs] = useState<SavedType['pub'][]>([]);
     const [collectionsAmount, setCollectionsAmount] = useState(0);
 
     const { width } = useWindowDimensions();
@@ -39,7 +55,7 @@ export default function SavedPubs({
                 .from('saves')
                 .select(
                     `*, 
-                    pubs(
+                    pub:pubs(
                         id, 
                         name, 
                         address,
@@ -62,7 +78,7 @@ export default function SavedPubs({
             const { coords } = await Location.getCurrentPositionAsync();
 
             // @ts-ignore
-            let temp: CollectionType['pubs'] = savesData.map(s => s.pubs);
+            let temp: SavedType['pub'][] = savesData.map(s => s.pub);
 
             temp = temp.map(pub => ({
                 ...pub,
@@ -171,6 +187,19 @@ export default function SavedPubs({
         return `${collectionsAmount} lists`;
     }, [collectionsAmount]);
 
+    // We check saved up here otherwise it doesn't update on
+    // Save toggle.
+    const isSaved = useCallback(
+        (index: number) => {
+            if (!pubs[index]) {
+                return false;
+            }
+
+            return pubs[index].saved[0].count > 0;
+        },
+        [pubs],
+    );
+
     if (isLoading) {
         return <ActivityIndicator />;
     }
@@ -215,13 +244,14 @@ export default function SavedPubs({
                     </TouchableOpacity>
                 }
                 data={pubs}
-                renderItem={({ item }) => (
+                renderItem={({ item, index }) => (
                     <View
                         style={{
                             width,
                         }}>
                         <SavedListItem
                             pub={item}
+                            saved={isSaved(index)}
                             onSaveCommence={id => toggleSave(id, true)}
                             onSaveComplete={(success, id) =>
                                 !success ? toggleSave(id, false) : undefined

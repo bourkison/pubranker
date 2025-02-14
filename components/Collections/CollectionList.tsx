@@ -19,9 +19,9 @@ import {
 } from '@expo/vector-icons';
 import CollectionMap from '@/components/Collections/CollectionMap';
 import UserAvatar from '@/components/User/UserAvatar';
-import SavedListItem from '@/components/Saves/SavedListItem';
 import { StackActions, useNavigation } from '@react-navigation/native';
 import LikeCollectionButton from '@/components/Collections/LikeCollectionButton';
+import CollectionItemListItem from './CollectionItemListItem';
 
 type CollectionListProps = {
     collection?: CollectionType;
@@ -136,6 +136,8 @@ export default function CollectionList({
     const setToLiked = useCallback(() => setLiked(true), [setLiked]);
     const setToUnliked = useCallback(() => setLiked(false), [setLiked]);
 
+    // We check saved up here otherwise it doesn't update on
+    // Save toggle.
     const isSaved = useCallback(
         (index: number) => {
             if (!collection || !collection.collection_items[index]) {
@@ -332,8 +334,8 @@ export default function CollectionList({
                 )
             }
             renderItem={({ item, index }) => (
-                <SavedListItem
-                    pub={item.pub}
+                <CollectionItemListItem
+                    collectionItem={item}
                     saved={isSaved(index)}
                     onSaveCommence={id => toggleSave(id, true)}
                     onSaveComplete={(success, id) =>

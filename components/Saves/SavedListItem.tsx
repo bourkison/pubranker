@@ -12,12 +12,12 @@ import { distanceString, roundToNearest } from '@/services';
 import { GOLD_RATINGS_COLOR } from '@/constants';
 import { supabase } from '@/services/supabase';
 import { useNavigation } from '@react-navigation/native';
-import { CollectionType } from '@/services/queries/collections';
+import { SavedType } from '@/screens/SavedNavigator/Saved';
 
 const NO_IMAGE = require('@/assets/noimage.png');
 
 type BottomSheetPubItemProps = {
-    pub: CollectionType['collection_items'][number]['pub'];
+    pub: SavedType['pub'];
     saved: boolean;
     onSaveCommence?: (id: number) => void;
     onSaveComplete?: (success: boolean, id: number) => void;

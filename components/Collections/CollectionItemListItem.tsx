@@ -1,15 +1,274 @@
+import { GOLD_RATINGS_COLOR } from '@/constants';
+import { distanceString, roundToNearest } from '@/services';
 import { CollectionType } from '@/services/queries/collections';
-import React from 'react';
-import { View, Text } from 'react-native';
+import { supabase } from '@/services/supabase';
+import { useNavigation } from '@react-navigation/native';
+import React, { useCallback, useMemo, useState } from 'react';
+import {
+    View,
+    Text,
+    StyleSheet,
+    TouchableOpacity,
+    Image,
+    TouchableHighlight,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 type CollectionItemListItemProps = {
-    collectionItem: CollectionType['collection_items'];
+    collectionItem: CollectionType['collection_items'][number];
+    saved: boolean;
+    onSaveCommence?: (id: number) => void;
+    onSaveComplete?: (success: boolean, id: number) => void;
+    onUnsaveCommence?: (id: number) => void;
+    onUnsaveComplete?: (success: boolean, id: number) => void;
 };
 
-export default function CollectionItemListItem({}: CollectionItemListItemProps) {
+const ASPECT_RATIO = 1;
+const WIDTH_PERCENTAGE = 0.3;
+
+const NO_IMAGE = require('@/assets/noimage.png');
+
+export default function CollectionItemListItem({
+    collectionItem,
+    onSaveCommence,
+    onSaveComplete,
+    onUnsaveCommence,
+    onUnsaveComplete,
+}: CollectionItemListItemProps) {
+    const [containerWidth, setContainerWidth] = useState(0);
+
+    const [isSaving, setIsSaving] = useState(false);
+
+    const navigation = useNavigation();
+
+    const IMAGE_WIDTH = useMemo<number>(
+        () => containerWidth * WIDTH_PERCENTAGE,
+        [containerWidth],
+    );
+
+    const image = useMemo(() => {
+        if (!collectionItem.pub.primary_photo) {
+            return NO_IMAGE;
+        }
+
+        return {
+            uri: supabase.storage
+                .from('pubs')
+                .getPublicUrl(collectionItem.pub.primary_photo).data.publicUrl,
+        };
+    }, [collectionItem]);
+
+    const saved = useMemo(
+        () => collectionItem.pub.saved[0].count > 0,
+        [collectionItem],
+    );
+
+    const toggleLike = useCallback(async () => {
+        if (isSaving) {
+            return;
+        }
+
+        setIsSaving(true);
+
+        const { data: userData, error: userError } =
+            await supabase.auth.getUser();
+
+        if (userError) {
+            console.error(userError);
+            setIsSaving(false);
+            return;
+        }
+
+        if (!saved) {
+            onSaveCommence && onSaveCommence(collectionItem.pub.id);
+
+            const { error } = await supabase.from('saves').insert({
+                pub_id: collectionItem.pub.id,
+            });
+
+            setIsSaving(false);
+
+            if (error) {
+                console.error(error);
+                onSaveComplete && onSaveComplete(false, collectionItem.pub.id);
+            }
+
+            onSaveComplete && onSaveComplete(true, collectionItem.pub.id);
+        } else {
+            onUnsaveCommence && onUnsaveCommence(collectionItem.pub.id);
+
+            const { error } = await supabase
+                .from('saves')
+                .delete()
+                .eq('pub_id', collectionItem.pub.id)
+                .eq('user_id', userData.user.id);
+
+            setIsSaving(false);
+
+            if (error) {
+                console.error(error);
+                onUnsaveComplete &&
+                    onUnsaveComplete(false, collectionItem.pub.id);
+            }
+
+            onUnsaveComplete && onUnsaveComplete(true, collectionItem.pub.id);
+        }
+    }, [
+        isSaving,
+        collectionItem,
+        onSaveCommence,
+        onSaveComplete,
+        onUnsaveCommence,
+        onUnsaveComplete,
+        saved,
+    ]);
+
     return (
-        <View>
-            <Text>Test</Text>
-        </View>
+        <TouchableHighlight
+            style={styles.container}
+            underlayColor="#E5E7EB"
+            onPress={() =>
+                navigation.navigate('PubView', { pubId: collectionItem.pub.id })
+            }>
+            <View
+                style={styles.innerContainer}
+                onLayout={({
+                    nativeEvent: {
+                        layout: { width },
+                    },
+                }) => setContainerWidth(width)}>
+                <View>
+                    <Image
+                        source={image}
+                        style={[
+                            styles.image,
+                            {
+                                width: IMAGE_WIDTH,
+                                height: IMAGE_WIDTH / ASPECT_RATIO,
+                            },
+                        ]}
+                    />
+
+                    <TouchableOpacity
+                        onPress={toggleLike}
+                        disabled={isSaving}
+                        style={styles.saveButton}>
+                        {saved ? (
+                            <Ionicons name="heart" size={12} color="#dc2626" />
+                        ) : (
+                            <Ionicons
+                                name="heart-outline"
+                                size={12}
+                                color="#dc2626"
+                            />
+                        )}
+                    </TouchableOpacity>
+                </View>
+
+                <View style={styles.infoContainer}>
+                    <View style={styles.reviewContainer}>
+                        <Ionicons
+                            name="star"
+                            size={12}
+                            color={GOLD_RATINGS_COLOR}
+                        />
+                        <Text style={styles.ratingText}>
+                            {roundToNearest(
+                                collectionItem.pub.rating,
+                                0.1,
+                            ).toFixed(1)}
+                        </Text>
+                        <Text style={styles.numReviewsText}>
+                            ({collectionItem.pub.num_reviews[0].count})
+                        </Text>
+                    </View>
+                    <View style={styles.titleContainer}>
+                        <Text style={styles.titleText}>
+                            {collectionItem.pub.name}
+                        </Text>
+                    </View>
+                    <View style={styles.addressContainer}>
+                        <Text style={styles.addressText}>
+                            {collectionItem.pub.address}
+                        </Text>
+                    </View>
+                    <View style={styles.distanceContainer}>
+                        <Text style={styles.distanceText}>
+                            {distanceString(collectionItem.pub.dist_meters)}
+                        </Text>
+                    </View>
+                </View>
+            </View>
+        </TouchableHighlight>
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        paddingHorizontal: 10,
+        borderBottomWidth: 1,
+        borderColor: '#E5E7EB',
+        paddingVertical: 10,
+    },
+    innerContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    infoContainer: {
+        paddingHorizontal: 2,
+        marginLeft: 5,
+        flex: 1,
+    },
+    reviewContainer: {
+        flexDirection: 'row',
+        alignContent: 'center',
+    },
+    ratingText: {
+        marginLeft: 3,
+        color: '#292935',
+        fontWeight: '500',
+    },
+    numReviewsText: {
+        marginLeft: 3,
+        color: '#292935',
+        fontWeight: '200',
+    },
+    titleContainer: {
+        marginTop: 4,
+    },
+    titleText: {
+        fontSize: 16,
+        color: '#292935',
+        fontWeight: '600',
+    },
+    addressContainer: {
+        marginTop: 4,
+    },
+    addressText: {
+        fontSize: 10,
+        color: '#292935',
+        fontWeight: '300',
+    },
+    distanceContainer: {
+        marginTop: 4,
+    },
+    distanceText: {
+        fontSize: 10,
+        color: '#292935',
+        fontWeight: '300',
+    },
+    image: {
+        borderRadius: 3,
+    },
+    saveButton: {
+        height: 20,
+        width: 20,
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'absolute',
+        top: 3,
+        left: 3,
+    },
+});
