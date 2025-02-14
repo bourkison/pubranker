@@ -385,8 +385,7 @@ const styles = StyleSheet.create({
     addPubsText: {
         color: PRIMARY_COLOR,
         fontSize: 16,
-        marginTop: 15,
-        marginBottom: 15,
+        marginVertical: 10,
         fontWeight: '600',
     },
     settingsSection: {

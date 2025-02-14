@@ -13,6 +13,9 @@ import { supabase } from '@/services/supabase';
 import * as Location from 'expo-location';
 import { distance, point } from '@turf/turf';
 import { useActionSheet } from '@expo/react-native-action-sheet';
+import { FetchPubType, pubQuery } from '@/services/queries/pub';
+
+type ActionSheetOptions = 'Edit' | 'Add Pub' | 'Delete' | 'Cancel' | 'Report';
 
 export default function CollectionView({
     navigation,
@@ -28,6 +31,14 @@ export default function CollectionView({
         () => userId === collection?.user_id,
         [userId, collection],
     );
+
+    const menuActionSheetOptions = useMemo<ActionSheetOptions[]>(() => {
+        if (isOwnedCollection) {
+            return ['Add Pub', 'Edit', 'Delete', 'Cancel'];
+        }
+
+        return ['Report', 'Cancel'];
+    }, [isOwnedCollection]);
 
     useEffect(() => {
         (async () => {
@@ -168,48 +179,100 @@ export default function CollectionView({
         });
     }, [collection, navigation]);
 
-    const showActions = useCallback(() => {
-        if (isOwnedCollection) {
-            showActionSheetWithOptions(
-                {
-                    options: ['Edit', 'Delete', 'Cancel'],
-                    cancelButtonIndex: 2,
-                    tintColor: '#000',
-                },
-                selected => {
-                    if (selected === 0) {
-                        if (!collection) {
-                            return;
-                        }
+    const addPubToCollection = useCallback(() => {
+        console.log('ADDP UB');
 
-                        navigation.navigate('EditCollection', {
-                            collection,
-                        });
-                    } else if (selected === 1) {
-                        deleteCollection();
-                    }
-                },
-            );
-
+        if (!collection) {
             return;
         }
 
+        navigation.navigate('SelectPub', {
+            header: 'Select a pub',
+            onAdd: async pub => {
+                const { error: insertError } = await supabase
+                    .from('collection_items')
+                    .insert({ pub_id: pub.id, collection_id: collection.id });
+
+                if (insertError) {
+                    console.error(insertError);
+                    return;
+                }
+
+                // Get the pub information.
+                const { data, error } = await pubQuery(userId)
+                    .eq('id', pub.id)
+                    .limit(1)
+                    .single();
+
+                if (error) {
+                    console.error(error);
+                    return;
+                }
+
+                // @ts-ignore
+                const response: FetchPubType = data;
+
+                const { coords } = await Location.getCurrentPositionAsync();
+
+                setCollection({
+                    ...collection,
+                    collection_items: [
+                        ...collection.collection_items,
+                        {
+                            pub: {
+                                address: response.address,
+                                dist_meters: distance(
+                                    point([coords.longitude, coords.latitude]),
+                                    point(response.location.coordinates),
+                                    { units: 'meters' },
+                                ),
+                                id: response.id,
+                                location: response.location,
+                                name: response.name,
+                                num_reviews: response.num_reviews,
+                                primary_photo: response.primary_photo,
+                                rating: response.rating,
+                                saved: response.saved,
+                            },
+                        },
+                    ],
+                });
+            },
+            excludedIds: collection.collection_items.map(pubs => pubs.pub.id),
+        });
+    }, [collection, navigation, userId]);
+
+    const showActions = useCallback(() => {
         showActionSheetWithOptions(
             {
-                options: ['Report', 'Cancel'],
-                cancelButtonIndex: 1,
+                options: menuActionSheetOptions,
+                cancelButtonIndex: menuActionSheetOptions.length - 1,
                 tintColor: '#000',
             },
             selected => {
-                if (selected === 0) {
-                    // TODO: Add report.
-                    console.log('REPORT');
+                if (selected === undefined) {
+                    return;
+                }
+
+                if (!collection) {
+                    return;
+                }
+
+                if (menuActionSheetOptions[selected] === 'Edit') {
+                    navigation.navigate('EditCollection', {
+                        collection,
+                    });
+                } else if (menuActionSheetOptions[selected] === 'Add Pub') {
+                    addPubToCollection();
+                } else if (menuActionSheetOptions[selected] === 'Delete') {
+                    deleteCollection();
                 }
             },
         );
     }, [
-        isOwnedCollection,
+        menuActionSheetOptions,
         navigation,
+        addPubToCollection,
         showActionSheetWithOptions,
         collection,
         deleteCollection,
