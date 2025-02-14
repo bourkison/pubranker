@@ -8,12 +8,18 @@ export type ListReviewType = Tables<'reviews'> & {
         username: string;
         profile_photo: string | null;
     };
+    pub: {
+        id: number;
+        name: string;
+        primary_photo: string | null;
+    };
     liked: { count: number }[];
     like_amount: { count: number }[];
 };
 
 export const reviewListQueryString = `*,
 user:users_public(id, name, username, profile_photo),
+pub:pubs(id, name, primary_photo),
 liked:review_likes(count),
 like_amount:review_likes(count)` as const;
 

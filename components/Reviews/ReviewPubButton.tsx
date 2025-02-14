@@ -76,7 +76,7 @@ export default function ReviewPubButton({ pub }: ReviewPubButtonProps) {
     return (
         <View style={styles.container}>
             {userReview && userReview.content ? (
-                <Review pub={pub} review={userReview} noBorder={true} />
+                <Review review={userReview} noBorder={true} />
             ) : (
                 <View style={styles.reviewButtonContainer}>
                     <TouchableOpacity

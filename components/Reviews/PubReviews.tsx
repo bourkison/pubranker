@@ -45,7 +45,7 @@ export default function PubReviews({ pub }: PubReviewsProps) {
                 return;
             }
 
-            // setReviews(data);
+            setReviews(data);
             setIsLoading(false);
             setHasLoaded(true);
         };
@@ -65,7 +65,7 @@ export default function PubReviews({ pub }: PubReviewsProps) {
             {!isLoading ? (
                 <View>
                     {reviews.map(review => (
-                        <Review review={review} key={review.id} pub={pub} />
+                        <Review review={review} key={review.id} />
                     ))}
                 </View>
             ) : (

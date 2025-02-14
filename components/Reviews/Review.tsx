@@ -14,11 +14,9 @@ import { ListReviewType } from '@/services/queries/review';
 import { useNavigation } from '@react-navigation/native';
 import RatingsStarViewer from '@/components/Ratings/RatingsStarsViewer';
 import ReviewAttributes from '@/components/Reviews/ReviewAttributes';
-import { FetchPubType } from '@/services/queries/pub';
 
 type ReviewProps = {
     review: ListReviewType;
-    pub: FetchPubType;
     noBorder?: boolean;
 };
 

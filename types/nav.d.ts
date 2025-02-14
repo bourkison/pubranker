@@ -113,6 +113,9 @@ export type RootStackParamList = {
     UserRatings: {
         userId: string;
     };
+    UserReviews: {
+        userId: string;
+    };
 };
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> =

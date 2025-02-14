@@ -17,6 +17,7 @@ import CreateCollection from '@/screens/MainNavigator/CreateCollection';
 import { RootStackParamList } from '@/types/nav';
 import EditCollection from '@/screens/MainNavigator/EditCollection';
 import UserRatings from '@/screens/MainNavigator/UserRatings';
+import UserReviews from '@/screens/MainNavigator/UserReviews';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -91,6 +92,11 @@ export default function MainNavigator() {
             <Stack.Screen
                 name="UserRatings"
                 component={UserRatings}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="UserReviews"
+                component={UserReviews}
                 options={{ headerShown: false }}
             />
             <Stack.Screen
