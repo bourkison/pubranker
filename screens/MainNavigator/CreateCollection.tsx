@@ -9,10 +9,21 @@ import CreateEditCollectionForm from '@/components/Collections/CreateEditCollect
 
 export default function CreateCollection({
     navigation,
+    route,
 }: RootStackScreenProps<'CreateCollection'>) {
     const [pubs, setPubs] = useState<
         { id: number; name: string; primary_photo: string | null }[]
-    >([]);
+    >(
+        route.params
+            ? [
+                  {
+                      id: route.params.withPub.id,
+                      name: route.params.withPub.name,
+                      primary_photo: route.params.withPub.primary_photo,
+                  },
+              ]
+            : [],
+    );
 
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');

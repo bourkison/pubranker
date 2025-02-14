@@ -134,7 +134,7 @@ export default function Settings({
                 favourites.map((favourite, index) => ({
                     pub_id: favourite.pubs.id,
                     user_id: userData.user.id,
-                    count: index + 1,
+                    order: index + 1,
                 })),
             );
 

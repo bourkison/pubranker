@@ -66,6 +66,8 @@ export type RootStackParamList = {
     };
     AddToList: {
         pubId: number;
+        name: string;
+        primary_photo: string | null;
     };
     Profile: {
         userId: string;
@@ -102,7 +104,9 @@ export type RootStackParamList = {
     UserActivity: {
         userId: string;
     };
-    CreateCollection: undefined;
+    CreateCollection?: {
+        withPub: { id: number; name: string; primary_photo: string | null };
+    };
     EditCollection: {
         collection: CollectionType;
     };

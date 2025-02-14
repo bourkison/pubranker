@@ -1,7 +1,10 @@
 import { createContext, useContext } from 'react';
 
 type CollectionContext = {
-    showAddToCollection: (id: number, duration?: number) => void;
+    showAddToCollection: (
+        pub: { id: number; name: string; primary_photo: string | null },
+        duration?: number,
+    ) => void;
     setIsOnBottomTabsPage: (isOnBottomTabs: boolean) => void;
     setBottomTabHeight: (height: number) => void;
 };

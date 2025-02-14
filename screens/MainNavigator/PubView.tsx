@@ -165,7 +165,11 @@ export default function PubView({
                 return;
             }
 
-            showAddToCollection(pub.id);
+            showAddToCollection({
+                id: pub.id,
+                name: pub.name,
+                primary_photo: pub.primary_photo,
+            });
 
             if (route.params.onSaveToggle) {
                 route.params.onSaveToggle(pub.id, true);

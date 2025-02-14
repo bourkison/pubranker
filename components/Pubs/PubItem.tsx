@@ -128,7 +128,11 @@ export default function PubItem({
                 onSaveComplete && onSaveComplete(false, pub.id);
             }
 
-            showAddToCollection(pub.id);
+            showAddToCollection({
+                id: pub.id,
+                name: pub.name,
+                primary_photo: pub.primary_photo,
+            });
             onSaveComplete && onSaveComplete(true, pub.id);
         } else {
             onUnsaveCommence && onUnsaveCommence(pub.id);

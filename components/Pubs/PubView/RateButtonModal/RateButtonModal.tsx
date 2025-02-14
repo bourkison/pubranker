@@ -67,7 +67,11 @@ export default function RateButtonModal({ pub }: RateButtonProps) {
 
     const navigateToAddToCollection = useCallback(() => {
         bottomSheetRef.current?.dismiss();
-        navigation.navigate('AddToList', { pubId: pub.id });
+        navigation.navigate('AddToList', {
+            pubId: pub.id,
+            name: pub.name,
+            primary_photo: pub.primary_photo,
+        });
     }, [bottomSheetRef, pub, navigation]);
 
     const navigateToReview = useCallback(() => {

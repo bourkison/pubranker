@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import {
     SafeAreaView,
     Text,
-    View,
     TouchableOpacity,
     StyleSheet,
     ActivityIndicator,
@@ -14,6 +13,7 @@ import { userQuery } from '@/services/queries/user';
 import { UserType } from '@/services/queries/user';
 import ProfileView from '@/components/User/ProfileView';
 import { ProfileNavigatorScreenProps } from '@/types/nav';
+import Header from '@/components/Utility/Header';
 
 export default function LoggedInProfile({
     navigation,
@@ -62,32 +62,31 @@ export default function LoggedInProfile({
 
     return (
         <SafeAreaView style={styles.flexOne}>
-            <View style={styles.headerContainer}>
-                <TouchableOpacity
-                    style={styles.settingsContainer}
-                    onPress={() =>
-                        navigation.navigate('Settings', {
-                            email,
-                            name: user.name,
-                            username: user.username,
-                            bio: user.bio,
-                            profile_photo: user.profile_photo,
-                            favourites: user.favourites,
-                            location: user.location,
-                        })
-                    }>
-                    <Feather name="settings" size={14} />
-                </TouchableOpacity>
-
-                <View style={styles.headerTextContainer}>
-                    <Text style={styles.headerText}>{user.username}</Text>
-                </View>
-
-                {/* TODO: You will need to work with multiple navigations here, and hence fix up your types. */}
-                <TouchableOpacity style={styles.menuContainer}>
-                    <Feather name="bell" size={15} />
-                </TouchableOpacity>
-            </View>
+            <Header
+                header={user.username}
+                leftColumn={
+                    <TouchableOpacity
+                        style={styles.settingsContainer}
+                        onPress={() =>
+                            navigation.navigate('Settings', {
+                                email,
+                                name: user.name,
+                                username: user.username,
+                                bio: user.bio,
+                                profile_photo: user.profile_photo,
+                                favourites: user.favourites,
+                                location: user.location,
+                            })
+                        }>
+                        <Feather name="settings" size={14} />
+                    </TouchableOpacity>
+                }
+                rightColumn={
+                    <TouchableOpacity style={styles.menuContainer}>
+                        <Feather name="bell" size={15} />
+                    </TouchableOpacity>
+                }
+            />
 
             <ScrollView style={styles.flexOne}>
                 <ProfileView
@@ -106,27 +105,10 @@ const ICON_PADDING = 10;
 
 const styles = StyleSheet.create({
     flexOne: { flex: 1 },
-    headerContainer: {
-        paddingVertical: 10,
-        alignItems: 'center',
-        flexDirection: 'row',
-        borderBottomWidth: 1,
-        borderColor: '#E5E7EB',
-    },
     settingsContainer: {
         paddingLeft: ICON_PADDING,
     },
     menuContainer: {
         paddingRight: ICON_PADDING,
-    },
-
-    headerTextContainer: {
-        flex: 1,
-    },
-    headerText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        fontFamily: 'Jost',
-        textAlign: 'center',
     },
 });

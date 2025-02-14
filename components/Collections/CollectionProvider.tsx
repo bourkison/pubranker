@@ -26,14 +26,21 @@ export default function CollectionProvider({
 
     const [hidden, setHidden] = useState(false);
 
-    const [selectedPub, setSelectedPub] = useState<null | number>(null);
+    const [selectedPub, setSelectedPub] = useState<null | {
+        id: number;
+        name: string;
+        primary_photo: string | null;
+    }>(null);
     const [timer, setTimer] = useState<NodeJS.Timeout>();
 
     const navigation = useNavigation();
 
     const showAddToCollection = useCallback(
-        (id: number, duration = DEFAULT_DURATION) => {
-            setSelectedPub(id);
+        (
+            pub: { id: number; name: string; primary_photo: string | null },
+            duration = DEFAULT_DURATION,
+        ) => {
+            setSelectedPub(pub);
             setHidden(false);
 
             const timeout = setTimeout(() => {
@@ -54,7 +61,9 @@ export default function CollectionProvider({
         clearTimeout(timer);
 
         navigation.navigate('AddToList', {
-            pubId: selectedPub,
+            pubId: selectedPub.id,
+            name: selectedPub.name,
+            primary_photo: selectedPub.primary_photo,
         });
 
         setSelectedPub(null);

@@ -156,7 +156,18 @@ export default function AddToList({
                     )
                 }
                 ListHeaderComponent={
-                    <TouchableHighlight style={styles.listContainer}>
+                    <TouchableHighlight
+                        style={styles.listContainer}
+                        underlayColor="#E5E7EB"
+                        onPress={() => {
+                            navigation.navigate('CreateCollection', {
+                                withPub: {
+                                    id: route.params.pubId,
+                                    name: route.params.name,
+                                    primary_photo: route.params.primary_photo,
+                                },
+                            });
+                        }}>
                         <>
                             <Text style={styles.titleText}>New list</Text>
 
