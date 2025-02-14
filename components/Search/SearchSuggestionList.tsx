@@ -56,6 +56,24 @@ export default function SearchSuggestionList({}: SearchSuggestionListProps) {
                 </TouchableOpacity>
 
                 <TouchableOpacity
+                    disabled={searchType === 'collections'}
+                    onPress={() => toggleSearchType('collections')}
+                    style={[
+                        styles.radioContainer,
+                        searchType === 'collections' &&
+                            styles.activeRadioContainer,
+                    ]}>
+                    <Text
+                        style={[
+                            styles.radioText,
+                            searchType === 'collections' &&
+                                styles.activeRadioText,
+                        ]}>
+                        Lists
+                    </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
                     disabled={searchType === 'reviews'}
                     onPress={() => toggleSearchType('reviews')}
                     style={[

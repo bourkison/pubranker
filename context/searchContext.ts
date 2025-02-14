@@ -15,7 +15,7 @@ export type ResultType = {
     onPress: () => void;
 };
 
-export type SearchType = 'places' | 'users' | 'reviews';
+export type SearchType = 'places' | 'users' | 'reviews' | 'collections';
 
 type SearchContextType = {
     searchText: string;

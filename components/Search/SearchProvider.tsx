@@ -11,7 +11,7 @@ export default function SearchProvider({ children }: SearchProviderProps) {
     const [searchText, setSearchText] = useState('');
     const [lastSearchedText, setLastSearchedText] = useState('');
     const [searchType, setSearchType] = useState<
-        'places' | 'users' | 'reviews'
+        'places' | 'users' | 'reviews' | 'collections'
     >('places');
     const [isLoading, setIsLoading] = useState(false);
 
@@ -93,6 +93,37 @@ export default function SearchProvider({ children }: SearchProviderProps) {
         );
     }, [searchText, navigation]);
 
+    const searchCollections = useCallback(async () => {
+        const { data, error } = await supabase
+            .from('collections')
+            .select(
+                'id, name, users_public!collections_user_id_fkey1(username)',
+            )
+            .textSearch('name', searchText, {
+                config: 'english',
+                type: 'websearch',
+            });
+
+        if (error) {
+            console.error(error);
+            setInternalResults([]);
+            return;
+        }
+
+        setInternalResults(
+            data.map(d => ({
+                title: d.name,
+                subtitle: d.users_public.username,
+                type: 'region',
+                onPress: () => {
+                    navigation.navigate('UserCollectionView', {
+                        collectionId: d.id,
+                    });
+                },
+            })),
+        );
+    }, [navigation, searchText]);
+
     const searchReviews = useCallback(async () => {}, []);
 
     const search = useCallback(
@@ -112,13 +143,25 @@ export default function SearchProvider({ children }: SearchProviderProps) {
                 return;
             }
 
+            if (type === 'collections') {
+                await searchCollections();
+                setIsLoading(false);
+                return;
+            }
+
             if (type === 'reviews') {
                 await searchReviews();
                 setIsLoading(false);
                 return;
             }
         },
-        [searchUsers, searchPlaces, searchReviews, searchText],
+        [
+            searchUsers,
+            searchPlaces,
+            searchCollections,
+            searchReviews,
+            searchText,
+        ],
     );
 
     const toggleSearchType = useCallback(
