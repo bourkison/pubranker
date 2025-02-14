@@ -110,6 +110,9 @@ export type RootStackParamList = {
     EditCollection: {
         collection: CollectionType;
     };
+    UserRatings: {
+        userId: string;
+    };
 };
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> =

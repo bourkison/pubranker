@@ -18,7 +18,9 @@ export default function ProfileLinks({ user }: ProfileLinksProps) {
             <TouchableHighlight
                 style={styles.itemContainer}
                 underlayColor="#E5E7EB"
-                onPress={() => console.log('press')}>
+                onPress={() =>
+                    navigation.navigate('UserRatings', { userId: user.id })
+                }>
                 <>
                     <Text style={styles.itemHeader}>Ratings</Text>
 

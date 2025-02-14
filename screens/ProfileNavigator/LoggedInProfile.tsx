@@ -82,7 +82,9 @@ export default function LoggedInProfile({
                     </TouchableOpacity>
                 }
                 rightColumn={
-                    <TouchableOpacity style={styles.menuContainer}>
+                    <TouchableOpacity
+                        style={styles.menuContainer}
+                        onPress={() => navigation.navigate('Notifications')}>
                         <Feather name="bell" size={15} />
                     </TouchableOpacity>
                 }

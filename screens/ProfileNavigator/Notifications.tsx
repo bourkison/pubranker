@@ -1,11 +1,13 @@
+import Header from '@/components/Utility/Header';
 import { ProfileNavigatorScreenProps } from '@/types/nav';
 import React from 'react';
-import { View, Text } from 'react-native';
+import { SafeAreaView, Text } from 'react-native';
 
 export default function Notifications({}: ProfileNavigatorScreenProps<'Notifications'>) {
     return (
-        <View>
+        <SafeAreaView>
+            <Header header="Notifications" />
             <Text>Notifications</Text>
-        </View>
+        </SafeAreaView>
     );
 }

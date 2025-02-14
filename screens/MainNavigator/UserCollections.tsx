@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { RootStackScreenProps } from '@/types/nav';
+import Header from '@/components/Utility/Header';
 
 export default function UserCollections({
     route,
@@ -48,19 +49,17 @@ export default function UserCollections({
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.headerContainer}>
-                <TouchableOpacity
-                    style={styles.backContainer}
-                    onPress={() => navigation.goBack()}>
-                    <Ionicons name="arrow-back-outline" size={14} />
-                </TouchableOpacity>
-
-                <View style={styles.headerTextContainer}>
-                    <Text style={styles.headerText}>Lists</Text>
-                </View>
-
-                <View style={styles.emptyContainer} />
-            </View>
+            <Header
+                header="Lists"
+                leftColumn={
+                    <TouchableOpacity
+                        style={styles.backContainer}
+                        onPress={() => navigation.goBack()}>
+                        <Ionicons name="arrow-back-outline" size={14} />
+                    </TouchableOpacity>
+                }
+                rightColumn={<View style={styles.emptyContainer} />}
+            />
 
             <FlatList
                 ListEmptyComponent={
@@ -102,27 +101,10 @@ const styles = StyleSheet.create({
     listContainer: {
         flex: 1,
     },
-    headerContainer: {
-        paddingVertical: 10,
-        alignItems: 'center',
-        flexDirection: 'row',
-        borderBottomWidth: 1,
-        borderColor: '#E5E7EB',
-    },
     backContainer: {
         paddingLeft: ICON_PADDING,
     },
     emptyContainer: {
         flexBasis: 32,
-    },
-
-    headerTextContainer: {
-        flex: 1,
-    },
-    headerText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        fontFamily: 'Jost',
-        textAlign: 'center',
     },
 });
