@@ -101,19 +101,16 @@ export type Database = {
         Row: {
           collection_id: number
           created_at: string
-          id: number
           user_id: string
         }
         Insert: {
           collection_id: number
           created_at?: string
-          id?: number
           user_id: string
         }
         Update: {
           collection_id?: number
           created_at?: string
-          id?: number
           user_id?: string
         }
         Relationships: [
@@ -126,6 +123,45 @@ export type Database = {
           },
           {
             foreignKeyName: "collection_collaborations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collection_comments: {
+        Row: {
+          collection_id: number
+          content: string
+          created_at: string
+          id: number
+          user_id: string
+        }
+        Insert: {
+          collection_id: number
+          content: string
+          created_at?: string
+          id?: number
+          user_id: string
+        }
+        Update: {
+          collection_id?: number
+          content?: string
+          created_at?: string
+          id?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_comments_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_comments_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users_public"

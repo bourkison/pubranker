@@ -78,6 +78,13 @@ export type CollectionType = Tables<'collections'> & {
         username: string;
         profile_photo: string;
     };
+    collaborators: {
+        user: {
+            id: string;
+            username: string;
+            profile_photo: string | null;
+        };
+    }[];
     is_followed: { count: number }[];
     is_liked: { count: number }[];
     likes: { count: number }[];
@@ -102,7 +109,14 @@ collection_items(
 user:users_public!collections_user_id_fkey1(id, name, username, profile_photo),
 is_followed:collection_follows(count),
 is_liked:collection_likes(count),
-likes:collection_likes(count)
+likes:collection_likes(count),
+collaborators:collection_collaborations(
+    user:users_public(
+        id,
+        profile_photo,
+        username
+    )
+)
 ` as const;
 
 export const collectionQuery = (userId: string) =>

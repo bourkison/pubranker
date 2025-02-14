@@ -22,6 +22,7 @@ import UserAvatar from '@/components/User/UserAvatar';
 import { StackActions, useNavigation } from '@react-navigation/native';
 import LikeCollectionButton from '@/components/Collections/LikeCollectionButton';
 import CollectionItemListItem from './CollectionItemListItem';
+import CollectionCollaborators from './CollectionCollaborators';
 
 type CollectionListProps = {
     collection?: CollectionType;
@@ -334,6 +335,9 @@ export default function CollectionList({
                                 </View>
                             </View>
                         </View>
+                        {collection.collaborative && (
+                            <CollectionCollaborators collection={collection} />
+                        )}
                     </>
                 )
             }
