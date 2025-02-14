@@ -44,6 +44,7 @@ import { PubViewContext } from '@/context/pubViewContext';
 import { RootStackScreenProps } from '@/types/nav';
 
 const GRADIENT_HEIGHT = 128;
+const NO_IMAGE = require('@/assets/noimage.png');
 
 export default function PubView({
     route,
@@ -73,7 +74,8 @@ export default function PubView({
             return supabase.storage.from('pubs').getPublicUrl(pub.primary_photo)
                 .data.publicUrl;
         }
-        return '';
+
+        return NO_IMAGE;
     }, [pub]);
 
     const saved = useMemo<boolean>(() => {

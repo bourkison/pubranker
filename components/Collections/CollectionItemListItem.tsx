@@ -13,6 +13,8 @@ import {
     TouchableHighlight,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useActionSheet } from '@expo/react-native-action-sheet';
+import * as Haptics from 'expo-haptics';
 
 type CollectionItemListItemProps = {
     collectionItem: CollectionType['collection_items'][number];
@@ -21,6 +23,8 @@ type CollectionItemListItemProps = {
     onSaveComplete?: (success: boolean, id: number) => void;
     onUnsaveCommence?: (id: number) => void;
     onUnsaveComplete?: (success: boolean, id: number) => void;
+    onRemove?: (id: number) => void;
+    canEdit: boolean;
 };
 
 const ASPECT_RATIO = 1;
@@ -34,11 +38,13 @@ export default function CollectionItemListItem({
     onSaveComplete,
     onUnsaveCommence,
     onUnsaveComplete,
+    onRemove,
+    canEdit,
 }: CollectionItemListItemProps) {
     const [containerWidth, setContainerWidth] = useState(0);
-
     const [isSaving, setIsSaving] = useState(false);
 
+    const { showActionSheetWithOptions } = useActionSheet();
     const navigation = useNavigation();
 
     const IMAGE_WIDTH = useMemo<number>(
@@ -129,7 +135,28 @@ export default function CollectionItemListItem({
             underlayColor="#E5E7EB"
             onPress={() =>
                 navigation.navigate('PubView', { pubId: collectionItem.pub.id })
-            }>
+            }
+            onLongPress={() => {
+                if (!canEdit) {
+                    return;
+                }
+
+                Haptics.impactAsync();
+
+                showActionSheetWithOptions(
+                    {
+                        options: ['Remove Pub', 'Cancel'],
+                        cancelButtonIndex: 1,
+                        tintColor: '#000',
+                        cancelButtonTintColor: '#000',
+                    },
+                    selected => {
+                        if (selected === 0) {
+                            onRemove && onRemove(collectionItem.pub.id);
+                        }
+                    },
+                );
+            }}>
             <View
                 style={styles.innerContainer}
                 onLayout={({

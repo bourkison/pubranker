@@ -215,6 +215,37 @@ export default function CollectionView({
         deleteCollection,
     ]);
 
+    const removeCollectionItem = useCallback(
+        async (id: number) => {
+            if (!isOwnedCollection) {
+                return;
+            }
+
+            if (!collection) {
+                return;
+            }
+
+            // Remove locally.
+            let temp = collection.collection_items.slice();
+            temp = temp.filter(item => item.pub.id !== id);
+
+            setCollection({ ...collection, collection_items: temp });
+
+            // Delete in database.
+            const { error } = await supabase
+                .from('collection_items')
+                .delete()
+                .eq('pub_id', id)
+                .eq('collection_id', collection.id);
+
+            if (error) {
+                console.error(error);
+                return;
+            }
+        },
+        [collection, isOwnedCollection],
+    );
+
     return (
         <SafeAreaView style={styles.container}>
             <Header
@@ -241,6 +272,8 @@ export default function CollectionView({
 
             <CollectionList
                 collection={collection}
+                canEdit={isOwnedCollection}
+                onItemRemove={removeCollectionItem}
                 isLoading={isLoading}
                 userId={userId}
                 toggleSave={toggleSave}

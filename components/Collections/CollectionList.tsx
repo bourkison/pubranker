@@ -28,6 +28,8 @@ type CollectionListProps = {
     setFollow: (follow: boolean) => void;
     setLiked: (like: boolean) => void;
     toggleSave: (id: number, save: boolean) => void;
+    onItemRemove?: (id: number) => void;
+    canEdit: boolean;
     userId: string;
     isLoading: boolean;
 };
@@ -39,6 +41,8 @@ export default function CollectionList({
     toggleSave,
     setFollow,
     setLiked,
+    onItemRemove,
+    canEdit,
 }: CollectionListProps) {
     const [isFollowing, setIsFollowing] = useState(false);
 
@@ -335,6 +339,8 @@ export default function CollectionList({
             }
             renderItem={({ item, index }) => (
                 <CollectionItemListItem
+                    onRemove={onItemRemove}
+                    canEdit={canEdit}
                     collectionItem={item}
                     saved={isSaved(index)}
                     onSaveCommence={id => toggleSave(id, true)}
