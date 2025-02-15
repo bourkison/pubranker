@@ -34,7 +34,8 @@ export default function EditCollection({
     const [isUpdating, setIsUpdating] = useState(false);
 
     const updateCollectionItems = useCallback(async () => {
-        // First delete all collection items.
+        // First delete all collection items. We do this so order is reset.
+        // TODO: This could be smarter.
         const { error: deleteError } = await supabase
             .from('collection_items')
             .delete()

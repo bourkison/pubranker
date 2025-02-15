@@ -1,4 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, {
+    Dispatch,
+    SetStateAction,
+    useCallback,
+    useEffect,
+    useState,
+} from 'react';
 import {
     SafeAreaView,
     Text,
@@ -6,6 +12,7 @@ import {
     StyleSheet,
     ActivityIndicator,
     ScrollView,
+    RefreshControl,
 } from 'react-native';
 import { supabase } from '@/services/supabase';
 import { Feather } from '@expo/vector-icons';
@@ -21,16 +28,17 @@ export default function LoggedInProfile({
     const [user, setUser] = useState<UserType>();
     const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isRefreshing, setIsRefreshing] = useState(false);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            setIsLoading(true);
+    const fetchData = useCallback(
+        async (setLoading: Dispatch<SetStateAction<boolean>>) => {
+            setLoading(true);
 
             const { data, error } = await supabase.auth.getUser();
 
             if (error) {
                 console.warn(error);
-                setIsLoading(false);
+                setLoading(false);
                 return;
             }
 
@@ -41,16 +49,21 @@ export default function LoggedInProfile({
 
             if (publicUserError) {
                 console.warn('no public user', publicUserError);
-                setIsLoading(false);
+                setLoading(false);
                 return;
             }
 
             setUser(publicUser);
-            setIsLoading(false);
-        };
+            setLoading(false);
+        },
+        [],
+    );
 
-        fetchData();
-    }, []);
+    useEffect(() => {
+        fetchData(setIsLoading);
+    }, [fetchData]);
+
+    const refresh = useCallback(() => fetchData(setIsRefreshing), [fetchData]);
 
     if (isLoading) {
         return <ActivityIndicator />;
@@ -90,7 +103,14 @@ export default function LoggedInProfile({
                 }
             />
 
-            <ScrollView style={styles.flexOne}>
+            <ScrollView
+                style={styles.flexOne}
+                refreshControl={
+                    <RefreshControl
+                        onRefresh={refresh}
+                        refreshing={isRefreshing}
+                    />
+                }>
                 <ProfileView
                     user={user}
                     isLoggedInUser={true}

@@ -78,7 +78,6 @@ review_tens:reviews(count)
 ` as const;
 
 export const userQuery = (userId: string) =>
-    // @ts-ignore
     supabase
         .from('users_public')
         .select(userQueryString)
