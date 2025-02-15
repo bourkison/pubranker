@@ -167,6 +167,14 @@ export default function CreateEditCollectionForm({
         [collaborators, setCollaborators],
     );
 
+    const removePub = useCallback(
+        (id: number) => {
+            let temp = pubs.slice().filter(pub => pub.id !== id);
+            setPubs(temp);
+        },
+        [pubs, setPubs],
+    );
+
     return (
         <ScrollView
             style={styles.container}
@@ -178,6 +186,7 @@ export default function CreateEditCollectionForm({
             }) => setElementWidth(width)}
             bounces={false}
             keyboardDismissMode="on-drag">
+            {/* INFO SECTION */}
             <View style={styles.contentContainer}>
                 <View style={styles.section}>
                     <View style={styles.nameSectionHeaderContainer}>
@@ -217,6 +226,7 @@ export default function CreateEditCollectionForm({
                 </View>
             </View>
 
+            {/* PUBS SECTION */}
             <Pressable style={styles.addPubSection} onPress={navigateToSelect}>
                 <View style={styles.addPubTextSection}>
                     <Text style={styles.sectionHeaderText}>Pubs</Text>
@@ -239,6 +249,16 @@ export default function CreateEditCollectionForm({
                                     styles.pubContainer,
                                     { width: pubElementWidth },
                                 ]}>
+                                <Pressable
+                                    style={styles.pubIconContainer}
+                                    onPress={() => removePub(item.id)}>
+                                    <AntDesign
+                                        name="close"
+                                        size={12}
+                                        color="#000"
+                                    />
+                                </Pressable>
+
                                 <Image
                                     source={pubImage(index)}
                                     style={[
@@ -257,6 +277,7 @@ export default function CreateEditCollectionForm({
                 </ScrollView>
             </Pressable>
 
+            {/* COLLABORATIVE SECTION */}
             {collaborative && (
                 <View style={styles.addCollaboratorSection}>
                     <View style={styles.addCollaboratorHeaderContainer}>
@@ -330,6 +351,7 @@ export default function CreateEditCollectionForm({
                 </View>
             )}
 
+            {/* SETTINGS SECTION */}
             <View>
                 <View
                     style={[
@@ -534,7 +556,7 @@ const styles = StyleSheet.create({
     pubContainer: {
         zIndex: 1,
         alignItems: 'center',
-        marginVertical: 5,
+        marginVertical: 10,
     },
     addPubTextSection: {
         marginLeft: 20,
@@ -557,6 +579,20 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginRight: 15,
         marginTop: 10,
+    },
+    pubIconContainer: {
+        position: 'absolute',
+        top: -7,
+        right: 0,
+        backgroundColor: '#FFF',
+        height: 20,
+        width: 20,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 2,
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
     },
     collaboratorIconContainer: {
         position: 'absolute',

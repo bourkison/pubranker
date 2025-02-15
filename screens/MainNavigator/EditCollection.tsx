@@ -86,7 +86,7 @@ export default function EditCollection({
         }
     }, [route, collaborators]);
 
-    const upsertCollaborators = useCallback(async () => {
+    const createCollaborators = useCallback(async () => {
         // Filter collaborators where the new collaborator
         // isn't included in the array of old ones and hence it's net new.
         const newCollaborators = collaborators.filter(
@@ -150,7 +150,7 @@ export default function EditCollection({
         await Promise.allSettled([
             updateCollectionItems(),
             deleteCollaborators(),
-            upsertCollaborators(),
+            createCollaborators(),
         ]);
 
         navigation.navigate('Home', {
@@ -171,7 +171,7 @@ export default function EditCollection({
         route,
         updateCollectionItems,
         deleteCollaborators,
-        upsertCollaborators,
+        createCollaborators,
     ]);
 
     return (

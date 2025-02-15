@@ -120,6 +120,7 @@ is_followed:collection_follows(count),
 is_liked:collection_likes(count),
 likes:collection_likes(count),
 collaborators:collection_collaborations(
+    created_at,
     user:users_public(
         id,
         profile_photo,
@@ -132,6 +133,10 @@ export const collectionQuery = (userId: string) =>
     supabase
         .from('collections')
         .select(collectionQueryString)
+        .order('created_at', {
+            referencedTable: 'collection_collaborations',
+            ascending: true,
+        })
         .eq('is_followed.user_id', userId)
         .eq('is_liked.user_id', userId)
         .eq('collection_items.pub.saved.user_id', userId);

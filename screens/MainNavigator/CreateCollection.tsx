@@ -37,6 +37,43 @@ export default function CreateCollection({
 
     const [isCreating, setIsCreating] = useState(false);
 
+    const createCollaborators = useCallback(
+        async (collectionId: number) => {
+            const { error } = await supabase
+                .from('collection_collaborations')
+                .insert(
+                    collaborators.map(collaborator => ({
+                        user_id: collaborator.id,
+                        collection_id: collectionId,
+                    })),
+                );
+
+            if (error) {
+                console.error(error);
+                return;
+            }
+        },
+        [collaborators],
+    );
+
+    const createCollectionItems = useCallback(
+        async (collectionId: number) => {
+            const { error } = await supabase.from('collection_items').insert(
+                pubs.map((pub, index) => ({
+                    collection_id: collectionId,
+                    pub_id: pub.id,
+                    order: index + 1,
+                })),
+            );
+
+            if (error) {
+                console.error(error);
+                return;
+            }
+        },
+        [pubs],
+    );
+
     const createCollection = useCallback(async () => {
         if (!name || isCreating) {
             return;
@@ -73,21 +110,10 @@ export default function CreateCollection({
             return;
         }
 
-        const { error: itemError } = await supabase
-            .from('collection_items')
-            .insert(
-                pubs.map((pub, index) => ({
-                    collection_id: data.id,
-                    pub_id: pub.id,
-                    order: index + 1,
-                })),
-            );
-
-        if (itemError) {
-            console.error(itemError);
-            setIsCreating(false);
-            return;
-        }
+        await Promise.allSettled([
+            createCollectionItems(data.id),
+            createCollaborators(data.id),
+        ]);
 
         navigation.navigate('Home', {
             screen: 'Favourites',
@@ -104,7 +130,8 @@ export default function CreateCollection({
         ranked,
         isCreating,
         navigation,
-        pubs,
+        createCollectionItems,
+        createCollaborators,
     ]);
 
     return (
