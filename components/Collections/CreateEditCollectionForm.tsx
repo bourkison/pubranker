@@ -3,6 +3,7 @@ import React, {
     Dispatch,
     SetStateAction,
     useCallback,
+    useEffect,
     useMemo,
     useState,
 } from 'react';
@@ -27,7 +28,10 @@ import {
     FontAwesome6,
     FontAwesome5,
 } from '@expo/vector-icons';
-import { PRIMARY_COLOR } from '@/constants';
+import { PRIMARY_COLOR, SUCCESS_COLOR } from '@/constants';
+import UserAvatar from '../User/UserAvatar';
+import { AntDesign } from '@expo/vector-icons';
+import Animated, { LinearTransition } from 'react-native-reanimated';
 
 const ICON_COLOR = 'rgba(0, 0, 0, 0.8)';
 const NO_IMAGE = require('@/assets/noimage.png');
@@ -54,6 +58,16 @@ type CreateEditCollectionFormProps = {
     setRanked: Dispatch<SetStateAction<boolean>>;
     collaborative: boolean;
     setCollaborative: Dispatch<SetStateAction<boolean>>;
+    collaborators: {
+        id: string;
+        username: string;
+        profile_photo: string | null;
+    }[];
+    setCollaborators: Dispatch<
+        SetStateAction<
+            { id: string; username: string; profile_photo: string | null }[]
+        >
+    >;
 };
 
 export default function CreateEditCollectionForm({
@@ -69,8 +83,11 @@ export default function CreateEditCollectionForm({
     setRanked,
     collaborative,
     setCollaborative,
+    collaborators,
+    setCollaborators,
 }: CreateEditCollectionFormProps) {
     const [elementWidth, setElementWidth] = useState(0);
+    const [userId, setUserId] = useState('');
 
     const { bottom } = useSafeAreaInsets();
     const navigation = useNavigation();
@@ -89,6 +106,19 @@ export default function CreateEditCollectionForm({
         () => pubImageWidth / 1,
         [pubImageWidth],
     );
+
+    useEffect(() => {
+        (async () => {
+            const { data, error } = await supabase.auth.getUser();
+
+            if (error) {
+                console.error(error);
+                return;
+            }
+
+            setUserId(data.user.id);
+        })();
+    }, []);
 
     const togglePublicity = useCallback(() => {
         Haptics.selectionAsync();
@@ -127,6 +157,14 @@ export default function CreateEditCollectionForm({
                 excludedIds: pubs.map(pub => pub.id),
             }),
         [navigation, pubs, setPubs],
+    );
+
+    const removeCollaborator = useCallback(
+        (id: string) => {
+            let temp = collaborators.slice().filter(c => c.id !== id);
+            setCollaborators(temp);
+        },
+        [collaborators, setCollaborators],
     );
 
     return (
@@ -168,7 +206,7 @@ export default function CreateEditCollectionForm({
                         <TextInput
                             textAlignVertical="top"
                             style={styles.descriptionInputText}
-                            numberOfLines={5}
+                            numberOfLines={4}
                             multiline={true}
                             placeholder="Add description"
                             placeholderTextColor="rgba(0, 0, 0, 0.4)"
@@ -218,6 +256,79 @@ export default function CreateEditCollectionForm({
                     />
                 </ScrollView>
             </Pressable>
+
+            {collaborative && (
+                <View style={styles.addCollaboratorSection}>
+                    <View style={styles.addCollaboratorHeaderContainer}>
+                        <Text style={styles.sectionHeaderText}>
+                            Collaborators
+                        </Text>
+                    </View>
+
+                    <ScrollView
+                        horizontal={true}
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={styles.collaboratorsContainer}>
+                        {collaborators.map(c => (
+                            <Animated.View
+                                layout={LinearTransition}
+                                style={styles.collaboratorContainer}
+                                key={c.id}>
+                                <Pressable
+                                    style={styles.collaboratorIconContainer}
+                                    onPress={() => removeCollaborator(c.id)}>
+                                    <AntDesign
+                                        name="close"
+                                        size={12}
+                                        color="#000"
+                                    />
+                                </Pressable>
+                                <UserAvatar
+                                    photo={c.profile_photo || ''}
+                                    size={48}
+                                />
+                                <Text style={styles.collaboratorText}>
+                                    {c.username}
+                                </Text>
+                            </Animated.View>
+                        ))}
+                        <Animated.View layout={LinearTransition}>
+                            <Pressable
+                                style={styles.collaboratorContainer}
+                                onPress={() =>
+                                    navigation.navigate('AddCollaborator', {
+                                        excludedIds: [
+                                            ...collaborators.map(col => col.id),
+                                            userId,
+                                        ],
+                                        onAdd: user => {
+                                            setCollaborators([
+                                                ...collaborators,
+                                                user,
+                                            ]);
+                                        },
+                                    })
+                                }>
+                                <UserAvatar photo="" size={48} />
+                                <View
+                                    style={[
+                                        styles.collaboratorIconContainer,
+                                        { backgroundColor: SUCCESS_COLOR },
+                                    ]}>
+                                    <AntDesign
+                                        name="plus"
+                                        size={12}
+                                        color="#FFF"
+                                    />
+                                </View>
+                                <Text style={styles.collaboratorText}>
+                                    Add New
+                                </Text>
+                            </Pressable>
+                        </Animated.View>
+                    </ScrollView>
+                </View>
+            )}
 
             <View>
                 <View
@@ -375,7 +486,7 @@ const styles = StyleSheet.create({
     descriptionInputText: {
         fontSize: 16,
         letterSpacing: -0.2,
-        height: 144,
+        height: 120,
     },
     addPubSection: {
         marginTop: 15,
@@ -427,5 +538,44 @@ const styles = StyleSheet.create({
     },
     addPubTextSection: {
         marginLeft: 20,
+    },
+    addCollaboratorSection: {
+        paddingVertical: 15,
+        borderTopWidth: 1,
+        borderColor: '#E5E7EB',
+    },
+    addCollaboratorHeaderContainer: {
+        marginLeft: 20,
+    },
+    collaboratorsContainer: {
+        paddingHorizontal: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    collaboratorContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 15,
+        marginTop: 10,
+    },
+    collaboratorIconContainer: {
+        position: 'absolute',
+        top: -5,
+        right: -7,
+        backgroundColor: '#FFF',
+        height: 20,
+        width: 20,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 2,
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+    },
+    collaboratorText: {
+        fontSize: 12,
+        marginTop: 4,
+        fontWeight: '300',
+        letterSpacing: -0.3,
     },
 });

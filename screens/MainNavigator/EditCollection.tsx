@@ -27,7 +27,89 @@ export default function EditCollection({
         route.params.collection.collaborative,
     );
 
+    const [collaborators, setCollaborators] = useState(
+        route.params.collection.collaborators.map(c => c.user),
+    );
+
     const [isUpdating, setIsUpdating] = useState(false);
+
+    const updateCollectionItems = useCallback(async () => {
+        // First delete all collection items.
+        const { error: deleteError } = await supabase
+            .from('collection_items')
+            .delete()
+            .eq('collection_id', route.params.collection.id);
+
+        if (deleteError) {
+            console.error('Error deleting', deleteError);
+            return;
+        }
+
+        // Next reupload them in correct order.
+        const { error: itemError } = await supabase
+            .from('collection_items')
+            .insert(
+                pubs.map((pub, index) => ({
+                    collection_id: route.params.collection.id,
+                    pub_id: pub.id,
+                    order: index + 1,
+                })),
+            );
+
+        if (itemError) {
+            console.error('end test', itemError);
+            return;
+        }
+    }, [route, pubs]);
+
+    const deleteCollaborators = useCallback(async () => {
+        // Delete all collaborators that aren't equal to selected ones.
+        // As that suggests ones have been removed.
+        let query = supabase
+            .from('collection_collaborations')
+            .delete()
+            .eq('collection_id', route.params.collection.id);
+
+        if (collaborators.length) {
+            query = query.not(
+                'user_id',
+                'in',
+                `(${collaborators.map(c => c.id).join(',')})`,
+            );
+        }
+
+        const { error } = await query;
+
+        if (error) {
+            console.error('delete error', error);
+            return;
+        }
+    }, [route, collaborators]);
+
+    const upsertCollaborators = useCallback(async () => {
+        // Filter collaborators where the new collaborator
+        // isn't included in the array of old ones and hence it's net new.
+        const newCollaborators = collaborators.filter(
+            newCollaborator =>
+                !route.params.collection.collaborators
+                    .map(originalCollaborator => originalCollaborator.user.id)
+                    .includes(newCollaborator.id),
+        );
+
+        const { error } = await supabase
+            .from('collection_collaborations')
+            .insert(
+                newCollaborators.map(c => ({
+                    user_id: c.id,
+                    collection_id: route.params.collection.id,
+                })),
+            );
+
+        if (error) {
+            console.error('upsert error', error);
+            return;
+        }
+    }, [route, collaborators]);
 
     const updateCollection = useCallback(async () => {
         if (!name || isUpdating) {
@@ -65,34 +147,11 @@ export default function EditCollection({
             return;
         }
 
-        // First delete all collection items.
-        const { error: deleteError } = await supabase
-            .from('collection_items')
-            .delete()
-            .eq('collection_id', route.params.collection.id);
-
-        if (deleteError) {
-            console.error('Error deleting', deleteError);
-            setIsUpdating(false);
-            return;
-        }
-
-        // Next reupload them in correct order.
-        const { error: itemError } = await supabase
-            .from('collection_items')
-            .insert(
-                pubs.map((pub, index) => ({
-                    collection_id: route.params.collection.id,
-                    pub_id: pub.id,
-                    order: index + 1,
-                })),
-            );
-
-        if (itemError) {
-            console.error('end test', itemError);
-            setIsUpdating(false);
-            return;
-        }
+        await Promise.allSettled([
+            updateCollectionItems(),
+            deleteCollaborators(),
+            upsertCollaborators(),
+        ]);
 
         navigation.navigate('Home', {
             screen: 'Favourites',
@@ -109,8 +168,10 @@ export default function EditCollection({
         ranked,
         isUpdating,
         navigation,
-        pubs,
         route,
+        updateCollectionItems,
+        deleteCollaborators,
+        upsertCollaborators,
     ]);
 
     return (
@@ -146,6 +207,8 @@ export default function EditCollection({
                 setRanked={setRanked}
                 collaborative={collaborative}
                 setCollaborative={setCollaborative}
+                collaborators={collaborators}
+                setCollaborators={setCollaborators}
             />
         </View>
     );

@@ -88,8 +88,6 @@ export default function CollectionView({
 
     const loadData = useCallback(
         async (setLoading: Dispatch<SetStateAction<boolean>>) => {
-            console.log('called');
-
             setLoading(true);
 
             const { data: userData, error: userError } =

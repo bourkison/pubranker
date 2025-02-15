@@ -31,6 +31,9 @@ export default function CreateCollection({
         useState<Enums<'collection_privacy_type'>>('PUBLIC');
     const [ranked, setRanked] = useState(false);
     const [collaborative, setCollaborative] = useState(false);
+    const [collaborators, setCollaborators] = useState<
+        { id: string; username: string; profile_photo: string | null }[]
+    >([]);
 
     const [isCreating, setIsCreating] = useState(false);
 
@@ -125,6 +128,8 @@ export default function CreateCollection({
             />
 
             <CreateEditCollectionForm
+                collaborators={collaborators}
+                setCollaborators={setCollaborators}
                 pubs={pubs}
                 setPubs={setPubs}
                 name={name}
