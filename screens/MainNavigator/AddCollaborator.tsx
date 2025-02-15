@@ -54,10 +54,12 @@ export default function AddCollaborator({
                             username: d.username,
                             profile_photo: d.profile_photo,
                         });
+
+                        navigation.goBack();
                     },
                 })),
         );
-    }, [route, searchText]);
+    }, [route, searchText, navigation]);
 
     return (
         <View style={styles.container}>

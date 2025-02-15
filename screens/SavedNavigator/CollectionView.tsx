@@ -1,5 +1,12 @@
 import { Ionicons, SimpleLineIcons } from '@expo/vector-icons';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+    Dispatch,
+    SetStateAction,
+    useCallback,
+    useEffect,
+    useMemo,
+    useState,
+} from 'react';
 import { SafeAreaView, TouchableOpacity, StyleSheet } from 'react-native';
 import { PRIMARY_COLOR } from '@/constants';
 import CollectionList from '@/components/Collections/CollectionList';
@@ -29,6 +36,7 @@ export default function CollectionView({
 }: SavedNavigatorScreenProps<'CollectionView'>) {
     const [collection, setCollection] = useState<CollectionType>();
     const [isLoading, setIsLoading] = useState(false);
+    const [isRefreshing, setIsRefreshing] = useState(false);
     const [userId, setUserId] = useState('');
 
     const { showActionSheetWithOptions } = useActionSheet();
@@ -37,6 +45,22 @@ export default function CollectionView({
         () => userId === collection?.user_id,
         [userId, collection],
     );
+
+    const isCollaborator = useMemo<boolean>(() => {
+        if (!collection) {
+            return false;
+        }
+
+        if (isOwnedCollection) {
+            return true;
+        }
+
+        if (collection.collaborators.map(c => c.user.id).includes(userId)) {
+            return true;
+        }
+
+        return false;
+    }, [isOwnedCollection, collection, userId]);
 
     const menuActionSheetOptions = useMemo<ActionSheetOptions[]>(() => {
         if (!collection) {
@@ -57,19 +81,25 @@ export default function CollectionView({
             return ['Add Pub', 'Edit', 'Delete', 'Cancel'];
         }
 
-        return ['Report', 'Cancel'];
-    }, [collection, isOwnedCollection]);
+        if (isCollaborator) {
+            return ['Add Collaborator', 'Add Pub', 'Delete', 'Cancel'];
+        }
 
-    useEffect(() => {
-        (async () => {
-            setIsLoading(true);
+        return ['Report', 'Cancel'];
+    }, [collection, isOwnedCollection, isCollaborator]);
+
+    const loadData = useCallback(
+        async (setLoading: Dispatch<SetStateAction<boolean>>) => {
+            console.log('called');
+
+            setLoading(true);
 
             const { data: userData, error: userError } =
                 await supabase.auth.getUser();
 
             if (userError) {
                 console.error(userError);
-                setIsLoading(false);
+                setLoading(false);
                 return;
             }
 
@@ -86,7 +116,7 @@ export default function CollectionView({
 
             if (error) {
                 console.error(error);
-                setIsLoading(false);
+                setLoading(false);
                 return;
             }
 
@@ -113,9 +143,16 @@ export default function CollectionView({
             };
 
             setCollection(coll);
-            setIsLoading(false);
-        })();
-    }, [route]);
+            setLoading(false);
+        },
+        [route],
+    );
+
+    useEffect(() => {
+        loadData(setIsLoading);
+    }, [loadData]);
+
+    const refresh = useCallback(() => loadData(setIsRefreshing), [loadData]);
 
     const toggleSave = useCallback(
         (id: number, isSave: boolean) => {
@@ -131,9 +168,11 @@ export default function CollectionView({
 
             if (index > -1) {
                 collectionItems[index].pub.saved = [{ count: isSave ? 1 : 0 }];
+                setCollection({
+                    ...collection,
+                    collection_items: collectionItems,
+                });
             }
-
-            setCollection({ ...collection, collection_items: collectionItems });
         },
         [collection],
     );
@@ -327,9 +366,10 @@ export default function CollectionView({
                     menuActionSheetOptions[selected] === 'Add Collaborator'
                 ) {
                     navigation.navigate('AddCollaborator', {
-                        excludedIds: collection.collaborators.map(
-                            c => c.user.id,
-                        ),
+                        excludedIds: [
+                            userId,
+                            ...collection.collaborators.map(c => c.user.id),
+                        ],
                         onAdd: addCollaborator,
                     });
                 }
@@ -338,6 +378,7 @@ export default function CollectionView({
     }, [
         menuActionSheetOptions,
         navigation,
+        userId,
         addPubToCollection,
         showActionSheetWithOptions,
         collection,
@@ -347,7 +388,7 @@ export default function CollectionView({
 
     const removeCollectionItem = useCallback(
         async (id: number) => {
-            if (!isOwnedCollection) {
+            if (!isCollaborator) {
                 return;
             }
 
@@ -373,7 +414,7 @@ export default function CollectionView({
                 return;
             }
         },
-        [collection, isOwnedCollection],
+        [collection, isCollaborator],
     );
 
     return (
@@ -401,8 +442,10 @@ export default function CollectionView({
             />
 
             <CollectionList
+                refresh={refresh}
+                isRefreshing={isRefreshing}
                 collection={collection}
-                canEdit={isOwnedCollection}
+                canEdit={isCollaborator}
                 onItemRemove={removeCollectionItem}
                 isLoading={isLoading}
                 userId={userId}

@@ -95,6 +95,7 @@ export default function SelectPub({
                                 size={14}
                             />
                             <TextInput
+                                autoFocus={true}
                                 placeholder="Search for a pub"
                                 style={styles.searchInput}
                                 value={searchText}

@@ -40,6 +40,7 @@ export default function CollectionItemListItem({
     onUnsaveComplete,
     onRemove,
     canEdit,
+    saved,
 }: CollectionItemListItemProps) {
     const [containerWidth, setContainerWidth] = useState(0);
     const [isSaving, setIsSaving] = useState(false);
@@ -63,11 +64,6 @@ export default function CollectionItemListItem({
                 .getPublicUrl(collectionItem.pub.primary_photo).data.publicUrl,
         };
     }, [collectionItem]);
-
-    const saved = useMemo(
-        () => collectionItem.pub.saved[0].count > 0,
-        [collectionItem],
-    );
 
     const toggleLike = useCallback(async () => {
         if (isSaving) {

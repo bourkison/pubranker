@@ -30,6 +30,8 @@ type CollectionListProps = {
     setLiked: (like: boolean) => void;
     toggleSave: (id: number, save: boolean) => void;
     onItemRemove?: (id: number) => void;
+    refresh: () => void;
+    isRefreshing: boolean;
     canEdit: boolean;
     userId: string;
     isLoading: boolean;
@@ -40,6 +42,8 @@ export default function CollectionList({
     isLoading,
     userId,
     toggleSave,
+    refresh,
+    isRefreshing,
     setFollow,
     setLiked,
     onItemRemove,
@@ -158,6 +162,8 @@ export default function CollectionList({
         <FlatList
             data={collection?.collection_items || []}
             keyExtractor={item => item.pub.id.toString()}
+            onRefresh={refresh}
+            refreshing={isRefreshing}
             ListEmptyComponent={
                 isLoading ? (
                     <ActivityIndicator />
@@ -302,8 +308,7 @@ export default function CollectionList({
                                         </View>
                                     )}
 
-                                    {collection.public !== 'PRIVATE' &&
-                                    collection.collaborative ? (
+                                    {collection.collaborative && (
                                         <View style={styles.privacyItem}>
                                             <MaterialIcons
                                                 name="people"
@@ -315,22 +320,6 @@ export default function CollectionList({
                                                 Collaborative
                                             </Text>
                                         </View>
-                                    ) : (
-                                        collection.public !== 'PRIVATE' && (
-                                            <View style={styles.privacyItem}>
-                                                <MaterialIcons
-                                                    name="person"
-                                                    size={14}
-                                                    color="#000"
-                                                />
-                                                <Text
-                                                    style={
-                                                        styles.privacyItemText
-                                                    }>
-                                                    Non-Collaborative
-                                                </Text>
-                                            </View>
-                                        )
                                     )}
                                 </View>
                             </View>
