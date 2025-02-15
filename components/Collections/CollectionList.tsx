@@ -332,6 +332,9 @@ export default function CollectionList({
             }
             renderItem={({ item, index }) => (
                 <CollectionItemListItem
+                    collaborativeCollection={collection?.collaborative || false}
+                    rankedCollection={collection?.ranked || false}
+                    index={index}
                     onRemove={onItemRemove}
                     canEdit={canEdit}
                     collectionItem={item}

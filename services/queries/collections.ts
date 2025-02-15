@@ -69,7 +69,11 @@ export type CollectionType = Tables<'collections'> & {
             saved: { count: number }[];
             rating: number;
             num_reviews: { count: number }[];
-            dist_meters: number;
+        };
+        user: {
+            id: string;
+            username: string;
+            profile_photo: string | null;
         };
     }[];
     user: {
@@ -104,6 +108,11 @@ collection_items(
         saved:saves(count),
         location:get_pub_location, 
         rating:get_pub_rating
+    ),
+    user:users_public(
+        id,
+        username,
+        profile_photo
     )
 ),
 user:users_public!collections_user_id_fkey1(id, name, username, profile_photo),

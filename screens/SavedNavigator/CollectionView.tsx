@@ -17,8 +17,6 @@ import {
     CollectionType,
 } from '@/services/queries/collections';
 import { supabase } from '@/services/supabase';
-import * as Location from 'expo-location';
-import { distance, point } from '@turf/turf';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import { FetchPubType, pubQuery } from '@/services/queries/pub';
 
@@ -122,25 +120,6 @@ export default function CollectionView({
 
             // @ts-ignore
             let coll: CollectionType = data as CollectionType;
-
-            const { coords } = await Location.getCurrentPositionAsync();
-
-            coll = {
-                ...coll,
-                collection_items: coll.collection_items.map(
-                    collection_item => ({
-                        ...collection_item,
-                        pub: {
-                            ...collection_item.pub,
-                            dist_meters: distance(
-                                point([coords.longitude, coords.latitude]),
-                                point(collection_item.pub.location.coordinates),
-                                { units: 'meters' },
-                            ),
-                        },
-                    }),
-                ),
-            };
 
             setCollection(coll);
             setLoading(false);
@@ -305,23 +284,36 @@ export default function CollectionView({
                     return;
                 }
 
+                // Get user username and profile_photo
+                // TODO: This could probably just be stored in store
+                const { data: userPublicData, error: userPublicError } =
+                    await supabase
+                        .from('users_public')
+                        .select('username, profile_photo')
+                        .eq('id', userId)
+                        .limit(1)
+                        .single();
+
+                if (userPublicError) {
+                    console.error(error);
+                    return;
+                }
+
                 // @ts-ignore
                 const response: FetchPubType = data;
-
-                const { coords } = await Location.getCurrentPositionAsync();
 
                 setCollection({
                     ...collection,
                     collection_items: [
                         ...collection.collection_items,
                         {
+                            user: {
+                                id: userId,
+                                username: userPublicData.username,
+                                profile_photo: userPublicData.profile_photo,
+                            },
                             pub: {
                                 address: response.address,
-                                dist_meters: distance(
-                                    point([coords.longitude, coords.latitude]),
-                                    point(response.location.coordinates),
-                                    { units: 'meters' },
-                                ),
                                 id: response.id,
                                 location: response.location,
                                 name: response.name,
