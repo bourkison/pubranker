@@ -19,6 +19,7 @@ import EditCollection from '@/screens/MainNavigator/EditCollection';
 import UserRatings from '@/screens/MainNavigator/UserRatings';
 import UserReviews from '@/screens/MainNavigator/UserReviews';
 import AddCollaborator from '@/screens/MainNavigator/AddCollaborator';
+import CollectionComments from '@/screens/MainNavigator/CollectionComments';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -113,6 +114,11 @@ export default function MainNavigator() {
             <Stack.Screen
                 name="AddCollaborator"
                 component={AddCollaborator}
+                options={{ headerShown: false, presentation: 'modal' }}
+            />
+            <Stack.Screen
+                name="CollectionComments"
+                component={CollectionComments}
                 options={{ headerShown: false, presentation: 'modal' }}
             />
         </Stack.Navigator>

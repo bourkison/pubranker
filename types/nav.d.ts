@@ -124,6 +124,9 @@ export type RootStackParamList = {
             profile_photo: string | null;
         }) => void;
     };
+    CollectionComments: {
+        collectionId: number;
+    };
 };
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> =

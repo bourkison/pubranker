@@ -23,6 +23,7 @@ import { StackActions, useNavigation } from '@react-navigation/native';
 import LikeCollectionButton from '@/components/Collections/LikeCollectionButton';
 import CollectionItemListItem from './CollectionItemListItem';
 import CollectionCollaborators from './CollectionCollaborators';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 
 type CollectionListProps = {
     collection?: CollectionType;
@@ -50,6 +51,8 @@ export default function CollectionList({
     canEdit,
 }: CollectionListProps) {
     const [isFollowing, setIsFollowing] = useState(false);
+    const [createCommentVisible, setCreateCommentVisible] = useState(true);
+    const [scrollOffset, setScrollOffset] = useState(0);
 
     const navigation = useNavigation();
 
@@ -145,7 +148,30 @@ export default function CollectionList({
     const setToLiked = useCallback(() => setLiked(true), [setLiked]);
     const setToUnliked = useCallback(() => setLiked(false), [setLiked]);
 
-    // We check saved up here otherwise it doesn't update on
+    const showComments = useCallback(
+        (y: number) => {
+            const offset = scrollOffset;
+            setScrollOffset(y);
+
+            if (y <= 0) {
+                // At top of list.
+                setCreateCommentVisible(true);
+                return;
+            }
+
+            if (y > offset) {
+                // Scrolling down.
+                setCreateCommentVisible(false);
+                return;
+            }
+
+            // Else we're scrolling up.
+            setCreateCommentVisible(true);
+        },
+        [scrollOffset],
+    );
+
+    // We check saved up here ot    herwise it doesn't update on
     // Save toggle.
     const isSaved = useCallback(
         (index: number) => {
@@ -159,197 +185,237 @@ export default function CollectionList({
     );
 
     return (
-        <FlatList
-            data={collection?.collection_items || []}
-            keyExtractor={item => item.pub.id.toString()}
-            onRefresh={refresh}
-            refreshing={isRefreshing}
-            ListEmptyComponent={
-                isLoading ? (
-                    <ActivityIndicator />
-                ) : (
-                    <View>
-                        <Text>No pubs added to this collection yet</Text>
-                    </View>
-                )
-            }
-            ListHeaderComponent={
-                collection && (
-                    <>
-                        {collection.collection_items.length && (
-                            <CollectionMap
-                                collectionItems={collection.collection_items}
-                            />
-                        )}
-                        <View style={styles.listHeaderContainer}>
-                            <View style={styles.topListHeaderContainer}>
-                                <Pressable
-                                    style={styles.userContainer}
-                                    onPress={() => {
-                                        const pushAction = StackActions.push(
-                                            'Profile',
-                                            {
-                                                userId: collection.user.id,
-                                            },
-                                        );
-
-                                        navigation.dispatch(pushAction);
-                                    }}>
-                                    <UserAvatar
-                                        photo={
-                                            collection.user.profile_photo || ''
-                                        }
-                                        size={20}
-                                    />
-
-                                    <Text style={styles.userNameText}>
-                                        {collection.user.username}
-                                    </Text>
-                                </Pressable>
-
-                                <TouchableOpacity
-                                    style={styles.followContainer}
-                                    disabled={followButtonDisabled}
-                                    onPress={toggleFollow}>
-                                    {collection.is_followed[0].count > 0 ? (
-                                        <>
-                                            <Ionicons
-                                                name="checkmark"
-                                                size={16}
-                                                color={PRIMARY_COLOR}
-                                            />
-                                            <Text style={styles.followText}>
-                                                Followed
-                                            </Text>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <FontAwesome6
-                                                name="plus"
-                                                size={14}
-                                                color={PRIMARY_COLOR}
-                                            />
-                                            <Text style={styles.followText}>
-                                                Follow
-                                            </Text>
-                                        </>
-                                    )}
-                                </TouchableOpacity>
-                            </View>
-
-                            <Text style={styles.collectionNameText}>
-                                {collection.name}
-                            </Text>
-
-                            {collection.description && (
-                                <Text style={styles.descriptionText}>
-                                    {collection.description}
-                                </Text>
-                            )}
-
-                            <View style={styles.likePrivacyContainer}>
-                                <View style={styles.likeContainer}>
-                                    <LikeCollectionButton
-                                        size={16}
-                                        liked={liked}
-                                        onLikeCommence={setToLiked}
-                                        onUnlikeCommence={setToUnliked}
-                                        onLikeComplete={success =>
-                                            !success && setToUnliked()
-                                        }
-                                        onUnlikeComplete={success =>
-                                            !success && setToLiked()
-                                        }
-                                        collectionId={collection.id}
-                                    />
-                                    <Text style={styles.likeText}>
-                                        {collection.likes[0].count} likes
-                                    </Text>
-                                </View>
-
-                                <View style={styles.privacyContainer}>
-                                    {collection.public === 'PRIVATE' ? (
-                                        <View style={styles.privacyItem}>
-                                            <Entypo
-                                                name="lock"
-                                                size={12}
-                                                color="#000"
-                                            />
-
-                                            <Text
-                                                style={styles.privacyItemText}>
-                                                Private
-                                            </Text>
-                                        </View>
-                                    ) : collection.public === 'FRIENDS_ONLY' ? (
-                                        <View style={styles.privacyItem}>
-                                            <MaterialIcons
-                                                name="people"
-                                                size={14}
-                                                color="#000"
-                                            />
-                                            <Text
-                                                style={styles.privacyItemText}>
-                                                Friends only
-                                            </Text>
-                                        </View>
-                                    ) : (
-                                        <View style={styles.privacyItem}>
-                                            <Entypo
-                                                name="globe"
-                                                size={12}
-                                                color="#000"
-                                            />
-
-                                            <Text
-                                                style={styles.privacyItemText}>
-                                                Public
-                                            </Text>
-                                        </View>
-                                    )}
-
-                                    {collection.collaborative && (
-                                        <View style={styles.privacyItem}>
-                                            <MaterialIcons
-                                                name="people"
-                                                size={14}
-                                                color="#000"
-                                            />
-                                            <Text
-                                                style={styles.privacyItemText}>
-                                                Collaborative
-                                            </Text>
-                                        </View>
-                                    )}
-                                </View>
-                            </View>
+        <>
+            <FlatList
+                onScroll={({
+                    nativeEvent: {
+                        contentOffset: { y },
+                    },
+                }) => {
+                    showComments(y);
+                }}
+                scrollEventThrottle={100}
+                data={collection?.collection_items || []}
+                keyExtractor={item => item.pub.id.toString()}
+                onRefresh={refresh}
+                refreshing={isRefreshing}
+                ListEmptyComponent={
+                    isLoading ? (
+                        <ActivityIndicator />
+                    ) : (
+                        <View>
+                            <Text>No pubs added to this collection yet</Text>
                         </View>
-                        {collection.collaborative && (
-                            <CollectionCollaborators collection={collection} />
-                        )}
-                    </>
-                )
-            }
-            renderItem={({ item, index }) => (
-                <CollectionItemListItem
-                    collaborativeCollection={collection?.collaborative || false}
-                    rankedCollection={collection?.ranked || false}
-                    index={index}
-                    onRemove={onItemRemove}
-                    canEdit={canEdit}
-                    collectionItem={item}
-                    saved={isSaved(index)}
-                    onSaveCommence={id => toggleSave(id, true)}
-                    onSaveComplete={(success, id) =>
-                        !success ? toggleSave(id, false) : undefined
-                    }
-                    onUnsaveCommence={id => toggleSave(id, false)}
-                    onUnsaveComplete={(success, id) =>
-                        !success ? toggleSave(id, true) : undefined
-                    }
-                />
+                    )
+                }
+                ListHeaderComponent={
+                    collection && (
+                        <>
+                            {collection.collection_items.length && (
+                                <CollectionMap
+                                    collectionItems={
+                                        collection.collection_items
+                                    }
+                                />
+                            )}
+                            <View style={styles.listHeaderContainer}>
+                                <View style={styles.topListHeaderContainer}>
+                                    <Pressable
+                                        style={styles.userContainer}
+                                        onPress={() => {
+                                            const pushAction =
+                                                StackActions.push('Profile', {
+                                                    userId: collection.user.id,
+                                                });
+
+                                            navigation.dispatch(pushAction);
+                                        }}>
+                                        <UserAvatar
+                                            photo={
+                                                collection.user.profile_photo ||
+                                                ''
+                                            }
+                                            size={20}
+                                        />
+
+                                        <Text style={styles.userNameText}>
+                                            {collection.user.username}
+                                        </Text>
+                                    </Pressable>
+
+                                    <TouchableOpacity
+                                        style={styles.followContainer}
+                                        disabled={followButtonDisabled}
+                                        onPress={toggleFollow}>
+                                        {collection.is_followed[0].count > 0 ? (
+                                            <>
+                                                <Ionicons
+                                                    name="checkmark"
+                                                    size={16}
+                                                    color={PRIMARY_COLOR}
+                                                />
+                                                <Text style={styles.followText}>
+                                                    Followed
+                                                </Text>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <FontAwesome6
+                                                    name="plus"
+                                                    size={14}
+                                                    color={PRIMARY_COLOR}
+                                                />
+                                                <Text style={styles.followText}>
+                                                    Follow
+                                                </Text>
+                                            </>
+                                        )}
+                                    </TouchableOpacity>
+                                </View>
+
+                                <Text style={styles.collectionNameText}>
+                                    {collection.name}
+                                </Text>
+
+                                {collection.description && (
+                                    <Text style={styles.descriptionText}>
+                                        {collection.description}
+                                    </Text>
+                                )}
+
+                                <View style={styles.likePrivacyContainer}>
+                                    <View style={styles.likeContainer}>
+                                        <LikeCollectionButton
+                                            size={16}
+                                            liked={liked}
+                                            onLikeCommence={setToLiked}
+                                            onUnlikeCommence={setToUnliked}
+                                            onLikeComplete={success =>
+                                                !success && setToUnliked()
+                                            }
+                                            onUnlikeComplete={success =>
+                                                !success && setToLiked()
+                                            }
+                                            collectionId={collection.id}
+                                        />
+                                        <Text style={styles.likeText}>
+                                            {collection.likes[0].count} likes
+                                        </Text>
+                                    </View>
+
+                                    <View style={styles.privacyContainer}>
+                                        {collection.public === 'PRIVATE' ? (
+                                            <View style={styles.privacyItem}>
+                                                <Entypo
+                                                    name="lock"
+                                                    size={12}
+                                                    color="#000"
+                                                />
+
+                                                <Text
+                                                    style={
+                                                        styles.privacyItemText
+                                                    }>
+                                                    Private
+                                                </Text>
+                                            </View>
+                                        ) : collection.public ===
+                                          'FRIENDS_ONLY' ? (
+                                            <View style={styles.privacyItem}>
+                                                <MaterialIcons
+                                                    name="people"
+                                                    size={14}
+                                                    color="#000"
+                                                />
+                                                <Text
+                                                    style={
+                                                        styles.privacyItemText
+                                                    }>
+                                                    Friends only
+                                                </Text>
+                                            </View>
+                                        ) : (
+                                            <View style={styles.privacyItem}>
+                                                <Entypo
+                                                    name="globe"
+                                                    size={12}
+                                                    color="#000"
+                                                />
+
+                                                <Text
+                                                    style={
+                                                        styles.privacyItemText
+                                                    }>
+                                                    Public
+                                                </Text>
+                                            </View>
+                                        )}
+
+                                        {collection.collaborative && (
+                                            <View style={styles.privacyItem}>
+                                                <MaterialIcons
+                                                    name="people"
+                                                    size={14}
+                                                    color="#000"
+                                                />
+                                                <Text
+                                                    style={
+                                                        styles.privacyItemText
+                                                    }>
+                                                    Collaborative
+                                                </Text>
+                                            </View>
+                                        )}
+                                    </View>
+                                </View>
+                            </View>
+                            {collection.collaborative && (
+                                <CollectionCollaborators
+                                    collection={collection}
+                                />
+                            )}
+                        </>
+                    )
+                }
+                renderItem={({ item, index }) => (
+                    <CollectionItemListItem
+                        collaborativeCollection={
+                            collection?.collaborative || false
+                        }
+                        rankedCollection={collection?.ranked || false}
+                        index={index}
+                        onRemove={onItemRemove}
+                        canEdit={canEdit}
+                        collectionItem={item}
+                        saved={isSaved(index)}
+                        onSaveCommence={id => toggleSave(id, true)}
+                        onSaveComplete={(success, id) =>
+                            !success ? toggleSave(id, false) : undefined
+                        }
+                        onUnsaveCommence={id => toggleSave(id, false)}
+                        onUnsaveComplete={(success, id) =>
+                            !success ? toggleSave(id, true) : undefined
+                        }
+                    />
+                )}
+            />
+
+            {collection && createCommentVisible && (
+                <Pressable
+                    onPress={() =>
+                        navigation.navigate('CollectionComments', {
+                            collectionId: collection.id,
+                        })
+                    }>
+                    <Animated.View
+                        style={styles.commentContainer}
+                        entering={FadeIn.duration(150)}
+                        exiting={FadeOut.duration(150)}>
+                        <Text style={styles.commentText}>Comment</Text>
+                    </Animated.View>
+                </Pressable>
             )}
-        />
+        </>
     );
 }
 
@@ -426,5 +492,19 @@ const styles = StyleSheet.create({
         fontWeight: '300',
         letterSpacing: -0.4,
         marginLeft: 2,
+    },
+    commentContainer: {
+        position: 'absolute',
+        bottom: 15,
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+        alignSelf: 'center',
+        backgroundColor: PRIMARY_COLOR,
+        borderRadius: 20,
+    },
+    commentText: {
+        color: '#FFF',
+        fontSize: 12,
+        fontWeight: '500',
     },
 });

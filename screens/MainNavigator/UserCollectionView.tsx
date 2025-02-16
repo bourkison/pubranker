@@ -1,5 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {
+    Dispatch,
+    SetStateAction,
+    useCallback,
+    useEffect,
+    useState,
+} from 'react';
 import {
     SafeAreaView,
     Text,
@@ -23,18 +29,19 @@ export default function UserCollectionView({
 }: RootStackScreenProps<'UserCollectionView'>) {
     const [userId, setUserId] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isRefreshing, setIsRefreshing] = useState(false);
     const [collection, setCollection] = useState<CollectionType>();
 
-    useEffect(() => {
-        (async () => {
-            setIsLoading(true);
+    const loadData = useCallback(
+        async (setLoading: Dispatch<SetStateAction<boolean>>) => {
+            setLoading(true);
 
             const { data: userData, error: userError } =
                 await supabase.auth.getUser();
 
             if (userError) {
                 console.error(userError);
-                setIsLoading(false);
+                setLoading(false);
                 return;
             }
 
@@ -51,7 +58,7 @@ export default function UserCollectionView({
 
             if (error) {
                 console.error(error);
-                setIsLoading(false);
+                setLoading(false);
                 return;
             }
 
@@ -78,9 +85,16 @@ export default function UserCollectionView({
             };
 
             setCollection(coll);
-            setIsLoading(false);
-        })();
-    }, [route]);
+            setLoading(false);
+        },
+        [route],
+    );
+
+    useEffect(() => {
+        loadData(setIsLoading);
+    }, [loadData]);
+
+    const refresh = useCallback(() => loadData(setIsRefreshing), [loadData]);
 
     const setFollow = useCallback(
         (follow: boolean) => {
@@ -166,6 +180,9 @@ export default function UserCollectionView({
                 setLiked={setLiked}
                 toggleSave={toggleSave}
                 userId={userId}
+                canEdit={false}
+                refresh={refresh}
+                isRefreshing={isRefreshing}
             />
         </SafeAreaView>
     );
