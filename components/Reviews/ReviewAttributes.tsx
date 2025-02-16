@@ -1,7 +1,7 @@
 import { PRIMARY_COLOR } from '@/constants';
 import { ReviewType } from '@/services/queries/review';
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
 
 type ReviewAttributesProps = {
     review: ReviewType;
@@ -14,7 +14,7 @@ export default function ReviewAttributes({ review }: ReviewAttributesProps) {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.contentContainer}
             bounces={true}>
-            <Pressable style={styles.container}>
+            <View style={styles.container}>
                 {/* Positive attributes */}
                 {review.vibe === true ? (
                     <View
@@ -160,7 +160,7 @@ export default function ReviewAttributes({ review }: ReviewAttributesProps) {
                         </Text>
                     </View>
                 ) : undefined}
-            </Pressable>
+            </View>
         </ScrollView>
     );
 }

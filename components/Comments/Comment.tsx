@@ -161,16 +161,12 @@ export default function Comment({
                             style={styles.likeButton}
                             onPress={toggleLike}>
                             {comment.liked[0].count > 0 ? (
-                                <Ionicons
-                                    name="heart"
-                                    size={14}
-                                    color="#dc2626"
-                                />
+                                <Ionicons name="heart" size={14} color="#000" />
                             ) : (
                                 <Ionicons
                                     name="heart-outline"
                                     size={14}
-                                    color="#a3a3a3"
+                                    color="#000"
                                 />
                             )}
                         </TouchableOpacity>

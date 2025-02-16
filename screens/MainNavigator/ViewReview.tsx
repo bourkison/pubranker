@@ -16,6 +16,7 @@ import {
     Pressable,
     FlatList,
     KeyboardAvoidingView,
+    ImageSourcePropType,
 } from 'react-native';
 import { Ionicons, SimpleLineIcons } from '@expo/vector-icons';
 import UserAvatar from '@/components/User/UserAvatar';
@@ -64,7 +65,7 @@ export default function ViewReview({
         return review.liked[0].count > 0;
     }, [review]);
 
-    const image = useMemo(() => {
+    const image = useMemo<ImageSourcePropType>(() => {
         if (!review) {
             return NO_IMAGE;
         }
@@ -241,6 +242,8 @@ export default function ViewReview({
         );
     }
 
+    console.log('IMAGE', image);
+
     return (
         <SafeAreaView style={styles.flexOne}>
             <View style={styles.headerContainer}>
@@ -264,8 +267,8 @@ export default function ViewReview({
                 style={styles.flexOne}
                 keyboardDismissMode="on-drag"
                 ListEmptyComponent={
-                    <View>
-                        <Text>No comments</Text>
+                    <View style={styles.noCommentContainer}>
+                        <Text style={styles.noCommentText}>No comments</Text>
                     </View>
                 }
                 ListHeaderComponent={
@@ -427,6 +430,8 @@ export default function ViewReview({
                             onChangeText={setCreateCommentText}
                             placeholder="Add a comment..."
                             style={styles.commentInput}
+                            keyboardType="default"
+                            returnKeyType="done"
                         />
                     </View>
 
@@ -543,7 +548,7 @@ const styles = StyleSheet.create({
         fontSize: 12,
     },
     scrollableTagsContainer: {
-        paddingVertical: 10,
+        paddingTop: 10,
     },
     createCommentButtonContainer: {
         backgroundColor: PRIMARY_COLOR,
@@ -567,12 +572,21 @@ const styles = StyleSheet.create({
     commentInputContainer: {
         flex: 1,
         borderColor: '#E5E7EB',
-        borderWidth: 1,
+        borderWidth: 2,
         borderRadius: 25,
         paddingVertical: 10,
         paddingHorizontal: 15,
     },
     commentInput: {
         paddingVertical: 0,
+    },
+    noCommentContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 5,
+    },
+    noCommentText: {
+        color: 'rgba(0, 0, 0, 0.6)',
+        fontSize: 12,
     },
 });

@@ -5,7 +5,6 @@ import {
     StyleSheet,
     FlatList,
     ActivityIndicator,
-    Pressable,
     SafeAreaView,
     TouchableOpacity,
     TextInput,
@@ -15,15 +14,17 @@ import { RootStackScreenProps } from '@/types/nav';
 import Header from '@/components/Utility/Header';
 import { supabase } from '@/services/supabase';
 import { Tables } from '@/types/schema';
-import UserAvatar from '@/components/User/UserAvatar';
-import { fromNowString } from '@/services';
+import CollectionComment from '@/components/Comments/CollectionComment';
+import { v4 as uuidv4 } from 'uuid';
 
-type CollectionComment = Tables<'collection_comments'> & {
+export type CollectionCommentType = Tables<'collection_comments'> & {
     user: {
         id: string;
         username: string;
         profile_photo: string | null;
     };
+    likes: { count: number }[];
+    liked: { count: number }[];
 };
 
 export default function CollectionComments({
@@ -32,7 +33,7 @@ export default function CollectionComments({
 }: RootStackScreenProps<'CollectionComments'>) {
     const [createCommentText, setCreateCommentText] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [comments, setComments] = useState<CollectionComment[]>([]);
+    const [comments, setComments] = useState<CollectionCommentType[]>([]);
     const [isCreatingComment, setIsCreatingComment] = useState(false);
     const inputRef = useRef<TextInput>(null);
 
@@ -40,9 +41,19 @@ export default function CollectionComments({
         (async () => {
             setIsLoading(true);
 
+            const { data: userData } = await supabase.auth.getUser();
+
             const { data, error } = await supabase
                 .from('collection_comments')
-                .select('*, user:users_public(id, username, profile_photo)')
+                .select(
+                    `
+                    *, 
+                    user:users_public(id, username, profile_photo), 
+                    likes:collection_comment_likes(count),
+                    liked:collection_comment_likes(count)
+                `,
+                )
+                .eq('liked.user_id', userData.user?.id || uuidv4())
                 .eq('collection_id', route.params.collectionId)
                 .order('created_at', { ascending: false });
 
@@ -70,7 +81,14 @@ export default function CollectionComments({
                 collection_id: route.params.collectionId,
                 content: createCommentText,
             })
-            .select('*, user:users_public(id, username, profile_photo)')
+            .select(
+                `
+                    *, 
+                    user:users_public(id, username, profile_photo), 
+                    likes:collection_comment_likes(count),
+                    liked:collection_comment_likes(count)
+                `,
+            )
             .limit(1)
             .single();
 
@@ -85,6 +103,23 @@ export default function CollectionComments({
         setComments([data, ...comments]);
         setIsCreatingComment(false);
     }, [createCommentText, route, comments, isCreatingComment]);
+
+    const likeComment = useCallback(
+        (isLike: boolean, commentId: number) => {
+            const temp = comments.slice();
+            const index = temp.findIndex(comment => comment.id === commentId);
+
+            if (index === -1) {
+                return;
+            }
+
+            temp[index].liked[0].count = isLike ? 1 : 0;
+            temp[index].likes[0].count += isLike ? 1 : -1;
+
+            setComments(temp);
+        },
+        [comments],
+    );
 
     return (
         <SafeAreaView style={styles.container}>
@@ -119,40 +154,10 @@ export default function CollectionComments({
                     }
                     keyExtractor={item => item.id.toString()}
                     renderItem={({ item }) => (
-                        <View style={styles.commentContainer}>
-                            <View style={styles.topBarContainer}>
-                                <Pressable
-                                    style={styles.userContainer}
-                                    onPress={() =>
-                                        navigation.navigate('Profile', {
-                                            userId: item.user.id,
-                                        })
-                                    }>
-                                    <View style={styles.avatarContainer}>
-                                        <UserAvatar
-                                            photo={
-                                                item.user.profile_photo || ''
-                                            }
-                                            size={24}
-                                        />
-                                    </View>
-                                    <Text style={styles.usernameText}>
-                                        {item.user.username}
-                                    </Text>
-                                </Pressable>
-                                <View>
-                                    <Text style={styles.createdAtText}>
-                                        {fromNowString(item.created_at)}
-                                    </Text>
-                                </View>
-                            </View>
-
-                            <View style={styles.contentContainer}>
-                                <Text style={styles.contentText}>
-                                    {item.content}
-                                </Text>
-                            </View>
-                        </View>
+                        <CollectionComment
+                            comment={item}
+                            onLike={likeComment}
+                        />
                     )}
                 />
             </View>
@@ -199,38 +204,7 @@ const styles = StyleSheet.create({
     listContainer: {
         flex: 1,
     },
-    commentContainer: {
-        paddingHorizontal: 10,
-        paddingVertical: 15,
-        borderBottomWidth: 1,
-        borderColor: '#E5E7EB',
-    },
-    userContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    avatarContainer: {
-        marginRight: 10,
-    },
-    contentContainer: {
-        marginLeft: 34,
-        marginTop: 10,
-    },
-    topBarContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    usernameText: {
-        fontWeight: '500',
-    },
-    createdAtText: {
-        fontWeight: '300',
-        fontSize: 10,
-    },
-    contentText: {
-        fontSize: 12,
-    },
+
     createCommentContainer: {
         borderTopWidth: 1,
         borderColor: '#E5E7EB',
@@ -243,7 +217,7 @@ const styles = StyleSheet.create({
     commentInputContainer: {
         flex: 1,
         borderColor: '#E5E7EB',
-        borderWidth: 1,
+        borderWidth: 2,
         borderRadius: 25,
         paddingVertical: 10,
         paddingHorizontal: 15,

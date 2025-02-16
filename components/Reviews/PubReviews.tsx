@@ -101,7 +101,7 @@ export default function PubReviews({ pub }: PubReviewsProps) {
         <View>
             {!isLoading ? (
                 <View>
-                    {userReview && (
+                    {userReview && userReview.content && (
                         <Review review={userReview} noBorder={true} />
                     )}
                     {reviews.map((review, index) => (

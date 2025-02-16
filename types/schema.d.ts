@@ -130,6 +130,42 @@ export type Database = {
           },
         ]
       }
+      collection_comment_likes: {
+        Row: {
+          collection_comment_id: number
+          created_at: string
+          id: number
+          user_id: string
+        }
+        Insert: {
+          collection_comment_id: number
+          created_at?: string
+          id?: number
+          user_id?: string
+        }
+        Update: {
+          collection_comment_id?: number
+          created_at?: string
+          id?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_comment_likes_collection_comment_id_fkey"
+            columns: ["collection_comment_id"]
+            isOneToOne: false
+            referencedRelation: "collection_comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_comment_likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       collection_comments: {
         Row: {
           collection_id: number
