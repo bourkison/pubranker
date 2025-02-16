@@ -576,28 +576,22 @@ export type Database = {
       }
       pub_photos: {
         Row: {
-          admin: boolean
-          created_at: string | null
+          created_at: string
           id: number
           key: string
           pub_id: number
-          user_id: string | null
         }
         Insert: {
-          admin?: boolean
-          created_at?: string | null
+          created_at?: string
           id?: number
           key: string
           pub_id: number
-          user_id?: string | null
         }
         Update: {
-          admin?: boolean
-          created_at?: string | null
+          created_at?: string
           id?: number
           key?: string
           pub_id?: number
-          user_id?: string | null
         }
         Relationships: [
           {

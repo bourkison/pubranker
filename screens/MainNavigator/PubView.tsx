@@ -106,6 +106,8 @@ export default function PubView({
                 return;
             }
 
+            console.log('data', data);
+
             // Have to ts-ignore below as typescript is not picking up
             // The functions in our query as valid columns.
             // @ts-ignore
@@ -452,7 +454,21 @@ export default function PubView({
                                     data={[
                                         {
                                             title: 'Gallery',
-                                            component: <PubGallery pub={pub} />,
+                                            component: (
+                                                <PubGallery
+                                                    photos={pub.photos}
+                                                />
+                                            ),
+                                        },
+                                        {
+                                            title: `User Photos (${
+                                                pub.photos?.length || 0
+                                            })`,
+                                            component: (
+                                                <PubGallery
+                                                    photos={pub.photos}
+                                                />
+                                            ),
                                         },
                                     ]}
                                 />
@@ -464,20 +480,6 @@ export default function PubView({
                                         {
                                             title: `Reviews (${pub.num_reviews_with_content[0].count})`,
                                             component: <PubReviews pub={pub} />,
-                                        },
-                                        {
-                                            title: `User Photos (${
-                                                pub.photos?.length || 0
-                                            })`,
-                                            component: <PubGallery pub={pub} />,
-                                        },
-                                        {
-                                            title: 'Menu',
-                                            component: (
-                                                <View>
-                                                    <Text>Menu</Text>
-                                                </View>
-                                            ),
                                         },
                                         {
                                             title: 'Additional Information',

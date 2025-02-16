@@ -42,7 +42,8 @@ review_sixes:reviews(count),
 review_sevens:reviews(count),
 review_eights:reviews(count),
 review_nines:reviews(count),
-review_tens:reviews(count)
+review_tens:reviews(count),
+photos:pub_photos(*)
 ` as const;
 
 export const pubQuery = (userId: string) =>

@@ -1,38 +1,32 @@
 import ImageScroller from '@/components/Utility/ImageScroller';
-import { FetchPubType } from '@/services/queries/pub';
-// import { supabase } from '@/services/supabase';
-import React, { useEffect, useRef, useState } from 'react';
+import { Tables } from '@/types/schema';
+import { supabase } from '@/services/supabase';
+import React, { useMemo, useRef } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 
 type PubGalleryProps = {
-    pub: FetchPubType;
+    photos: Tables<'pub_photos'>[];
 };
 
-export default function PubGallery({ pub }: PubGalleryProps) {
+export default function PubGallery({ photos }: PubGalleryProps) {
     const imageFlatListRef = useRef<FlatList>(null);
-    const [imageUrls, setImageUrls] = useState<string[]>([]);
 
-    useEffect(() => {
-        let urls: string[] = [];
-        setImageUrls([]);
-
-        // TODO: Fix.
-        // pub.photos.forEach(photo => {
-        //     const url = supabase.storage
-        //         .from('pubs')
-        //         .getPublicUrl(photo?.key || '');
-        //     urls.push(url.data.publicUrl);
-        // });
-
-        setImageUrls(urls);
-    }, [pub]);
+    const images = useMemo(
+        () =>
+            photos.map(
+                photo =>
+                    supabase.storage.from('pubs').getPublicUrl(photo.key).data
+                        .publicUrl,
+            ),
+        [photos],
+    );
 
     return (
         <View style={styles.container}>
-            {imageUrls.length ? (
+            {images.length ? (
                 <ImageScroller
                     imageFlatListRef={imageFlatListRef}
-                    images={imageUrls || []}
+                    images={images}
                     percentageWidth={0.6}
                     aspectRatio={1.33}
                 />
