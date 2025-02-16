@@ -21,6 +21,7 @@ export type FetchPubType = Tables<'pubs'> & {
     review_nines: { count: number }[];
     review_tens: { count: number }[];
     num_reviews: { count: number }[];
+    num_reviews_with_content: { count: number }[];
 };
 
 // photos:pub_photos!pub_photos_pub_id_fkey,
@@ -31,6 +32,7 @@ rating:get_pub_rating,
 opening_hours(*),
 saved:saves(count),
 num_reviews:reviews(count),
+num_reviews_with_content:reviews(count),
 review_ones:reviews(count),
 review_twos:reviews(count),
 review_threes:reviews(count),
@@ -47,6 +49,7 @@ export const pubQuery = (userId: string) =>
     supabase
         .from('pubs')
         .select(pubQueryString)
+        .neq('num_reviews_with_content.content', null)
         .eq('review_ones.rating', 1)
         .eq('review_twos.rating', 2)
         .eq('review_threes.rating', 3)

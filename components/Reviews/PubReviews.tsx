@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import Review from '@/components/Reviews/Review';
 import { v4 as uuidv4 } from 'uuid';
-import ReviewPubButton from '@/components/Reviews/ReviewPubButton';
 import { useSharedPubViewContext } from '@/context/pubViewContext';
 import { reviewListQuery } from '@/services/queries/review';
 import { FetchPubType } from '@/services/queries/pub';
@@ -15,57 +14,99 @@ type PubReviewsProps = {
 
 export default function PubReviews({ pub }: PubReviewsProps) {
     const [isLoading, setIsLoading] = useState(false);
-    const [hasLoaded, setHasLoaded] = useState(false);
 
-    const { reviews, setReviews } = useSharedPubViewContext();
+    const {
+        reviews,
+        setReviews,
+        userReview,
+        setUserReview,
+        hasLoadedReviews: hasLoaded,
+        setHasLoadedReviews: setHasLoaded,
+    } = useSharedPubViewContext();
 
     useEffect(() => {
-        const fetchReviews = async () => {
-            setIsLoading(true);
+        const fetchReviews = () =>
+            new Promise<void>(async (resolve, reject) => {
+                const { data: userData } = await supabase.auth.getUser();
 
-            const { data: userData } = await supabase.auth.getUser();
+                let query = reviewListQuery()
+                    .eq('pub_id', pub.id)
+                    // If not logged in, generate random UUID so this shows up as 0.
+                    .eq('liked.user_id', userData.user?.id || uuidv4())
+                    .neq('content', null)
+                    .neq('content', '');
 
-            let query = reviewListQuery()
-                .eq('pub_id', pub.id)
-                // If not logged in, generate random UUID so this shows up as 0.
-                .eq('liked.user_id', userData.user?.id || uuidv4())
-                .neq('content', null)
-                .neq('content', '');
+                if (userData.user?.id) {
+                    query = query.neq('user_id', userData.user?.id || '');
+                }
 
-            if (userData.user?.id) {
-                query = query.neq('user_id', userData.user?.id || '');
-            }
+                const { data, error } = await query.order('created_at', {
+                    ascending: false,
+                });
 
-            const { data, error } = await query.order('created_at', {
-                ascending: false,
+                if (error) {
+                    console.error(error);
+                    return reject(error);
+                }
+
+                setReviews(data);
+                resolve();
             });
 
-            if (error) {
-                console.error(error);
-                return;
-            }
+        const fetchUserReview = () =>
+            new Promise<void>(async (resolve, reject) => {
+                const { data: userData, error: userError } =
+                    await supabase.auth.getUser();
 
-            setReviews(data);
-            setIsLoading(false);
-            setHasLoaded(true);
-        };
+                if (userError) {
+                    console.error(userError);
+                    return reject(userError);
+                }
+
+                const { data, error } = await reviewListQuery()
+                    .eq('pub_id', pub.id)
+                    .eq('user_id', userData.user.id)
+                    .eq('liked.user_id', userData.user.id)
+                    .limit(1)
+                    .maybeSingle();
+
+                if (error) {
+                    console.error(error);
+                    setUserReview(null);
+                    return reject(error);
+                }
+
+                setUserReview(data);
+                resolve();
+            });
 
         if (reviews.length) {
             setHasLoaded(true);
         }
 
         if (!hasLoaded) {
-            fetchReviews();
+            (async () => {
+                setIsLoading(true);
+                await Promise.allSettled([fetchReviews(), fetchUserReview()]);
+                setIsLoading(false);
+                setHasLoaded(true);
+            })();
         }
-    }, [pub, reviews, setIsLoading, setReviews, hasLoaded]);
+    }, [pub, reviews, setReviews, setUserReview, hasLoaded, setHasLoaded]);
 
     return (
         <View>
-            <ReviewPubButton pub={pub} />
             {!isLoading ? (
                 <View>
-                    {reviews.map(review => (
-                        <Review review={review} key={review.id} />
+                    {userReview && (
+                        <Review review={userReview} noBorder={true} />
+                    )}
+                    {reviews.map((review, index) => (
+                        <Review
+                            review={review}
+                            key={review.id}
+                            noBorder={!userReview && index === 0}
+                        />
                     ))}
                 </View>
             ) : (

@@ -56,6 +56,7 @@ export default function PubView({
     const [distMeters, setDistMeters] = useState(0);
     const [reviews, setReviews] = useState<ListReviewType[]>([]);
     const [userReview, setUserReview] = useState<ListReviewType | null>(null);
+    const [hasLoadedReviews, setHasLoadedReviews] = useState(false);
 
     const { width } = useWindowDimensions();
     const insets = useSafeAreaInsets();
@@ -262,6 +263,8 @@ export default function PubView({
                 setReviews,
                 userReview,
                 setUserReview,
+                hasLoadedReviews,
+                setHasLoadedReviews,
             }}>
             <View style={styles.container}>
                 {/* Top image with expanding container */}
@@ -459,7 +462,7 @@ export default function PubView({
                                 <TopTabs
                                     data={[
                                         {
-                                            title: `Reviews (${pub.num_reviews[0].count})`,
+                                            title: `Reviews (${pub.num_reviews_with_content[0].count})`,
                                             component: <PubReviews pub={pub} />,
                                         },
                                         {

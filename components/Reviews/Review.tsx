@@ -1,14 +1,5 @@
-import React, { useState, useCallback } from 'react';
-import {
-    View,
-    Text,
-    StyleSheet,
-    TextLayoutEventData,
-    NativeSyntheticEvent,
-    TouchableOpacity,
-    TouchableHighlight,
-} from 'react-native';
-import { fromNowString } from '@/services';
+import React from 'react';
+import { View, Text, StyleSheet, TouchableHighlight } from 'react-native';
 import UserAvatar from '@/components/User/UserAvatar';
 import { ListReviewType } from '@/services/queries/review';
 import { useNavigation } from '@react-navigation/native';
@@ -23,21 +14,7 @@ type ReviewProps = {
 const MAX_LINES_LENGTH = 4;
 
 export default function Review({ review, noBorder }: ReviewProps) {
-    const [textShown, setTextShown] = useState(false);
-    const [lengthMore, setLengthMore] = useState(false);
-
     const navigation = useNavigation();
-
-    const onTextLayout = useCallback(
-        (e: NativeSyntheticEvent<TextLayoutEventData>) => {
-            setLengthMore(e.nativeEvent.lines.length >= MAX_LINES_LENGTH);
-        },
-        [],
-    );
-
-    const toggleText = () => {
-        setTextShown(!textShown);
-    };
 
     return (
         <TouchableHighlight
@@ -52,23 +29,26 @@ export default function Review({ review, noBorder }: ReviewProps) {
             }>
             <View>
                 <View style={styles.headerContainer}>
-                    <View style={styles.avatarContainer}>
-                        <UserAvatar
-                            size={32}
-                            photo={review.user.profile_photo || ''}
+                    <View style={styles.starsContainer}>
+                        <RatingsStarViewer
+                            amount={review.rating}
+                            size={14}
+                            padding={1}
                         />
                     </View>
-                    <View style={styles.headerTextContainer}>
-                        <Text style={styles.nameText}>{review.user.name}</Text>
-                        <View style={styles.bottomHeaderRow}>
-                            <RatingsStarViewer
-                                amount={review.rating}
-                                size={14}
-                                padding={1}
-                            />
-                            <Text style={styles.dateText}>
-                                {fromNowString(review.created_at)}
+
+                    <View style={styles.userContainer}>
+                        <View style={styles.usernameContainer}>
+                            <Text style={styles.usernameText}>
+                                {review.user.username}
                             </Text>
+                        </View>
+
+                        <View style={styles.avatarContainer}>
+                            <UserAvatar
+                                size={20}
+                                photo={review.user.profile_photo || ''}
+                            />
                         </View>
                     </View>
                 </View>
@@ -80,23 +60,9 @@ export default function Review({ review, noBorder }: ReviewProps) {
                 <View style={styles.contentContainer}>
                     <Text
                         style={styles.contentText}
-                        numberOfLines={textShown ? undefined : MAX_LINES_LENGTH}
-                        onTextLayout={onTextLayout}>
+                        numberOfLines={MAX_LINES_LENGTH}>
                         {review.content}
                     </Text>
-                    {lengthMore ? (
-                        <TouchableOpacity
-                            onPress={toggleText}
-                            style={
-                                textShown
-                                    ? styles.seeLessContainer
-                                    : styles.seeMoreContainer
-                            }>
-                            <Text style={styles.toggleTextText}>
-                                {textShown ? 'See Less' : '... See More'}
-                            </Text>
-                        </TouchableOpacity>
-                    ) : undefined}
                 </View>
             </View>
         </TouchableHighlight>
@@ -116,28 +82,24 @@ const styles = StyleSheet.create({
     headerContainer: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between',
         paddingHorizontal: 25,
     },
     avatarContainer: {},
-    headerTextContainer: {
-        paddingLeft: 10,
+    usernameContainer: {
+        marginRight: 10,
     },
-    bottomHeaderRow: {
+    starsContainer: {
         flexDirection: 'row',
-        paddingTop: 4,
         alignItems: 'center',
     },
-    starContainer: {
-        paddingHorizontal: 2,
+    userContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
     },
-    nameText: {
-        fontSize: 16,
-        fontWeight: '500',
-    },
-    dateText: {
+    usernameText: {
         fontSize: 12,
-        opacity: 0.4,
-        paddingLeft: 5,
+        fontWeight: '600',
     },
     optionsContainer: {
         paddingTop: 10,
@@ -153,23 +115,5 @@ const styles = StyleSheet.create({
     },
     seeLessContainer: {
         alignSelf: 'flex-end',
-    },
-    seeMoreContainer: {
-        alignSelf: 'flex-end',
-        marginTop: -17,
-        backgroundColor: 'white',
-    },
-    toggleTextText: {
-        color: '#A3A3A3',
-    },
-    isHelpfulContainer: {
-        paddingTop: 15,
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    likedText: {
-        marginLeft: 3,
-        fontWeight: '300',
-        fontSize: 10,
     },
 });

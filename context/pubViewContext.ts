@@ -6,6 +6,8 @@ type PubViewContext = {
     setReviews: Dispatch<SetStateAction<ListReviewType[]>>;
     userReview: ListReviewType | null;
     setUserReview: Dispatch<SetStateAction<ListReviewType | null>>;
+    hasLoadedReviews: boolean;
+    setHasLoadedReviews: Dispatch<SetStateAction<boolean>>;
 };
 
 export const PubViewContext = createContext<PubViewContext | null>(null);

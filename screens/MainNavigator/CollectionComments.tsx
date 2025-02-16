@@ -163,6 +163,7 @@ export default function CollectionComments({
                 <View style={styles.createCommentContainer}>
                     <View style={styles.commentInputContainer}>
                         <TextInput
+                            onSubmitEditing={createComment}
                             autoFocus={route.params.focusOnOpen}
                             ref={inputRef}
                             value={createCommentText}
