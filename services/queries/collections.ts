@@ -92,6 +92,7 @@ export type CollectionType = Tables<'collections'> & {
     is_followed: { count: number }[];
     is_liked: { count: number }[];
     likes: { count: number }[];
+    comments: { count: number }[];
 };
 
 const collectionQueryString = `
@@ -126,7 +127,8 @@ collaborators:collection_collaborations(
         profile_photo,
         username
     )
-)
+),
+comments:collection_comments(count)
 ` as const;
 
 export const collectionQuery = (userId: string) =>

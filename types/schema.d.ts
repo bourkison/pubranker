@@ -143,7 +143,7 @@ export type Database = {
           content: string
           created_at?: string
           id?: number
-          user_id: string
+          user_id?: string
         }
         Update: {
           collection_id?: number
@@ -992,6 +992,20 @@ export type Database = {
           rating: number
           photos: string[]
         }[]
+      }
+      is_collaborator: {
+        Args: {
+          _user_id: string
+          _collection_id: number
+        }
+        Returns: boolean
+      }
+      is_friends: {
+        Args: {
+          _user_one: string
+          _user_two: string
+        }
+        Returns: boolean
       }
       validate_favourites_limit_three: {
         Args: {

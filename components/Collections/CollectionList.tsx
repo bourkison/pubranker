@@ -88,6 +88,18 @@ export default function CollectionList({
         return collection.is_liked[0].count > 0;
     }, [collection]);
 
+    const commentText = useMemo<string>(() => {
+        if (!collection) {
+            return 'Comment';
+        }
+
+        if (collection.comments[0].count > 0) {
+            return `${collection.comments[0].count} comments`;
+        }
+
+        return 'Comment';
+    }, [collection]);
+
     const toggleFollow = useCallback(async () => {
         if (!collection || isFollowing) {
             return;
@@ -411,7 +423,7 @@ export default function CollectionList({
                         style={styles.commentContainer}
                         entering={FadeIn.duration(150)}
                         exiting={FadeOut.duration(150)}>
-                        <Text style={styles.commentText}>Comment</Text>
+                        <Text style={styles.commentText}>{commentText}</Text>
                     </Animated.View>
                 </Pressable>
             )}
@@ -501,6 +513,12 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         backgroundColor: PRIMARY_COLOR,
         borderRadius: 20,
+        shadowColor: '#000',
+        shadowOpacity: 0.3,
+        shadowOffset: {
+            height: 0,
+            width: 0,
+        },
     },
     commentText: {
         color: '#FFF',
