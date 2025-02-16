@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
     View,
     Text,
@@ -34,6 +34,7 @@ export default function CollectionComments({
     const [isLoading, setIsLoading] = useState(false);
     const [comments, setComments] = useState<CollectionComment[]>([]);
     const [isCreatingComment, setIsCreatingComment] = useState(false);
+    const inputRef = useRef<TextInput>(null);
 
     useEffect(() => {
         (async () => {
@@ -80,6 +81,7 @@ export default function CollectionComments({
         }
 
         setCreateCommentText('');
+        inputRef.current?.blur();
         setComments([data, ...comments]);
         setIsCreatingComment(false);
     }, [createCommentText, route, comments, isCreatingComment]);
@@ -157,13 +159,16 @@ export default function CollectionComments({
 
             <KeyboardAvoidingView
                 behavior="padding"
-                keyboardVerticalOffset={72}>
+                keyboardVerticalOffset={64}>
                 <View style={styles.createCommentContainer}>
                     <View style={styles.commentInputContainer}>
                         <TextInput
+                            autoFocus={route.params.focusOnOpen}
+                            ref={inputRef}
                             value={createCommentText}
                             onChangeText={setCreateCommentText}
                             placeholder="Add a comment..."
+                            style={styles.commentInput}
                         />
                     </View>
 
@@ -245,5 +250,8 @@ const styles = StyleSheet.create({
     createCommentText: {
         fontWeight: '500',
         marginLeft: 10,
+    },
+    commentInput: {
+        paddingVertical: 0,
     },
 });

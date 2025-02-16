@@ -23,6 +23,7 @@ import { FetchPubType, pubQuery } from '@/services/queries/pub';
 type ActionSheetOptions =
     | 'Edit'
     | 'Add Pub'
+    | 'Add Comment'
     | 'Delete'
     | 'Cancel'
     | 'Report'
@@ -70,20 +71,27 @@ export default function CollectionView({
                 return [
                     'Add Collaborator',
                     'Add Pub',
+                    'Add Comment',
                     'Edit',
                     'Delete',
                     'Cancel',
                 ];
             }
 
-            return ['Add Pub', 'Edit', 'Delete', 'Cancel'];
+            return ['Add Pub', 'Add Comment', 'Edit', 'Delete', 'Cancel'];
         }
 
         if (isCollaborator) {
-            return ['Add Collaborator', 'Add Pub', 'Delete', 'Cancel'];
+            return [
+                'Add Collaborator',
+                'Add Comment',
+                'Add Pub',
+                'Delete',
+                'Cancel',
+            ];
         }
 
-        return ['Report', 'Cancel'];
+        return ['Report', 'Add Comment', 'Cancel'];
     }, [collection, isOwnedCollection, isCollaborator]);
 
     const loadData = useCallback(
@@ -347,6 +355,11 @@ export default function CollectionView({
                 if (menuActionSheetOptions[selected] === 'Edit') {
                     navigation.navigate('EditCollection', {
                         collection,
+                    });
+                } else if (menuActionSheetOptions[selected] === 'Add Comment') {
+                    navigation.navigate('CollectionComments', {
+                        collectionId: collection.id,
+                        focusOnOpen: true,
                     });
                 } else if (menuActionSheetOptions[selected] === 'Add Pub') {
                     addPubToCollection();

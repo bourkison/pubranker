@@ -126,6 +126,7 @@ export type RootStackParamList = {
     };
     CollectionComments: {
         collectionId: number;
+        focusOnOpen?: boolean;
     };
 };
 

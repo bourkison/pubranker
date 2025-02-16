@@ -206,7 +206,6 @@ export default function CollectionList({
                 }) => {
                     showComments(y);
                 }}
-                scrollEventThrottle={100}
                 data={collection?.collection_items || []}
                 keyExtractor={item => item.pub.id.toString()}
                 onRefresh={refresh}
