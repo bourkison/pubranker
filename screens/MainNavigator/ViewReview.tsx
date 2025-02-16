@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 import {
     View,
     Text,
@@ -9,6 +15,7 @@ import {
     Image,
     Pressable,
     FlatList,
+    KeyboardAvoidingView,
 } from 'react-native';
 import { Ionicons, SimpleLineIcons } from '@expo/vector-icons';
 import UserAvatar from '@/components/User/UserAvatar';
@@ -18,12 +25,12 @@ import dayjs from 'dayjs';
 import LikeReviewButton from '@/components/Reviews/LikeReviewButton';
 import Comment from '@/components/Comments/Comment';
 import { PRIMARY_COLOR } from '@/constants';
-import * as Haptics from 'expo-haptics';
 import ReviewAttributes from '@/components/Reviews/ReviewAttributes';
 import { reviewQuery, ReviewType } from '@/services/queries/review';
 import { v4 as uuidv4 } from 'uuid';
 import { RootStackScreenProps } from '@/types/nav';
 import { StackActions } from '@react-navigation/native';
+import { TextInput } from 'react-native-gesture-handler';
 
 const NO_IMAGE = require('@/assets/noimage.png');
 
@@ -37,10 +44,12 @@ export default function ViewReview({
 }: RootStackScreenProps<'ViewReview'>) {
     const [isLoading, setIsLoading] = useState(false);
     const [review, setReview] = useState<ReviewType>();
-
-    const [imageUrl, setImageUrl] = useState('');
+    const [createCommentText, setCreateCommentText] = useState('');
+    const [isCreatingComment, setIsCreatingComment] = useState(false);
 
     const [contentWidth, setContentWidth] = useState(1);
+
+    const inputRef = useRef<TextInput>(null);
 
     const IMAGE_WIDTH = useMemo(
         () => contentWidth * WIDTH_PERCENTAGE,
@@ -55,6 +64,22 @@ export default function ViewReview({
         return review.liked[0].count > 0;
     }, [review]);
 
+    const image = useMemo(() => {
+        if (!review) {
+            return NO_IMAGE;
+        }
+
+        if (review.pub.primary_photo) {
+            return {
+                uri: supabase.storage
+                    .from('pubs')
+                    .getPublicUrl(review.pub.primary_photo).data.publicUrl,
+            };
+        }
+
+        return NO_IMAGE;
+    }, [review]);
+
     useEffect(() => {
         const fetchReview = async () => {
             setIsLoading(true);
@@ -66,6 +91,10 @@ export default function ViewReview({
                 // If not logged in, generate random UUID so this shows up as 0.
                 .eq('liked.user_id', userData.user?.id || uuidv4())
                 .eq('comments.liked.user_id', userData.user?.id || uuidv4())
+                .order('created_at', {
+                    ascending: false,
+                    referencedTable: 'comments',
+                })
                 .limit(1)
                 .single();
 
@@ -74,14 +103,6 @@ export default function ViewReview({
             if (error) {
                 console.error(error);
                 return;
-            }
-
-            if (data.pub.primary_photo) {
-                const url = supabase.storage
-                    .from('pubs')
-                    .getPublicUrl(data.pub.primary_photo);
-
-                setImageUrl(url.data.publicUrl);
             }
 
             setReview(data);
@@ -169,56 +190,44 @@ export default function ViewReview({
     );
 
     const createComment = useCallback(async () => {
-        Haptics.selectionAsync();
+        if (!review) {
+            return;
+        }
 
-        navigation.navigate('CreateComment', {
-            reviewId: route.params.reviewId,
-            onCreate: async comment => {
-                if (!review) {
-                    console.warn('onCreateComment called with no review');
-                    return;
-                }
+        setIsCreatingComment(true);
 
-                const { data: userData } = await supabase.auth.getUser();
+        const { data, error } = await supabase
+            .from('comments')
+            .insert({
+                content: createCommentText,
+                review_id: review.id,
+            })
+            .select('*, user:users_public(id, username, profile_photo)')
+            .limit(1)
+            .single();
 
-                if (!userData.user) {
-                    console.warn('onCreateComment called with no user');
-                    return;
-                }
+        if (error) {
+            console.error(error);
+            setIsCreatingComment(false);
+            return;
+        }
 
-                // TODO: Store this info in store.
-                const { data: userPublicData, error: userPublicError } =
-                    await supabase
-                        .from('users_public')
-                        .select('id, name, profile_photo')
-                        .eq('id', userData.user.id)
-                        .limit(1)
-                        .single();
-
-                if (userPublicError) {
-                    console.error(userPublicError);
-                    return;
-                }
-
-                setReview({
-                    ...review,
-                    comments: [
-                        ...review.comments,
-                        {
-                            ...comment,
-                            liked: [{ count: 0 }],
-                            like_amount: [{ count: 0 }],
-                            user: {
-                                id: userData.user.id,
-                                name: userPublicData.name,
-                                profile_photo: userPublicData.profile_photo,
-                            },
-                        },
-                    ],
-                });
-            },
+        setReview({
+            ...review,
+            comments: [
+                {
+                    ...data,
+                    liked: [{ count: 0 }],
+                    like_amount: [{ count: 0 }],
+                },
+                ...review.comments,
+            ],
         });
-    }, [navigation, review, route]);
+
+        setIsCreatingComment(false);
+        setCreateCommentText('');
+        inputRef.current?.blur();
+    }, [review, createCommentText]);
 
     if (isLoading) {
         return <ActivityIndicator />;
@@ -253,25 +262,12 @@ export default function ViewReview({
             <FlatList
                 data={review.comments}
                 style={styles.flexOne}
+                keyboardDismissMode="on-drag"
                 ListEmptyComponent={
                     <View>
                         <Text>No comments</Text>
                     </View>
                 }
-                renderItem={({ item, index }) => (
-                    <Comment
-                        comment={item}
-                        index={index}
-                        onLikeCommence={setCommentToLiked}
-                        onUnlikeCommence={setCommentToUnliked}
-                        onLikeComplete={(i, success) =>
-                            !success ? setCommentToUnliked(i) : undefined
-                        }
-                        onUnlikeComplete={(i, success) =>
-                            !success ? setCommentToLiked(i) : undefined
-                        }
-                    />
-                )}
                 ListHeaderComponent={
                     <View>
                         <View style={styles.contentContainer}>
@@ -356,11 +352,7 @@ export default function ViewReview({
                                             { width: IMAGE_WIDTH },
                                         ]}>
                                         <Image
-                                            source={
-                                                imageUrl
-                                                    ? { uri: imageUrl }
-                                                    : NO_IMAGE
-                                            }
+                                            source={image}
                                             style={[
                                                 styles.pubImage,
                                                 {
@@ -405,15 +397,46 @@ export default function ViewReview({
                         </View>
 
                         <View style={styles.scrollableTagsContainer}>
-                            <ReviewAttributes
-                                review={review}
-                                withComment={true}
-                                onCreateCommentPress={createComment}
-                            />
+                            <ReviewAttributes review={review} />
                         </View>
                     </View>
                 }
+                renderItem={({ item, index }) => (
+                    <Comment
+                        comment={item}
+                        index={index}
+                        onLikeCommence={setCommentToLiked}
+                        onUnlikeCommence={setCommentToUnliked}
+                        onLikeComplete={(i, success) =>
+                            !success ? setCommentToUnliked(i) : undefined
+                        }
+                        onUnlikeComplete={(i, success) =>
+                            !success ? setCommentToLiked(i) : undefined
+                        }
+                    />
+                )}
             />
+
+            <KeyboardAvoidingView behavior="padding">
+                <View style={styles.createCommentContainer}>
+                    <View style={styles.commentInputContainer}>
+                        <TextInput
+                            onSubmitEditing={createComment}
+                            ref={inputRef}
+                            value={createCommentText}
+                            onChangeText={setCreateCommentText}
+                            placeholder="Add a comment..."
+                            style={styles.commentInput}
+                        />
+                    </View>
+
+                    <TouchableOpacity
+                        onPress={createComment}
+                        disabled={isCreatingComment}>
+                        <Text style={styles.createCommentText}>Comment</Text>
+                    </TouchableOpacity>
+                </View>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     );
 }
@@ -521,7 +544,6 @@ const styles = StyleSheet.create({
     },
     scrollableTagsContainer: {
         paddingVertical: 10,
-        paddingHorizontal: 15,
     },
     createCommentButtonContainer: {
         backgroundColor: PRIMARY_COLOR,
@@ -530,8 +552,27 @@ const styles = StyleSheet.create({
         paddingVertical: 5,
     },
     createCommentText: {
-        fontSize: 12,
-        color: '#FFF',
         fontWeight: '500',
+        marginLeft: 10,
+    },
+    createCommentContainer: {
+        borderTopWidth: 1,
+        borderColor: '#E5E7EB',
+        paddingVertical: 15,
+        paddingHorizontal: 20,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    commentInputContainer: {
+        flex: 1,
+        borderColor: '#E5E7EB',
+        borderWidth: 1,
+        borderRadius: 25,
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+    },
+    commentInput: {
+        paddingVertical: 0,
     },
 });

@@ -1,41 +1,22 @@
 import { PRIMARY_COLOR } from '@/constants';
-import { ListReviewType } from '@/services/queries/review';
+import { ReviewType } from '@/services/queries/review';
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native';
 
-type ReviewAttributesProps =
-    | {
-          review: ListReviewType;
-          withComment?: false;
-      }
-    | {
-          review: ListReviewType;
-          withComment: true;
-          onCreateCommentPress: () => void;
-      };
+type ReviewAttributesProps = {
+    review: ReviewType;
+};
 
-export default function ReviewAttributes(props: ReviewAttributesProps) {
+export default function ReviewAttributes({ review }: ReviewAttributesProps) {
     return (
         <ScrollView
             horizontal={true}
             showsHorizontalScrollIndicator={false}
-            bounces={false}>
+            contentContainerStyle={styles.contentContainer}
+            bounces={true}>
             <Pressable style={styles.container}>
-                {props.withComment === true ? (
-                    <Pressable
-                        style={[
-                            styles.generalContainer,
-                            styles.positiveContainer,
-                        ]}
-                        onPress={props.onCreateCommentPress}>
-                        <Text style={[styles.generalText, styles.positiveText]}>
-                            Comment
-                        </Text>
-                    </Pressable>
-                ) : undefined}
-
                 {/* Positive attributes */}
-                {props.review.vibe === true ? (
+                {review.vibe === true ? (
                     <View
                         style={[
                             styles.generalContainer,
@@ -47,7 +28,7 @@ export default function ReviewAttributes(props: ReviewAttributesProps) {
                     </View>
                 ) : undefined}
 
-                {props.review.service === true ? (
+                {review.service === true ? (
                     <View
                         style={[
                             styles.generalContainer,
@@ -59,7 +40,7 @@ export default function ReviewAttributes(props: ReviewAttributesProps) {
                     </View>
                 ) : undefined}
 
-                {props.review.beer === true ? (
+                {review.beer === true ? (
                     <View
                         style={[
                             styles.generalContainer,
@@ -71,7 +52,7 @@ export default function ReviewAttributes(props: ReviewAttributesProps) {
                     </View>
                 ) : undefined}
 
-                {props.review.food === true ? (
+                {review.food === true ? (
                     <View
                         style={[
                             styles.generalContainer,
@@ -83,7 +64,7 @@ export default function ReviewAttributes(props: ReviewAttributesProps) {
                     </View>
                 ) : undefined}
 
-                {props.review.location === true ? (
+                {review.location === true ? (
                     <View
                         style={[
                             styles.generalContainer,
@@ -95,7 +76,7 @@ export default function ReviewAttributes(props: ReviewAttributesProps) {
                     </View>
                 ) : undefined}
 
-                {props.review.music === true ? (
+                {review.music === true ? (
                     <View
                         style={[
                             styles.generalContainer,
@@ -108,7 +89,7 @@ export default function ReviewAttributes(props: ReviewAttributesProps) {
                 ) : undefined}
 
                 {/* Negative attributes */}
-                {props.review.vibe === false ? (
+                {review.vibe === false ? (
                     <View
                         style={[
                             styles.generalContainer,
@@ -120,7 +101,7 @@ export default function ReviewAttributes(props: ReviewAttributesProps) {
                     </View>
                 ) : undefined}
 
-                {props.review.service === false ? (
+                {review.service === false ? (
                     <View
                         style={[
                             styles.generalContainer,
@@ -132,7 +113,7 @@ export default function ReviewAttributes(props: ReviewAttributesProps) {
                     </View>
                 ) : undefined}
 
-                {props.review.beer === false ? (
+                {review.beer === false ? (
                     <View
                         style={[
                             styles.generalContainer,
@@ -144,7 +125,7 @@ export default function ReviewAttributes(props: ReviewAttributesProps) {
                     </View>
                 ) : undefined}
 
-                {props.review.food === false ? (
+                {review.food === false ? (
                     <View
                         style={[
                             styles.generalContainer,
@@ -156,7 +137,7 @@ export default function ReviewAttributes(props: ReviewAttributesProps) {
                     </View>
                 ) : undefined}
 
-                {props.review.location === false ? (
+                {review.location === false ? (
                     <View
                         style={[
                             styles.generalContainer,
@@ -168,7 +149,7 @@ export default function ReviewAttributes(props: ReviewAttributesProps) {
                     </View>
                 ) : undefined}
 
-                {props.review.music === false ? (
+                {review.music === false ? (
                     <View
                         style={[
                             styles.generalContainer,
@@ -188,6 +169,9 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
         paddingLeft: 15,
+    },
+    contentContainer: {
+        paddingHorizontal: 15,
     },
     generalContainer: {
         paddingVertical: 5,

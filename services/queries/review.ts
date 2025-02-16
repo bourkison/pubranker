@@ -31,7 +31,6 @@ export const reviewListQuery = () =>
 export type ReviewType = Tables<'reviews'> & {
     user: {
         id: string;
-        name: string;
         username: string;
         profile_photo: string | null;
     };
@@ -46,12 +45,12 @@ export type ReviewType = Tables<'reviews'> & {
     comments: (Tables<'comments'> & {
         liked: { count: number }[];
         like_amount: { count: number }[];
-        user: { id: string; name: string; profile_photo: string | null };
+        user: { id: string; username: string; profile_photo: string | null };
     })[];
 };
 
 export const reviewQueryString = `*,
-user:users_public(id, name, username, profile_photo),
+user:users_public(id, username, profile_photo),
 liked:review_likes(count),
 like_amount:review_likes(count),
 pub:pubs(id, name, address, primary_photo),
@@ -59,7 +58,7 @@ comments(
     *,
     liked:comment_likes(count),
     like_amount:comment_likes(count),
-    user:users_public(id, name, profile_photo)
+    user:users_public(id, username, profile_photo)
 )` as const;
 
 export const reviewQuery = () =>

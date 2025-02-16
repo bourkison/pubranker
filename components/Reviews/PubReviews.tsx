@@ -12,6 +12,8 @@ type PubReviewsProps = {
     pub: FetchPubType;
 };
 
+const NUM_REVIEWS_TO_SHOW = 10;
+
 export default function PubReviews({ pub }: PubReviewsProps) {
     const [isLoading, setIsLoading] = useState(false);
 
@@ -34,7 +36,8 @@ export default function PubReviews({ pub }: PubReviewsProps) {
                     // If not logged in, generate random UUID so this shows up as 0.
                     .eq('liked.user_id', userData.user?.id || uuidv4())
                     .neq('content', null)
-                    .neq('content', '');
+                    .neq('content', '')
+                    .limit(NUM_REVIEWS_TO_SHOW);
 
                 if (userData.user?.id) {
                     query = query.neq('user_id', userData.user?.id || '');

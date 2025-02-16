@@ -4,7 +4,6 @@ import React from 'react';
 import PubView from '@/screens/MainNavigator/PubView';
 import CreateReview from '@/screens/MainNavigator/CreateReview';
 import ViewReview from '@/screens/MainNavigator/ViewReview';
-import CreateComment from '@/screens/MainNavigator/CreateComment';
 import AddToList from '@/screens/MainNavigator/AddToList';
 import Profile from '@/screens/MainNavigator/Profile';
 import UserCollections from '@/screens/MainNavigator/UserCollections';
@@ -45,11 +44,6 @@ export default function MainNavigator() {
                 name="ViewReview"
                 component={ViewReview}
                 options={{ headerShown: false }}
-            />
-            <Stack.Screen
-                name="CreateComment"
-                component={CreateComment}
-                options={{ headerShown: false, presentation: 'modal' }}
             />
             <Stack.Screen
                 name="AddToList"

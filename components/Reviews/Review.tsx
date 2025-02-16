@@ -4,7 +4,6 @@ import UserAvatar from '@/components/User/UserAvatar';
 import { ListReviewType } from '@/services/queries/review';
 import { useNavigation } from '@react-navigation/native';
 import RatingsStarViewer from '@/components/Ratings/RatingsStarsViewer';
-import ReviewAttributes from '@/components/Reviews/ReviewAttributes';
 
 type ReviewProps = {
     review: ListReviewType;
@@ -51,10 +50,6 @@ export default function Review({ review, noBorder }: ReviewProps) {
                             />
                         </View>
                     </View>
-                </View>
-
-                <View style={styles.optionsContainer}>
-                    <ReviewAttributes review={review} withComment={false} />
                 </View>
 
                 <View style={styles.contentContainer}>

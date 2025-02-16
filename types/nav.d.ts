@@ -60,10 +60,6 @@ export type RootStackParamList = {
     ViewReview: {
         reviewId: number;
     };
-    CreateComment: {
-        reviewId: number;
-        onCreate: (comment: Tables<'comments'>) => void;
-    };
     AddToList: {
         pubId: number;
         name: string;

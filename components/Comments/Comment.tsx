@@ -132,7 +132,9 @@ export default function Comment({
                         size={22}
                     />
 
-                    <Text style={styles.usernameText}>{comment.user.name}</Text>
+                    <Text style={styles.usernameText}>
+                        {comment.user.username}
+                    </Text>
                 </Pressable>
                 <Text
                     style={styles.contentText}
