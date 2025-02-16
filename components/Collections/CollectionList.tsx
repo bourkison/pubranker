@@ -507,8 +507,8 @@ const styles = StyleSheet.create({
     commentContainer: {
         position: 'absolute',
         bottom: 15,
-        paddingHorizontal: 12,
-        paddingVertical: 10,
+        paddingHorizontal: 10,
+        paddingVertical: 8,
         alignSelf: 'center',
         backgroundColor: PRIMARY_COLOR,
         borderRadius: 20,
@@ -521,7 +521,7 @@ const styles = StyleSheet.create({
     },
     commentText: {
         color: '#FFF',
-        fontSize: 12,
+        fontSize: 10,
         fontWeight: '500',
     },
 });

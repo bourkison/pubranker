@@ -32,8 +32,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { RootStackScreenProps } from '@/types/nav';
 import { StackActions } from '@react-navigation/native';
 import { TextInput } from 'react-native-gesture-handler';
+import { useActionSheet } from '@expo/react-native-action-sheet';
 
 const NO_IMAGE = require('@/assets/noimage.png');
+
+type ActionSheetOptions = 'Edit Review' | 'Delete Review' | 'Report' | 'Cancel';
 
 const ASPECT_RATIO = 1;
 const WIDTH_PERCENTAGE = 0.3;
@@ -48,7 +51,11 @@ export default function ViewReview({
     const [createCommentText, setCreateCommentText] = useState('');
     const [isCreatingComment, setIsCreatingComment] = useState(false);
 
+    const [loggedInUser, setLoggedInUser] = useState<string>();
+
     const [contentWidth, setContentWidth] = useState(1);
+
+    const { showActionSheetWithOptions } = useActionSheet();
 
     const inputRef = useRef<TextInput>(null);
 
@@ -56,6 +63,18 @@ export default function ViewReview({
         () => contentWidth * WIDTH_PERCENTAGE,
         [contentWidth],
     );
+
+    const actionSheetOptions = useMemo<ActionSheetOptions[]>(() => {
+        if (!review) {
+            return [];
+        }
+
+        if (loggedInUser === review.user_id) {
+            return ['Edit Review', 'Delete Review', 'Cancel'];
+        }
+
+        return ['Report', 'Cancel'];
+    }, [review, loggedInUser]);
 
     const liked = useMemo<boolean>(() => {
         if (!review) {
@@ -86,6 +105,8 @@ export default function ViewReview({
             setIsLoading(true);
 
             const { data: userData } = await supabase.auth.getUser();
+
+            setLoggedInUser(userData.user?.id);
 
             const { data, error } = await reviewQuery()
                 .eq('id', route.params.reviewId)
@@ -230,6 +251,36 @@ export default function ViewReview({
         inputRef.current?.blur();
     }, [review, createCommentText]);
 
+    const showActionSheet = useCallback(() => {
+        showActionSheetWithOptions(
+            {
+                options: actionSheetOptions,
+                cancelButtonIndex: actionSheetOptions.length - 1,
+                tintColor: '#000',
+                cancelButtonTintColor: '#000',
+            },
+            selected => {
+                if (selected === undefined || !review) {
+                    return;
+                }
+
+                if (actionSheetOptions[selected] === 'Edit Review') {
+                    navigation.navigate('CreateReview', {
+                        pubId: review.pub_id,
+                    });
+                }
+
+                if (actionSheetOptions[selected] === 'Delete Review') {
+                    console.log('Delete');
+                }
+
+                if (actionSheetOptions[selected] === 'Report') {
+                    console.log('Report');
+                }
+            },
+        );
+    }, [review, actionSheetOptions, navigation, showActionSheetWithOptions]);
+
     if (isLoading) {
         return <ActivityIndicator />;
     }
@@ -241,8 +292,6 @@ export default function ViewReview({
             </View>
         );
     }
-
-    console.log('IMAGE', image);
 
     return (
         <SafeAreaView style={styles.flexOne}>
@@ -257,7 +306,9 @@ export default function ViewReview({
                     <Text style={styles.headerText}>Review</Text>
                 </View>
 
-                <TouchableOpacity style={styles.menuContainer}>
+                <TouchableOpacity
+                    style={styles.menuContainer}
+                    onPress={showActionSheet}>
                     <SimpleLineIcons name="options" size={14} />
                 </TouchableOpacity>
             </View>

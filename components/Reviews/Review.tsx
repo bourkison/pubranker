@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableHighlight } from 'react-native';
 import UserAvatar from '@/components/User/UserAvatar';
 import { ListReviewType } from '@/services/queries/review';
-import { useNavigation } from '@react-navigation/native';
+import { StackActions, useNavigation } from '@react-navigation/native';
 import RatingsStarViewer from '@/components/Ratings/RatingsStarsViewer';
 
 type ReviewProps = {
@@ -23,9 +23,12 @@ export default function Review({ review, noBorder }: ReviewProps) {
                 styles.container,
                 noBorder === true ? styles.noBorder : undefined,
             ]}
-            onPress={() =>
-                navigation.navigate('ViewReview', { reviewId: review.id })
-            }>
+            onPress={() => {
+                const pushAction = StackActions.push('ViewReview', {
+                    reviewId: review.id,
+                });
+                navigation.dispatch(pushAction);
+            }}>
             <View>
                 <View style={styles.headerContainer}>
                     <View style={styles.starsContainer}>

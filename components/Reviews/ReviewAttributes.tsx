@@ -168,7 +168,7 @@ export default function ReviewAttributes({ review }: ReviewAttributesProps) {
 const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
-        paddingLeft: 15,
+        paddingLeft: 5,
     },
     contentContainer: {
         paddingHorizontal: 15,

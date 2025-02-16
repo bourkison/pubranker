@@ -1,8 +1,15 @@
 import RatingsSelector from '@/components/Ratings/RatingsSelector';
-import { SECONDARY_COLOR } from '@/constants';
+import { PRIMARY_COLOR } from '@/constants';
 import { supabase } from '@/services/supabase';
-import { Database } from '@/types/schema';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Tables } from '@/types/schema';
+import React, {
+    Dispatch,
+    SetStateAction,
+    useCallback,
+    useEffect,
+    useMemo,
+    useState,
+} from 'react';
 import {
     View,
     Text,
@@ -12,10 +19,12 @@ import {
     useWindowDimensions,
     TextInput,
     ScrollView,
+    SafeAreaView,
 } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { RootStackScreenProps } from '@/types/nav';
+import Header from '@/components/Utility/Header';
 
 const NO_IMAGE = require('@/assets/noimage.png');
 
@@ -29,8 +38,7 @@ export default function CreateReview({
     navigation,
 }: RootStackScreenProps<'CreateReview'>) {
     const [isLoading, setIsLoading] = useState(false);
-    const [pub, setPub] =
-        useState<Database['public']['Tables']['pubs']['Row']>();
+    const [pub, setPub] = useState<Tables<'pubs'>>();
     const [imageUrl, setImageUrl] = useState('');
 
     const [initialSaved, setInitialSaved] = useState(false);
@@ -38,16 +46,90 @@ export default function CreateReview({
 
     const [isCreating, setIsCreating] = useState(false);
 
-    const [review, setReview] = useState<
-        Database['public']['Tables']['reviews']['Insert']
-    >({
-        pub_id: route.params.pubId,
-        content: '',
-        rating: 0,
-    });
+    const [content, setContent] = useState('');
+    const [rating, setRating] = useState(0);
+    const [beer, setBeer] = useState<boolean | null>(null);
+    const [vibe, setVibe] = useState<boolean | null>(null);
+    const [music, setMusic] = useState<boolean | null>(null);
+    const [location, setLocation] = useState<boolean | null>(null);
+    const [service, setService] = useState<boolean | null>(null);
+    const [food, setFood] = useState<boolean | null>(null);
 
     const { width } = useWindowDimensions();
+
     const IMAGE_WIDTH = useMemo(() => width * WIDTH_PERCENTAGE, [width]);
+
+    const beerText = useMemo<string>(() => {
+        if (beer === null) {
+            return 'Beer?';
+        }
+
+        if (beer === false) {
+            return 'Bad Beer';
+        }
+
+        return 'Good Beer';
+    }, [beer]);
+
+    const vibeText = useMemo<string>(() => {
+        if (vibe === null) {
+            return 'Vibe?';
+        }
+
+        if (vibe === false) {
+            return 'Bad Vibe';
+        }
+
+        return 'Good Vibe';
+    }, [vibe]);
+
+    const musicText = useMemo<string>(() => {
+        if (music === null) {
+            return 'Music?';
+        }
+
+        if (music === false) {
+            return 'Bad Music';
+        }
+
+        return 'Good Music';
+    }, [music]);
+
+    const locationText = useMemo<string>(() => {
+        if (location === null) {
+            return 'Location?';
+        }
+
+        if (location === false) {
+            return 'Bad Location';
+        }
+
+        return 'Good Location';
+    }, [location]);
+
+    const serviceText = useMemo<string>(() => {
+        if (service === null) {
+            return 'Service?';
+        }
+
+        if (service === false) {
+            return 'Bad Service';
+        }
+
+        return 'Good Service';
+    }, [service]);
+
+    const foodText = useMemo<string>(() => {
+        if (food === null) {
+            return 'Food?';
+        }
+
+        if (food === false) {
+            return 'Bad Food';
+        }
+
+        return 'Good Food';
+    }, [food]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -98,7 +180,7 @@ export default function CreateReview({
                         .single();
 
                     if (error) {
-                        resolve();
+                        reject(error);
                         return;
                     }
 
@@ -129,11 +211,19 @@ export default function CreateReview({
                         .single();
 
                     if (error) {
-                        resolve();
+                        reject(error);
                         return;
                     }
 
-                    setReview(data);
+                    setContent(data.content || '');
+                    setRating(data.rating);
+                    setBeer(data.beer);
+                    setVibe(data.vibe);
+                    setLocation(data.location);
+                    setMusic(data.music);
+                    setService(data.service);
+                    setFood(data.food);
+
                     resolve();
                 });
             };
@@ -145,99 +235,134 @@ export default function CreateReview({
         fetchData();
     }, [route]);
 
-    const saveReview = useCallback(() => {
-        const save = async () => {
-            if (!pub) {
-                return;
-            }
+    const saveReview = useCallback(async () => {
+        if (!pub) {
+            return;
+        }
 
-            setIsCreating(true);
+        setIsCreating(true);
 
-            const { data: userData, error: userError } =
-                await supabase.auth.getUser();
+        const { data: userData, error: userError } =
+            await supabase.auth.getUser();
 
-            if (userError) {
-                console.error(userError);
-                setIsCreating(false);
-                return;
-            }
-
-            const { data, error } = await supabase
-                .from('reviews')
-                .upsert(
-                    {
-                        ...review,
-                        content: review.content?.trim(),
-                        pub_id: pub.id,
-                    },
-                    { onConflict: 'pub_id, user_id' },
-                )
-                .eq('pub_id', pub.id)
-                .eq('user_id', userData.user.id)
-                .select()
-                .limit(1)
-                .single();
-
-            if (error) {
-                console.error(error);
-                setIsCreating(false);
-                return;
-            }
-
-            if (initialSaved === false && saved === true) {
-                const { error: savesError } = await supabase
-                    .from('saves')
-                    .insert({ pub_id: pub.id });
-
-                if (savesError) {
-                    console.error(savesError);
-                }
-            } else if (initialSaved === true && saved === false) {
-                const { error: savesError } = await supabase
-                    .from('saves')
-                    .delete()
-                    .eq('pub_id', pub.id)
-                    .eq('user_id', userData.user.id);
-
-                if (savesError) {
-                    console.error(savesError);
-                }
-            }
-
+        if (userError) {
+            console.error(userError);
             setIsCreating(false);
-            navigation.replace('ViewReview', { reviewId: data.id });
-        };
+            return;
+        }
 
-        save();
-    }, [pub, review, saved, initialSaved, navigation]);
+        const { data, error } = await supabase
+            .from('reviews')
+            .upsert(
+                {
+                    content: content.trim(),
+                    pub_id: pub.id,
+                    rating,
+                    beer,
+                    vibe,
+                    music,
+                    service,
+                    location,
+                    food,
+                },
+                { onConflict: 'pub_id, user_id' },
+            )
+            .eq('pub_id', pub.id)
+            .eq('user_id', userData.user.id)
+            .select()
+            .limit(1)
+            .single();
+
+        if (error) {
+            console.error(error);
+            setIsCreating(false);
+            return;
+        }
+
+        if (initialSaved === false && saved === true) {
+            const { error: savesError } = await supabase
+                .from('saves')
+                .insert({ pub_id: pub.id });
+
+            if (savesError) {
+                console.error(savesError);
+            }
+        } else if (initialSaved === true && saved === false) {
+            const { error: savesError } = await supabase
+                .from('saves')
+                .delete()
+                .eq('pub_id', pub.id)
+                .eq('user_id', userData.user.id);
+
+            if (savesError) {
+                console.error(savesError);
+            }
+        }
+
+        setIsCreating(false);
+        navigation.replace('ViewReview', { reviewId: data.id });
+    }, [
+        pub,
+        saved,
+        initialSaved,
+        navigation,
+        beer,
+        content,
+        rating,
+        vibe,
+        music,
+        service,
+        location,
+        food,
+    ]);
+
+    const toggleAttribute = useCallback(
+        (
+            attribute: boolean | null,
+            setAttribute: Dispatch<SetStateAction<boolean | null>>,
+        ) => {
+            if (attribute === null) {
+                setAttribute(true);
+                return;
+            }
+
+            if (attribute === true) {
+                setAttribute(false);
+                return;
+            }
+
+            setAttribute(null);
+        },
+        [],
+    );
 
     return (
-        <View>
-            <View style={styles.headerContainer}>
-                <TouchableOpacity
-                    style={styles.cancelContainer}
-                    onPress={() => navigation.goBack()}>
-                    <Text>Cancel</Text>
-                </TouchableOpacity>
-
-                <View style={styles.headerTextContainer}>
-                    <Text style={styles.headerText}>Review</Text>
-                </View>
-
-                <TouchableOpacity
-                    disabled={isCreating}
-                    style={styles.saveContainer}
-                    onPress={saveReview}>
-                    {isCreating ? (
-                        <ActivityIndicator
-                            size={15}
-                            style={styles.creatingIndicator}
-                        />
-                    ) : (
-                        <Text style={styles.saveText}>Save</Text>
-                    )}
-                </TouchableOpacity>
-            </View>
+        <SafeAreaView style={styles.flexOne}>
+            <Header
+                header="Review"
+                leftColumn={
+                    <TouchableOpacity
+                        style={styles.cancelContainer}
+                        onPress={() => navigation.goBack()}>
+                        <Text>Cancel</Text>
+                    </TouchableOpacity>
+                }
+                rightColumn={
+                    <TouchableOpacity
+                        disabled={isCreating}
+                        style={styles.saveContainer}
+                        onPress={saveReview}>
+                        {isCreating ? (
+                            <ActivityIndicator
+                                size={15}
+                                style={styles.creatingIndicator}
+                            />
+                        ) : (
+                            <Text style={styles.saveText}>Save</Text>
+                        )}
+                    </TouchableOpacity>
+                }
+            />
 
             {isLoading ? (
                 <ActivityIndicator />
@@ -247,9 +372,9 @@ export default function CreateReview({
                 </View>
             ) : (
                 <ScrollView
+                    contentContainerStyle={styles.flexOne}
                     bounces={false}
-                    keyboardDismissMode="on-drag"
-                    style={styles.contentContainer}>
+                    keyboardDismissMode="on-drag">
                     <View style={styles.pubInfoContainer}>
                         <Image
                             source={imageUrl ? { uri: imageUrl } : NO_IMAGE}
@@ -261,8 +386,12 @@ export default function CreateReview({
                                 },
                             ]}
                         />
-
-                        <Text style={styles.pubNameText}>{pub.name}</Text>
+                        <View style={styles.pubNameContainer}>
+                            <Text style={styles.pubNameText}>{pub.name}</Text>
+                            <Text style={styles.pubAddressText}>
+                                {pub.address}
+                            </Text>
+                        </View>
                     </View>
 
                     <View style={styles.ratingSaveContainer}>
@@ -271,13 +400,8 @@ export default function CreateReview({
 
                             <View style={styles.starsContainer}>
                                 <RatingsSelector
-                                    rating={review.rating}
-                                    onRating={amount =>
-                                        setReview(r => ({
-                                            ...r,
-                                            rating: amount,
-                                        }))
-                                    }
+                                    rating={rating}
+                                    onRating={setRating}
                                     starPadding={1}
                                     starSize={ICON_SIZE}
                                 />
@@ -309,29 +433,175 @@ export default function CreateReview({
 
                     <View style={styles.textInputContainer}>
                         <TextInput
-                            value={review.content || ''}
-                            onChangeText={val =>
-                                setReview(r => ({ ...r, content: val }))
-                            }
+                            value={content}
+                            onChangeText={setContent}
                             placeholder="Add review..."
                             textAlignVertical="top"
                             multiline={true}
                             style={styles.textInput}
                         />
                     </View>
+
+                    {/* ATTRIBUTES */}
+                    <View style={styles.attributesContainer}>
+                        <ScrollView
+                            horizontal={true}
+                            contentContainerStyle={
+                                styles.scrollableAttributesContainer
+                            }
+                            showsHorizontalScrollIndicator={false}>
+                            <TouchableOpacity
+                                onPress={() => toggleAttribute(vibe, setVibe)}
+                                style={[
+                                    styles.generalAttributeContainer,
+                                    vibe === null
+                                        ? undefined
+                                        : vibe === true
+                                        ? styles.positiveAttributeContainer
+                                        : styles.negativeAttributeContainer,
+                                ]}>
+                                <Text
+                                    style={[
+                                        styles.generalAttributeText,
+                                        vibe === null
+                                            ? undefined
+                                            : vibe === true
+                                            ? styles.positiveAttributeText
+                                            : styles.negativeAttributeText,
+                                    ]}>
+                                    {vibeText}
+                                </Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                onPress={() => toggleAttribute(beer, setBeer)}
+                                style={[
+                                    styles.generalAttributeContainer,
+                                    beer === null
+                                        ? undefined
+                                        : beer === true
+                                        ? styles.positiveAttributeContainer
+                                        : styles.negativeAttributeContainer,
+                                ]}>
+                                <Text
+                                    style={[
+                                        styles.generalAttributeText,
+                                        beer === null
+                                            ? undefined
+                                            : beer === true
+                                            ? styles.positiveAttributeText
+                                            : styles.negativeAttributeText,
+                                    ]}>
+                                    {beerText}
+                                </Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                onPress={() => toggleAttribute(music, setMusic)}
+                                style={[
+                                    styles.generalAttributeContainer,
+                                    music === null
+                                        ? undefined
+                                        : music === true
+                                        ? styles.positiveAttributeContainer
+                                        : styles.negativeAttributeContainer,
+                                ]}>
+                                <Text
+                                    style={[
+                                        styles.generalAttributeText,
+                                        music === null
+                                            ? undefined
+                                            : music === true
+                                            ? styles.positiveAttributeText
+                                            : styles.negativeAttributeText,
+                                    ]}>
+                                    {musicText}
+                                </Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                onPress={() =>
+                                    toggleAttribute(service, setService)
+                                }
+                                style={[
+                                    styles.generalAttributeContainer,
+                                    service === null
+                                        ? undefined
+                                        : service === true
+                                        ? styles.positiveAttributeContainer
+                                        : styles.negativeAttributeContainer,
+                                ]}>
+                                <Text
+                                    style={[
+                                        styles.generalAttributeText,
+                                        service === null
+                                            ? undefined
+                                            : service === true
+                                            ? styles.positiveAttributeText
+                                            : styles.negativeAttributeText,
+                                    ]}>
+                                    {serviceText}
+                                </Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                onPress={() =>
+                                    toggleAttribute(location, setLocation)
+                                }
+                                style={[
+                                    styles.generalAttributeContainer,
+                                    location === null
+                                        ? undefined
+                                        : location === true
+                                        ? styles.positiveAttributeContainer
+                                        : styles.negativeAttributeContainer,
+                                ]}>
+                                <Text
+                                    style={[
+                                        styles.generalAttributeText,
+                                        location === null
+                                            ? undefined
+                                            : location === true
+                                            ? styles.positiveAttributeText
+                                            : styles.negativeAttributeText,
+                                    ]}>
+                                    {locationText}
+                                </Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                onPress={() => toggleAttribute(food, setFood)}
+                                style={[
+                                    styles.generalAttributeContainer,
+                                    food === null
+                                        ? undefined
+                                        : food === true
+                                        ? styles.positiveAttributeContainer
+                                        : styles.negativeAttributeContainer,
+                                ]}>
+                                <Text
+                                    style={[
+                                        styles.generalAttributeText,
+                                        food === null
+                                            ? undefined
+                                            : food === true
+                                            ? styles.positiveAttributeText
+                                            : styles.negativeAttributeText,
+                                    ]}>
+                                    {foodText}
+                                </Text>
+                            </TouchableOpacity>
+                        </ScrollView>
+                    </View>
                 </ScrollView>
             )}
-        </View>
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
-    headerContainer: {
-        paddingVertical: 15,
-        alignItems: 'center',
-        flexDirection: 'row',
-        borderBottomWidth: 1,
-        borderColor: '#E5E7EB',
+    flexOne: {
+        flex: 1,
     },
     saveContainer: {
         flex: 1,
@@ -339,7 +609,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     saveText: {
-        color: SECONDARY_COLOR,
+        color: PRIMARY_COLOR,
         fontWeight: 'bold',
     },
     creatingIndicator: { marginLeft: 12, marginRight: 6 },
@@ -348,16 +618,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         justifyContent: 'center',
     },
-    headerTextContainer: {
-        flex: 1,
-    },
-    headerText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        fontFamily: 'Jost',
-        textAlign: 'center',
-    },
-    contentContainer: {},
     pubInfoContainer: {
         flexDirection: 'row',
         paddingVertical: 10,
@@ -367,10 +627,17 @@ const styles = StyleSheet.create({
         backgroundColor: '#E5E7EB88',
         borderColor: '#E5E7EB',
     },
+    pubNameContainer: {
+        marginLeft: 10,
+    },
     pubNameText: {
-        marginLeft: 15,
         fontSize: 15,
         fontWeight: '500',
+    },
+    pubAddressText: {
+        fontSize: 10,
+        marginTop: 2,
+        fontWeight: '300',
     },
     ratingSaveContainer: {
         paddingHorizontal: 15,
@@ -383,8 +650,9 @@ const styles = StyleSheet.create({
     ratingContainer: {},
     rateText: {
         fontSize: 15,
-        paddingHorizontal: 10,
-        marginBottom: 10,
+        fontWeight: '400',
+        paddingHorizontal: 5,
+        marginBottom: 7,
     },
     starsContainer: {
         flexDirection: 'row',
@@ -397,11 +665,42 @@ const styles = StyleSheet.create({
         alignContent: 'flex-end',
     },
     textInputContainer: {
+        flex: 1,
         paddingVertical: 15,
         paddingHorizontal: 15,
     },
     textInput: {},
     image: {
         borderRadius: 3,
+    },
+    attributesContainer: {
+        paddingVertical: 20,
+        borderColor: '#E5E7EB',
+        borderTopWidth: 1,
+    },
+    scrollableAttributesContainer: {
+        paddingHorizontal: 15,
+    },
+    generalAttributeContainer: {
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        borderColor: 'rgba(0, 0, 0, 0.3)',
+        borderWidth: 2,
+        marginRight: 10,
+        borderRadius: 20,
+    },
+    positiveAttributeContainer: {
+        backgroundColor: PRIMARY_COLOR,
+        borderColor: PRIMARY_COLOR,
+    },
+    negativeAttributeContainer: {
+        borderColor: PRIMARY_COLOR,
+    },
+    generalAttributeText: {},
+    positiveAttributeText: {
+        color: '#fff',
+    },
+    negativeAttributeText: {
+        color: PRIMARY_COLOR,
     },
 });
