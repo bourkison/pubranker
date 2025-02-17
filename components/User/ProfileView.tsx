@@ -166,7 +166,7 @@ export default function ProfileView({
                 following={user.following[0].count}
             />
 
-            {user.favourites.length && (
+            {user.favourites.length > 0 && (
                 <ProfileFavourites favourites={user.favourites} />
             )}
 

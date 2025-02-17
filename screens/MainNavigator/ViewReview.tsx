@@ -33,6 +33,7 @@ import { RootStackScreenProps } from '@/types/nav';
 import { StackActions } from '@react-navigation/native';
 import { TextInput } from 'react-native-gesture-handler';
 import { useActionSheet } from '@expo/react-native-action-sheet';
+import Gallery from '@/components/Utility/Gallery';
 
 const NO_IMAGE = require('@/assets/noimage.png');
 
@@ -419,34 +420,44 @@ export default function ViewReview({
                                         />
                                     </View>
                                 </View>
+                            </View>
+                        </View>
+                        {review.photos.length > 0 && (
+                            <View style={styles.galleryContainer}>
+                                <Gallery
+                                    photos={review.photos}
+                                    type="reviews"
+                                    percentageWidth={0.4}
+                                />
+                            </View>
+                        )}
+                        <View style={styles.reviewContentContainer}>
+                            <View style={styles.reviewContentTextContainer}>
+                                <Text style={styles.contentText}>
+                                    {review.content}
+                                </Text>
+                            </View>
 
-                                <View style={styles.reviewContentContainer}>
-                                    <Text style={styles.contentText}>
-                                        {review.content}
-                                    </Text>
-                                </View>
-
-                                <View style={styles.likedContainer}>
-                                    <LikeReviewButton
-                                        reviewId={review.id}
-                                        size={18}
-                                        liked={liked}
-                                        onLikeCommence={setToLiked}
-                                        onUnlikeCommence={setToUnliked}
-                                        onLikeComplete={success =>
-                                            !success && setToUnliked()
-                                        }
-                                        onUnlikeComplete={success =>
-                                            !success && setToLiked()
-                                        }
-                                    />
-                                    <Text style={styles.likedText}>
-                                        {review.like_amount[0].count}{' '}
-                                        {review.like_amount[0].count === 1
-                                            ? 'like'
-                                            : 'likes'}
-                                    </Text>
-                                </View>
+                            <View style={styles.likedContainer}>
+                                <LikeReviewButton
+                                    reviewId={review.id}
+                                    size={18}
+                                    liked={liked}
+                                    onLikeCommence={setToLiked}
+                                    onUnlikeCommence={setToUnliked}
+                                    onLikeComplete={success =>
+                                        !success && setToUnliked()
+                                    }
+                                    onUnlikeComplete={success =>
+                                        !success && setToLiked()
+                                    }
+                                />
+                                <Text style={styles.likedText}>
+                                    {review.like_amount[0].count}{' '}
+                                    {review.like_amount[0].count === 1
+                                        ? 'like'
+                                        : 'likes'}
+                                </Text>
                             </View>
                         </View>
 
@@ -586,12 +597,17 @@ const styles = StyleSheet.create({
         fontWeight: '200',
     },
     reviewContentContainer: {
-        paddingVertical: 20,
+        paddingHorizontal: 15,
+    },
+    reviewContentTextContainer: {
+        marginTop: 15,
     },
     contentText: {},
     likedContainer: {
         flexDirection: 'row',
         alignItems: 'center',
+        marginTop: 20,
+        marginBottom: 7,
     },
     likedText: {
         marginLeft: 3,
@@ -639,5 +655,9 @@ const styles = StyleSheet.create({
     noCommentText: {
         color: 'rgba(0, 0, 0, 0.6)',
         fontSize: 12,
+    },
+    galleryContainer: {
+        marginTop: 15,
+        marginBottom: 5,
     },
 });

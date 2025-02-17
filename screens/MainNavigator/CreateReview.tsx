@@ -47,6 +47,8 @@ export default function CreateReview({
     const [pub, setPub] = useState<Tables<'pubs'>>();
     const [imageUrl, setImageUrl] = useState('');
 
+    const [initialReviewImagesAmount, setInitialReviewImagesAmount] =
+        useState(0);
     const [reviewImages, setReviewImages] = useState<ImageType[]>([]);
     const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
 
@@ -239,6 +241,7 @@ export default function CreateReview({
                             value: photo,
                         })),
                     );
+                    setInitialReviewImagesAmount(data.photos.length);
 
                     resolve();
                 });
@@ -347,7 +350,8 @@ export default function CreateReview({
         });
 
         // Next update this review with the images.
-        if (keysToUpsert.length) {
+        // If we've got keys to upsert, or alternatively have none now but had some at the start.
+        if (keysToUpsert.length || initialReviewImagesAmount > 0) {
             const { error: updateError } = await supabase
                 .from('reviews')
                 .update({
@@ -408,6 +412,7 @@ export default function CreateReview({
         food,
         imagesToDelete,
         reviewImages,
+        initialReviewImagesAmount,
     ]);
 
     const toggleAttribute = useCallback(

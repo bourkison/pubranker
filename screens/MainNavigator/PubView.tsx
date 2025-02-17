@@ -36,7 +36,7 @@ import RatingsSummary from '@/components/Ratings/RatingsSummary';
 import RateButtonModal from '@/components/Pubs/PubView/RateButtonModal/RateButtonModal';
 import FeaturesSection from '@/components/Pubs/PubView/Features/FeaturesSection';
 import TopTabs from '@/components/Utility/TopTabs';
-import PubGallery from '@/components/Pubs/PubView/PubGallery';
+import Gallery from '@/components/Utility/Gallery';
 import PubReviews from '@/components/Reviews/PubReviews';
 import PubDetails from '@/components/Pubs/PubView/PubDetails';
 import { ListReviewType } from '@/services/queries/review';
@@ -455,9 +455,15 @@ export default function PubView({
                                         {
                                             title: 'Gallery',
                                             component: (
-                                                <PubGallery
-                                                    photos={pub.photos}
-                                                />
+                                                <View
+                                                    style={
+                                                        styles.galleryContainer
+                                                    }>
+                                                    <Gallery
+                                                        type="pubs"
+                                                        photos={pub.photos}
+                                                    />
+                                                </View>
                                             ),
                                         },
                                         {
@@ -465,9 +471,15 @@ export default function PubView({
                                                 pub.photos?.length || 0
                                             })`,
                                             component: (
-                                                <PubGallery
-                                                    photos={pub.photos}
-                                                />
+                                                <View
+                                                    style={
+                                                        styles.galleryContainer
+                                                    }>
+                                                    <Gallery
+                                                        type="pubs"
+                                                        photos={pub.photos}
+                                                    />
+                                                </View>
                                             ),
                                         },
                                     ]}
@@ -602,5 +614,9 @@ const styles = StyleSheet.create({
         height: 1,
         marginHorizontal: 30,
         backgroundColor: '#E5E7EB',
+    },
+    galleryContainer: {
+        marginTop: 25,
+        marginBottom: 40,
     },
 });

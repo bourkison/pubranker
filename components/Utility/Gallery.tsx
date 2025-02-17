@@ -3,21 +3,27 @@ import { supabase } from '@/services/supabase';
 import React, { useMemo, useRef } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 
-type PubGalleryProps = {
+type GalleryProps = {
     photos: string[];
+    type: 'pubs' | 'reviews';
+    percentageWidth?: number;
 };
 
-export default function PubGallery({ photos }: PubGalleryProps) {
+export default function Gallery({
+    photos,
+    type,
+    percentageWidth = 0.6,
+}: GalleryProps) {
     const imageFlatListRef = useRef<FlatList>(null);
 
     const images = useMemo(
         () =>
             photos.map(
                 photo =>
-                    supabase.storage.from('pubs').getPublicUrl(photo).data
+                    supabase.storage.from(type).getPublicUrl(photo).data
                         .publicUrl,
             ),
-        [photos],
+        [photos, type],
     );
 
     return (
@@ -26,7 +32,7 @@ export default function PubGallery({ photos }: PubGalleryProps) {
                 <ImageScroller
                     imageFlatListRef={imageFlatListRef}
                     images={images}
-                    percentageWidth={0.6}
+                    percentageWidth={percentageWidth}
                     aspectRatio={1.33}
                 />
             ) : undefined}
@@ -35,8 +41,5 @@ export default function PubGallery({ photos }: PubGalleryProps) {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        marginTop: 25,
-        marginBottom: 40,
-    },
+    container: {},
 });
