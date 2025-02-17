@@ -42,6 +42,7 @@ import PubDetails from '@/components/Pubs/PubView/PubDetails';
 import { ListReviewType } from '@/services/queries/review';
 import { PubViewContext } from '@/context/pubViewContext';
 import { RootStackScreenProps } from '@/types/nav';
+import FollowedRatings from '@/components/Pubs/PubView/FollowedRatings';
 
 const GRADIENT_HEIGHT = 128;
 const NO_IMAGE = require('@/assets/noimage.png');
@@ -443,6 +444,10 @@ export default function PubView({
                                 <RateButtonModal pub={pub} />
                             </View>
 
+                            <View style={styles.friendsRatingsContainer}>
+                                <FollowedRatings pubId={pub.id} />
+                            </View>
+
                             <View style={styles.seperator} />
 
                             <View>
@@ -496,6 +501,14 @@ export default function PubView({
                                         {
                                             title: 'Additional Information',
                                             component: <PubDetails pub={pub} />,
+                                        },
+                                        {
+                                            title: 'Lists',
+                                            component: (
+                                                <View>
+                                                    <Text>Test</Text>
+                                                </View>
+                                            ),
                                         },
                                         {
                                             title: 'Similar Pubs',
@@ -619,4 +632,5 @@ const styles = StyleSheet.create({
         marginTop: 25,
         marginBottom: 40,
     },
+    friendsRatingsContainer: {},
 });
