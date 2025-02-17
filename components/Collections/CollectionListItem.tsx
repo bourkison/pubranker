@@ -23,6 +23,8 @@ type CollectionListItemProps = {
 const IMAGE_ASPECT_RATIO = 1.3333;
 const IMAGE_WIDTH = 100;
 
+const DESCRIPTION_LINES_AMOUNT = 5;
+
 const PRIVACY_ICON_SIZE = 12;
 
 export default function CollectionListItem({
@@ -90,7 +92,9 @@ export default function CollectionListItem({
 
                 {collection.description ? (
                     <View style={styles.descriptionContainer}>
-                        <Text style={styles.descriptionText}>
+                        <Text
+                            style={styles.descriptionText}
+                            numberOfLines={DESCRIPTION_LINES_AMOUNT}>
                             {collection.description}
                         </Text>
                     </View>

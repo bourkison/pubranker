@@ -1,11 +1,10 @@
 import ImageScroller from '@/components/Utility/ImageScroller';
-import { Tables } from '@/types/schema';
 import { supabase } from '@/services/supabase';
 import React, { useMemo, useRef } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 
 type PubGalleryProps = {
-    photos: Tables<'pub_photos'>[];
+    photos: string[];
 };
 
 export default function PubGallery({ photos }: PubGalleryProps) {
@@ -15,7 +14,7 @@ export default function PubGallery({ photos }: PubGalleryProps) {
         () =>
             photos.map(
                 photo =>
-                    supabase.storage.from('pubs').getPublicUrl(photo.key).data
+                    supabase.storage.from('pubs').getPublicUrl(photo).data
                         .publicUrl,
             ),
         [photos],

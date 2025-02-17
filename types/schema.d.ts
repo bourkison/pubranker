@@ -610,35 +610,6 @@ export type Database = {
           },
         ]
       }
-      pub_photos: {
-        Row: {
-          created_at: string
-          id: number
-          key: string
-          pub_id: number
-        }
-        Insert: {
-          created_at?: string
-          id?: number
-          key: string
-          pub_id: number
-        }
-        Update: {
-          created_at?: string
-          id?: number
-          key?: string
-          pub_id?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "pub_photos_pub_id_fkey"
-            columns: ["pub_id"]
-            isOneToOne: false
-            referencedRelation: "pubs"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       pubs: {
         Row: {
           address: string
@@ -658,6 +629,7 @@ export type Database = {
           location: unknown
           name: string
           phone_number: string | null
+          photos: string[]
           pool_table: boolean | null
           primary_photo: string | null
           reservable: boolean | null
@@ -684,6 +656,7 @@ export type Database = {
           location: unknown
           name: string
           phone_number?: string | null
+          photos?: string[]
           pool_table?: boolean | null
           primary_photo?: string | null
           reservable?: boolean | null
@@ -710,6 +683,7 @@ export type Database = {
           location?: unknown
           name?: string
           phone_number?: string | null
+          photos?: string[]
           pool_table?: boolean | null
           primary_photo?: string | null
           reservable?: boolean | null
@@ -759,6 +733,7 @@ export type Database = {
           id: number
           location: boolean | null
           music: boolean | null
+          photos: string[]
           pub_id: number
           rating: number
           service: boolean | null
@@ -775,6 +750,7 @@ export type Database = {
           id?: number
           location?: boolean | null
           music?: boolean | null
+          photos?: string[]
           pub_id: number
           rating: number
           service?: boolean | null
@@ -791,6 +767,7 @@ export type Database = {
           id?: number
           location?: boolean | null
           music?: boolean | null
+          photos?: string[]
           pub_id?: number
           rating?: number
           service?: boolean | null

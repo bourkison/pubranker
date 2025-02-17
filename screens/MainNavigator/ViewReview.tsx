@@ -28,7 +28,7 @@ import Comment from '@/components/Comments/Comment';
 import { PRIMARY_COLOR } from '@/constants';
 import ReviewAttributes from '@/components/Reviews/ReviewAttributes';
 import { reviewQuery, ReviewType } from '@/services/queries/review';
-import { v4 as uuidv4 } from 'uuid';
+import uuid from 'react-native-uuid';
 import { RootStackScreenProps } from '@/types/nav';
 import { StackActions } from '@react-navigation/native';
 import { TextInput } from 'react-native-gesture-handler';
@@ -111,8 +111,8 @@ export default function ViewReview({
             const { data, error } = await reviewQuery()
                 .eq('id', route.params.reviewId)
                 // If not logged in, generate random UUID so this shows up as 0.
-                .eq('liked.user_id', userData.user?.id || uuidv4())
-                .eq('comments.liked.user_id', userData.user?.id || uuidv4())
+                .eq('liked.user_id', userData.user?.id || uuid.v4())
+                .eq('comments.liked.user_id', userData.user?.id || uuid.v4())
                 .order('created_at', {
                     ascending: false,
                     referencedTable: 'comments',

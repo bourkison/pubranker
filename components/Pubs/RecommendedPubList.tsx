@@ -12,7 +12,9 @@ type RecommendedPubListProps = {};
 
 export default function RecommendedPubList({}: RecommendedPubListProps) {
     const [isLoading, setIsLoading] = useState(false);
-    const [pubs, setPubs] = useState<CollectionType['pubs']>([]);
+    const [pubs, setPubs] = useState<
+        CollectionType['collection_items']['pub'][]
+    >([]);
 
     useEffect(() => {
         const initialLoad = async () => {

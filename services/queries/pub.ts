@@ -8,7 +8,7 @@ export type FetchPubType = Tables<'pubs'> & {
     };
     rating: number;
     opening_hours: Tables<'opening_hours'>[];
-    photos: Tables<'pub_photos'>[];
+    photos: string[];
     saved: { count: number }[];
     review_ones: { count: number }[];
     review_twos: { count: number }[];
@@ -43,7 +43,7 @@ review_sevens:reviews(count),
 review_eights:reviews(count),
 review_nines:reviews(count),
 review_tens:reviews(count),
-photos:pub_photos(*)
+photos
 ` as const;
 
 export const pubQuery = (userId: string) =>

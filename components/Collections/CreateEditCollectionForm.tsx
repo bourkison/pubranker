@@ -242,7 +242,7 @@ export default function CreateEditCollectionForm({
                         hapticsEnabled={true}
                         data={pubs}
                         keyExtractor={pub => pub.id.toString()}
-                        onDragEnd={params => setPubs(params.data)}
+                        onDragEnd={({ data }) => setPubs(data)}
                         renderItem={({ item, index }) => (
                             <Pressable
                                 style={[

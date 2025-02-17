@@ -15,7 +15,7 @@ import Header from '@/components/Utility/Header';
 import { supabase } from '@/services/supabase';
 import { Tables } from '@/types/schema';
 import CollectionComment from '@/components/Comments/CollectionComment';
-import { v4 as uuidv4 } from 'uuid';
+import uuid from 'react-native-uuid';
 
 export type CollectionCommentType = Tables<'collection_comments'> & {
     user: {
@@ -53,7 +53,7 @@ export default function CollectionComments({
                     liked:collection_comment_likes(count)
                 `,
                 )
-                .eq('liked.user_id', userData.user?.id || uuidv4())
+                .eq('liked.user_id', userData.user?.id || uuid.v4())
                 .eq('collection_id', route.params.collectionId)
                 .order('created_at', { ascending: false });
 

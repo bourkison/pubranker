@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import Review from '@/components/Reviews/Review';
-import { v4 as uuidv4 } from 'uuid';
+import uuid from 'react-native-uuid';
 import { useSharedPubViewContext } from '@/context/pubViewContext';
 import { reviewListQuery } from '@/services/queries/review';
 import { FetchPubType } from '@/services/queries/pub';
@@ -34,7 +34,7 @@ export default function PubReviews({ pub }: PubReviewsProps) {
                 let query = reviewListQuery()
                     .eq('pub_id', pub.id)
                     // If not logged in, generate random UUID so this shows up as 0.
-                    .eq('liked.user_id', userData.user?.id || uuidv4())
+                    .eq('liked.user_id', userData.user?.id || uuid.v4())
                     .neq('content', null)
                     .neq('content', '')
                     .limit(NUM_REVIEWS_TO_SHOW);

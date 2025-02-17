@@ -25,6 +25,12 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { RootStackScreenProps } from '@/types/nav';
 import Header from '@/components/Utility/Header';
+import * as Haptics from 'expo-haptics';
+import ReviewImageUpload, {
+    ImageType,
+} from '@/components/Reviews/ReviewImageUpload';
+import uuid from 'react-native-uuid';
+import { decode } from 'base64-arraybuffer';
 
 const NO_IMAGE = require('@/assets/noimage.png');
 
@@ -40,6 +46,9 @@ export default function CreateReview({
     const [isLoading, setIsLoading] = useState(false);
     const [pub, setPub] = useState<Tables<'pubs'>>();
     const [imageUrl, setImageUrl] = useState('');
+
+    const [reviewImages, setReviewImages] = useState<ImageType[]>([]);
+    const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
 
     const [initialSaved, setInitialSaved] = useState(false);
     const [saved, setSaved] = useState(false);
@@ -223,6 +232,13 @@ export default function CreateReview({
                     setMusic(data.music);
                     setService(data.service);
                     setFood(data.food);
+                    setReviewImages(
+                        data.photos.map(photo => ({
+                            id: uuid.v4(),
+                            local: false,
+                            value: photo,
+                        })),
+                    );
 
                     resolve();
                 });
@@ -251,6 +267,7 @@ export default function CreateReview({
             return;
         }
 
+        // First insert the entry.
         const { data, error } = await supabase
             .from('reviews')
             .upsert(
@@ -277,6 +294,81 @@ export default function CreateReview({
             console.error(error);
             setIsCreating(false);
             return;
+        }
+
+        // Next upload any images.
+        const uploadImage = (baseString: string) => {
+            return new Promise<string>(async (resolve, reject) => {
+                const { data: uploadData, error: uploadError } =
+                    await supabase.storage
+                        .from('reviews')
+                        .upload(
+                            `${data.id}/${uuid.v4()}.jpeg`,
+                            decode(baseString),
+                            { contentType: 'image/jpeg' },
+                        );
+
+                if (uploadError) {
+                    console.error(uploadError);
+                    return reject(uploadError);
+                }
+
+                resolve(uploadData.path);
+            });
+        };
+
+        // First upload any local images
+        const promises: Promise<string>[] = [];
+
+        reviewImages.forEach(image => {
+            if (image.local) {
+                promises.push(uploadImage(image.value));
+            }
+        });
+
+        // Next loop through current array, pushing old keys in if not local
+        // or alternatively pushing the new key in when local.
+        const keys = await Promise.allSettled(promises);
+        const keysToUpsert: string[] = [];
+        let i = 0;
+
+        reviewImages.forEach(image => {
+            if (!image.local) {
+                keysToUpsert.push(image.value);
+                return;
+            }
+
+            if (keys[i].status === 'fulfilled') {
+                // @ts-ignore
+                keysToUpsert.push(keys[i].value);
+            }
+
+            i++;
+        });
+
+        // Next update this review with the images.
+        if (keysToUpsert.length) {
+            const { error: updateError } = await supabase
+                .from('reviews')
+                .update({
+                    photos: keysToUpsert,
+                })
+                .eq('id', data.id);
+
+            if (updateError) {
+                console.error(updateError);
+            }
+        }
+
+        // Finally delete any images to delete.
+        if (imagesToDelete.length) {
+            const { error: deleteError } = await supabase.storage
+                .from('reviews')
+                .remove(imagesToDelete);
+
+            if (deleteError) {
+                console.error(deleteError);
+            }
         }
 
         if (initialSaved === false && saved === true) {
@@ -314,6 +406,8 @@ export default function CreateReview({
         service,
         location,
         food,
+        imagesToDelete,
+        reviewImages,
     ]);
 
     const toggleAttribute = useCallback(
@@ -321,6 +415,8 @@ export default function CreateReview({
             attribute: boolean | null,
             setAttribute: Dispatch<SetStateAction<boolean | null>>,
         ) => {
+            Haptics.selectionAsync();
+
             if (attribute === null) {
                 setAttribute(true);
                 return;
@@ -439,6 +535,18 @@ export default function CreateReview({
                             textAlignVertical="top"
                             multiline={true}
                             style={styles.textInput}
+                        />
+                    </View>
+
+                    <View style={styles.imageUploadContainer}>
+                        <Text style={styles.imageUploadText}>
+                            Upload up to 6 photos of the pub.
+                        </Text>
+
+                        <ReviewImageUpload
+                            images={reviewImages}
+                            setImages={setReviewImages}
+                            setImagesToDelete={setImagesToDelete}
                         />
                     </View>
 
@@ -702,5 +810,17 @@ const styles = StyleSheet.create({
     },
     negativeAttributeText: {
         color: PRIMARY_COLOR,
+    },
+    imageUploadContainer: {
+        paddingVertical: 20,
+        borderColor: '#E5E7EB',
+        borderTopWidth: 1,
+    },
+    imageUploadText: {
+        fontSize: 12,
+        fontWeight: '500',
+        paddingHorizontal: 20,
+        letterSpacing: -0.2,
+        marginBottom: 10,
     },
 });
