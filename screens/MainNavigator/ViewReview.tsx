@@ -325,6 +325,16 @@ export default function ViewReview({
                 }
                 ListHeaderComponent={
                     <View>
+                        {review.photos.length > 0 && (
+                            <View style={styles.galleryContainer}>
+                                <Gallery
+                                    photos={review.photos}
+                                    type="reviews"
+                                    percentageWidth={0.8}
+                                    margin={0}
+                                />
+                            </View>
+                        )}
                         <View style={styles.contentContainer}>
                             <View
                                 style={styles.flexOne}
@@ -422,15 +432,6 @@ export default function ViewReview({
                                 </View>
                             </View>
                         </View>
-                        {review.photos.length > 0 && (
-                            <View style={styles.galleryContainer}>
-                                <Gallery
-                                    photos={review.photos}
-                                    type="reviews"
-                                    percentageWidth={0.4}
-                                />
-                            </View>
-                        )}
                         <View style={styles.reviewContentContainer}>
                             <View style={styles.reviewContentTextContainer}>
                                 <Text style={styles.contentText}>
@@ -657,7 +658,6 @@ const styles = StyleSheet.create({
         fontSize: 12,
     },
     galleryContainer: {
-        marginTop: 15,
         marginBottom: 5,
     },
 });

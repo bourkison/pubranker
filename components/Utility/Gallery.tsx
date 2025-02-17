@@ -7,12 +7,14 @@ type GalleryProps = {
     photos: string[];
     type: 'pubs' | 'reviews';
     percentageWidth?: number;
+    margin?: number;
 };
 
 export default function Gallery({
     photos,
     type,
     percentageWidth = 0.6,
+    margin = 5,
 }: GalleryProps) {
     const imageFlatListRef = useRef<FlatList>(null);
 
@@ -34,6 +36,7 @@ export default function Gallery({
                     images={images}
                     percentageWidth={percentageWidth}
                     aspectRatio={1.33}
+                    margin={margin}
                 />
             ) : undefined}
         </View>
