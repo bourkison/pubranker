@@ -17,6 +17,9 @@ import { useSharedMapContext } from '@/context/mapContext';
 const ANIMATE_DELTA = 0.0075;
 const INITIAL_DELTA = 0.01;
 
+// TODO: Check out rnmapbox
+// https://github.com/rnmapbox/maps
+
 export default function HomeMap() {
     const [location, setLocation] = useState<
         Location.LocationObject | undefined
