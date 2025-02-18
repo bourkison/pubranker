@@ -139,8 +139,11 @@ export default function CollectionItemListItem({
                 style={styles.container}
                 underlayColor="#E5E7EB"
                 onPress={() =>
-                    navigation.navigate('PubView', {
-                        pubId: collectionItem.pub.id,
+                    navigation.navigate('PubHome', {
+                        screen: 'PubView',
+                        params: {
+                            pubId: collectionItem.pub.id,
+                        },
                     })
                 }
                 onLongPress={() => {

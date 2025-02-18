@@ -1,4 +1,4 @@
-import Review from '@/components/Reviews/Review';
+import UserReview from '@/components/Reviews/UserReview';
 import Header from '@/components/Utility/Header';
 import { ListReviewType, reviewListQuery } from '@/services/queries/review';
 import { RootStackScreenProps } from '@/types/nav';
@@ -65,7 +65,7 @@ export default function UserReviews({
                     )
                 }
                 data={reviews}
-                renderItem={({ item }) => <Review review={item} />}
+                renderItem={({ item }) => <UserReview review={item} />}
             />
         </SafeAreaView>
     );
