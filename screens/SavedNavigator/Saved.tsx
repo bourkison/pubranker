@@ -20,6 +20,7 @@ import Header from '@/components/Utility/Header';
 import { distance, point } from '@turf/turf';
 import { SavedNavigatorScreenProps } from '@/types/nav';
 import { Tables } from '@/types/schema';
+import { HEADER_ICON_SIZE } from '@/constants';
 
 export type SavedType = Tables<'saves'> & {
     pub: {
@@ -217,7 +218,7 @@ export default function SavedPubs({
                     <TouchableOpacity
                         onPress={() => navigation.navigate('CreateCollection')}
                         style={styles.createContainer}>
-                        <Feather name="plus" size={14} />
+                        <Feather name="plus" size={HEADER_ICON_SIZE} />
                     </TouchableOpacity>
                 }
             />

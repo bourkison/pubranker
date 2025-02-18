@@ -17,6 +17,7 @@ import {
 } from '@/services/queries/follows';
 import FollowListItem from '@/components/Follows/FollowListItem';
 import { RootStackScreenProps } from '@/types/nav';
+import { HEADER_ICON_SIZE } from '@/constants';
 
 export default function FollowersFollowingView({
     route,
@@ -92,7 +93,10 @@ export default function FollowersFollowingView({
                 <TouchableOpacity
                     style={styles.settingsContainer}
                     onPress={() => navigation.goBack()}>
-                    <Ionicons name="arrow-back-outline" size={14} />
+                    <Ionicons
+                        name="arrow-back-outline"
+                        size={HEADER_ICON_SIZE}
+                    />
                 </TouchableOpacity>
 
                 <View style={styles.headerTextContainer}>

@@ -17,3 +17,5 @@ export const PRIMARY_COLOR = '#384D48';
 export const SECONDARY_COLOR = '#721121';
 export const SUCCESS_COLOR = '#16A34A';
 export const FAIL_COLOR = '#dc2626';
+
+export const HEADER_ICON_SIZE = 16;

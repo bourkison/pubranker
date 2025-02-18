@@ -25,7 +25,7 @@ import RatingsStarViewer from '@/components/Ratings/RatingsStarsViewer';
 import dayjs from 'dayjs';
 import LikeReviewButton from '@/components/Reviews/LikeReviewButton';
 import Comment from '@/components/Comments/Comment';
-import { PRIMARY_COLOR } from '@/constants';
+import { HEADER_ICON_SIZE, PRIMARY_COLOR } from '@/constants';
 import ReviewAttributes from '@/components/Reviews/ReviewAttributes';
 import { reviewQuery, ReviewType } from '@/services/queries/review';
 import uuid from 'react-native-uuid';
@@ -300,7 +300,10 @@ export default function ViewReview({
                 <TouchableOpacity
                     style={styles.settingsContainer}
                     onPress={() => navigation.goBack()}>
-                    <Ionicons name="arrow-back-outline" size={14} />
+                    <Ionicons
+                        name="arrow-back-outline"
+                        size={HEADER_ICON_SIZE}
+                    />
                 </TouchableOpacity>
 
                 <View style={styles.headerTextContainer}>
@@ -310,7 +313,7 @@ export default function ViewReview({
                 <TouchableOpacity
                     style={styles.menuContainer}
                     onPress={showActionSheet}>
-                    <SimpleLineIcons name="options" size={14} />
+                    <SimpleLineIcons name="options" size={HEADER_ICON_SIZE} />
                 </TouchableOpacity>
             </View>
 

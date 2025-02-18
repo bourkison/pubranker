@@ -16,6 +16,7 @@ import {
 import CollectionListItem from '@/components/Collections/CollectionListItem';
 import { supabase } from '@/services/supabase';
 import { SavedNavigatorScreenProps } from '@/types/nav';
+import { HEADER_ICON_SIZE } from '@/constants';
 
 const INITIAL_LOAD_AMOUNT = 10;
 
@@ -96,7 +97,10 @@ export default function CollectionsHome({
                 <TouchableOpacity
                     style={styles.settingsContainer}
                     onPress={() => navigation.goBack()}>
-                    <Ionicons name="arrow-back-outline" size={14} />
+                    <Ionicons
+                        name="arrow-back-outline"
+                        size={HEADER_ICON_SIZE}
+                    />
                 </TouchableOpacity>
 
                 <View style={styles.headerTextContainer}>
@@ -106,7 +110,7 @@ export default function CollectionsHome({
                 <View style={styles.menuContainer}>
                     <TouchableOpacity
                         onPress={() => navigation.navigate('CreateCollection')}>
-                        <Feather name="plus" size={14} />
+                        <Feather name="plus" size={HEADER_ICON_SIZE} />
                     </TouchableOpacity>
                 </View>
             </View>

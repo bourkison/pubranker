@@ -13,6 +13,7 @@ import {
     ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { HEADER_ICON_SIZE } from '@/constants';
 
 export default function UserReviews({
     route,
@@ -48,7 +49,10 @@ export default function UserReviews({
                     <TouchableOpacity
                         style={styles.backContainer}
                         onPress={() => navigation.goBack()}>
-                        <Ionicons name="arrow-back-outline" size={14} />
+                        <Ionicons
+                            name="arrow-back-outline"
+                            size={HEADER_ICON_SIZE}
+                        />
                     </TouchableOpacity>
                 }
                 rightColumn={<View style={styles.emptyContainer} />}

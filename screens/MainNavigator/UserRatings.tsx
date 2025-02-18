@@ -15,6 +15,7 @@ import {
     View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { HEADER_ICON_SIZE } from '@/constants';
 
 type ReviewType = {
     id: number;
@@ -100,7 +101,10 @@ export default function UserRatings({
                     <TouchableOpacity
                         style={styles.backContainer}
                         onPress={() => navigation.goBack()}>
-                        <Ionicons name="arrow-back-outline" size={14} />
+                        <Ionicons
+                            name="arrow-back-outline"
+                            size={HEADER_ICON_SIZE}
+                        />
                     </TouchableOpacity>
                 }
                 rightColumn={<View style={styles.emptyContainer} />}
@@ -128,8 +132,11 @@ export default function UserRatings({
                     <Pressable
                         style={styles.pubContainer}
                         onPress={() =>
-                            navigation.navigate('PubView', {
-                                pubId: item.pub.id,
+                            navigation.navigate('PubHome', {
+                                screen: 'PubView',
+                                params: {
+                                    pubId: item.pub.id,
+                                },
                             })
                         }>
                         <Image

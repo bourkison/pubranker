@@ -21,6 +21,7 @@ import { UserType } from '@/services/queries/user';
 import ProfileView from '@/components/User/ProfileView';
 import { ProfileNavigatorScreenProps } from '@/types/nav';
 import Header from '@/components/Utility/Header';
+import { HEADER_ICON_SIZE } from '@/constants';
 
 export default function LoggedInProfile({
     navigation,
@@ -91,14 +92,14 @@ export default function LoggedInProfile({
                                 location: user.location,
                             })
                         }>
-                        <Feather name="settings" size={14} />
+                        <Feather name="settings" size={HEADER_ICON_SIZE} />
                     </TouchableOpacity>
                 }
                 rightColumn={
                     <TouchableOpacity
                         style={styles.menuContainer}
                         onPress={() => navigation.navigate('Notifications')}>
-                        <Feather name="bell" size={15} />
+                        <Feather name="bell" size={HEADER_ICON_SIZE} />
                     </TouchableOpacity>
                 }
             />

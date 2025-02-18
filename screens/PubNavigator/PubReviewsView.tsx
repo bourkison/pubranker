@@ -14,6 +14,7 @@ import { ListReviewType, reviewListQuery } from '@/services/queries/review';
 import { supabase } from '@/services/supabase';
 import uuid from 'react-native-uuid';
 import Review from '@/components/Reviews/Review';
+import { HEADER_ICON_SIZE } from '@/constants';
 
 export default function PubReviewsView({
     route,
@@ -53,12 +54,15 @@ export default function PubReviewsView({
                     <TouchableOpacity
                         style={styles.settingsContainer}
                         onPress={() => navigation.goBack()}>
-                        <Ionicons name="arrow-back-outline" size={16} />
+                        <Ionicons
+                            name="arrow-back-outline"
+                            size={HEADER_ICON_SIZE}
+                        />
                     </TouchableOpacity>
                 }
                 rightColumn={
                     <TouchableOpacity style={styles.optionsContainer}>
-                        <Ionicons name="options" size={16} />
+                        <Ionicons name="options" size={HEADER_ICON_SIZE} />
                     </TouchableOpacity>
                 }
             />
