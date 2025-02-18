@@ -7,7 +7,7 @@ import {
 } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 
-type ProfileNavigatorStackParamList = {
+export type ProfileNavigatorStackParamList = {
     ProfileHome: undefined;
     Notifications: undefined;
 };
@@ -19,7 +19,7 @@ export type ProfileNavigatorScreenProps<
     HomeNavigatorBottomTabProps<keyof HomeNavigatorBottomTabParamList>
 >;
 
-type SavedNavigatorStackParamList = {
+export type SavedNavigatorStackParamList = {
     SavedHome: undefined;
     CollectionsHome: undefined;
     CollectionView: {
@@ -34,7 +34,33 @@ export type SavedNavigatorScreenProps<
     HomeNavigatorBottomTabProps<keyof HomeNavigatorBottomTabParamList>
 >;
 
-type HomeNavigatorBottomTabParamList = {
+export type PubNavigatorStackParamList = {
+    PubView: {
+        pubId: number;
+        onSaveToggle?: (id: number, value: boolean) => void;
+    };
+    PubReviewsView: {
+        pubId: number;
+    };
+    PubMapView: {
+        pub: {
+            id: number;
+            name: string;
+            location: {
+                type: string;
+                coordinates: [number, number];
+            };
+        };
+    };
+};
+
+export type PubNavigatorStackProps<T extends keyof PubNavigatorStackParamList> =
+    CompositeScreenProps<
+        StackScreenProps<PubNavigatorStackParamList, T>,
+        RootStackScreenProps<keyof RootStackParamList>
+    >;
+
+export type HomeNavigatorBottomTabParamList = {
     Explore: undefined;
     Favourites: NavigatorScreenParams<SavedNavigatorStackParamList>;
     LoggedInProfile: NavigatorScreenParams<ProfileNavigatorStackParamList>;
@@ -50,10 +76,7 @@ export type HomeNavigatorBottomTabProps<
 
 export type RootStackParamList = {
     Home: NavigatorScreenParams<HomeNavigatorBottomTabParamList>;
-    PubView: {
-        pubId: number;
-        onSaveToggle?: (id: number, value: boolean) => void;
-    };
+    PubHome: NavigatorScreenParams<PubNavigatorStackParamList>;
     CreateReview: {
         pubId: number;
     };

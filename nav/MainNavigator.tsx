@@ -1,7 +1,6 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import BottomTabNavigator from '@/nav/BottomTabNavigator';
 import React from 'react';
-import PubView from '@/screens/MainNavigator/PubView';
 import CreateReview from '@/screens/MainNavigator/CreateReview';
 import ViewReview from '@/screens/MainNavigator/ViewReview';
 import AddToList from '@/screens/MainNavigator/AddToList';
@@ -19,6 +18,7 @@ import UserRatings from '@/screens/MainNavigator/UserRatings';
 import UserReviews from '@/screens/MainNavigator/UserReviews';
 import AddCollaborator from '@/screens/MainNavigator/AddCollaborator';
 import CollectionComments from '@/screens/MainNavigator/CollectionComments';
+import PubNavigator from '@/nav/PubNavigator';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -31,8 +31,8 @@ export default function MainNavigator() {
                 options={{ headerShown: false }}
             />
             <Stack.Screen
-                name="PubView"
-                component={PubView}
+                name="PubHome"
+                component={PubNavigator}
                 options={{ headerShown: false }}
             />
             <Stack.Screen

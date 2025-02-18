@@ -446,7 +446,7 @@ const styles = StyleSheet.create({
     descriptionText: {
         fontSize: 14,
         fontWeight: '300',
-        marginTop: 20,
+        marginTop: 15,
     },
     topListHeaderContainer: {
         flexDirection: 'row',

@@ -8,14 +8,14 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import PubInfo from '@/components/Pubs/PubView/PubInfo';
-import { CollectionType } from '@/services/queries/collections';
+import { Database } from '@/types/schema';
 
 const NO_IMAGE = require('@/assets/noimage.png');
 const WIDTH_PERCENTAGE = 0.8;
 const ASPECT_RATIO = 1.3333; // 4:3
 
 type RecommendedPubItemProps = {
-    pub: CollectionType['pubs'][number];
+    pub: Database['public']['Functions']['get_pub_list_item']['Returns'][number];
     onSaveToggle?: (id: number, value: boolean) => void;
 };
 
@@ -44,7 +44,10 @@ export default function RecommendedPubItem({
         <Pressable
             style={[styles.container, { width: COMPONENT_WIDTH }]}
             onPress={() =>
-                navigation.navigate('PubView', { pubId: pub.id, onSaveToggle })
+                navigation.navigate('PubHome', {
+                    screen: 'PubView',
+                    params: { pubId: pub.id, onSaveToggle },
+                })
             }>
             <Image
                 source={imageUrl ? { uri: imageUrl } : NO_IMAGE}
