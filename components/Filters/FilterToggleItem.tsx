@@ -1,4 +1,3 @@
-import { BoolOrUnset } from '@/types';
 import React, { useMemo } from 'react';
 import {
     StyleSheet,
@@ -13,7 +12,7 @@ import { FAIL_COLOR, SUCCESS_COLOR } from '@/constants';
 type FilterToggleItemProps = {
     title: string;
     onPress: () => void;
-    state: BoolOrUnset;
+    state: boolean | null;
 };
 
 export default function FilterToggleItem({

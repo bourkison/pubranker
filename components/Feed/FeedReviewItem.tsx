@@ -122,7 +122,10 @@ export default function FeedReviewItem({ user, review }: FeedReviewItemProps) {
             underlayColor="#E5E7EB"
             style={styles.noContentContainer}
             onPress={() =>
-                navigation.navigate('PubView', { pubId: review.pub.id })
+                navigation.navigate('PubHome', {
+                    screen: 'PubView',
+                    params: { pubId: review.pub.id },
+                })
             }>
             <>
                 <Pressable

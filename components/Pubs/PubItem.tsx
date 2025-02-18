@@ -198,7 +198,10 @@ export default function PubItem({
             </View>
             <Pressable
                 onPress={() =>
-                    navigation.navigate('PubView', { pubId: pub.id })
+                    navigation.navigate('PubHome', {
+                        screen: 'PubView',
+                        params: { pubId: pub.id },
+                    })
                 }>
                 <PubInfo
                     name={pub.name}

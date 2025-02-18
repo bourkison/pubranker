@@ -126,7 +126,10 @@ export default function SelectedPub({ pub }: SelectedPubProps) {
                 <Pressable
                     style={styles.container}
                     onPress={() =>
-                        navigation.navigate('PubView', { pubId: pub.id })
+                        navigation.navigate('PubHome', {
+                            screen: 'PubView',
+                            params: { pubId: pub.id },
+                        })
                     }>
                     {image ? (
                         <Image

@@ -87,7 +87,10 @@ export default function SearchProvider({ children }: SearchProviderProps) {
                 subtitle: d.address,
                 type: 'pub',
                 onPress: () => {
-                    navigation.navigate('PubView', { pubId: d.id });
+                    navigation.navigate('PubHome', {
+                        screen: 'PubView',
+                        params: { pubId: d.id },
+                    });
                 },
             })),
         );

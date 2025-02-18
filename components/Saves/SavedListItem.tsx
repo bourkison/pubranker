@@ -118,7 +118,12 @@ export default function SavedListItem({
         <TouchableHighlight
             style={styles.container}
             underlayColor="#E5E7EB"
-            onPress={() => navigation.navigate('PubView', { pubId: pub.id })}>
+            onPress={() =>
+                navigation.navigate('PubHome', {
+                    screen: 'PubView',
+                    params: { pubId: pub.id },
+                })
+            }>
             <View
                 style={styles.innerContainer}
                 onLayout={({
