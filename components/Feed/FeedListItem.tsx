@@ -27,6 +27,7 @@ export default function FeedListItem({ feedItem }: FeedListItemProps) {
             <FeedReviewLikeItem
                 user={feedItem.user}
                 reviewLike={feedItem.review_like}
+                createdAt={feedItem.updated_at}
             />
         );
     } else if (feedItem.type === 'REVIEW_LIKE') {
@@ -34,13 +35,25 @@ export default function FeedListItem({ feedItem }: FeedListItemProps) {
     }
 
     if (feedItem.type === 'REVIEW' && feedItem.review) {
-        return <FeedReviewItem user={feedItem.user} review={feedItem.review} />;
+        return (
+            <FeedReviewItem
+                user={feedItem.user}
+                review={feedItem.review}
+                createdAt={feedItem.updated_at}
+            />
+        );
     } else if (feedItem.type === 'REVIEW') {
         return <EmptyFeedListItem id={feedItem.id} />;
     }
 
     if (feedItem.type === 'FOLLOW' && feedItem.follow) {
-        return <FeedFollowItem user={feedItem.user} follow={feedItem.follow} />;
+        return (
+            <FeedFollowItem
+                user={feedItem.user}
+                follow={feedItem.follow}
+                createdAt={feedItem.updated_at}
+            />
+        );
     } else if (feedItem.type === 'FOLLOW') {
         return <EmptyFeedListItem id={feedItem.id} />;
     }

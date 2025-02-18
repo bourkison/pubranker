@@ -12,10 +12,12 @@ import UserAvatar from '../User/UserAvatar';
 import RatingsStarViewer from '../Ratings/RatingsStarsViewer';
 import { supabase } from '@/services/supabase';
 import { useNavigation } from '@react-navigation/native';
+import { fromNowString } from '@/services';
 
 type FeedReviewItemProps = {
     user: FeedType['user'];
     review: NonNullable<FeedType['review']>;
+    createdAt: string;
 };
 
 const ASPECT_RATIO = 1;
@@ -23,7 +25,11 @@ const IMAGE_PERCENTAGE = 0.33;
 
 const NO_IMAGE = require('@/assets/noimage.png');
 
-export default function FeedReviewItem({ user, review }: FeedReviewItemProps) {
+export default function FeedReviewItem({
+    user,
+    review,
+    createdAt,
+}: FeedReviewItemProps) {
     const [elementWidth, setElementWidth] = useState(0);
     const navigation = useNavigation();
 
@@ -56,24 +62,37 @@ export default function FeedReviewItem({ user, review }: FeedReviewItemProps) {
                     navigation.navigate('ViewReview', { reviewId: review.id })
                 }>
                 <>
-                    <Pressable
-                        style={styles.topContainer}
-                        onPress={() =>
-                            navigation.navigate('Profile', { userId: user.id })
-                        }>
-                        <View style={styles.avatarContainer}>
-                            <UserAvatar size={24} photo={user.profile_photo} />
-                        </View>
+                    <View style={styles.topBarContainer}>
+                        <Pressable
+                            style={styles.userPressableContainer}
+                            onPress={() =>
+                                navigation.navigate('Profile', {
+                                    userId: user.id,
+                                })
+                            }>
+                            <View style={styles.avatarContainer}>
+                                <UserAvatar
+                                    size={24}
+                                    photo={user.profile_photo}
+                                />
+                            </View>
+
+                            <View>
+                                <Text style={styles.feedText}>
+                                    <Text style={styles.boldText}>
+                                        {user.username}
+                                    </Text>{' '}
+                                    reviewed
+                                </Text>
+                            </View>
+                        </Pressable>
 
                         <View>
-                            <Text style={styles.feedText}>
-                                <Text style={styles.boldText}>
-                                    {user.username}
-                                </Text>{' '}
-                                reviewed
+                            <Text style={styles.fromNowText}>
+                                {fromNowString(createdAt)}
                             </Text>
                         </View>
-                    </Pressable>
+                    </View>
 
                     <View style={styles.contentContainer}>
                         <Text style={styles.pubName}>{review.pub.name}</Text>
@@ -120,40 +139,50 @@ export default function FeedReviewItem({ user, review }: FeedReviewItemProps) {
     return (
         <TouchableHighlight
             underlayColor="#E5E7EB"
-            style={styles.noContentContainer}
+            style={styles.noContentTouchableContainer}
             onPress={() =>
                 navigation.navigate('PubHome', {
                     screen: 'PubView',
                     params: { pubId: review.pub.id },
                 })
             }>
-            <>
-                <Pressable
-                    style={styles.avatarPressable}
-                    onPress={() =>
-                        navigation.navigate('Profile', {
-                            userId: user.id,
-                        })
-                    }>
-                    <UserAvatar size={24} photo={user.profile_photo} />
-                </Pressable>
+            <View style={styles.noContentContainer}>
+                <View style={styles.noContentContentContainer}>
+                    <Pressable
+                        style={styles.avatarPressable}
+                        onPress={() =>
+                            navigation.navigate('Profile', {
+                                userId: user.id,
+                            })
+                        }>
+                        <UserAvatar size={24} photo={user.profile_photo} />
+                    </Pressable>
 
-                <View style={styles.textContentContainer}>
-                    <Text style={styles.text}>
-                        <Text style={styles.boldText}>{user.username}</Text>{' '}
-                        rated{' '}
-                        <Text style={styles.boldText}>{review.pub.name}</Text>{' '}
-                    </Text>
-                    <View style={styles.noContentStarsContainer}>
-                        <RatingsStarViewer
-                            amount={review.rating}
-                            size={12}
-                            padding={0}
-                            color="rgba(0, 0, 0, 0.7)"
-                        />
+                    <View style={styles.textContentContainer}>
+                        <Text style={styles.text}>
+                            <Text style={styles.boldText}>{user.username}</Text>{' '}
+                            rated{' '}
+                            <Text style={styles.boldText}>
+                                {review.pub.name}
+                            </Text>{' '}
+                        </Text>
+                        <View style={styles.noContentStarsContainer}>
+                            <RatingsStarViewer
+                                amount={review.rating}
+                                size={12}
+                                padding={0}
+                                color="rgba(0, 0, 0, 0.7)"
+                            />
+                        </View>
                     </View>
                 </View>
-            </>
+
+                <View>
+                    <Text style={styles.fromNowText}>
+                        {fromNowString(createdAt)}
+                    </Text>
+                </View>
+            </View>
         </TouchableHighlight>
     );
 }
@@ -169,7 +198,12 @@ const styles = StyleSheet.create({
     feedText: {
         fontSize: 12,
     },
-    topContainer: {
+    topBarContainer: {
+        alignItems: 'center',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    userPressableContainer: {
         flexDirection: 'row',
         alignItems: 'center',
     },
@@ -182,6 +216,10 @@ const styles = StyleSheet.create({
     },
     boldText: {
         fontWeight: '500',
+    },
+    fromNowText: {
+        fontSize: 10,
+        fontWeight: '300',
     },
     pubName: {
         fontWeight: '600',
@@ -220,9 +258,21 @@ const styles = StyleSheet.create({
     },
     noContentContainer: {
         flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    noContentContentContainer: {
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        flex: 1,
+    },
+    noContentTouchableContainer: {
+        flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 20,
+        flex: 1,
         paddingVertical: 15,
         borderBottomWidth: 1,
         borderColor: '#E5E7EB',
