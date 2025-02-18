@@ -41,7 +41,7 @@ import PubReviews from '@/components/Reviews/PubReviews';
 import PubDetails from '@/components/Pubs/PubView/PubDetails';
 import { ListReviewType } from '@/services/queries/review';
 import { PubViewContext } from '@/context/pubViewContext';
-import { RootStackScreenProps } from '@/types/nav';
+import { PubNavigatorStackProps } from '@/types/nav';
 import FollowedRatings from '@/components/Pubs/PubView/FollowedRatings';
 
 const GRADIENT_HEIGHT = 128;
@@ -50,7 +50,7 @@ const NO_IMAGE = require('@/assets/noimage.png');
 export default function PubView({
     route,
     navigation,
-}: RootStackScreenProps<'PubView'>) {
+}: PubNavigatorStackProps<'PubView'>) {
     const [pub, setPub] = useState<FetchPubType>();
     const [isLoading, setIsLoading] = useState(false);
     const [isSaving, setIsSaving] = useState(false);

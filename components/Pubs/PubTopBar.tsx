@@ -6,6 +6,7 @@ import { timeString } from '@/services';
 import * as Location from 'expo-location';
 import { showLocation } from 'react-native-map-link';
 import { FetchPubType } from '@/services/queries/pub';
+import { useNavigation } from '@react-navigation/native';
 
 type TopBarPubProps = {
     pub: FetchPubType;
@@ -20,6 +21,8 @@ export default function PubTopBar({ pub, distMeters }: TopBarPubProps) {
     const [userLocation, setUserLocation] = useState<
         Location.LocationObject | undefined
     >(undefined);
+
+    const navigation = useNavigation();
 
     useEffect(() => {
         const setLocation = async () => {
@@ -57,7 +60,14 @@ export default function PubTopBar({ pub, distMeters }: TopBarPubProps) {
 
     return (
         <View style={styles.container}>
-            <TouchableOpacity style={styles.column}>
+            <TouchableOpacity
+                style={styles.column}
+                onPress={() =>
+                    navigation.navigate('PubHome', {
+                        screen: 'PubReviewsView',
+                        params: { pubId: pub.id },
+                    })
+                }>
                 <View style={styles.reviewColumnContainer}>
                     <Ionicons name="star" />
                     <Text style={styles.reviewText}>
