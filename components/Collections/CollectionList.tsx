@@ -16,6 +16,7 @@ import {
     FontAwesome6,
     Entypo,
     MaterialIcons,
+    EvilIcons,
 } from '@expo/vector-icons';
 import CollectionMap from '@/components/Collections/CollectionMap';
 import UserAvatar from '@/components/User/UserAvatar';
@@ -23,7 +24,6 @@ import { StackActions, useNavigation } from '@react-navigation/native';
 import LikeCollectionButton from '@/components/Collections/LikeCollectionButton';
 import CollectionItemListItem from './CollectionItemListItem';
 import CollectionCollaborators from './CollectionCollaborators';
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 
 type CollectionListProps = {
     collection?: CollectionType;
@@ -51,8 +51,6 @@ export default function CollectionList({
     canEdit,
 }: CollectionListProps) {
     const [isFollowing, setIsFollowing] = useState(false);
-    const [createCommentVisible, setCreateCommentVisible] = useState(true);
-    const [scrollOffset, setScrollOffset] = useState(0);
 
     const navigation = useNavigation();
 
@@ -88,9 +86,25 @@ export default function CollectionList({
         return collection.is_liked[0].count > 0;
     }, [collection]);
 
+    const likeText = useMemo<string>(() => {
+        if (!collection) {
+            return '';
+        }
+
+        if (collection.likes[0].count === 1) {
+            return `${collection.likes[0].count} like`;
+        }
+
+        return `${collection.likes[0].count} likes`;
+    }, [collection]);
+
     const commentText = useMemo<string>(() => {
         if (!collection) {
             return 'Comment';
+        }
+
+        if (collection.comments[0].count === 1) {
+            return `${collection.comments[0].count} comment`;
         }
 
         if (collection.comments[0].count > 0) {
@@ -160,29 +174,6 @@ export default function CollectionList({
     const setToLiked = useCallback(() => setLiked(true), [setLiked]);
     const setToUnliked = useCallback(() => setLiked(false), [setLiked]);
 
-    const showComments = useCallback(
-        (y: number) => {
-            const offset = scrollOffset;
-            setScrollOffset(y);
-
-            if (y <= 0) {
-                // At top of list.
-                setCreateCommentVisible(true);
-                return;
-            }
-
-            if (y > offset) {
-                // Scrolling down.
-                setCreateCommentVisible(false);
-                return;
-            }
-
-            // Else we're scrolling up.
-            setCreateCommentVisible(true);
-        },
-        [scrollOffset],
-    );
-
     // We check saved up here ot    herwise it doesn't update on
     // Save toggle.
     const isSaved = useCallback(
@@ -199,13 +190,6 @@ export default function CollectionList({
     return (
         <>
             <FlatList
-                onScroll={({
-                    nativeEvent: {
-                        contentOffset: { y },
-                    },
-                }) => {
-                    showComments(y);
-                }}
                 data={collection?.collection_items || []}
                 keyExtractor={item => item.pub.id.toString()}
                 onRefresh={refresh}
@@ -310,7 +294,29 @@ export default function CollectionList({
                                             collectionId={collection.id}
                                         />
                                         <Text style={styles.likeText}>
-                                            {collection.likes[0].count} likes
+                                            {likeText}
+                                        </Text>
+
+                                        <TouchableOpacity
+                                            style={styles.commentIcon}
+                                            onPress={() =>
+                                                navigation.navigate(
+                                                    'CollectionComments',
+                                                    {
+                                                        collectionId:
+                                                            collection.id,
+                                                        focusOnOpen: true,
+                                                    },
+                                                )
+                                            }>
+                                            <EvilIcons
+                                                name="comment"
+                                                size={18}
+                                            />
+                                        </TouchableOpacity>
+
+                                        <Text style={styles.commentText}>
+                                            {commentText}
                                         </Text>
                                     </View>
 
@@ -410,22 +416,6 @@ export default function CollectionList({
                     />
                 )}
             />
-
-            {collection && createCommentVisible && (
-                <Pressable
-                    onPress={() =>
-                        navigation.navigate('CollectionComments', {
-                            collectionId: collection.id,
-                        })
-                    }>
-                    <Animated.View
-                        style={styles.commentContainer}
-                        entering={FadeIn.duration(150)}
-                        exiting={FadeOut.duration(150)}>
-                        <Text style={styles.commentText}>{commentText}</Text>
-                    </Animated.View>
-                </Pressable>
-            )}
         </>
     );
 }
@@ -504,24 +494,11 @@ const styles = StyleSheet.create({
         letterSpacing: -0.4,
         marginLeft: 2,
     },
-    commentContainer: {
-        position: 'absolute',
-        bottom: 15,
-        paddingHorizontal: 10,
-        paddingVertical: 8,
-        alignSelf: 'center',
-        backgroundColor: PRIMARY_COLOR,
-        borderRadius: 20,
-        shadowColor: '#000',
-        shadowOpacity: 0.3,
-        shadowOffset: {
-            height: 0,
-            width: 0,
-        },
+    commentIcon: {
+        marginLeft: 4,
     },
     commentText: {
-        color: '#FFF',
-        fontSize: 10,
-        fontWeight: '500',
+        marginLeft: 2,
+        fontSize: 12,
     },
 });
