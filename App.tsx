@@ -15,10 +15,30 @@ import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { StatusBar } from 'expo-status-bar';
 import dayjs from 'dayjs';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
+import updateLocale from 'dayjs/plugin/updateLocale';
 import CollectionProvider from '@/components/Collections/CollectionProvider';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 dayjs.extend(advancedFormat);
+dayjs.extend(updateLocale);
+
+dayjs.updateLocale('en', {
+    relativeTime: {
+        future: 'in %s',
+        past: '%s',
+        s: '%s',
+        m: '%m',
+        mm: '%dm',
+        h: '1h',
+        hh: '%dh',
+        d: '1d',
+        dd: '%dd',
+        M: '1m',
+        MM: '%dm',
+        y: '1y',
+        yy: '%dy',
+    },
+});
 
 LogBox.ignoreLogs([
     'Non-serializable values were found in the navigation state',

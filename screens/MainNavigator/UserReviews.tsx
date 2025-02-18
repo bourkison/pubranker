@@ -43,7 +43,7 @@ export default function UserReviews({
     return (
         <SafeAreaView style={styles.container}>
             <Header
-                header="User Reviews"
+                header="Reviews"
                 leftColumn={
                     <TouchableOpacity
                         style={styles.backContainer}
