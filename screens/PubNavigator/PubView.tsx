@@ -44,6 +44,7 @@ import { PubViewContext } from '@/context/pubViewContext';
 import { PubNavigatorStackProps } from '@/types/nav';
 import FollowedRatings from '@/components/Pubs/PubView/FollowedRatings';
 import PubUserPhotos from '@/components/Pubs/PubView/PubUserPhotos';
+import PubCollections from '@/components/Pubs/PubView/PubCollections';
 
 const GRADIENT_HEIGHT = 128;
 const NO_IMAGE = require('@/assets/noimage.png');
@@ -503,9 +504,9 @@ export default function PubView({
                                         {
                                             title: 'Lists',
                                             component: (
-                                                <View>
-                                                    <Text>Test</Text>
-                                                </View>
+                                                <PubCollections
+                                                    pubId={pub.id}
+                                                />
                                             ),
                                         },
                                         {
