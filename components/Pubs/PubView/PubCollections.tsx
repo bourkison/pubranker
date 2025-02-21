@@ -1,6 +1,7 @@
 import CollectionListItem from '@/components/Collections/CollectionListItem';
-import { ListCollectionType } from '@/services/queries/collections';
+import { useSharedPubViewContext } from '@/context/pubViewContext';
 import { supabase } from '@/services/supabase';
+import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 
@@ -12,10 +13,18 @@ const INITIAL_AMOUNT = 5;
 
 export default function PubCollections({ pubId }: PubCollectionsProps) {
     const [isLoading, setIsLoading] = useState(false);
-    const [collections, setCollections] = useState<ListCollectionType[]>([]);
+
+    const navigation = useNavigation();
+
+    const {
+        collections,
+        setCollections,
+        hasLoadedCollections,
+        setHasLoadedCollections,
+    } = useSharedPubViewContext();
 
     useEffect(() => {
-        (async () => {
+        const fetchCollections = async () => {
             setIsLoading(true);
 
             // First pull all collections with this pub in it.
@@ -81,8 +90,20 @@ export default function PubCollections({ pubId }: PubCollectionsProps) {
 
             setCollections(data);
             setIsLoading(false);
-        })();
-    }, [pubId]);
+            setHasLoadedCollections(true);
+        };
+
+        if (!hasLoadedCollections && !isLoading) {
+            fetchCollections();
+        }
+    }, [
+        hasLoadedCollections,
+        setHasLoadedCollections,
+        isLoading,
+        setCollections,
+        collections,
+        pubId,
+    ]);
 
     if (isLoading) {
         return <ActivityIndicator />;
@@ -92,8 +113,13 @@ export default function PubCollections({ pubId }: PubCollectionsProps) {
         <View>
             {collections.map(collection => (
                 <CollectionListItem
+                    key={collection.id}
                     collection={collection}
-                    onPress={() => console.log('press')}
+                    onPress={() =>
+                        navigation.navigate('UserCollectionView', {
+                            collectionId: collection.id,
+                        })
+                    }
                 />
             ))}
         </View>

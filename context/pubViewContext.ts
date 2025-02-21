@@ -1,3 +1,4 @@
+import { ListCollectionType } from '@/services/queries/collections';
 import { ListReviewType } from '@/services/queries/review';
 import { Dispatch, SetStateAction, createContext, useContext } from 'react';
 
@@ -8,6 +9,11 @@ type PubViewContext = {
     setUserReview: Dispatch<SetStateAction<ListReviewType | null>>;
     hasLoadedReviews: boolean;
     setHasLoadedReviews: Dispatch<SetStateAction<boolean>>;
+
+    collections: ListCollectionType[];
+    setCollections: Dispatch<SetStateAction<ListCollectionType[]>>;
+    hasLoadedCollections: boolean;
+    setHasLoadedCollections: Dispatch<SetStateAction<boolean>>;
 };
 
 export const PubViewContext = createContext<PubViewContext | null>(null);

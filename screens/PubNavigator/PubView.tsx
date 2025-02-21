@@ -45,6 +45,7 @@ import { PubNavigatorStackProps } from '@/types/nav';
 import FollowedRatings from '@/components/Pubs/PubView/FollowedRatings';
 import PubUserPhotos from '@/components/Pubs/PubView/PubUserPhotos';
 import PubCollections from '@/components/Pubs/PubView/PubCollections';
+import { ListCollectionType } from '@/services/queries/collections';
 
 const GRADIENT_HEIGHT = 128;
 const NO_IMAGE = require('@/assets/noimage.png');
@@ -60,6 +61,8 @@ export default function PubView({
     const [reviews, setReviews] = useState<ListReviewType[]>([]);
     const [userReview, setUserReview] = useState<ListReviewType | null>(null);
     const [hasLoadedReviews, setHasLoadedReviews] = useState(false);
+    const [collections, setCollections] = useState<ListCollectionType[]>([]);
+    const [hasLoadedCollections, setHasLoadedCollections] = useState(false);
 
     const { width } = useWindowDimensions();
     const insets = useSafeAreaInsets();
@@ -270,6 +273,10 @@ export default function PubView({
                 setUserReview,
                 hasLoadedReviews,
                 setHasLoadedReviews,
+                collections,
+                setCollections,
+                hasLoadedCollections,
+                setHasLoadedCollections,
             }}>
             <View style={styles.container}>
                 {/* Top image with expanding container */}
