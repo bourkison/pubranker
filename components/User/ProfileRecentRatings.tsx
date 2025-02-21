@@ -80,8 +80,11 @@ export default function ProfileRecentRatings({
                 {recentRatings.map((rating, index) => (
                     <Pressable
                         onPress={() => {
-                            const pushAction = StackActions.push('PubView', {
-                                pubId: rating.pubs.id,
+                            const pushAction = StackActions.push('PubHome', {
+                                screen: 'PubView',
+                                params: {
+                                    pubId: rating.pubs.id,
+                                },
                             });
                             navigation.dispatch(pushAction);
                         }}

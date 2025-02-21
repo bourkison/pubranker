@@ -1,7 +1,7 @@
 import Gallery from '@/components/Utility/Gallery';
 import { supabase } from '@/services/supabase';
 import React, { useEffect, useState } from 'react';
-import { View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
 
 type PubUserPhotosType = {
     pubId: number;
@@ -31,7 +31,7 @@ export default function PubUserPhotos({ pubId }: PubUserPhotosType) {
 
     if (isLoading) {
         return (
-            <View>
+            <View style={styles.emptyContainer}>
                 <ActivityIndicator />
             </View>
         );
@@ -43,3 +43,11 @@ export default function PubUserPhotos({ pubId }: PubUserPhotosType) {
         </View>
     );
 }
+
+const styles = StyleSheet.create({
+    emptyContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginVertical: 60,
+    },
+});

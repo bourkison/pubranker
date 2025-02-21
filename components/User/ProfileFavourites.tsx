@@ -68,7 +68,7 @@ export default function ProfileFavourites({
                             { width: pubElementWidth },
                         ]}
                         onPress={() => {
-                            const pushAction = StackActions.push('P', {
+                            const pushAction = StackActions.push('PubHome', {
                                 screen: 'PubView',
                                 params: {
                                     pubId: favourite.pubs.id,

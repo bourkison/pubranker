@@ -3,7 +3,7 @@ import { useSharedPubViewContext } from '@/context/pubViewContext';
 import { supabase } from '@/services/supabase';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
 
 type PubCollectionsProps = {
     pubId: number;
@@ -106,7 +106,11 @@ export default function PubCollections({ pubId }: PubCollectionsProps) {
     ]);
 
     if (isLoading) {
-        return <ActivityIndicator />;
+        return (
+            <View style={styles.emptyContainer}>
+                <ActivityIndicator />
+            </View>
+        );
     }
 
     return (
@@ -125,3 +129,11 @@ export default function PubCollections({ pubId }: PubCollectionsProps) {
         </View>
     );
 }
+
+const styles = StyleSheet.create({
+    emptyContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginVertical: 75,
+    },
+});
