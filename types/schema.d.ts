@@ -938,6 +938,14 @@ export type Database = {
         }
         Returns: number
       }
+      get_pub_user_photos: {
+        Args: {
+          pub_id: number
+        }
+        Returns: {
+          photos: string
+        }[]
+      }
       get_pubs_in_polygon: {
         Args: {
           geojson: string

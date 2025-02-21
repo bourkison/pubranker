@@ -43,6 +43,7 @@ import { ListReviewType } from '@/services/queries/review';
 import { PubViewContext } from '@/context/pubViewContext';
 import { PubNavigatorStackProps } from '@/types/nav';
 import FollowedRatings from '@/components/Pubs/PubView/FollowedRatings';
+import PubUserPhotos from '@/components/Pubs/PubView/PubUserPhotos';
 
 const GRADIENT_HEIGHT = 128;
 const NO_IMAGE = require('@/assets/noimage.png');
@@ -472,17 +473,14 @@ export default function PubView({
                                             ),
                                         },
                                         {
-                                            title: `User Photos (${
-                                                pub.photos?.length || 0
-                                            })`,
+                                            title: 'User Photos',
                                             component: (
                                                 <View
                                                     style={
                                                         styles.galleryContainer
                                                     }>
-                                                    <Gallery
-                                                        type="pubs"
-                                                        photos={pub.photos}
+                                                    <PubUserPhotos
+                                                        pubId={pub.id}
                                                     />
                                                 </View>
                                             ),
