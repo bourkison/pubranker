@@ -1,18 +1,17 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-
-import MapView, { Region } from 'react-native-maps';
 import * as Location from 'expo-location';
 import MapStyle from '@/json/map_style.json';
 import { StyleSheet, View } from 'react-native';
 import { useAppSelector } from '@/store/hooks';
-import DebugPolygons from './DebugPolygons';
+// import DebugPolygons from './DebugPolygons';
 import BottomSheet from '@gorhom/bottom-sheet';
 import BottomSheetPubList from '@/components/Pubs/BottomSheetPubList';
 import SelectedPub from './SelectedPub';
 import { useSharedExploreContext } from '@/context/exploreContext';
-import MapMarkers from './MapMarkers';
+// import MapMarkers from './MapMarkers';
 import { Point } from '@turf/helpers';
 import { useSharedMapContext } from '@/context/mapContext';
+import { MapView, Camera, LocationPuck } from '@rnmapbox/maps';
 
 const ANIMATE_DELTA = 0.0075;
 const INITIAL_DELTA = 0.01;
@@ -25,6 +24,7 @@ export default function HomeMap() {
         Location.LocationObject | undefined
     >(undefined);
     const MapRef = useRef<MapView>(null);
+    const CameraRef = useRef<Camera>(null);
 
     const [bottomMapPadding, setBottomMapPadding] = useState(0);
     const explorePubs = useAppSelector(state => state.explore.pubs);
@@ -55,28 +55,23 @@ export default function HomeMap() {
 
             const l = await Location.getCurrentPositionAsync();
             setLocation(l);
+            CameraRef.current?.setCamera({
+                centerCoordinate: [l.coords.longitude, l.coords.latitude],
+                animationDuration: 0,
+                zoomLevel: 14,
+            });
         })();
     }, []);
 
     const snapPoints = useMemo(() => ['10%', '35%', '100%'], []);
 
-    const initialRegion = useMemo(() => {
+    const initialRegion = useMemo<[number, number]>(() => {
         return location
-            ? {
-                  latitude: location.coords.latitude,
-                  longitude: location.coords.longitude,
-                  latitudeDelta: INITIAL_DELTA,
-                  longitudeDelta: INITIAL_DELTA,
-              }
-            : {
-                  latitude: 51.553064,
-                  longitude: -0.056349,
-                  latitudeDelta: INITIAL_DELTA,
-                  longitudeDelta: INITIAL_DELTA,
-              };
+            ? [location.coords.longitude, location.coords.latitude]
+            : [-0.056349, 51.553064];
     }, [location]);
 
-    const [region, setRegion] = useState<Region>(initialRegion);
+    const [region, setRegion] = useState<[number, number]>(initialRegion);
 
     const pubSelectedOnMap = (pub: { id: number; location: Point }) => {
         MapRef.current?.animateToRegion({
@@ -113,6 +108,23 @@ export default function HomeMap() {
         <>
             <MapView
                 ref={MapRef}
+                style={styles.map}
+                onLayout={({
+                    nativeEvent: {
+                        layout: { height },
+                    },
+                }) =>
+                    setBottomMapPadding(
+                        height * (parseFloat(snapPoints[0]) / 100),
+                    )
+                }
+                styleJSON={JSON.stringify(MapStyle)}>
+                <Camera ref={CameraRef} />
+                <LocationPuck />
+            </MapView>
+
+            {/* <MapView
+                ref={MapRef}
                 showsUserLocation={true}
                 showsMyLocationButton={false}
                 onLayout={e => {
@@ -139,7 +151,7 @@ export default function HomeMap() {
                     onGroupSelect={groupSelectedOnMap}
                 />
                 <DebugPolygons />
-            </MapView>
+            </MapView> */}
             {selectedMapPub !== undefined ? (
                 <View
                     style={[

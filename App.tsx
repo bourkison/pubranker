@@ -18,6 +18,11 @@ import advancedFormat from 'dayjs/plugin/advancedFormat';
 import updateLocale from 'dayjs/plugin/updateLocale';
 import CollectionProvider from '@/components/Collections/CollectionProvider';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import MapBox from '@rnmapbox/maps';
+
+MapBox.setAccessToken(
+    'pk.eyJ1IjoiaGFycmlzb25ib3Vya2UiLCJhIjoiY203ZzluMHM1MHl0aDJpcjB1cnBhNWkydyJ9.9QqjbSyBDwFw0gmseVokDQ',
+);
 
 dayjs.extend(advancedFormat);
 dayjs.extend(updateLocale);
