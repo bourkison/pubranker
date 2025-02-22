@@ -64,6 +64,51 @@ export const joinPolygons = (
     return response;
 };
 
+export const getMinMaxLatLong = (
+    locations: turf.Position[],
+):
+    | { minLong: number; minLat: number; maxLong: number; maxLat: number }
+    | undefined => {
+    let minLong: number | undefined;
+    let minLat: number | undefined;
+    let maxLat: number | undefined;
+    let maxLong: number | undefined;
+
+    locations.forEach(l => {
+        if (minLong === undefined || l[0] < minLong) {
+            minLong = l[0];
+        }
+
+        if (minLat === undefined || l[1] < minLat) {
+            minLat = l[1];
+        }
+
+        if (maxLong === undefined || l[0] > maxLong) {
+            maxLong = l[0];
+        }
+
+        if (maxLat === undefined || l[1] > maxLat) {
+            maxLat = l[1];
+        }
+    });
+
+    if (
+        minLat === undefined ||
+        minLong === undefined ||
+        maxLat === undefined ||
+        maxLong === undefined
+    ) {
+        return;
+    }
+
+    return {
+        minLat,
+        minLong,
+        maxLat,
+        maxLong,
+    };
+};
+
 export const getBorough = (input: turf.Point) => {
     for (let i = 0; i < boroughs.features.length; i++) {
         const borough = boroughs.features[i];

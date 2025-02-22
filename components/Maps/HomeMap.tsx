@@ -19,7 +19,7 @@ import { Feature, MultiPolygon, Point, Polygon, polygon } from '@turf/helpers';
 import { useSharedMapContext } from '@/context/mapContext';
 import { MapView, Camera, LocationPuck } from '@rnmapbox/maps';
 import { Position } from '@rnmapbox/maps/lib/typescript/src/types/Position';
-import { convertBoxToCoordinates } from '@/services/geo';
+import { convertBoxToCoordinates, getMinMaxLatLong } from '@/services/geo';
 import { booleanPointInPolygon, distance, ellipse, union } from '@turf/turf';
 
 const MAX_CAMERA_ZOOM = 16;
@@ -264,41 +264,15 @@ export default function HomeMap() {
     );
 
     const groupSelectedOnMap = useCallback((locations: Position[]) => {
-        let minimumLongitude: number | undefined;
-        let minimumLatitude: number | undefined;
-        let maximumLatitude: number | undefined;
-        let maximumLongitude: number | undefined;
+        const minMaxLatLong = getMinMaxLatLong(locations);
 
-        locations.forEach(l => {
-            if (minimumLongitude === undefined || l[0] < minimumLongitude) {
-                minimumLongitude = l[0];
-            }
-
-            if (minimumLatitude === undefined || l[1] < minimumLatitude) {
-                minimumLatitude = l[1];
-            }
-
-            if (maximumLongitude === undefined || l[0] > maximumLongitude) {
-                maximumLongitude = l[0];
-            }
-
-            if (maximumLatitude === undefined || l[1] > maximumLatitude) {
-                maximumLatitude = l[1];
-            }
-        });
-
-        if (
-            minimumLatitude === undefined ||
-            minimumLongitude === undefined ||
-            maximumLatitude === undefined ||
-            maximumLongitude === undefined
-        ) {
+        if (!minMaxLatLong) {
             return;
         }
 
         CameraRef.current?.fitBounds(
-            [minimumLongitude, minimumLatitude],
-            [maximumLongitude, maximumLatitude],
+            [minMaxLatLong.minLong, minMaxLatLong.minLat],
+            [minMaxLatLong.maxLong, minMaxLatLong.maxLat],
             100,
         );
 
