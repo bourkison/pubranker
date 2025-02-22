@@ -8,13 +8,13 @@ import BottomSheet from '@gorhom/bottom-sheet';
 import BottomSheetPubList from '@/components/Pubs/BottomSheetPubList';
 import SelectedPub from './SelectedPub';
 import { useSharedExploreContext } from '@/context/exploreContext';
-// import MapMarkers from './MapMarkers';
+import MapMarkers from '@/components/Maps/MapMarkers';
 import { Point } from '@turf/helpers';
 import { useSharedMapContext } from '@/context/mapContext';
 import { MapView, Camera, LocationPuck } from '@rnmapbox/maps';
+import { Position } from '@rnmapbox/maps/lib/typescript/src/types/Position';
 
 const ANIMATE_DELTA = 0.0075;
-const INITIAL_DELTA = 0.01;
 
 // TODO: Check out rnmapbox
 // https://github.com/rnmapbox/maps
@@ -23,8 +23,17 @@ export default function HomeMap() {
     const [location, setLocation] = useState<
         Location.LocationObject | undefined
     >(undefined);
+
+    const initialRegion = useMemo<Position>(() => {
+        return location
+            ? [location.coords.longitude, location.coords.latitude]
+            : [-0.056349, 51.553064];
+    }, [location]);
+
     const MapRef = useRef<MapView>(null);
     const CameraRef = useRef<Camera>(null);
+    const [region, setRegion] = useState<Position>(initialRegion);
+    const [mapBounds, setMapBounds] = useState<[Position, Position]>();
 
     const [bottomMapPadding, setBottomMapPadding] = useState(0);
     const explorePubs = useAppSelector(state => state.explore.pubs);
@@ -59,56 +68,70 @@ export default function HomeMap() {
                 centerCoordinate: [l.coords.longitude, l.coords.latitude],
                 animationDuration: 0,
                 zoomLevel: 14,
+                animationMode: 'none',
             });
+
+            const bounds = await MapRef.current?.getVisibleBounds();
+            setMapBounds(bounds);
+
+            console.log('bounds', bounds);
         })();
     }, []);
 
     const snapPoints = useMemo(() => ['10%', '35%', '100%'], []);
 
-    const initialRegion = useMemo<[number, number]>(() => {
-        return location
-            ? [location.coords.longitude, location.coords.latitude]
-            : [-0.056349, 51.553064];
-    }, [location]);
-
-    const [region, setRegion] = useState<[number, number]>(initialRegion);
-
     const pubSelectedOnMap = (pub: { id: number; location: Point }) => {
-        MapRef.current?.animateToRegion({
-            latitude: pub.location.coordinates[1] - 0.15 * ANIMATE_DELTA,
-            longitude: pub.location.coordinates[0],
-            latitudeDelta: ANIMATE_DELTA,
-            longitudeDelta: ANIMATE_DELTA,
+        CameraRef.current?.setCamera({
+            centerCoordinate: pub.location.coordinates,
+            zoomLevel: 15,
         });
 
         selectMapPub(pub.id);
         bottomSheetRef.current?.collapse();
     };
 
-    const groupSelectedOnMap = (
-        locations: { latitude: number; longitude: number }[],
-    ) => {
-        MapRef.current?.fitToCoordinates(locations, {
-            edgePadding: { left: 50, right: 50, top: 200, bottom: 200 },
-        });
+    const groupSelectedOnMap = (locations: Positions[]) => {
+        // CameraRef.current?.fitBounds(locations);
+        // MapRef.current?.fitToCoordinates(locations, {
+        //     edgePadding: { left: 50, right: 50, top: 200, bottom: 200 },
+        // });
         bottomSheetRef.current?.collapse();
     };
 
     // When region changes, get any new pubs that are within this new region.
     useEffect(() => {
+        if (!mapBounds || !mapBounds[0] || !mapBounds[1]) {
+            return;
+        }
+
+        console.log('FETCHING PUBS', mapPubs);
+
         fetchMapPubs({
-            minLat: region.latitude - region.latitudeDelta,
-            minLong: region.longitude - region.longitudeDelta,
-            maxLat: region.latitude + region.latitudeDelta,
-            maxLong: region.longitude + region.longitudeDelta,
+            minLat: mapBounds[0][1],
+            minLong: mapBounds[0][0],
+            maxLat: mapBounds[1][1],
+            maxLong: mapBounds[1][0],
         });
-    }, [region, fetchMapPubs]);
+    }, [mapBounds, fetchMapPubs, mapPubs]);
 
     return (
         <>
             <MapView
                 ref={MapRef}
                 style={styles.map}
+                regionDidChangeDebounceTime={200}
+                scaleBarEnabled={false}
+                logoPosition={{ bottom: bottomMapPadding - 10, left: 10 }}
+                attributionPosition={{
+                    bottom: bottomMapPadding - 10,
+                    right: 0,
+                }}
+                onRegionDidChange={({ properties }) =>
+                    setMapBounds([
+                        properties.visibleBounds[0],
+                        properties.visibleBounds[1],
+                    ])
+                }
                 onLayout={({
                     nativeEvent: {
                         layout: { height },
@@ -121,6 +144,13 @@ export default function HomeMap() {
                 styleJSON={JSON.stringify(MapStyle)}>
                 <Camera ref={CameraRef} />
                 <LocationPuck />
+                <MapMarkers
+                    mapBounds={mapBounds || []}
+                    pubs={mapPubs}
+                    markerWidth={32}
+                    onPubSelect={pubSelectedOnMap}
+                    onGroupSelect={groupSelectedOnMap}
+                />
             </MapView>
 
             {/* <MapView

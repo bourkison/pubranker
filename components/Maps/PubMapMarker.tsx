@@ -1,6 +1,6 @@
 import React from 'react';
 import Svg, { Rect, Path } from 'react-native-svg';
-import { View, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet } from 'react-native';
 import { Color } from '@/types';
 
 type PubMapMarkerProps = {
@@ -8,6 +8,7 @@ type PubMapMarkerProps = {
     pinColor: Color;
     dotColor: Color;
     outlineColor: Color;
+    onPress: () => void;
 };
 
 export default function PubMapMarker({
@@ -15,9 +16,10 @@ export default function PubMapMarker({
     dotColor,
     outlineColor,
     pinColor,
+    onPress,
 }: PubMapMarkerProps) {
     return (
-        <View style={[styles.container, { width }]}>
+        <Pressable onPress={onPress} style={[styles.container, { width }]}>
             <Svg width="100%" height="100%" viewBox="0 0 207 263" fill="none">
                 <Rect x="48" y="56" width="109" height="115" fill={dotColor} />
                 <Path
@@ -29,7 +31,7 @@ export default function PubMapMarker({
                     fill={pinColor}
                 />
             </Svg>
-        </View>
+        </Pressable>
     );
 }
 

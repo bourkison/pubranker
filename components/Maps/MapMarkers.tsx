@@ -13,33 +13,32 @@ import center from '@turf/center';
 import ellipse from '@turf/ellipse';
 import union from '@turf/union';
 
-import { MapMarker, Region } from 'react-native-maps';
 import { convertBoxToCoordinates } from '@/services/geo';
 import { useWindowDimensions } from 'react-native';
 import PubMapMarker from './PubMapMarker';
 import { SECONDARY_COLOR } from '@/constants';
 import GroupMapMarker from './GroupMapMarker';
 import { useSharedMapContext } from '@/context/mapContext';
+import { Position } from '@rnmapbox/maps/lib/typescript/src/types/Position';
+import { MarkerView } from '@rnmapbox/maps';
 
 const markerAspectRatio = 207 / 263;
 
 type MapPubType = { id: number; location: Point };
 
 type MapMarkersProps = {
-    region: Region;
+    mapBounds: Position[];
     pubs: { id: number; location: Point }[];
     markerWidth: number;
     onPubSelect?: (pub: MapPubType) => void;
-    onGroupSelect?: (
-        locations: { latitude: number; longitude: number }[],
-    ) => void;
+    onGroupSelect?: (locations: Point[]) => void;
 };
 
 // TODO: Minimum delta to just show all pubs and not have any groupings.
 // TODO: Probably over grouping here. If you have a group with 25 pubs this could easily be split out into 2 or 3 smaller groups that won't overlap each other. look into logic on how to do that.
 
 export default function MapMarkers({
-    region,
+    mapBounds,
     pubs,
     markerWidth,
     onPubSelect,
@@ -54,12 +53,16 @@ export default function MapMarkers({
     const { selectedMapPub: selectedPub } = useSharedMapContext();
 
     useEffect(() => {
+        if (!mapBounds || !mapBounds[0] || !mapBounds[1]) {
+            return;
+        }
+
         // First let's ensure these pubs are within bounds.
         // TODO: May want to add some padding on the screen.
         const markerHeight = markerWidth / markerAspectRatio;
 
-        const deltaWidthPerPixel = region.longitudeDelta / width;
-        const deltaHeightPerPixel = region.latitudeDelta / height;
+        const deltaWidthPerPixel = 0.01 / width;
+        const deltaHeightPerPixel = 0.01 / height;
 
         const ellipsisWidth = deltaWidthPerPixel * markerWidth;
         const ellipsisHeight = deltaHeightPerPixel * markerHeight;
@@ -70,10 +73,10 @@ export default function MapMarkers({
 
         const screenPolygon = polygon([
             convertBoxToCoordinates({
-                minLong: region.longitude - region.longitudeDelta,
-                minLat: region.latitude - region.latitudeDelta,
-                maxLong: region.longitude + region.longitudeDelta,
-                maxLat: region.latitude + region.latitudeDelta,
+                minLat: mapBounds[0][1],
+                minLong: mapBounds[0][0],
+                maxLat: mapBounds[1][1],
+                maxLong: mapBounds[1][0],
             }),
         ]);
 
@@ -174,7 +177,7 @@ export default function MapMarkers({
         }
 
         setMarkers(outputArray);
-    }, [region, pubs, height, markerWidth, width, selectedPub]);
+    }, [mapBounds, pubs, height, markerWidth, width, selectedPub]);
 
     return (
         <>
@@ -186,59 +189,40 @@ export default function MapMarkers({
                     const c = center(points);
 
                     return (
-                        <MapMarker
+                        <MarkerView
                             key={marker.reduce(
                                 (acc, curr) => acc + curr.pubId.toString(),
                                 '',
                             )}
-                            coordinate={{
-                                latitude: c.geometry.coordinates[1],
-                                longitude: c.geometry.coordinates[0],
-                            }}
-                            onPress={() => {
-                                if (onGroupSelect) {
-                                    onGroupSelect(
-                                        marker.map(m => ({
-                                            latitude: m.location.coordinates[1],
-                                            longitude:
-                                                m.location.coordinates[0],
-                                        })),
-                                    );
-                                }
-                            }}>
+                            coordinate={c.geometry.coordinates}>
                             <GroupMapMarker
                                 group={marker}
                                 width={36}
+                                onPress={onGroupSelect}
                                 borderSize={4}
                                 outlineColor="#FFF"
                                 circleColor={SECONDARY_COLOR}
                                 numberColor="#FFF"
                             />
-                        </MapMarker>
+                        </MarkerView>
                     );
                 } else {
                     const selected = selectedPub?.id === marker.id;
 
                     return (
-                        <MapMarker
-                            onPress={() => {
-                                if (onPubSelect) {
-                                    onPubSelect(marker);
-                                }
-                            }}
+                        <MarkerView
                             key={marker.id.toString()}
-                            coordinate={{
-                                latitude: marker.location.coordinates[1],
-                                longitude: marker.location.coordinates[0],
-                            }}
-                            zIndex={selected ? 3 : 2}>
+                            coordinate={marker.location.coordinates}>
                             <PubMapMarker
+                                onPress={() =>
+                                    onPubSelect && onPubSelect(marker)
+                                }
                                 width={selected ? 36 : 32}
                                 pinColor={selected ? '#000' : SECONDARY_COLOR}
                                 outlineColor={selected ? '#000' : '#FFF'}
                                 dotColor="#FFF"
                             />
-                        </MapMarker>
+                        </MarkerView>
                     );
                 }
             })}
