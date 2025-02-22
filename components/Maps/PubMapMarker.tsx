@@ -38,5 +38,6 @@ export default function PubMapMarker({
 const styles = StyleSheet.create({
     container: {
         aspectRatio: 1,
+        zIndex: 99,
     },
 });
