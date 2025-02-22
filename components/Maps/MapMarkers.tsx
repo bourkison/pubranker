@@ -31,7 +31,7 @@ type MapMarkersProps = {
     pubs: { id: number; location: Point }[];
     markerWidth: number;
     onPubSelect?: (pub: MapPubType) => void;
-    onGroupSelect?: (locations: Point[]) => void;
+    onGroupSelect?: (locations: Position[]) => void;
 };
 
 // TODO: Minimum delta to just show all pubs and not have any groupings.
@@ -53,16 +53,20 @@ export default function MapMarkers({
     const { selectedMapPub: selectedPub } = useSharedMapContext();
 
     useEffect(() => {
+        console.log('Calculating grouping');
+
         if (!mapBounds || !mapBounds[0] || !mapBounds[1]) {
             return;
         }
+
+        console.log('Calculating grouping with map bounds', mapBounds);
 
         // First let's ensure these pubs are within bounds.
         // TODO: May want to add some padding on the screen.
         const markerHeight = markerWidth / markerAspectRatio;
 
-        const deltaWidthPerPixel = 0.01 / width;
-        const deltaHeightPerPixel = 0.01 / height;
+        const deltaWidthPerPixel = 0.1 / width;
+        const deltaHeightPerPixel = 0.1 / height;
 
         const ellipsisWidth = deltaWidthPerPixel * markerWidth;
         const ellipsisHeight = deltaHeightPerPixel * markerHeight;
@@ -70,6 +74,12 @@ export default function MapMarkers({
         if (!ellipsisHeight || !ellipsisWidth) {
             return;
         }
+
+        console.log(
+            'Calculating grouping with ellipsis height',
+            ellipsisHeight,
+            ellipsisWidth,
+        );
 
         const screenPolygon = polygon([
             convertBoxToCoordinates({
@@ -83,6 +93,8 @@ export default function MapMarkers({
         const pubsWithinScreen = pubs.filter(pub => {
             return booleanPointInPolygon(pub.location, screenPolygon);
         });
+
+        console.log('pubs within screen', pubsWithinScreen.length);
 
         let outputArray: Array<
             MapPubType | { pubId: number; location: Point }[]
@@ -177,6 +189,7 @@ export default function MapMarkers({
         }
 
         setMarkers(outputArray);
+        console.log('output array', JSON.stringify(outputArray));
     }, [mapBounds, pubs, height, markerWidth, width, selectedPub]);
 
     return (
@@ -187,6 +200,8 @@ export default function MapMarkers({
                         marker.map(p => feature(p.location)),
                     );
                     const c = center(points);
+
+                    console.log('TEST', marker);
 
                     return (
                         <MarkerView

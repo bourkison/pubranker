@@ -14,25 +14,9 @@ import { useSharedMapContext } from '@/context/mapContext';
 import { MapView, Camera, LocationPuck } from '@rnmapbox/maps';
 import { Position } from '@rnmapbox/maps/lib/typescript/src/types/Position';
 
-const ANIMATE_DELTA = 0.0075;
-
-// TODO: Check out rnmapbox
-// https://github.com/rnmapbox/maps
-
 export default function HomeMap() {
-    const [location, setLocation] = useState<
-        Location.LocationObject | undefined
-    >(undefined);
-
-    const initialRegion = useMemo<Position>(() => {
-        return location
-            ? [location.coords.longitude, location.coords.latitude]
-            : [-0.056349, 51.553064];
-    }, [location]);
-
     const MapRef = useRef<MapView>(null);
     const CameraRef = useRef<Camera>(null);
-    const [region, setRegion] = useState<Position>(initialRegion);
     const [mapBounds, setMapBounds] = useState<[Position, Position]>();
 
     const [bottomMapPadding, setBottomMapPadding] = useState(0);
@@ -63,7 +47,7 @@ export default function HomeMap() {
             }
 
             const l = await Location.getCurrentPositionAsync();
-            setLocation(l);
+
             CameraRef.current?.setCamera({
                 centerCoordinate: [l.coords.longitude, l.coords.latitude],
                 animationDuration: 0,
@@ -90,11 +74,49 @@ export default function HomeMap() {
         bottomSheetRef.current?.collapse();
     };
 
-    const groupSelectedOnMap = (locations: Positions[]) => {
+    const groupSelectedOnMap = (locations: Position[]) => {
         // CameraRef.current?.fitBounds(locations);
         // MapRef.current?.fitToCoordinates(locations, {
         //     edgePadding: { left: 50, right: 50, top: 200, bottom: 200 },
         // });
+        let minimumLongitude: number | undefined;
+        let minimumLatitude: number | undefined;
+        let maximumLatitude: number | undefined;
+        let maximumLongitude: number | undefined;
+
+        locations.forEach(l => {
+            if (minimumLongitude === undefined || l[0] < minimumLongitude) {
+                minimumLongitude = l[0];
+            }
+
+            if (minimumLatitude === undefined || l[1] < minimumLatitude) {
+                minimumLatitude = l[1];
+            }
+
+            if (maximumLongitude === undefined || l[0] > maximumLongitude) {
+                maximumLongitude = l[0];
+            }
+
+            if (maximumLatitude === undefined || l[1] > maximumLatitude) {
+                maximumLatitude = l[1];
+            }
+        });
+
+        if (
+            minimumLatitude === undefined ||
+            minimumLongitude === undefined ||
+            maximumLatitude === undefined ||
+            maximumLongitude === undefined
+        ) {
+            return;
+        }
+
+        CameraRef.current?.fitBounds(
+            [minimumLongitude, minimumLatitude],
+            [maximumLongitude, maximumLatitude],
+            25,
+        );
+
         bottomSheetRef.current?.collapse();
     };
 
@@ -104,33 +126,28 @@ export default function HomeMap() {
             return;
         }
 
-        console.log('FETCHING PUBS', mapPubs);
-
         fetchMapPubs({
             minLat: mapBounds[0][1],
             minLong: mapBounds[0][0],
             maxLat: mapBounds[1][1],
             maxLong: mapBounds[1][0],
         });
-    }, [mapBounds, fetchMapPubs, mapPubs]);
+    }, [mapBounds, fetchMapPubs]);
 
     return (
         <>
             <MapView
                 ref={MapRef}
                 style={styles.map}
-                regionDidChangeDebounceTime={200}
                 scaleBarEnabled={false}
                 logoPosition={{ bottom: bottomMapPadding - 10, left: 10 }}
                 attributionPosition={{
                     bottom: bottomMapPadding - 10,
                     right: 0,
                 }}
-                onRegionDidChange={({ properties }) =>
-                    setMapBounds([
-                        properties.visibleBounds[0],
-                        properties.visibleBounds[1],
-                    ])
+                regionDidChangeDebounceTime={200}
+                onMapIdle={({ properties }) =>
+                    setMapBounds([properties.bounds.ne, properties.bounds.sw])
                 }
                 onLayout={({
                     nativeEvent: {
@@ -142,7 +159,7 @@ export default function HomeMap() {
                     )
                 }
                 styleJSON={JSON.stringify(MapStyle)}>
-                <Camera ref={CameraRef} />
+                <Camera ref={CameraRef} maxZoomLevel={16} minZoomLevel={11} />
                 <LocationPuck />
                 <MapMarkers
                     mapBounds={mapBounds || []}

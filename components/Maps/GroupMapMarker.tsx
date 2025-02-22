@@ -2,6 +2,7 @@ import React from 'react';
 import { Text, StyleSheet, Pressable } from 'react-native';
 import { Color } from '@/types';
 import { Point } from '@turf/helpers';
+import { Position } from '@rnmapbox/maps/lib/typescript/src/types/Position';
 
 type GroupMapMarkerProps = {
     group: { location: Point; pubId: number }[];
@@ -10,7 +11,7 @@ type GroupMapMarkerProps = {
     circleColor: Color;
     outlineColor: Color;
     numberColor: Color;
-    onPress?: (locations: Point[]) => void;
+    onPress?: (locations: Position[]) => void;
 };
 
 export default function GroupMapMarker({
@@ -24,7 +25,9 @@ export default function GroupMapMarker({
 }: GroupMapMarkerProps) {
     return (
         <Pressable
-            onPress={() => onPress && onPress(group.map(p => p.location))}
+            onPress={() =>
+                onPress && onPress(group.map(p => p.location.coordinates))
+            }
             style={[
                 styles.container,
                 {
