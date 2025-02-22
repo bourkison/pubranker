@@ -23,7 +23,7 @@ import { convertBoxToCoordinates } from '@/services/geo';
 import { booleanPointInPolygon, distance, ellipse, union } from '@turf/turf';
 
 const MAX_CAMERA_ZOOM = 16;
-const MIN_CAMERA_ZOOM = 12;
+const MIN_CAMERA_ZOOM = 11;
 
 export default function HomeMap() {
     const MapRef = useRef<MapView>(null);
@@ -95,25 +95,6 @@ export default function HomeMap() {
             return [];
         }
 
-        const ELLIPSE_WIDTH_PIXELS = 20;
-        const ELLIPSE_HEIGHT_PIXELS = 50;
-        const MAX_GROUPING_DISTANCE_PIXELS = 100;
-
-        // Get the total width of the screen in degrees, then calculate per pixel width.
-        const screenWidthDeg = Math.abs(mapBounds.sw[1] - mapBounds.ne[1]);
-        const degWidthPerPixel = screenWidthDeg / mapWidth;
-        const ELLIPSE_WIDTH_DEG = ELLIPSE_WIDTH_PIXELS * degWidthPerPixel;
-
-        // Do the same for height.
-        const screenHeightDeg = Math.abs(mapBounds.ne[0] - mapBounds.sw[0]);
-        const degHeightPerPixel = screenHeightDeg / mapHeight;
-        const ELLIPSE_HEIGHT_DEG = ELLIPSE_HEIGHT_PIXELS * degHeightPerPixel;
-
-        // Average out the 2 and get our max distance degrees.
-        const avgDegPerPixel = (degWidthPerPixel + degHeightPerPixel) / 2;
-        const MAX_GROUPING_DISTANCE_DEG =
-            avgDegPerPixel * MAX_GROUPING_DISTANCE_PIXELS;
-
         // TODO: Potentially add a bit extra padding on the outside to include other pubs just outside viewport.
         const screenPolygon = polygon([
             convertBoxToCoordinates({
@@ -132,6 +113,25 @@ export default function HomeMap() {
         if (cameraZoom >= MAX_CAMERA_ZOOM) {
             return pubsWithinScreen;
         }
+
+        const ELLIPSE_WIDTH_PIXELS = 20;
+        const ELLIPSE_HEIGHT_PIXELS = 50;
+        const MAX_GROUPING_DISTANCE_PIXELS = 100;
+
+        // Get the total width of the screen in degrees, then calculate per pixel width.
+        const screenWidthDeg = Math.abs(mapBounds.sw[1] - mapBounds.ne[1]);
+        const degWidthPerPixel = screenWidthDeg / mapWidth;
+        const ELLIPSE_WIDTH_DEG = ELLIPSE_WIDTH_PIXELS * degWidthPerPixel;
+
+        // Do the same for height.
+        const screenHeightDeg = Math.abs(mapBounds.ne[0] - mapBounds.sw[0]);
+        const degHeightPerPixel = screenHeightDeg / mapHeight;
+        const ELLIPSE_HEIGHT_DEG = ELLIPSE_HEIGHT_PIXELS * degHeightPerPixel;
+
+        // Average out the 2 and get our max distance degrees.
+        const avgDegPerPixel = (degWidthPerPixel + degHeightPerPixel) / 2;
+        const MAX_GROUPING_DISTANCE_DEG =
+            avgDegPerPixel * MAX_GROUPING_DISTANCE_PIXELS;
 
         // This is taking an input of either 1 polygon (initial ellipsis) or multi polygon (merged ellipsis)
         // As well as the index to check from (to avoid checking over previously checked pubs).
@@ -299,7 +299,7 @@ export default function HomeMap() {
         CameraRef.current?.fitBounds(
             [minimumLongitude, minimumLatitude],
             [maximumLongitude, maximumLatitude],
-            25,
+            100,
         );
 
         bottomSheetRef.current?.collapse();
@@ -356,37 +356,7 @@ export default function HomeMap() {
                     onGroupSelect={groupSelectedOnMap}
                 />
             </MapView>
-
-            {/* <MapView
-                ref={MapRef}
-                showsUserLocation={true}
-                showsMyLocationButton={false}
-                onLayout={e => {
-                    setBottomMapPadding(
-                        e.nativeEvent.layout.height *
-                            (parseFloat(snapPoints[0]) / 100),
-                    );
-                }}
-                style={[styles.map]}
-                customMapStyle={MapStyle}
-                mapPadding={{
-                    bottom: bottomMapPadding,
-                    top: 0,
-                    right: 0,
-                    left: 0,
-                }}
-                onRegionChangeComplete={setRegion}
-                initialRegion={initialRegion}>
-                <MapMarkers
-                    region={region}
-                    pubs={mapPubs}
-                    markerWidth={32}
-                    onPubSelect={pubSelectedOnMap}
-                    onGroupSelect={groupSelectedOnMap}
-                />
-                <DebugPolygons />
-            </MapView> */}
-            {selectedMapPub !== undefined ? (
+            {selectedMapPub !== undefined && (
                 <View
                     style={[
                         styles.selectedPubContainer,
@@ -394,7 +364,7 @@ export default function HomeMap() {
                     ]}>
                     <SelectedPub pub={selectedMapPub} />
                 </View>
-            ) : undefined}
+            )}
             <BottomSheet
                 snapPoints={snapPoints}
                 index={1}

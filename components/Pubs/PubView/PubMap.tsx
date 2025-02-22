@@ -1,10 +1,10 @@
-import React, { useMemo, useRef } from 'react';
-import MapView, { MapMarker } from 'react-native-maps';
+import React, { useRef } from 'react';
 import MapStyle from '@/json/map_style.json';
 import { StyleSheet, useWindowDimensions } from 'react-native';
 import PubMapMarker from '@/components/Maps/PubMapMarker';
 import { SECONDARY_COLOR } from '@/constants';
 import { FetchPubType } from '@/services/queries/pub';
+import { Camera, MapView, MarkerView } from '@rnmapbox/maps';
 
 type PubMapProps = {
     pub: FetchPubType;
@@ -14,24 +14,18 @@ const MAP_PADDING = 30;
 
 export default function PubMap({ pub }: PubMapProps) {
     const { width } = useWindowDimensions();
-    const pubLocation = useMemo(() => pub.location, [pub]);
-
-    const mapRef = useRef<MapView>(null);
+    const CameraRef = useRef<Camera>(null);
 
     return (
         <>
             <MapView
-                ref={mapRef}
-                initialRegion={{
-                    latitude: pubLocation.coordinates[1],
-                    longitude: pubLocation.coordinates[0],
-                    latitudeDelta: 0.006,
-                    longitudeDelta: 0.006,
-                }}
                 rotateEnabled={false}
-                showsUserLocation={true}
-                showsMyLocationButton={false}
                 pointerEvents="none"
+                zoomEnabled={false}
+                pitchEnabled={false}
+                scrollEnabled={false}
+                scaleBarEnabled={false}
+                compassEnabled={false}
                 style={[
                     styles.map,
                     {
@@ -40,19 +34,23 @@ export default function PubMap({ pub }: PubMapProps) {
                         marginHorizontal: MAP_PADDING,
                     },
                 ]}
-                customMapStyle={MapStyle}>
-                <MapMarker
-                    coordinate={{
-                        latitude: pubLocation.coordinates[1],
-                        longitude: pubLocation.coordinates[0],
-                    }}>
+                styleJSON={JSON.stringify(MapStyle)}>
+                <Camera
+                    ref={CameraRef}
+                    animationDuration={0}
+                    animationMode="none"
+                    centerCoordinate={pub.location.coordinates}
+                    zoomLevel={14}
+                />
+
+                <MarkerView coordinate={pub.location.coordinates}>
                     <PubMapMarker
                         dotColor="#FFF"
                         pinColor={SECONDARY_COLOR}
                         outlineColor="#FFF"
                         width={32}
                     />
-                </MapMarker>
+                </MarkerView>
             </MapView>
         </>
     );

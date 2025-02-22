@@ -8,7 +8,7 @@ type PubMapMarkerProps = {
     pinColor: Color;
     dotColor: Color;
     outlineColor: Color;
-    onPress: () => void;
+    onPress?: () => void;
 };
 
 export default function PubMapMarker({
