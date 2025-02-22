@@ -1,11 +1,11 @@
 import React from 'react';
 import { Text, StyleSheet, Pressable } from 'react-native';
 import { Color } from '@/types';
-import { Point } from '@turf/helpers';
 import { Position } from '@rnmapbox/maps/lib/typescript/src/types/Position';
+import { MapPubType } from '@/components/Maps/MapMarkers';
 
 type GroupMapMarkerProps = {
-    group: { location: Point; pubId: number }[];
+    group: MapPubType[];
     width: number;
     borderSize: number;
     circleColor: Color;
