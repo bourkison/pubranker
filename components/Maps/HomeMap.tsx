@@ -9,7 +9,6 @@ import * as Location from 'expo-location';
 import MapStyle from '@/json/map_style.json';
 import { StyleSheet, View } from 'react-native';
 import { useAppSelector } from '@/store/hooks';
-// import DebugPolygons from './DebugPolygons';
 import BottomSheet from '@gorhom/bottom-sheet';
 import BottomSheetPubList from '@/components/Pubs/BottomSheetPubList';
 import SelectedPub from './SelectedPub';
@@ -34,8 +33,8 @@ export default function HomeMap() {
     }>();
     const [cameraZoom, setCameraZoom] = useState(0);
 
-    const [mapHeight, setMapHeight] = useState(0);
-    const [mapWidth, setMapWidth] = useState(0);
+    const [mapHeight, setMapHeight] = useState(400);
+    const [mapWidth, setMapWidth] = useState(400);
     const explorePubs = useAppSelector(state => state.explore.pubs);
 
     const { filterBarHeight, mapBottomSheetAnimatedValue } =
@@ -85,8 +84,6 @@ export default function HomeMap() {
             }
 
             setMapBounds({ ne: bounds[0], sw: bounds[1] });
-
-            console.log('bounds', bounds);
         })();
     }, []);
 
@@ -299,12 +296,13 @@ export default function HomeMap() {
                 ref={MapRef}
                 style={styles.map}
                 scaleBarEnabled={false}
-                logoPosition={{ bottom: bottomMapPadding - 10, left: 10 }}
-                attributionPosition={{
-                    bottom: bottomMapPadding - 10,
-                    right: 0,
-                }}
-                regionDidChangeDebounceTime={200}
+                // TODO: There is currently a bug where setting this will mess up
+                // the markers. Create a ticket for the team to look into.
+                // logoPosition={{ bottom: bottomMapPadding - 10, left: 10 }}
+                // attributionPosition={{
+                //     bottom: bottomMapPadding - 10,
+                //     right: 0,
+                // }}
                 onMapIdle={({ properties }) => {
                     setMapBounds(properties.bounds);
                     setCameraZoom(properties.zoom);
@@ -318,17 +316,17 @@ export default function HomeMap() {
                     setMapHeight(height);
                 }}
                 styleJSON={JSON.stringify(MapStyle)}>
+                <MapMarkers
+                    markers={markers}
+                    onPubSelect={pubSelectedOnMap}
+                    onGroupSelect={groupSelectedOnMap}
+                />
                 <Camera
                     ref={CameraRef}
                     maxZoomLevel={MAX_CAMERA_ZOOM}
                     minZoomLevel={MIN_CAMERA_ZOOM}
                 />
                 <LocationPuck />
-                <MapMarkers
-                    markers={markers}
-                    onPubSelect={pubSelectedOnMap}
-                    onGroupSelect={groupSelectedOnMap}
-                />
             </MapView>
             {selectedMapPub !== undefined && (
                 <View
