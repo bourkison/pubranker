@@ -1,15 +1,17 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import * as turf from '@turf/turf';
+import { Text, StyleSheet, Pressable } from 'react-native';
 import { Color } from '@/types';
+import { Position } from '@rnmapbox/maps/lib/typescript/src/types/Position';
+import { MapPubType } from '@/components/Maps/MapMarkers';
 
 type GroupMapMarkerProps = {
-    group: { location: turf.helpers.Point; pubId: number }[];
+    group: MapPubType[];
     width: number;
     borderSize: number;
     circleColor: Color;
     outlineColor: Color;
     numberColor: Color;
+    onPress?: (locations: Position[]) => void;
 };
 
 export default function GroupMapMarker({
@@ -19,9 +21,13 @@ export default function GroupMapMarker({
     outlineColor,
     numberColor,
     borderSize,
+    onPress,
 }: GroupMapMarkerProps) {
     return (
-        <View
+        <Pressable
+            onPress={() =>
+                onPress && onPress(group.map(p => p.location.coordinates))
+            }
             style={[
                 styles.container,
                 {
@@ -36,7 +42,7 @@ export default function GroupMapMarker({
             <Text style={[styles.text, { color: numberColor }]}>
                 {group.length}
             </Text>
-        </View>
+        </Pressable>
     );
 }
 
