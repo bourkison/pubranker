@@ -102,7 +102,13 @@ export default function RatingsMap({ ratings }: RatingsMapProps) {
                         coordinate={rating.pub.location.coordinates}
                         key={rating.id}>
                         <Pressable onPress={() => selectPub(index)}>
-                            <View style={styles.markerContainer}>
+                            <View
+                                style={[
+                                    styles.markerContainer,
+                                    selectedPub?.pub.id === rating.pub.id
+                                        ? styles.selectedMarkerContainer
+                                        : undefined,
+                                ]}>
                                 <View style={styles.starContainer}>
                                     <Ionicons
                                         name="star"
@@ -233,5 +239,8 @@ const styles = StyleSheet.create({
     },
     closeText: {
         color: 'white',
+    },
+    selectedMarkerContainer: {
+        backgroundColor: '#000',
     },
 });
