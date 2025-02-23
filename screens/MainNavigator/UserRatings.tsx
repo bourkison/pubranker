@@ -16,14 +16,19 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { HEADER_ICON_SIZE } from '@/constants';
+import RatingsMap from '@/components/Ratings/RatingsMap';
 
-type ReviewType = {
+export type UserRatingsType = {
     id: number;
     rating: number;
     pub: {
         id: number;
         name: string;
         primary_photo: string | null;
+        location: {
+            type: string;
+            coordinates: [number, number];
+        };
     };
 };
 
@@ -31,16 +36,18 @@ const NO_IMAGE = require('@/assets/noimage.png');
 const NUM_COLUMNS = 4;
 const IMAGE_PADDING = 4;
 
+const CONTENT_PADDING = 20;
+
 export default function UserRatings({
     route,
     navigation,
 }: RootStackScreenProps<'UserRatings'>) {
     const [isLoading, setIsLoading] = useState(false);
-    const [reviews, setReviews] = useState<ReviewType[]>([]);
+    const [reviews, setReviews] = useState<UserRatingsType[]>([]);
     const [elementWidth, setElementWidth] = useState(0);
 
     const pubElementWidth = useMemo<number>(
-        () => elementWidth / NUM_COLUMNS,
+        () => (elementWidth - CONTENT_PADDING * 2) / NUM_COLUMNS,
         [elementWidth],
     );
 
@@ -61,7 +68,7 @@ export default function UserRatings({
             const { data, error } = await supabase
                 .from('users_public')
                 .select(
-                    'id, reviews(id, rating, pub:pubs(id, name, primary_photo))',
+                    'id, reviews(id, rating, pub:pubs(id, name, primary_photo, location:get_pub_location))',
                 )
                 .eq('id', route.params.userId)
                 .order('updated_at', {
@@ -77,8 +84,11 @@ export default function UserRatings({
                 return;
             }
 
+            // @ts-ignore
             setReviews(data.reviews);
             setIsLoading(false);
+
+            console.log('data', JSON.stringify(data));
         })();
     }, [route]);
 
@@ -119,7 +129,6 @@ export default function UserRatings({
             />
             <FlatList
                 data={reviews}
-                contentContainerStyle={styles.contentContainer}
                 numColumns={NUM_COLUMNS}
                 ListEmptyComponent={
                     isLoading ? (
@@ -128,6 +137,12 @@ export default function UserRatings({
                         <Text>No recent ratings</Text>
                     )
                 }
+                ListHeaderComponent={
+                    <View style={styles.mapContainer}>
+                        <RatingsMap ratings={reviews} />
+                    </View>
+                }
+                columnWrapperStyle={{ paddingHorizontal: CONTENT_PADDING }}
                 renderItem={({ item }) => (
                     <Pressable
                         style={styles.pubContainer}
@@ -177,10 +192,10 @@ const styles = StyleSheet.create({
     emptyContainer: {
         flexBasis: 32,
     },
-    contentContainer: {
-        marginHorizontal: 10,
-        marginTop: 5,
+    mapContainer: {
+        marginBottom: 10,
     },
+    contentContainer: {},
     pubContainer: {
         marginBottom: 10,
     },
