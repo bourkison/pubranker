@@ -98,7 +98,9 @@ export default function RatingsMap({ ratings }: RatingsMapProps) {
                 />
                 <LocationPuck />
                 {ratings.map((rating, index) => (
-                    <MarkerView coordinate={rating.pub.location.coordinates}>
+                    <MarkerView
+                        coordinate={rating.pub.location.coordinates}
+                        key={rating.id}>
                         <Pressable onPress={() => selectPub(index)}>
                             <View style={styles.markerContainer}>
                                 <View style={styles.starContainer}>

@@ -33,7 +33,6 @@ import { RootStackScreenProps } from '@/types/nav';
 import { StackActions } from '@react-navigation/native';
 import { TextInput } from 'react-native-gesture-handler';
 import { useActionSheet } from '@expo/react-native-action-sheet';
-import Gallery from '@/components/Utility/Gallery';
 
 const NO_IMAGE = require('@/assets/noimage.png');
 
@@ -328,16 +327,6 @@ export default function ViewReview({
                 }
                 ListHeaderComponent={
                     <View>
-                        {review.photos.length > 0 && (
-                            <View style={styles.galleryContainer}>
-                                <Gallery
-                                    photos={review.photos}
-                                    type="reviews"
-                                    percentageWidth={0.8}
-                                    margin={0}
-                                />
-                            </View>
-                        )}
                         <View style={styles.contentContainer}>
                             <View
                                 style={styles.flexOne}
@@ -659,8 +648,5 @@ const styles = StyleSheet.create({
     noCommentText: {
         color: 'rgba(0, 0, 0, 0.6)',
         fontSize: 12,
-    },
-    galleryContainer: {
-        marginBottom: 5,
     },
 });
