@@ -327,9 +327,12 @@ export default function PubView({
                                 {
                                     options: [
                                         saved ? 'Unsave' : 'Save',
-                                        'Write Review',
-                                        'Suggest an edit',
-                                        'View on map',
+                                        userReview === null ||
+                                        !userReview.content
+                                            ? 'Write Review'
+                                            : 'Edit Review',
+                                        'Suggest an Edit',
+                                        'View on Map',
                                         'Cancel',
                                     ],
                                     cancelButtonIndex: 4,

@@ -5,6 +5,7 @@ import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Gallery from '@/components/Utility/Gallery';
 import Collapsible from 'react-native-collapsible';
+import * as Haptics from 'expo-haptics';
 
 type ReviewAttributesProps = {
     review: ReviewType;
@@ -23,16 +24,16 @@ export default function ReviewAttributes({ review }: ReviewAttributesProps) {
                 <View style={styles.container}>
                     {/* Images */}
                     {review.photos.length > 0 ? (
-                        <View
+                        <Pressable
                             style={[
                                 styles.generalContainer,
                                 styles.positiveContainer,
-                            ]}>
-                            <Pressable
-                                style={styles.photosContainer}
-                                onPress={() =>
-                                    setImagesCollapsed(!imagesCollapsed)
-                                }>
+                            ]}
+                            onPress={() => {
+                                Haptics.impactAsync();
+                                setImagesCollapsed(!imagesCollapsed);
+                            }}>
+                            <View style={styles.photosContainer}>
                                 <View style={styles.imageIconContainer}>
                                     <Ionicons
                                         name="grid"
@@ -47,8 +48,8 @@ export default function ReviewAttributes({ review }: ReviewAttributesProps) {
                                     ]}>
                                     {review.photos.length} Photos
                                 </Text>
-                            </Pressable>
-                        </View>
+                            </View>
+                        </Pressable>
                     ) : undefined}
 
                     {/* Positive attributes */}

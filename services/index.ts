@@ -84,8 +84,16 @@ export const roundToNearest = (input: number, nearest: number): number => {
     return Math.ceil(input / nearest) * nearest;
 };
 
-export const distanceString = (input: number): string => {
-    // TODO: Miles vs Metric.
+export const distanceString = (
+    input: number,
+    units: 'imperial' | 'metric' = 'imperial',
+): string => {
+    if (units === 'imperial') {
+        const miles = input * 0.000621371192;
+        const amount = roundToNearest(miles, 0.1);
+
+        return `${amount.toFixed(1)}mi away`;
+    }
 
     const amount = roundToNearest(input, 10);
 
