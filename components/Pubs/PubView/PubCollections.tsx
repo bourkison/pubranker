@@ -134,6 +134,6 @@ const styles = StyleSheet.create({
     emptyContainer: {
         justifyContent: 'center',
         alignItems: 'center',
-        marginVertical: 75,
+        paddingVertical: 75,
     },
 });

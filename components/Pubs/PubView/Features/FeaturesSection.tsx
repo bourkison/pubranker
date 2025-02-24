@@ -1,21 +1,32 @@
-import React from 'react';
+import React, { RefObject } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import PubMap from '@/components/Pubs/PubView/PubMap';
 import DraughtBeersList from '@/components/Beers/DraughtBeersList';
 import { FetchPubType } from '@/services/queries/pub';
 import CreateSuggestion from '@/components/Pubs/PubView/Features/CreateSuggestion';
 import PubFeature from '@/components/Pubs/PubView/Features/PubFeature';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
 type FeaturesSectionProps = {
     pub: FetchPubType;
+    expandModal: () => void;
+    featuresBottomSheetRef: RefObject<BottomSheetModal>;
 };
 
-export default function FeaturesSection({ pub }: FeaturesSectionProps) {
+export default function FeaturesSection({
+    pub,
+    expandModal,
+    featuresBottomSheetRef,
+}: FeaturesSectionProps) {
     return (
         <>
             <View style={styles.headerContainer}>
                 <Text style={styles.headerText}>Features</Text>
-                <CreateSuggestion pub={pub} />
+                <CreateSuggestion
+                    pub={pub}
+                    expandModal={expandModal}
+                    bottomSheetRef={featuresBottomSheetRef}
+                />
             </View>
 
             <View style={styles.featureList}>

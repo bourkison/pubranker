@@ -1,6 +1,12 @@
 import { FetchPubType, pubQuery } from '@/services/queries/pub';
 import { supabase } from '@/services/supabase';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 import {
     View,
     Text,
@@ -46,6 +52,7 @@ import FollowedRatings from '@/components/Pubs/PubView/FollowedRatings';
 import PubUserPhotos from '@/components/Pubs/PubView/PubUserPhotos';
 import PubCollections from '@/components/Pubs/PubView/PubCollections';
 import { ListCollectionType } from '@/services/queries/collections';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
 const GRADIENT_HEIGHT = 128;
 const NO_IMAGE = require('@/assets/noimage.png');
@@ -68,6 +75,8 @@ export default function PubView({
     const insets = useSafeAreaInsets();
     const { showActionSheetWithOptions } = useActionSheet();
     const { showAddToCollection } = useSharedCollectionContext();
+
+    const FeaturesBottomSheet = useRef<BottomSheetModal>(null);
 
     const scrollY = useSharedValue(0);
 
@@ -208,6 +217,10 @@ export default function PubView({
         }
     }, [pub, isSaving, showAddToCollection, route, setSaved, saved]);
 
+    const expandFeaturesModal = useCallback(() => {
+        FeaturesBottomSheet.current?.present();
+    }, []);
+
     // ------- ANIMATED -----------
 
     const onFlatListScroll = useAnimatedScrollHandler(
@@ -329,8 +342,16 @@ export default function PubView({
                                         return;
                                     }
 
+                                    if (selected === 1) {
+                                        navigation.navigate('CreateReview', {
+                                            pubId: pub.id,
+                                        });
+                                        return;
+                                    }
+
                                     if (selected === 2) {
-                                        // TODO: Suggestion
+                                        expandFeaturesModal();
+                                        return;
                                     }
                                 },
                             )
@@ -348,7 +369,7 @@ export default function PubView({
                     showsVerticalScrollIndicator={false}
                     ListHeaderComponent={
                         <>
-                            {/* This drops the content by the image height allowing  */}
+                            {/* This drops the content by the image height allowing */}
                             {/* us to see the image */}
                             <View
                                 style={[
@@ -460,7 +481,11 @@ export default function PubView({
                             <View style={styles.seperator} />
 
                             <View>
-                                <FeaturesSection pub={pub} />
+                                <FeaturesSection
+                                    pub={pub}
+                                    featuresBottomSheetRef={FeaturesBottomSheet}
+                                    expandModal={expandFeaturesModal}
+                                />
                             </View>
 
                             <View>

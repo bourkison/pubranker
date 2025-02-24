@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { RefObject, useCallback, useState } from 'react';
 import {
     TouchableOpacity,
     StyleSheet,
@@ -16,18 +16,18 @@ import { supabase } from '@/services/supabase';
 
 type CreateSuggestionProps = {
     pub: FetchPubType;
+    expandModal: () => void;
+    bottomSheetRef: RefObject<BottomSheetModal>;
 };
 
 const FEATURE_MARGIN_BOTTOM = 5;
 const FEATURE_MARGIN_HORIZONTAL = 4;
 
-export default function CreateSuggestion({ pub }: CreateSuggestionProps) {
-    const bottomSheetRef = useRef<BottomSheetModal>(null);
-
-    const expandModal = useCallback(() => {
-        bottomSheetRef.current?.present();
-    }, []);
-
+export default function CreateSuggestion({
+    pub,
+    expandModal,
+    bottomSheetRef,
+}: CreateSuggestionProps) {
     const [isCreating, setIsCreating] = useState(false);
 
     const [reservable, setReservable] = useState<boolean | null>(null);
@@ -73,7 +73,7 @@ export default function CreateSuggestion({ pub }: CreateSuggestionProps) {
         setWheelchairAccessible(null);
 
         bottomSheetRef.current?.dismiss();
-    }, []);
+    }, [bottomSheetRef]);
 
     const uploadSuggestion = useCallback(async () => {
         if (isCreating) {
