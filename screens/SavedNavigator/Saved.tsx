@@ -9,13 +9,19 @@ import PageTabs from '@/components/Utility/PageTabs';
 import FavouritesHome, {
     SavedType,
 } from '@/screens/SavedNavigator/FavouritesHome';
+import { ListCollectionType } from '@/services/queries/collections';
+import CollectionsHome from './CollectionsHome';
 
 export default function SavedPubs({
     navigation,
 }: SavedNavigatorScreenProps<'SavedHome'>) {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+
     const [favourites, setFavourites] = useState<SavedType['pub'][]>([]);
     const [hasLoadedFavourites, setHasLoadedFavourites] = useState(false);
+
+    const [collections, setCollections] = useState<ListCollectionType[]>([]);
+    const [hasLoadedCollections, setHasLoadedCollections] = useState(false);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -58,9 +64,12 @@ export default function SavedPubs({
                         {
                             title: 'Lists',
                             component: (
-                                <View>
-                                    <Text>Lists</Text>
-                                </View>
+                                <CollectionsHome
+                                    hasLoaded={hasLoadedCollections}
+                                    setHasLoaded={setHasLoadedCollections}
+                                    collections={collections}
+                                    setCollections={setCollections}
+                                />
                             ),
                         },
                     ]}
