@@ -11,9 +11,15 @@ import { FetchPubType } from '@/services/queries/pub';
 
 type RateButtonProps = {
     pub: FetchPubType;
+    setSaved: (saved: boolean) => void;
+    setWishlisted: (wishlisted: boolean) => void;
 };
 
-export default function RateButtonModal({ pub }: RateButtonProps) {
+export default function RateButtonModal({
+    pub,
+    setSaved,
+    setWishlisted,
+}: RateButtonProps) {
     const bottomSheetRef = useRef<BottomSheetModal>(null);
     const navigation = useNavigation();
 
@@ -58,12 +64,20 @@ export default function RateButtonModal({ pub }: RateButtonProps) {
             );
         }
 
+        if (pub.wishlisted[0].count > 0) {
+            return (
+                <Text style={styles.buttonText}>
+                    This pub is in your wishlist
+                </Text>
+            );
+        }
+
         return (
             <Text style={styles.buttonText}>
                 Review, favourite, add to list, or more
             </Text>
         );
-    }, [userReview, stars]);
+    }, [userReview, pub, stars]);
 
     const navigateToAddToCollection = useCallback(() => {
         bottomSheetRef.current?.dismiss();
@@ -110,6 +124,8 @@ export default function RateButtonModal({ pub }: RateButtonProps) {
                                 navigateToAddToCollection={
                                     navigateToAddToCollection
                                 }
+                                setSaved={setSaved}
+                                setWishlisted={setWishlisted}
                             />
                         </View>
 

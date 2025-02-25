@@ -10,6 +10,7 @@ export type FetchPubType = Tables<'pubs'> & {
     opening_hours: Tables<'opening_hours'>[];
     photos: string[];
     saved: { count: number }[];
+    wishlisted: { count: number }[];
     review_ones: { count: number }[];
     review_twos: { count: number }[];
     review_threes: { count: number }[];
@@ -31,6 +32,7 @@ location:get_pub_location,
 rating:get_pub_rating,
 opening_hours(*),
 saved:saves(count),
+wishlisted:wishlists(count),
 num_reviews:reviews(count),
 num_reviews_with_content:reviews(count),
 review_ones:reviews(count),
@@ -61,4 +63,5 @@ export const pubQuery = (userId: string) =>
         .eq('review_eights.rating', 8)
         .eq('review_nines.rating', 9)
         .eq('review_tens.rating', 10)
-        .eq('saved.user_id', userId);
+        .eq('saved.user_id', userId)
+        .eq('wishlisted.user_id', userId);

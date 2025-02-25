@@ -155,6 +155,17 @@ export default function PubView({
         [pub],
     );
 
+    const setWishlisted = useCallback(
+        (w: boolean) => {
+            if (!pub) {
+                return;
+            }
+
+            setPub({ ...pub, wishlisted: [{ count: w ? 1 : 0 }] });
+        },
+        [pub],
+    );
+
     const toggleLike = useCallback(async () => {
         if (isSaving || !pub) {
             return;
@@ -474,7 +485,11 @@ export default function PubView({
                             <View style={styles.seperator} />
 
                             <View style={styles.rateButtonContainer}>
-                                <RateButtonModal pub={pub} />
+                                <RateButtonModal
+                                    pub={pub}
+                                    setSaved={setSaved}
+                                    setWishlisted={setWishlisted}
+                                />
                             </View>
 
                             <View style={styles.friendsRatingsContainer}>

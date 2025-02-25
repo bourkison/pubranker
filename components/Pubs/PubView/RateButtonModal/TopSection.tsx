@@ -1,14 +1,14 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Ionicons, Feather, MaterialIcons } from '@expo/vector-icons';
-import { useAppDispatch } from '@/store/hooks';
+import { Ionicons, Feather, Fontisto } from '@expo/vector-icons';
 import { supabase } from '@/services/supabase';
-import { setPubSave } from '@/store/slices/explore';
 import { FetchPubType } from '@/services/queries/pub';
 
 type TopSectionProps = {
     pub: FetchPubType;
     navigateToAddToCollection: () => void;
+    setSaved: (saved: boolean) => void;
+    setWishlisted: (wishlisted: boolean) => void;
 };
 
 const ICON_SIZE = 40;
@@ -16,14 +16,14 @@ const ICON_SIZE = 40;
 export default function TopSection({
     pub,
     navigateToAddToCollection,
+    setSaved,
+    setWishlisted,
 }: TopSectionProps) {
-    const dispatch = useAppDispatch();
     const [isSaving, setIsSaving] = useState(false);
-    const [saved, setSaved] = useState(false);
+    const [isWishlisting, setIsWishlisting] = useState(false);
 
-    useEffect(() => {
-        setSaved(pub.saved[0].count > 0);
-    }, [pub]);
+    const saved = useMemo(() => pub.saved[0].count > 0, [pub]);
+    const wishlisted = useMemo(() => pub.wishlisted[0].count > 0, [pub]);
 
     const toggleSaveLocal = useCallback(async () => {
         if (isSaving) {
@@ -40,7 +40,7 @@ export default function TopSection({
             return;
         }
 
-        if (!pub.saved) {
+        if (!saved) {
             setSaved(true);
 
             const { error } = await supabase.from('saves').insert({
@@ -49,11 +49,8 @@ export default function TopSection({
 
             setIsSaving(false);
 
-            if (!error) {
-                dispatch(setPubSave({ id: pub.id, value: true }));
-            } else {
+            if (error) {
                 setSaved(false);
-
                 console.error(error);
             }
         } else {
@@ -67,14 +64,56 @@ export default function TopSection({
 
             setIsSaving(false);
 
-            if (!error) {
-                dispatch(setPubSave({ id: pub.id, value: false }));
-            } else {
+            if (error) {
                 setSaved(true);
                 console.error(error);
             }
         }
-    }, [dispatch, isSaving, pub]);
+    }, [isSaving, setSaved, saved, pub]);
+
+    const toggleWishlistLocal = useCallback(async () => {
+        if (isWishlisting) {
+            return;
+        }
+
+        setIsWishlisting(true);
+
+        const { data: userData, error: userError } =
+            await supabase.auth.getUser();
+
+        if (userError) {
+            console.error(userError);
+            return;
+        }
+
+        if (!wishlisted) {
+            setWishlisted(true);
+
+            const { error } = await supabase
+                .from('wishlists')
+                .insert({ pub_id: pub.id, user_id: userData.user.id });
+
+            if (error) {
+                setWishlisted(false);
+                console.error(error);
+            }
+        } else {
+            setWishlisted(false);
+
+            const { error } = await supabase
+                .from('wishlists')
+                .delete()
+                .eq('pub_id', pub.id)
+                .eq('user_id', userData.user.id);
+
+            if (error) {
+                setWishlisted(false);
+                console.error(error);
+            }
+        }
+
+        setIsWishlisting(false);
+    }, [isWishlisting, setWishlisted, wishlisted, pub]);
 
     return (
         <View style={styles.container}>
@@ -98,13 +137,21 @@ export default function TopSection({
                 <Text style={styles.headerText}>Add to List</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.column}>
-                <MaterialIcons
-                    name="location-history"
-                    size={ICON_SIZE}
-                    color={'#000'}
-                />
-                <Text style={styles.headerText}>Check In</Text>
+            <TouchableOpacity
+                style={styles.column}
+                onPress={toggleWishlistLocal}>
+                {wishlisted ? (
+                    <Fontisto
+                        name="bookmark-alt"
+                        size={ICON_SIZE}
+                        color={'#000'}
+                    />
+                ) : (
+                    <Fontisto name="bookmark" size={ICON_SIZE} color={'#000'} />
+                )}
+                <Text style={styles.headerText}>
+                    Wishlist{wishlisted ? 'ed' : ''}
+                </Text>
             </TouchableOpacity>
         </View>
     );
