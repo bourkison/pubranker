@@ -88,6 +88,46 @@ export default function ProfileLinks({ user }: ProfileLinksProps) {
                 style={styles.itemContainer}
                 underlayColor="#E5E7EB"
                 onPress={() => {
+                    console.log('Wishlist');
+                }}>
+                <>
+                    <Text style={styles.itemHeader}>Wishlist</Text>
+
+                    <View style={styles.subheaderContainer}>
+                        <Text style={styles.subheaderText}>0</Text>
+                        <Feather
+                            name="chevron-right"
+                            size={18}
+                            color={RIGHT_COLUMN_COLOR}
+                        />
+                    </View>
+                </>
+            </TouchableHighlight>
+
+            <TouchableHighlight
+                style={styles.itemContainer}
+                underlayColor="#E5E7EB"
+                onPress={() => {
+                    console.log('Favourites');
+                }}>
+                <>
+                    <Text style={styles.itemHeader}>Favourites</Text>
+
+                    <View style={styles.subheaderContainer}>
+                        <Text style={styles.subheaderText}>0</Text>
+                        <Feather
+                            name="chevron-right"
+                            size={18}
+                            color={RIGHT_COLUMN_COLOR}
+                        />
+                    </View>
+                </>
+            </TouchableHighlight>
+
+            <TouchableHighlight
+                style={styles.itemContainer}
+                underlayColor="#E5E7EB"
+                onPress={() => {
                     const pushAction = StackActions.push(
                         'FollowersFollowingView',
                         {
