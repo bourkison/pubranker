@@ -21,6 +21,7 @@ import { distance, point } from '@turf/turf';
 import { SavedNavigatorScreenProps } from '@/types/nav';
 import { Tables } from '@/types/schema';
 import { HEADER_ICON_SIZE } from '@/constants';
+import PageTabs from '@/components/Utility/PageTabs';
 
 export type SavedType = Tables<'saves'> & {
     pub: {
@@ -223,51 +224,91 @@ export default function SavedPubs({
                 }
             />
 
-            <FlatList
-                ListEmptyComponent={
-                    <View>
-                        <Text>Empty</Text>
-                    </View>
-                }
-                ListHeaderComponent={
-                    <TouchableOpacity
-                        style={styles.collectionsContainer}
-                        onPress={() => navigation.navigate('CollectionsHome')}>
-                        <View>
-                            <Text style={styles.collectionsText}>
-                                {collectionsAmountText}
-                            </Text>
-                        </View>
+            <View style={styles.pageContainer}>
+                <PageTabs
+                    pages={[
+                        {
+                            title: 'Favourites',
+                            component: (
+                                <FlatList
+                                    ListEmptyComponent={
+                                        <View>
+                                            <Text>Empty</Text>
+                                        </View>
+                                    }
+                                    ListHeaderComponent={
+                                        <TouchableOpacity
+                                            style={styles.collectionsContainer}
+                                            onPress={() =>
+                                                navigation.navigate(
+                                                    'CollectionsHome',
+                                                )
+                                            }>
+                                            <View>
+                                                <Text
+                                                    style={
+                                                        styles.collectionsText
+                                                    }>
+                                                    {collectionsAmountText}
+                                                </Text>
+                                            </View>
 
-                        <View>
-                            <Feather name="chevron-right" size={18} />
-                        </View>
-                    </TouchableOpacity>
-                }
-                data={pubs}
-                renderItem={({ item, index }) => (
-                    <View
-                        style={{
-                            width,
-                        }}>
-                        <SavedListItem
-                            pub={item}
-                            saved={isSaved(index)}
-                            onSaveCommence={id => toggleSave(id, true)}
-                            onSaveComplete={(success, id) =>
-                                !success ? toggleSave(id, false) : undefined
-                            }
-                            onUnsaveCommence={id => toggleSave(id, false)}
-                            onUnsaveComplete={(success, id) =>
-                                !success ? toggleSave(id, true) : undefined
-                            }
-                        />
-                    </View>
-                )}
-                keyExtractor={item => item.id.toString()}
-                refreshing={isRefreshing}
-                onRefresh={refresh}
-            />
+                                            <View>
+                                                <Feather
+                                                    name="chevron-right"
+                                                    size={18}
+                                                />
+                                            </View>
+                                        </TouchableOpacity>
+                                    }
+                                    data={pubs}
+                                    renderItem={({ item, index }) => (
+                                        <View
+                                            style={{
+                                                width,
+                                            }}>
+                                            <SavedListItem
+                                                pub={item}
+                                                saved={isSaved(index)}
+                                                onSaveCommence={id =>
+                                                    toggleSave(id, true)
+                                                }
+                                                onSaveComplete={(success, id) =>
+                                                    !success
+                                                        ? toggleSave(id, false)
+                                                        : undefined
+                                                }
+                                                onUnsaveCommence={id =>
+                                                    toggleSave(id, false)
+                                                }
+                                                onUnsaveComplete={(
+                                                    success,
+                                                    id,
+                                                ) =>
+                                                    !success
+                                                        ? toggleSave(id, true)
+                                                        : undefined
+                                                }
+                                            />
+                                        </View>
+                                    )}
+                                    keyExtractor={item => item.id.toString()}
+                                    refreshing={isRefreshing}
+                                    onRefresh={refresh}
+                                />
+                            ),
+                        },
+                        {
+                            title: 'Lists',
+                            component: (
+                                <View>
+                                    <Text>Lists</Text>
+                                </View>
+                            ),
+                        },
+                    ]}
+                />
+            </View>
         </SafeAreaView>
     );
 }
@@ -279,6 +320,10 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    pageContainer: {
+        flex: 1,
+        width: '100%',
     },
     collectionsContainer: {
         paddingVertical: 20,
