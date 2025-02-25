@@ -219,7 +219,7 @@ export default function CollectionView({
 
         navigation.navigate('Home', {
             screen: 'Favourites',
-            params: { screen: 'CollectionsHome' },
+            params: { screen: 'SavedHome' },
         });
     }, [collection, navigation]);
 

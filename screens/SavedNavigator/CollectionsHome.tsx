@@ -1,34 +1,51 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {
+    Dispatch,
+    SetStateAction,
+    useCallback,
+    useEffect,
+    useState,
+} from 'react';
 import {
     View,
     Text,
-    SafeAreaView,
-    TouchableOpacity,
     StyleSheet,
     FlatList,
     ActivityIndicator,
 } from 'react-native';
-import { Ionicons, Feather } from '@expo/vector-icons';
 import {
     ListCollectionType,
     listFollowedCollectionsQuery,
 } from '@/services/queries/collections';
 import CollectionListItem from '@/components/Collections/CollectionListItem';
 import { supabase } from '@/services/supabase';
-import { SavedNavigatorScreenProps } from '@/types/nav';
-import { HEADER_ICON_SIZE } from '@/constants';
+import { useNavigation } from '@react-navigation/native';
 
 const INITIAL_LOAD_AMOUNT = 10;
 
+type CollectionsHomeProps = {
+    collections: ListCollectionType[];
+    setCollections: Dispatch<SetStateAction<ListCollectionType[]>>;
+    hasLoaded: boolean;
+    setHasLoaded: Dispatch<SetStateAction<boolean>>;
+};
+
 export default function CollectionsHome({
-    navigation,
-}: SavedNavigatorScreenProps<'CollectionsHome'>) {
+    collections,
+    setCollections,
+    hasLoaded,
+    setHasLoaded,
+}: CollectionsHomeProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
-    const [collections, setCollections] = useState<ListCollectionType[]>([]);
+
+    const navigation = useNavigation();
 
     useEffect(() => {
         (async () => {
+            if (hasLoaded) {
+                return;
+            }
+
             setIsLoading(true);
 
             const { data: userData, error: userError } =
@@ -57,8 +74,9 @@ export default function CollectionsHome({
 
             setCollections(data.map(follow => follow.collections));
             setIsLoading(false);
+            setHasLoaded(true);
         })();
-    }, []);
+    }, [hasLoaded, setHasLoaded, setCollections]);
 
     const refresh = useCallback(async () => {
         setIsRefreshing(true);
@@ -89,62 +107,44 @@ export default function CollectionsHome({
 
         setCollections(data.map(follow => follow.collections));
         setIsRefreshing(false);
-    }, []);
+    }, [setCollections]);
 
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.headerContainer}>
-                <TouchableOpacity
-                    style={styles.settingsContainer}
-                    onPress={() => navigation.goBack()}>
-                    <Ionicons
-                        name="arrow-back-outline"
-                        size={HEADER_ICON_SIZE}
-                    />
-                </TouchableOpacity>
-
-                <View style={styles.headerTextContainer}>
-                    <Text style={styles.headerText}>Lists</Text>
-                </View>
-
-                <View style={styles.menuContainer}>
-                    <TouchableOpacity
-                        onPress={() => navigation.navigate('CreateCollection')}>
-                        <Feather name="plus" size={HEADER_ICON_SIZE} />
-                    </TouchableOpacity>
-                </View>
-            </View>
-
-            <FlatList
-                ListEmptyComponent={
-                    isLoading ? (
-                        <ActivityIndicator />
-                    ) : (
-                        <View>
-                            <Text>
-                                No collections yet. Hit the plus at the top
-                                right to add.
-                            </Text>
-                        </View>
-                    )
-                }
-                data={collections}
-                contentContainerStyle={styles.listContainer}
-                onRefresh={refresh}
-                refreshing={isRefreshing}
-                renderItem={({ item }) => (
-                    <CollectionListItem
-                        collection={item}
-                        onPress={() =>
-                            navigation.navigate('CollectionView', {
-                                collectionId: item.id,
-                            })
-                        }
-                    />
-                )}
-                keyExtractor={item => item.id.toString()}
-            />
-        </SafeAreaView>
+        <FlatList
+            ListEmptyComponent={
+                isLoading ? (
+                    <ActivityIndicator />
+                ) : (
+                    <View>
+                        <Text>
+                            No collections yet. Hit the plus at the top right to
+                            add.
+                        </Text>
+                    </View>
+                )
+            }
+            data={collections}
+            contentContainerStyle={styles.listContainer}
+            onRefresh={refresh}
+            refreshing={isRefreshing}
+            renderItem={({ item }) => (
+                <CollectionListItem
+                    collection={item}
+                    onPress={() =>
+                        navigation.navigate('Home', {
+                            screen: 'Favourites',
+                            params: {
+                                screen: 'CollectionView',
+                                params: {
+                                    collectionId: item.id,
+                                },
+                            },
+                        })
+                    }
+                />
+            )}
+            keyExtractor={item => item.id.toString()}
+        />
     );
 }
 
