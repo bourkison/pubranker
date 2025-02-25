@@ -1,5 +1,5 @@
 import { PRIMARY_COLOR } from '@/constants';
-import React, { useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import Animated, {
     useAnimatedStyle,
@@ -9,14 +9,19 @@ import Animated, {
 import * as Haptics from 'expo-haptics';
 
 type PageTabsProps = {
+    selectedPage: number;
+    setSelectedPage: Dispatch<SetStateAction<number>>;
     pages: {
         title: string;
         component: JSX.Element;
     }[];
 };
 
-export default function PageTabs({ pages }: PageTabsProps) {
-    const [selectedPage, setSelectedPage] = useState(0);
+export default function PageTabs({
+    selectedPage,
+    setSelectedPage,
+    pages,
+}: PageTabsProps) {
     const [overlayHeight, setOverlayHeight] = useState(0);
     const [overlayWidth, setOverlayWidth] = useState(0);
 
@@ -32,7 +37,7 @@ export default function PageTabs({ pages }: PageTabsProps) {
         Haptics.impactAsync();
 
         sOverlayTranslateX.value = withTiming(overlayWidth * selectedPage, {
-            duration: 150,
+            duration: 200,
         });
     }, [selectedPage, overlayWidth, sOverlayTranslateX]);
 

@@ -21,7 +21,6 @@ export type ProfileNavigatorScreenProps<
 
 export type SavedNavigatorStackParamList = {
     SavedHome: undefined;
-    CollectionsHome: undefined;
     CollectionView: {
         collectionId: number;
     };
