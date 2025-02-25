@@ -6,6 +6,7 @@ import {
     Image,
     TouchableHighlight,
     TouchableOpacity,
+    useWindowDimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { distanceString, roundToNearest } from '@/services';
@@ -36,16 +37,14 @@ export default function SavedListItem({
     onUnsaveCommence,
     onUnsaveComplete,
 }: BottomSheetPubItemProps) {
-    const [containerWidth, setContainerWidth] = useState(0);
     const [imageUrl, setImageUrl] = useState('');
     const [isSaving, setIsSaving] = useState(false);
 
     const navigation = useNavigation();
 
-    const IMAGE_WIDTH = useMemo(
-        () => containerWidth * WIDTH_PERCENTAGE,
-        [containerWidth],
-    );
+    const { width } = useWindowDimensions();
+
+    const IMAGE_WIDTH = useMemo(() => width * WIDTH_PERCENTAGE, [width]);
 
     useEffect(() => {
         const url = supabase.storage
@@ -124,13 +123,7 @@ export default function SavedListItem({
                     params: { pubId: pub.id },
                 })
             }>
-            <View
-                style={styles.innerContainer}
-                onLayout={({
-                    nativeEvent: {
-                        layout: { width },
-                    },
-                }) => setContainerWidth(width)}>
+            <View style={styles.innerContainer}>
                 <View>
                     <Image
                         source={imageUrl ? { uri: imageUrl } : NO_IMAGE}

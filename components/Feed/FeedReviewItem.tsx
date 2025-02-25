@@ -1,5 +1,5 @@
 import { FeedType } from '@/services/queries/feed';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import {
     View,
     Text,
@@ -7,6 +7,7 @@ import {
     StyleSheet,
     Image,
     TouchableHighlight,
+    useWindowDimensions,
 } from 'react-native';
 import UserAvatar from '../User/UserAvatar';
 import RatingsStarViewer from '../Ratings/RatingsStarsViewer';
@@ -21,7 +22,7 @@ type FeedReviewItemProps = {
 };
 
 const ASPECT_RATIO = 1;
-const IMAGE_PERCENTAGE = 0.33;
+const IMAGE_PERCENTAGE = 0.3;
 
 const NO_IMAGE = require('@/assets/noimage.png');
 
@@ -30,8 +31,9 @@ export default function FeedReviewItem({
     review,
     createdAt,
 }: FeedReviewItemProps) {
-    const [elementWidth, setElementWidth] = useState(0);
     const navigation = useNavigation();
+
+    const { width } = useWindowDimensions();
 
     const image = useMemo<string>(() => {
         if (review.pub.primary_photo) {
@@ -44,8 +46,13 @@ export default function FeedReviewItem({
     }, [review]);
 
     const imageWidth = useMemo<number>(
-        () => elementWidth * IMAGE_PERCENTAGE,
-        [elementWidth],
+        () =>
+            (width -
+                styles.avatarContainer.marginRight -
+                24 -
+                styles.container.paddingHorizontal) *
+            IMAGE_PERCENTAGE,
+        [width],
     );
 
     const imageHeight = useMemo<number>(
@@ -104,13 +111,7 @@ export default function FeedReviewItem({
                             />
                         </View>
 
-                        <View
-                            style={styles.reviewContainer}
-                            onLayout={({
-                                nativeEvent: {
-                                    layout: { width },
-                                },
-                            }) => setElementWidth(width)}>
+                        <View style={styles.reviewContainer}>
                             <View style={styles.imageContainer}>
                                 <Image
                                     source={image ? { uri: image } : NO_IMAGE}
@@ -125,7 +126,9 @@ export default function FeedReviewItem({
                             </View>
 
                             <View style={styles.reviewContentContainer}>
-                                <Text style={styles.contentText}>
+                                <Text
+                                    style={styles.contentText}
+                                    numberOfLines={10}>
                                     {review.content}
                                 </Text>
                             </View>
@@ -240,6 +243,7 @@ const styles = StyleSheet.create({
     },
     reviewContentContainer: {
         marginLeft: 10,
+        flex: 1,
     },
     contentText: {
         fontSize: 12,
