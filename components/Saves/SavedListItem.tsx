@@ -12,7 +12,7 @@ import { distanceString, roundToNearest } from '@/services';
 import { GOLD_RATINGS_COLOR } from '@/constants';
 import { supabase } from '@/services/supabase';
 import { useNavigation } from '@react-navigation/native';
-import { SavedType } from '@/screens/SavedNavigator/Saved';
+import { SavedType } from '@/screens/SavedNavigator/FavouritesHome';
 
 const NO_IMAGE = require('@/assets/noimage.png');
 
