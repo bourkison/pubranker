@@ -12,6 +12,7 @@ import {
 import RatingsStarViewer from '@/components/Ratings/RatingsStarsViewer';
 import { useNavigation } from '@react-navigation/native';
 import { supabase } from '@/services/supabase';
+import { fromNowString } from '@/services';
 
 const NO_IMAGE = require('@/assets/noimage.png');
 
@@ -56,13 +57,23 @@ export default function UserReview({ review }: UserReviewType) {
             }>
             <>
                 <View style={styles.topBarContainer}>
-                    <Text style={styles.pubNameText}>{review.pub.name}</Text>
-                    <View style={styles.starsContainer}>
-                        <RatingsStarViewer
-                            amount={review.rating}
-                            size={14}
-                            padding={0}
-                        />
+                    <View>
+                        <Text style={styles.pubNameText}>
+                            {review.pub.name}
+                        </Text>
+                        <View style={styles.starsContainer}>
+                            <RatingsStarViewer
+                                amount={review.rating}
+                                size={14}
+                                padding={0}
+                            />
+                        </View>
+                    </View>
+
+                    <View style={styles.createdAtContainer}>
+                        <Text style={styles.createdAtText}>
+                            {fromNowString(review.created_at)}
+                        </Text>
                     </View>
                 </View>
 
@@ -70,7 +81,10 @@ export default function UserReview({ review }: UserReviewType) {
                     <View style={styles.imageContainer}>
                         <Image
                             source={image}
-                            style={{ width: imageWidth, height: imageHeight }}
+                            style={[
+                                styles.image,
+                                { width: imageWidth, height: imageHeight },
+                            ]}
                         />
                     </View>
 
@@ -90,7 +104,16 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderColor: '#E5E7EB',
     },
-    topBarContainer: {},
+    topBarContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    createdAtContainer: {},
+    createdAtText: {
+        fontSize: 10,
+        fontWeight: '300',
+    },
     pubNameText: {
         fontSize: 14,
         fontWeight: '500',
@@ -105,12 +128,21 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         marginTop: 4,
     },
+
     imageContainer: {
-        marginRight: 5,
+        marginRight: 7,
+        marginTop: 2,
     },
-    contentTextContainer: {},
+    image: {
+        borderRadius: 2,
+    },
+    contentTextContainer: {
+        flex: 1,
+        // paddingTop: 5,
+    },
     contentText: {
         fontWeight: '300',
         fontSize: 12,
+        letterSpacing: -0.2,
     },
 });

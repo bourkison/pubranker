@@ -28,7 +28,8 @@ export default function UserReviews({
 
             const { data, error } = await reviewListQuery()
                 .eq('user_id', route.params.userId)
-                .neq('content', null);
+                .neq('content', null)
+                .order('created_at', { ascending: false });
 
             if (error) {
                 console.error(error);
