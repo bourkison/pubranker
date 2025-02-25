@@ -1,6 +1,12 @@
 import { PRIMARY_COLOR } from '@/constants';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
+import Animated, {
+    useAnimatedStyle,
+    useSharedValue,
+    withTiming,
+} from 'react-native-reanimated';
+import * as Haptics from 'expo-haptics';
 
 type PageTabsProps = {
     pages: {
@@ -13,6 +19,22 @@ export default function PageTabs({ pages }: PageTabsProps) {
     const [selectedPage, setSelectedPage] = useState(0);
     const [overlayHeight, setOverlayHeight] = useState(0);
     const [overlayWidth, setOverlayWidth] = useState(0);
+
+    const sOverlayTranslateX = useSharedValue(0);
+
+    const rOverlayStyle = useAnimatedStyle(() => {
+        return {
+            transform: [{ translateX: sOverlayTranslateX.value }],
+        };
+    }, []);
+
+    useEffect(() => {
+        Haptics.impactAsync();
+
+        sOverlayTranslateX.value = withTiming(overlayWidth * selectedPage, {
+            duration: 150,
+        });
+    }, [selectedPage, overlayWidth, sOverlayTranslateX]);
 
     return (
         <View style={styles.container}>
@@ -36,6 +58,7 @@ export default function PageTabs({ pages }: PageTabsProps) {
                         <Pressable
                             style={styles.tabContainer}
                             key={index}
+                            disabled={index === selectedPage}
                             onPress={() => setSelectedPage(index)}>
                             <Text
                                 style={[
@@ -49,10 +72,11 @@ export default function PageTabs({ pages }: PageTabsProps) {
                         </Pressable>
                     ))}
 
-                    <View
+                    <Animated.View
                         style={[
                             styles.overlay,
                             { height: overlayHeight, width: overlayWidth },
+                            rOverlayStyle,
                         ]}
                     />
                 </View>
@@ -71,9 +95,11 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     topContainer: {
-        paddingHorizontal: 15,
+        paddingHorizontal: 10,
         paddingVertical: 10,
         width: '100%',
+        borderBottomWidth: 1,
+        borderColor: '#E5E7EB',
     },
     overlay: {
         backgroundColor: PRIMARY_COLOR,
@@ -81,15 +107,15 @@ const styles = StyleSheet.create({
         left: 0,
         top: 0,
         bottom: 0,
-        borderRadius: 10,
+        borderRadius: 6,
     },
     tabsContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingVertical: 6,
+        paddingVertical: 4,
         backgroundColor: 'rgba(0, 0, 0, 0.04)',
-        borderRadius: 10,
+        borderRadius: 6,
     },
     tabContainer: {
         flex: 1,

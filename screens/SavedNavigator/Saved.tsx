@@ -213,7 +213,7 @@ export default function SavedPubs({
     return (
         <SafeAreaView style={styles.container}>
             <Header
-                header="Favourites"
+                header="Saved"
                 leftColumn={<View style={styles.cancelContainer} />}
                 rightColumn={
                     <TouchableOpacity
@@ -296,6 +296,14 @@ export default function SavedPubs({
                                     refreshing={isRefreshing}
                                     onRefresh={refresh}
                                 />
+                            ),
+                        },
+                        {
+                            title: 'Wishlist',
+                            component: (
+                                <View>
+                                    <Text>Wishlist</Text>
+                                </View>
                             ),
                         },
                         {
