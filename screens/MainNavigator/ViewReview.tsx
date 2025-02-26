@@ -368,9 +368,12 @@ export default function ViewReview({
                                             onPress={() => {
                                                 const pushAction =
                                                     StackActions.push(
-                                                        'PubView',
+                                                        'PubHome',
                                                         {
-                                                            pubId: review.pub_id,
+                                                            screen: 'PubView',
+                                                            params: {
+                                                                pubId: review.pub_id,
+                                                            },
                                                         },
                                                     );
                                                 navigation.dispatch(pushAction);
