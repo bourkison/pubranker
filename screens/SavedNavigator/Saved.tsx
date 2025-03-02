@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from 'react';
 import { SafeAreaView, View, StyleSheet, TouchableOpacity } from 'react-native';
-import { Text } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import Header from '@/components/Utility/Header';
 import { SavedNavigatorScreenProps } from '@/types/nav';
@@ -10,7 +9,10 @@ import FavouritesHome, {
     SavedType,
 } from '@/screens/SavedNavigator/FavouritesHome';
 import { ListCollectionType } from '@/services/queries/collections';
-import CollectionsHome from './CollectionsHome';
+import CollectionsHome from '@/screens/SavedNavigator/CollectionsHome';
+import WishlistsHome, {
+    WishlistType,
+} from '@/screens/SavedNavigator/WishlistsHome';
 
 export default function SavedPubs({
     navigation,
@@ -23,6 +25,9 @@ export default function SavedPubs({
 
     const [collections, setCollections] = useState<ListCollectionType[]>([]);
     const [hasLoadedCollections, setHasLoadedCollections] = useState(false);
+
+    const [wishlists, setWishlists] = useState<WishlistType['pub'][]>([]);
+    const [hasLoadedWishlists, setHasLoadedWishlists] = useState(false);
 
     const rightColumn = useMemo<JSX.Element>(() => {
         if (selectedPage === 2) {
@@ -67,9 +72,14 @@ export default function SavedPubs({
                         {
                             title: 'Wishlist',
                             component: (
-                                <View>
-                                    <Text>Wishlist</Text>
-                                </View>
+                                <WishlistsHome
+                                    hasLoaded={hasLoadedWishlists}
+                                    setHasLoaded={setHasLoadedWishlists}
+                                    wishlists={wishlists}
+                                    setWishlists={setWishlists}
+                                    isLoggedIn={isLoggedIn}
+                                    setIsLoggedIn={setIsLoggedIn}
+                                />
                             ),
                         },
                         {

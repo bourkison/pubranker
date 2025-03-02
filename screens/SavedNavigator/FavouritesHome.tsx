@@ -62,6 +62,7 @@ export default function FavouritesHome({
     const fetchSavedPromise = useCallback(
         (userData: User) => {
             return new Promise<void>(async (resolve, reject) => {
+                // TODO: Do i need a filter on saved?
                 const { data: savesData, error: savesError } = await supabase
                     .from('saves')
                     .select(
@@ -162,7 +163,6 @@ export default function FavouritesHome({
             }
 
             setIsLoading(true);
-            setIsLoggedIn(false);
 
             const { data: userData, error: userError } =
                 await supabase.auth.getUser();
