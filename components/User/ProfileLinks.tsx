@@ -94,7 +94,9 @@ export default function ProfileLinks({ user }: ProfileLinksProps) {
                     <Text style={styles.itemHeader}>Wishlist</Text>
 
                     <View style={styles.subheaderContainer}>
-                        <Text style={styles.subheaderText}>0</Text>
+                        <Text style={styles.subheaderText}>
+                            {user.wishlists[0].count}
+                        </Text>
                         <Feather
                             name="chevron-right"
                             size={18}
@@ -114,7 +116,9 @@ export default function ProfileLinks({ user }: ProfileLinksProps) {
                     <Text style={styles.itemHeader}>Favourites</Text>
 
                     <View style={styles.subheaderContainer}>
-                        <Text style={styles.subheaderText}>0</Text>
+                        <Text style={styles.subheaderText}>
+                            {user.saves[0].count}
+                        </Text>
                         <Feather
                             name="chevron-right"
                             size={18}

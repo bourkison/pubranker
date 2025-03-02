@@ -7,6 +7,7 @@ import GroupMapMarker from './GroupMapMarker';
 import { useSharedMapContext } from '@/context/mapContext';
 import { Position } from '@rnmapbox/maps/lib/typescript/src/types/Position';
 import { MarkerView } from '@rnmapbox/maps';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 
 export const markerAspectRatio = 207 / 263;
 export type MapPubType = { id: number; location: Point };
@@ -44,15 +45,17 @@ export default function MapMarkers({
                                 '',
                             )}
                             coordinate={c.geometry.coordinates}>
-                            <GroupMapMarker
-                                group={marker}
-                                width={36}
-                                onPress={onGroupSelect}
-                                borderSize={4}
-                                outlineColor="#FFF"
-                                circleColor={SECONDARY_COLOR}
-                                numberColor="#FFF"
-                            />
+                            <Animated.View entering={FadeIn} exiting={FadeOut}>
+                                <GroupMapMarker
+                                    group={marker}
+                                    width={36}
+                                    onPress={onGroupSelect}
+                                    borderSize={4}
+                                    outlineColor="#FFF"
+                                    circleColor={SECONDARY_COLOR}
+                                    numberColor="#FFF"
+                                />
+                            </Animated.View>
                         </MarkerView>
                     );
                 } else {
@@ -62,15 +65,19 @@ export default function MapMarkers({
                         <MarkerView
                             key={marker.id.toString()}
                             coordinate={marker.location.coordinates}>
-                            <PubMapMarker
-                                onPress={() =>
-                                    onPubSelect && onPubSelect(marker)
-                                }
-                                width={selected ? 36 : 32}
-                                pinColor={selected ? '#000' : SECONDARY_COLOR}
-                                outlineColor={selected ? '#000' : '#FFF'}
-                                dotColor="#FFF"
-                            />
+                            <Animated.View entering={FadeIn} exiting={FadeOut}>
+                                <PubMapMarker
+                                    onPress={() =>
+                                        onPubSelect && onPubSelect(marker)
+                                    }
+                                    width={selected ? 36 : 32}
+                                    pinColor={
+                                        selected ? '#000' : SECONDARY_COLOR
+                                    }
+                                    outlineColor={selected ? '#000' : '#FFF'}
+                                    dotColor="#FFF"
+                                />
+                            </Animated.View>
                         </MarkerView>
                     );
                 }

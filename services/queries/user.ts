@@ -4,6 +4,8 @@ import { Tables } from '@/types/schema';
 export type UserType = Tables<'users_public'> & {
     reviews: { count: number }[];
     ratings: { count: number }[];
+    saves: { count: number }[];
+    wishlists: { count: number }[];
     recent_ratings: {
         id: number;
         created_at: string;
@@ -42,6 +44,8 @@ export type UserType = Tables<'users_public'> & {
 const userQueryString = `*,
 reviews(count),
 ratings:reviews(count),
+saves(count),
+wishlists(count),
 recent_ratings:reviews(
     id,
     created_at,
