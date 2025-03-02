@@ -8,37 +8,37 @@ import {
     TouchableOpacity,
     useWindowDimensions,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Fontisto, Ionicons } from '@expo/vector-icons';
 import { distanceString, roundToNearest } from '@/services';
 import { GOLD_RATINGS_COLOR } from '@/constants';
 import { supabase } from '@/services/supabase';
 import { useNavigation } from '@react-navigation/native';
-import { SavedType } from '@/screens/SavedNavigator/FavouritesHome';
+import { WishlistType } from '@/screens/SavedNavigator/WishlistsHome';
 
 const NO_IMAGE = require('@/assets/noimage.png');
 
-type SavedListItemProps = {
-    pub: SavedType['pub'];
-    saved: boolean;
-    onSaveCommence?: (id: number) => void;
-    onSaveComplete?: (success: boolean, id: number) => void;
-    onUnsaveCommence?: (id: number) => void;
-    onUnsaveComplete?: (success: boolean, id: number) => void;
+type WishlistedListItemProps = {
+    pub: WishlistType['pub'];
+    wishlisted: boolean;
+    onWishlistCommence?: (id: number) => void;
+    onWishlistComplete?: (success: boolean, id: number) => void;
+    onUnwishlistCommence?: (id: number) => void;
+    onUnwishlistComplete?: (success: boolean, id: number) => void;
 };
 
 const ASPECT_RATIO = 1;
 const WIDTH_PERCENTAGE = 0.3;
 
-export default function SavedListItem({
+export default function WishlistedListItem({
     pub,
-    saved,
-    onSaveCommence,
-    onSaveComplete,
-    onUnsaveCommence,
-    onUnsaveComplete,
-}: SavedListItemProps) {
+    wishlisted,
+    onWishlistCommence,
+    onWishlistComplete,
+    onUnwishlistCommence,
+    onUnwishlistComplete,
+}: WishlistedListItemProps) {
     const [imageUrl, setImageUrl] = useState('');
-    const [isSaving, setIsSaving] = useState(false);
+    const [isWishlisting, setIsWishlisting] = useState(false);
 
     const navigation = useNavigation();
 
@@ -54,65 +54,66 @@ export default function SavedListItem({
         setImageUrl(url.data.publicUrl);
     }, [pub]);
 
-    const toggleLike = useCallback(async () => {
-        if (isSaving) {
+    const toggleWishlist = useCallback(async () => {
+        if (isWishlisting) {
             return;
         }
 
-        setIsSaving(true);
+        setIsWishlisting(true);
 
         const { data: userData, error: userError } =
             await supabase.auth.getUser();
 
         if (userError) {
             console.error(userError);
-            setIsSaving(false);
+            setIsWishlisting(false);
             return;
         }
 
-        if (!saved) {
-            onSaveCommence && onSaveCommence(pub.id);
+        if (!wishlisted) {
+            onWishlistCommence && onWishlistCommence(pub.id);
 
-            const { error } = await supabase.from('saves').insert({
+            const { error } = await supabase.from('wishlists').insert({
                 pub_id: pub.id,
+                user_id: userData.user.id,
             });
 
-            setIsSaving(false);
+            setIsWishlisting(false);
 
             if (error) {
                 console.error(error);
-                onSaveComplete && onSaveComplete(false, pub.id);
+                onWishlistComplete && onWishlistComplete(false, pub.id);
                 return;
             }
 
-            onSaveComplete && onSaveComplete(true, pub.id);
+            onWishlistComplete && onWishlistComplete(true, pub.id);
         } else {
-            onUnsaveCommence && onUnsaveCommence(pub.id);
+            onUnwishlistCommence && onUnwishlistCommence(pub.id);
 
             const { error } = await supabase
-                .from('saves')
+                .from('wishlists')
                 .delete()
                 .eq('pub_id', pub.id)
                 .eq('user_id', userData.user.id);
 
-            setIsSaving(false);
+            setIsWishlisting(false);
 
             if (error) {
                 console.error(error);
-                onUnsaveComplete && onUnsaveComplete(false, pub.id);
+                onUnwishlistComplete && onUnwishlistComplete(false, pub.id);
                 return;
             }
 
-            onUnsaveComplete && onUnsaveComplete(true, pub.id);
+            onUnwishlistComplete && onUnwishlistComplete(false, pub.id);
         }
     }, [
-        isSaving,
+        isWishlisting,
+        onWishlistCommence,
+        onWishlistComplete,
+        onUnwishlistCommence,
+        onUnwishlistComplete,
         pub,
-        onSaveCommence,
-        onSaveComplete,
-        onUnsaveCommence,
-        onUnsaveComplete,
-        saved,
+        wishlisted,
     ]);
 
     return (
@@ -139,17 +140,17 @@ export default function SavedListItem({
                     />
 
                     <TouchableOpacity
-                        onPress={toggleLike}
-                        disabled={isSaving}
+                        onPress={toggleWishlist}
+                        disabled={isWishlisting}
                         style={styles.saveButton}>
-                        {saved ? (
-                            <Ionicons name="heart" size={12} color="#dc2626" />
-                        ) : (
-                            <Ionicons
-                                name="heart-outline"
+                        {wishlisted ? (
+                            <Fontisto
+                                name="bookmark-alt"
                                 size={12}
-                                color="#dc2626"
+                                color="#000"
                             />
+                        ) : (
+                            <Fontisto name="bookmark" size={12} color="#000" />
                         )}
                     </TouchableOpacity>
                 </View>

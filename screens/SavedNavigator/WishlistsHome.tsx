@@ -1,9 +1,16 @@
 import { supabase } from '@/services/supabase';
 import { Tables } from '@/types/schema';
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import React, {
+    Dispatch,
+    SetStateAction,
+    useCallback,
+    useEffect,
+    useState,
+} from 'react';
 import { View, Text, FlatList, ActivityIndicator } from 'react-native';
 import * as Location from 'expo-location';
 import { distance, point } from '@turf/turf';
+import WishlistedListItem from '@/components/Saves/WishlistedListItem';
 
 export type WishlistType = Tables<'wishlists'> & {
     pub: {
@@ -33,6 +40,7 @@ type WishlistsHomeProps = {
 
 export default function WishlistsHome({
     hasLoaded,
+    setHasLoaded,
     setIsLoggedIn,
     setWishlists,
     wishlists,
@@ -102,8 +110,37 @@ export default function WishlistsHome({
 
             setWishlists(temp);
             setIsLoading(false);
+            setHasLoaded(true);
         })();
-    }, [hasLoaded, setIsLoggedIn, setWishlists]);
+    }, [hasLoaded, setIsLoggedIn, setWishlists, setHasLoaded]);
+
+    const toggleWishlist = useCallback(
+        (id: number, isWishlist: boolean) => {
+            const w = wishlists.slice();
+
+            const index = w.findIndex(pub => pub.id === id);
+
+            if (index > -1) {
+                w[index].wishlisted[0].count = isWishlist ? 1 : 0;
+            }
+
+            setWishlists(w);
+        },
+        [wishlists, setWishlists],
+    );
+
+    // We check saved up here otherwise it doesn't update on
+    // Save toggle.
+    const isWishlisted = useCallback(
+        (index: number) => {
+            if (!wishlists[index]) {
+                return false;
+            }
+
+            return wishlists[index].wishlisted[0].count > 0;
+        },
+        [wishlists],
+    );
 
     return (
         <FlatList
@@ -117,10 +154,19 @@ export default function WishlistsHome({
                 )
             }
             data={wishlists}
-            renderItem={({ item }) => (
-                <View>
-                    <Text>{item.name}</Text>
-                </View>
+            renderItem={({ item, index }) => (
+                <WishlistedListItem
+                    pub={item}
+                    wishlisted={isWishlisted(index)}
+                    onWishlistCommence={id => toggleWishlist(id, true)}
+                    onWishlistComplete={(success, id) =>
+                        !success && toggleWishlist(id, false)
+                    }
+                    onUnwishlistCommence={id => toggleWishlist(id, false)}
+                    onUnwishlistComplete={(success, id) =>
+                        !success && toggleWishlist(id, true)
+                    }
+                />
             )}
             keyExtractor={item => item.id.toString()}
         />
