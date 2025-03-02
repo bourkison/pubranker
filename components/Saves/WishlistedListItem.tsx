@@ -104,7 +104,7 @@ export default function WishlistedListItem({
                 return;
             }
 
-            onUnwishlistComplete && onUnwishlistComplete(false, pub.id);
+            onUnwishlistComplete && onUnwishlistComplete(true, pub.id);
         }
     }, [
         isWishlisting,

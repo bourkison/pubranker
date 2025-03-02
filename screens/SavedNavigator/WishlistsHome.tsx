@@ -143,7 +143,7 @@ export default function WishlistsHome({
     );
 
     // We check saved up here otherwise it doesn't update on
-    // Save toggle.
+    // wishlist toggle.
     const isWishlisted = useCallback(
         (index: number) => {
             if (!wishlists[index]) {
