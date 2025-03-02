@@ -208,11 +208,11 @@ export default function FavouritesHome({
                         saved={isSaved(index)}
                         onSaveCommence={id => toggleSave(id, true)}
                         onSaveComplete={(success, id) =>
-                            !success ? toggleSave(id, false) : undefined
+                            !success && toggleSave(id, false)
                         }
                         onUnsaveCommence={id => toggleSave(id, false)}
                         onUnsaveComplete={(success, id) =>
-                            !success ? toggleSave(id, true) : undefined
+                            !success && toggleSave(id, true)
                         }
                     />
                 </View>

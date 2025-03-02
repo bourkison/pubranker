@@ -46,14 +46,11 @@ export default function WishlistsHome({
     wishlists,
 }: WishlistsHomeProps) {
     const [isLoading, setIsLoading] = useState(false);
+    const [isRefreshing, setIsRefreshing] = useState(false);
 
-    useEffect(() => {
-        (async () => {
-            if (hasLoaded) {
-                return;
-            }
-
-            setIsLoading(true);
+    const fetchWishlists = useCallback(
+        async (setLoading: Dispatch<SetStateAction<boolean>>) => {
+            setLoading(true);
 
             const { data: userData, error: userError } =
                 await supabase.auth.getUser();
@@ -61,7 +58,7 @@ export default function WishlistsHome({
             if (userError) {
                 console.warn(userError);
                 setIsLoggedIn(false);
-                setIsLoading(false);
+                setLoading(false);
                 return;
             }
 
@@ -71,18 +68,18 @@ export default function WishlistsHome({
                 .from('wishlists')
                 .select(
                     `
-                *,
-                pub:pubs(
-                    id, 
-                    name, 
-                    address,
-                    num_reviews:reviews(count),
-                    primary_photo, 
-                    wishlisted:wishlists(count),
-                    location:get_pub_location, 
-                    rating:get_pub_rating
-                )
-            `,
+            *,
+            pub:pubs(
+                id, 
+                name, 
+                address,
+                num_reviews:reviews(count),
+                primary_photo, 
+                wishlisted:wishlists(count),
+                location:get_pub_location, 
+                rating:get_pub_rating
+            )
+        `,
                 )
                 .eq('user_id', userData.user.id)
                 .eq('pub.wishlisted.user_id', userData.user.id)
@@ -90,7 +87,7 @@ export default function WishlistsHome({
 
             if (error) {
                 console.error(error);
-                setIsLoading(false);
+                setLoading(false);
                 return;
             }
 
@@ -109,10 +106,26 @@ export default function WishlistsHome({
             }));
 
             setWishlists(temp);
-            setIsLoading(false);
+            setLoading(false);
             setHasLoaded(true);
+        },
+        [setHasLoaded, setIsLoggedIn, setWishlists],
+    );
+
+    useEffect(() => {
+        (async () => {
+            if (hasLoaded) {
+                return;
+            }
+
+            fetchWishlists(setIsLoading);
         })();
-    }, [hasLoaded, setIsLoggedIn, setWishlists, setHasLoaded]);
+    }, [hasLoaded, fetchWishlists]);
+
+    const refresh = useCallback(
+        () => fetchWishlists(setIsRefreshing),
+        [fetchWishlists],
+    );
 
     const toggleWishlist = useCallback(
         (id: number, isWishlist: boolean) => {
@@ -169,6 +182,8 @@ export default function WishlistsHome({
                 />
             )}
             keyExtractor={item => item.id.toString()}
+            refreshing={isRefreshing}
+            onRefresh={refresh}
         />
     );
 }
