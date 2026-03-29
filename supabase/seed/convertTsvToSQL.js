@@ -86,98 +86,112 @@ const convert = () => {
             if (pub[20] && pub[21]) {
                 let openDay = 1;
                 let closeDay = 1;
+                let openHour = pub[20].replaceAll(':', '');
+                let closeHour = pub[21].replaceAll(':', '');
 
                 // If the number of opening is less than the number of closing, then we are on the same day still
                 // If closing hour is less than number of opening hour, then we are on the next day
-                if (parseInt(pub[21]) < parseInt(pub[20])) {
+                if (parseInt(closeHour) < parseInt(openHour)) {
                     closeDay = 2;
                 }
 
-                ohString += `(${i}, ${openDay}, '${pub[20]}', ${closeDay}, '${pub[21]}'),\n`;
+                ohString += `(${i}, ${openDay}, '${openHour}', ${closeDay}, '${closeHour}'),\n`;
             }
 
             // Tuesday
             if (pub[22] && pub[23]) {
                 let openDay = 2;
                 let closeDay = 2;
+                let openHour = pub[22].replaceAll(':', '');
+                let closeHour = pub[23].replaceAll(':', '');
 
                 // If the number of opening is less than the number of closing, then we are on the same day still
                 // If closing hour is less than number of opening hour, then we are on the next day
-                if (parseInt(pub[22]) < parseInt(pub[23])) {
+                if (parseInt(closeHour) < parseInt(openHour)) {
                     closeDay = 3;
                 }
 
-                ohString += `(${i}, ${openDay}, '${pub[22]}', ${closeDay}, '${pub[23]}'),\n`;
+                ohString += `(${i}, ${openDay}, '${openHour}', ${closeDay}, '${closeHour}'),\n`;
             }
 
             // Wednesday
             if (pub[24] && pub[25]) {
                 let openDay = 3;
                 let closeDay = 3;
+                let openHour = pub[24].replaceAll(':', '');
+                let closeHour = pub[25].replaceAll(':', '');
 
                 // If the number of opening is less than the number of closing, then we are on the same day still
                 // If closing hour is less than number of opening hour, then we are on the next day
-                if (parseInt(pub[24]) < parseInt(pub[25])) {
+                if (parseInt(closeHour) < parseInt(openHour)) {
                     closeDay = 4;
                 }
 
-                ohString += `(${i}, ${openDay}, '${pub[24]}', ${closeDay}, '${pub[25]}'),\n`;
+                ohString += `(${i}, ${openDay}, '${openHour}', ${closeDay}, '${closeHour}'),\n`;
             }
 
             // Thursday
             if (pub[26] && pub[27]) {
                 let openDay = 4;
                 let closeDay = 4;
+                let openHour = pub[26].replaceAll(':', '');
+                let closeHour = pub[27].replaceAll(':', '');
 
                 // If the number of opening is less than the number of closing, then we are on the same day still
                 // If closing hour is less than number of opening hour, then we are on the next day
-                if (parseInt(pub[26]) < parseInt(pub[27])) {
+                if (parseInt(closeHour) < parseInt(openHour)) {
                     closeDay = 5;
                 }
 
-                ohString += `(${i}, ${openDay}, '${pub[26]}', ${closeDay}, '${pub[27]}'),\n`;
+                ohString += `(${i}, ${openDay}, '${openHour}', ${closeDay}, '${closeHour}'),\n`;
             }
 
             // Friday
             if (pub[28] && pub[29]) {
                 let openDay = 5;
                 let closeDay = 5;
+                let openHour = pub[28].replaceAll(':', '');
+                let closeHour = pub[29].replaceAll(':', '');
 
                 // If the number of opening is less than the number of closing, then we are on the same day still
                 // If closing hour is less than number of opening hour, then we are on the next day
-                if (parseInt(pub[28]) < parseInt(pub[29])) {
+                if (parseInt(closeHour) < parseInt(openHour)) {
                     closeDay = 6;
                 }
 
-                ohString += `(${i}, ${openDay}, '${pub[28]}', ${closeDay}, '${pub[29]}'),\n`;
+                ohString += `(${i}, ${openDay}, '${openHour}', ${closeDay}, '${closeHour}'),\n`;
             }
 
             // Saturday
             if (pub[30] && pub[31]) {
                 let openDay = 6;
                 let closeDay = 6;
+                let openHour = pub[30].replaceAll(':', '');
+                let closeHour = pub[31].replaceAll(':', '');
 
                 // If the number of opening is less than the number of closing, then we are on the same day still
                 // If closing hour is less than number of opening hour, then we are on the next day
-                if (parseInt(pub[30]) < parseInt(pub[31])) {
+                if (parseInt(closeHour) < parseInt(openHour)) {
                     closeDay = 7;
                 }
 
-                ohString += `(${i}, ${openDay}, '${pub[30]}', ${closeDay}, '${pub[31]}'),\n`;
+                ohString += `(${i}, ${openDay}, '${openHour}', ${closeDay}, '${closeHour}'),\n`;
             }
 
             // Sunday
             if (pub[32] && pub[33]) {
                 let openDay = 7;
                 let closeDay = 7;
+                let openHour = pub[32].replaceAll(':', '');
+                let closeHour = pub[33].replaceAll(':', '');
 
                 // If the number of opening is less than the number of closing, then we are on the same day still
                 // If closing hour is less than number of opening hour, then we are on the next day
-                if (parseInt(pub[32]) < parseInt(pub[33])) {
+                if (parseInt(closeHour) < parseInt(openHour)) {
                     closeDay = 1;
                 }
 
-                ohString += `(${i}, ${openDay}, '${pub[32]}', ${closeDay}, '${pub[33]}'),\n`;
+                ohString += `(${i}, ${openDay}, '${openHour}', ${closeDay}, '${closeHour}'),\n`;
             }
 
             return ohString + '\n';

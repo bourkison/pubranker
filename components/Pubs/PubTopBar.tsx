@@ -41,6 +41,8 @@ export default function PubTopBar({ pub, distMeters }: TopBarPubProps) {
     }, []);
 
     useEffect(() => {
+        console.log('PUB:', pub);
+
         const { isOpen: o, nextHours } = checkIfOpen(pub.opening_hours);
 
         setIsOpen(o);
