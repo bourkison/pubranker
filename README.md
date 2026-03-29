@@ -29,3 +29,9 @@ supabase db reset
 ```
 supabase gen types typescript --local > types/schema.d.ts
 ```
+
+---
+
+#### Ideas
+
+-   Badges / Achievements?
