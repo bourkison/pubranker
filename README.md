@@ -35,3 +35,4 @@ supabase gen types typescript --local > types/schema.d.ts
 #### Ideas
 
 -   Badges / Achievements?
+-   What's on draught and cost?
