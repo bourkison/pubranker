@@ -10,7 +10,7 @@ module.exports = function (api) {
                     rootPathSuffix: './',
                 },
             ],
-            'react-native-reanimated/plugin',
+            'react-native-worklets/plugin',
         ],
     };
 };
