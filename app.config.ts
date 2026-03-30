@@ -10,8 +10,8 @@ module.exports = ({ config }: ConfigContext): ExpoConfig => {
             [
                 '@rnmapbox/maps',
                 {
-                    RNMapboxMapsVersion: '11.8.0',
-                    RNMapboxMapsDownloadToken: process.env.MAPBOX_SECRET,
+                    RNMAPBOX_MAPS_DOWNLOAD_TOKEN:
+                        process.env.RNMAPBOX_MAPS_DOWNLOAD_TOKEN,
                 },
             ],
         ],
