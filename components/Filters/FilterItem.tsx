@@ -17,8 +17,8 @@ import Animated, {
 } from 'react-native-reanimated';
 
 type FilterItemProps = {
-    buttonContent: JSX.Element | string;
-    bottomSheetContent: JSX.Element;
+    buttonContent: React.JSX.Element | string;
+    bottomSheetContent: React.JSX.Element;
     snapPoints: (number | string)[];
     withBottomBar?: boolean;
     onSearchPress?: () => void;

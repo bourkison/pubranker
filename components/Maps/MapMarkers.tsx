@@ -1,13 +1,14 @@
 import React from 'react';
-import { Point, feature, featureCollection } from '@turf/helpers';
+import { feature, featureCollection } from '@turf/helpers';
+import type { Point } from 'geojson';
 import center from '@turf/center';
 import PubMapMarker from './PubMapMarker';
 import { SECONDARY_COLOR } from '@/constants';
 import GroupMapMarker from './GroupMapMarker';
 import { useSharedMapContext } from '@/context/mapContext';
-import { Position } from '@rnmapbox/maps/lib/typescript/src/types/Position';
 import { MarkerView } from '@rnmapbox/maps';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import type { Position } from 'geojson';
 
 export const markerAspectRatio = 207 / 263;
 export type MapPubType = { id: number; location: Point };

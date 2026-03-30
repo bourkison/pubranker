@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, StyleSheet, Pressable } from 'react-native';
 import { Color } from '@/types';
-import { Position } from '@rnmapbox/maps/lib/typescript/src/types/Position';
+import type { Position } from 'geojson';
 import { MapPubType } from '@/components/Maps/MapMarkers';
 
 type GroupMapMarkerProps = {

@@ -8,7 +8,7 @@ import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native';
 
 type CollectionProviderProps = {
-    children: JSX.Element;
+    children: React.JSX.Element;
 };
 
 const BOTTOM_PADDING_BOTTOM_TAB = 15;

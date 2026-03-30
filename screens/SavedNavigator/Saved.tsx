@@ -29,7 +29,7 @@ export default function SavedPubs({
     const [wishlists, setWishlists] = useState<WishlistType['pub'][]>([]);
     const [hasLoadedWishlists, setHasLoadedWishlists] = useState(false);
 
-    const rightColumn = useMemo<JSX.Element>(() => {
+    const rightColumn = useMemo<React.JSX.Element>(() => {
         if (selectedPage === 2) {
             return (
                 <TouchableOpacity

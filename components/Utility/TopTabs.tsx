@@ -22,18 +22,18 @@ type InputData = {
     textWidth: number;
     xPos: number;
     title: string;
-    component: JSX.Element;
+    component: React.JSX.Element;
 };
 
 type TopTabsProps = {
     data: {
         title: string;
-        component: JSX.Element;
+        component: React.JSX.Element;
     }[];
 };
 
 type TopTabsPageProps = {
-    component: JSX.Element;
+    component: React.JSX.Element;
 };
 
 function TopTabsPage({ component }: TopTabsPageProps) {

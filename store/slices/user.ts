@@ -1,10 +1,13 @@
 import { supabase } from '@/services/supabase';
-import { RejectWithValueType, UserType } from '@/types';
+import { RejectWithValueType } from '@/types';
+import { Database } from '@/types/schema';
 import {
     createAsyncThunk,
     createEntityAdapter,
     createSlice,
 } from '@reduxjs/toolkit';
+
+type UserType = Database['public']['Tables']['users_public']['Row'];
 
 const userAdapter = createEntityAdapter();
 

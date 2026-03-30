@@ -60,10 +60,10 @@ export default function Explore({}: HomeNavigatorBottomTabProps<'Explore'>) {
     // START VARIABLES FOR MAP BUTTON
     const sharedMapButtonWidth = useSharedValue(MAX_MAP_BUTTON_WIDTH);
     const [previousYScrollOffset, setPreviousYScrollOffset] = useState(0);
-    const expandTimeout = useRef<NodeJS.Timeout | undefined>();
+    const expandTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
 
     const collapseMapButton = useCallback(() => {
-        clearTimeout(expandTimeout.current);
+        expandTimeout.current && clearTimeout(expandTimeout.current);
 
         if (sharedMapButtonWidth.value === MIN_MAP_BUTTON_WIDTH) {
             return;
@@ -76,7 +76,7 @@ export default function Explore({}: HomeNavigatorBottomTabProps<'Explore'>) {
     }, [sharedMapButtonWidth]);
 
     const expandMapButton = useCallback(() => {
-        clearTimeout(expandTimeout.current);
+        expandTimeout.current && clearTimeout(expandTimeout.current);
 
         if (sharedMapButtonWidth.value === MAX_MAP_BUTTON_WIDTH) {
             return;
@@ -100,7 +100,7 @@ export default function Explore({}: HomeNavigatorBottomTabProps<'Explore'>) {
         if (yOffset < COLLAPSE_ON_SCROLL_AMOUNT && diff < 0) {
             expandMapButton();
 
-            clearTimeout(expandTimeout.current);
+            expandTimeout.current && clearTimeout(expandTimeout.current);
 
             expandTimeout.current = setTimeout(() => {
                 collapseMapButton();

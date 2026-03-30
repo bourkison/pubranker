@@ -6,7 +6,7 @@ import PubMapMarker from '../Maps/PubMapMarker';
 import { SECONDARY_COLOR } from '@/constants';
 import { Camera, MapView, MarkerView } from '@rnmapbox/maps';
 import { getMinMaxLatLong } from '@/services/geo';
-import { Position } from '@turf/helpers';
+import type { Position } from 'geojson';
 
 type CollectionMapType = {
     collectionItems: CollectionType['collection_items'];

@@ -14,10 +14,10 @@ import BottomSheetPubList from '@/components/Pubs/BottomSheetPubList';
 import SelectedPub from './SelectedPub';
 import { useSharedExploreContext } from '@/context/exploreContext';
 import MapMarkers, { MapPubType } from '@/components/Maps/MapMarkers';
-import { Feature, MultiPolygon, Point, Polygon, polygon } from '@turf/helpers';
 import { useSharedMapContext } from '@/context/mapContext';
 import { MapView, Camera, LocationPuck } from '@rnmapbox/maps';
-import { Position } from '@rnmapbox/maps/lib/typescript/src/types/Position';
+import { featureCollection, polygon } from '@turf/helpers';
+import type { Feature, MultiPolygon, Point, Polygon, Position } from 'geojson';
 import { convertBoxToCoordinates, getMinMaxLatLong } from '@/services/geo';
 import { booleanPointInPolygon, distance, ellipse, union } from '@turf/turf';
 
@@ -225,7 +225,9 @@ export default function HomeMap() {
                 );
 
                 // Join the 2 ellipses
-                const u = union(ellipsePolygon, collisionEllipse);
+                const u = union(
+                    featureCollection([ellipsePolygon, collisionEllipse]),
+                );
 
                 if (!u) {
                     console.warn('Error in polygon union.');

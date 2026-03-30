@@ -110,4 +110,5 @@ export const userQuery = (userId: string) =>
         })
         .limit(3, { referencedTable: 'recent_ratings' })
         .limit(1)
-        .single();
+        .single()
+        .overrideTypes<UserType, { merge: false }>();

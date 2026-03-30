@@ -177,7 +177,7 @@ export default function SettingsFavourites({
                                 },
                             ]}>
                             <AntDesign
-                                name="pluscircleo"
+                                name="plus-circle"
                                 size={32}
                                 color={SUCCESS_COLOR + 'aa'}
                             />

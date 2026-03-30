@@ -1,6 +1,4 @@
 import { OpeningHoursType, PubFilters } from '@/types';
-import { Database } from '@/types/schema';
-import { PostgrestFilterBuilder } from '@supabase/postgrest-js';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
@@ -104,15 +102,20 @@ export const distanceString = (
     }
 };
 
-export const applyFilters = (
-    query: PostgrestFilterBuilder<
-        Database['public'],
-        Database['public']['Functions']['get_pubs_with_distances']['Returns'][number],
-        any
-    >,
+type FilterableQuery<T> = {
+    textSearch: (
+        column: string,
+        query: string,
+        options?: { type?: string },
+    ) => T;
+    eq: (column: string, value: boolean) => T;
+};
+
+export const applyFilters = <T extends FilterableQuery<T>>(
+    query: T,
     filters: PubFilters,
     searchText: string,
-): PostgrestFilterBuilder<any, any, any> => {
+): T => {
     if (searchText) {
         query = query.textSearch('name', `'${searchText.toLowerCase()}'`, {
             type: 'websearch',

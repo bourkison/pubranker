@@ -33,7 +33,7 @@ export default function BottomSheetPubList({ pubs }: BottomSheetPubListProps) {
     }, [isLoading, isLoadingMore, moreToLoad, dispatch]);
 
     return (
-        <BottomSheetFlatList
+        <BottomSheetFlatList<ExplorePub>
             contentContainerStyle={{ paddingBottom: bottomTabBarHeight }}
             ListHeaderComponent={
                 <View style={styles.headerContainer}>
@@ -43,8 +43,8 @@ export default function BottomSheetPubList({ pubs }: BottomSheetPubListProps) {
                 </View>
             }
             data={pubs}
-            keyExtractor={item => item.id.toString()}
-            renderItem={({ item }) => (
+            keyExtractor={(item: ExplorePub) => item.id.toString()}
+            renderItem={({ item }: { item: ExplorePub }) => (
                 <PubItem
                     pub={item}
                     onSaveComplete={() =>

@@ -1,4 +1,3 @@
-import { applyFilters } from '@/services';
 import { supabase } from '@/services/supabase';
 import { PubFilters, RejectWithValueType } from '@/types';
 import {
@@ -94,7 +93,7 @@ const queryDb = async (
         { count: 'exact' },
     );
 
-    query = applyFilters(query, filters, searchText);
+    // query = applyFilters(query, filters, searchText);
 
     if (withinRange < MAX_WITHIN_RANGE) {
         query = query.lte('dist_meters', withinRange);

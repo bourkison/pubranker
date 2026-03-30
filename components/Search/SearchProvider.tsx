@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useMemo, useState } from 'react';
 
 type SearchProviderProps = {
-    children: JSX.Element;
+    children: React.JSX.Element;
 };
 
 export default function SearchProvider({ children }: SearchProviderProps) {

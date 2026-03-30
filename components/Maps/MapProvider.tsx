@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { MapContext, MapPub } from '@/context/mapContext';
-import { Feature, MultiPolygon, point, polygon, Polygon } from '@turf/helpers';
+import { point, polygon } from '@turf/helpers';
+import type { Feature, MultiPolygon, Polygon } from 'geojson';
 import {
     convertBoxToCoordinates,
     hasFetchedPreviously,
@@ -9,12 +10,11 @@ import {
 import { BoundingBox } from '@/types';
 import * as Location from 'expo-location';
 import { supabase } from '@/services/supabase';
-import { applyFilters } from '@/services';
 import { useAppSelector } from '@/store/hooks';
 import { MAX_WITHIN_RANGE } from '@/constants';
 
 type MapProviderProps = {
-    children: JSX.Element;
+    children: React.JSX.Element;
 };
 
 export default function MapProvider({ children }: MapProviderProps) {
@@ -27,7 +27,6 @@ export default function MapProvider({ children }: MapProviderProps) {
     const [currentlySelectedPolygon, setCurrentlySelectedPolygon] =
         useState<Feature<Polygon> | null>(null);
 
-    const filters = useAppSelector(state => state.explore.filters);
     const withinRange = useAppSelector(state => state.explore.withinRange);
     const overallRating = useAppSelector(state => state.explore.overallRating);
 
@@ -134,7 +133,6 @@ export default function MapProvider({ children }: MapProviderProps) {
         },
         [
             currentlySelectedPolygon,
-            filters,
             overallRating,
             mapPubs,
             withinRange,

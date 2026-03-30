@@ -17,7 +17,7 @@ import { supabase } from '@/services/supabase';
 type CreateSuggestionProps = {
     pub: FetchPubType;
     expandModal: () => void;
-    bottomSheetRef: RefObject<BottomSheetModal>;
+    bottomSheetRef: RefObject<BottomSheetModal | null>;
 };
 
 const FEATURE_MARGIN_BOTTOM = 5;

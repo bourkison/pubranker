@@ -10,7 +10,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 type FeaturesSectionProps = {
     pub: FetchPubType;
     expandModal: () => void;
-    featuresBottomSheetRef: RefObject<BottomSheetModal>;
+    featuresBottomSheetRef: RefObject<BottomSheetModal | null>;
 };
 
 export default function FeaturesSection({

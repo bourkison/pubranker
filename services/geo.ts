@@ -1,4 +1,11 @@
-import * as turf from '@turf/turf';
+import {
+    union,
+    featureCollection,
+    difference,
+    polygon,
+    booleanPointInPolygon,
+} from '@turf/turf';
+import type { Feature, Polygon, MultiPolygon, Position, Point } from 'geojson';
 import { BoundingBox } from '@/types';
 import * as boroughs from '@/json/boroughs.json';
 
@@ -11,13 +18,9 @@ export const convertBoxToCoordinates = (input: BoundingBox): number[][] => [
 ];
 
 export const hasFetchedPreviously = (
-    currentSelected: turf.helpers.Feature<turf.helpers.Polygon> | null,
-    previouslyFetched: turf.helpers.Feature<
-        turf.helpers.Polygon | turf.helpers.MultiPolygon
-    > | null,
-): turf.helpers.Feature<
-    turf.helpers.Polygon | turf.helpers.MultiPolygon
-> | null => {
+    currentSelected: Feature<Polygon> | null,
+    previouslyFetched: Feature<Polygon | MultiPolygon> | null,
+): Feature<Polygon | MultiPolygon> | null => {
     try {
         if (!previouslyFetched) {
             return currentSelected;
@@ -27,15 +30,15 @@ export const hasFetchedPreviously = (
             throw new Error('No current selecteds');
         }
 
-        const difference: turf.helpers.Feature<
-            turf.helpers.Polygon | turf.helpers.MultiPolygon
-        > | null = turf.difference(currentSelected, previouslyFetched);
+        const diff: Feature<Polygon | MultiPolygon> | null = difference(
+            featureCollection([currentSelected, previouslyFetched]),
+        );
 
-        if (!difference) {
+        if (!diff) {
             throw new Error('Error in removing differences');
         }
 
-        return difference;
+        return diff;
     } catch (err) {
         // console.warn('difference:', err);
         return null;
@@ -43,18 +46,14 @@ export const hasFetchedPreviously = (
 };
 
 export const joinPolygons = (
-    newPolygon: turf.helpers.Feature<
-        turf.helpers.MultiPolygon | turf.helpers.Polygon
-    >,
-    originalPolygon: turf.helpers.Feature<
-        turf.helpers.MultiPolygon | turf.helpers.Polygon
-    > | null,
-): turf.helpers.Feature<turf.helpers.MultiPolygon | turf.helpers.Polygon> => {
+    newPolygon: Feature<MultiPolygon | Polygon>,
+    originalPolygon: Feature<MultiPolygon | Polygon> | null,
+): Feature<MultiPolygon | Polygon> => {
     if (!originalPolygon) {
         return newPolygon;
     }
 
-    const response = turf.union(newPolygon, originalPolygon);
+    const response = union(featureCollection([newPolygon, originalPolygon]));
 
     if (!response) {
         console.warn('Error in polygon union');
@@ -65,7 +64,7 @@ export const joinPolygons = (
 };
 
 export const getMinMaxLatLong = (
-    locations: turf.Position[],
+    locations: Position[],
 ):
     | { minLong: number; minLat: number; maxLong: number; maxLat: number }
     | undefined => {
@@ -109,14 +108,12 @@ export const getMinMaxLatLong = (
     };
 };
 
-export const getBorough = (input: turf.Point) => {
+export const getBorough = (input: Point) => {
     for (let i = 0; i < boroughs.features.length; i++) {
         const borough = boroughs.features[i];
-        const boroughPoly = turf.polygon(
-            boroughs.features[i].geometry.coordinates,
-        );
+        const boroughPoly = polygon(boroughs.features[i].geometry.coordinates);
 
-        if (turf.booleanPointInPolygon(input, boroughPoly)) {
+        if (booleanPointInPolygon(input, boroughPoly)) {
             return borough.properties.name;
         }
     }

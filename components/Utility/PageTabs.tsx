@@ -13,7 +13,7 @@ type PageTabsProps = {
     setSelectedPage: Dispatch<SetStateAction<number>>;
     pages: {
         title: string;
-        component: JSX.Element;
+        component: React.JSX.Element;
     }[];
 };
 

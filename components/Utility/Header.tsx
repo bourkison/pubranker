@@ -9,9 +9,9 @@ import {
 } from 'react-native';
 
 type HeaderProps = {
-    header: string | JSX.Element;
-    leftColumn?: string | JSX.Element;
-    rightColumn?: string | JSX.Element;
+    header: string | React.JSX.Element;
+    leftColumn?: string | React.JSX.Element;
+    rightColumn?: string | React.JSX.Element;
     containerStyle?: StyleProp<ViewStyle>;
     leftColumnContainerStyle?: StyleProp<ViewStyle>;
     leftColumnTextStyle?: StyleProp<TextStyle>;

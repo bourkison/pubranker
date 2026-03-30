@@ -1,5 +1,5 @@
 import { BoundingBox } from '@/types';
-import { Feature, MultiPolygon, Point, Polygon } from '@turf/helpers';
+import type { Feature, MultiPolygon, Point, Polygon } from 'geojson';
 import { createContext, useContext } from 'react';
 
 export type MapPub = {

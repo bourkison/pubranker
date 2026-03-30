@@ -4,7 +4,7 @@ import { useAppDispatch } from '@/store/hooks';
 import { fetchUser, logout } from '@/store/slices/user';
 
 type AuthContainerProps = {
-    children: JSX.Element;
+    children: React.JSX.Element;
 };
 
 export default function AuthContainer({ children }: AuthContainerProps) {
