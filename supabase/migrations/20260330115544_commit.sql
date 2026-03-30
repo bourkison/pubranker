@@ -751,13 +751,14 @@ WHERE pub.id = r.pub_id);
 END$function$
 ;
 
-CREATE OR REPLACE FUNCTION public.get_pub_user_photos(pub_id bigint)
+CREATE OR REPLACE FUNCTION public.get_pub_user_photos(input_pub_id bigint)
  RETURNS TABLE(photos text)
  LANGUAGE sql
 AS $function$
 	SELECT UNNEST(reviews.photos) as photos
 	FROM reviews
-	WHERE reviews.pub_id = pub_id;
+	WHERE reviews.pub_id = input_pub_id
+	ORDER BY created_at DESC
 $function$
 ;
 

@@ -73,9 +73,9 @@ export default function MapProvider({ children }: MapProviderProps) {
                 dist_long: location.coords.longitude,
             });
 
-            // Apply all filters except searchText as we
+            // TODO: Apply all filters except searchText as we
             // Don't want that to apply to the map.
-            query = applyFilters(query, filters, '');
+            // query = applyFilters(query, filters, '');
 
             if (withinRange < MAX_WITHIN_RANGE) {
                 query = query.lte('dist_meters', withinRange);
@@ -98,10 +98,12 @@ export default function MapProvider({ children }: MapProviderProps) {
             const mappedData: MapPub[] = data
                 .filter(d => {
                     if (!d.location) {
+                        console.log('FILTERED');
                         return false;
                     }
 
                     if (!point(JSON.parse(d.location)?.coordinates)?.geometry) {
+                        console.log('FILTERED');
                         return false;
                     }
 

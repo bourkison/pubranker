@@ -122,9 +122,15 @@ export default function ProfileRecentRatings({
 
             <TouchableOpacity
                 style={styles.viewAllContainer}
-                onPress={() =>
-                    navigation.navigate('UserActivity', { userId: userId })
-                }>
+                onPress={() => {
+                    const pushAction = StackActions.push('PubHome', {
+                        screen: 'UserActivity',
+                        params: { userId: userId },
+                    });
+                    navigation.dispatch(pushAction);
+
+                    // navigation.navigate('UserActivity', { userId: userId });
+                }}>
                 <Text style={styles.viewAllText}>View all activity</Text>
 
                 <Feather

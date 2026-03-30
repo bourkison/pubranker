@@ -128,7 +128,7 @@ export default function HomeMap() {
         // Average out the 2 and get our max distance degrees.
         const avgDegPerPixel = (degWidthPerPixel + degHeightPerPixel) / 2;
         const MAX_GROUPING_DISTANCE_DEG =
-            (avgDegPerPixel * MAX_GROUPING_DISTANCE_PIXELS) / 3;
+            (avgDegPerPixel * MAX_GROUPING_DISTANCE_PIXELS) / 2;
 
         // This is taking an input of either 1 polygon (initial ellipsis) or multi polygon (merged ellipsis)
         // As well as the index to check from (to avoid checking over previously checked pubs).
@@ -192,7 +192,7 @@ export default function HomeMap() {
                 }
 
                 // Minimum delta to just show all pubs and not have any groupings.
-                if (cameraZoom <= MIN_CAMERA_ZOOM) {
+                if (cameraZoom >= MAX_CAMERA_ZOOM) {
                     break;
                 }
 

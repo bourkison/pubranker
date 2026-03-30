@@ -16,6 +16,7 @@ import {
     StyleSheet,
     TouchableOpacity,
     Pressable,
+    Linking,
 } from 'react-native';
 import * as Location from 'expo-location';
 import { distance, point } from '@turf/turf';
@@ -344,9 +345,10 @@ export default function PubView({
                                             : 'Edit Review',
                                         'Suggest an Edit',
                                         'View on Map',
+                                        'View on Google Maps',
                                         'Cancel',
                                     ],
-                                    cancelButtonIndex: 4,
+                                    cancelButtonIndex: 5,
                                     tintColor: PRIMARY_COLOR,
                                     cancelButtonTintColor: PRIMARY_COLOR,
                                 },
@@ -366,6 +368,16 @@ export default function PubView({
                                     if (selected === 2) {
                                         expandFeaturesModal();
                                         return;
+                                    }
+
+                                    if (selected === 4) {
+                                        const url = `https://www.google.com/maps/search/?api=1&query=${pub.name
+                                            .replaceAll(' ', '_')
+                                            .trim()}&query_place_id=${
+                                            pub.google_id
+                                        }`;
+
+                                        Linking.openURL(url);
                                     }
                                 },
                             )

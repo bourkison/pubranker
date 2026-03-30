@@ -16,7 +16,7 @@ export default function PubUserPhotos({ pubId }: PubUserPhotosType) {
             setIsLoading(true);
 
             const { data, error } = await supabase.rpc('get_pub_user_photos', {
-                pub_id: pubId,
+                input_pub_id: pubId,
             });
 
             if (error) {
