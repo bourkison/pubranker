@@ -198,7 +198,7 @@ create table "public"."pubs" (
     "rooftop" boolean,
     "wheelchair_accessible" boolean,
     "hidden" boolean not null default false,
-    "location" geography(Point,4326) not null,
+    "location" extensions.geography(Point,4326) not null,
     "brewery" boolean default false,
     "dart_board" boolean,
     "foosball_table" boolean,
@@ -502,6 +502,24 @@ alter table "public"."comments" add constraint "comments_user_id_fkey1" FOREIGN 
 
 alter table "public"."comments" validate constraint "comments_user_id_fkey1";
 
+CREATE OR REPLACE FUNCTION public.validate_favourites_limit_three(u_id uuid)
+ RETURNS boolean
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+IF (
+	SELECT COUNT(*) 
+	FROM public.favourites f 
+	WHERE f.user_id = u_id
+) >= 3 THEN 
+	RETURN False;
+END IF;
+
+RETURN True;
+END
+$function$
+;
+
 alter table "public"."favourites" add constraint "ck_limit_three" CHECK ((validate_favourites_limit_three(user_id) = true)) not valid;
 
 alter table "public"."favourites" validate constraint "ck_limit_three";
@@ -721,7 +739,7 @@ AS $function$
 		count(DISTINCT reviews.*) as num_reviews,
 		st_distance(
 	        pubs.location,
-	        st_point(long, lat) :: geography
+	        st_point(long, lat) :: extensions.geography
 	    ) as dist_meters,
 		pubs.photos,
 		pubs.primary_photo,
@@ -786,7 +804,7 @@ SELECT
 	st_asgeojson(pubs.location) AS location,
 	st_distance(
 		pubs.location,
-		st_point(dist_long, dist_lat) :: geography
+		st_point(dist_long, dist_lat) :: extensions.geography
 	) as dist_meters,
 	COUNT(DISTINCT r.*) as num_reviews
 FROM pubs
@@ -827,7 +845,7 @@ SELECT
     COUNT(s.pub_id = pubs.id AND s.user_id = auth.uid()) > 0 AS saved,
     st_distance(
         pubs.location,
-        st_point(dist_long, dist_lat) :: geography
+        st_point(dist_long, dist_lat) :: extensions.geography
     ) as dist_meters,
     COALESCE(avg(r.rating)::double precision, 0::double precision) / 2::double precision AS rating,
     pubs.photos
@@ -836,7 +854,7 @@ LEFT JOIN saves s ON pubs.id = s.pub_id
 LEFT JOIN reviews r ON pubs.id = r.pub_id
 GROUP BY pubs.id
 ORDER BY
-    pubs.location <-> st_point(order_long, order_lat) :: geography;
+    pubs.location <-> st_point(order_long, order_lat) :: extensions.geography;
 
 $function$
 ;
@@ -931,24 +949,6 @@ AS $function$BEGIN
 	NEW.updated_at = now();
 	RETURN NEW;
 END$function$
-;
-
-CREATE OR REPLACE FUNCTION public.validate_favourites_limit_three(u_id uuid)
- RETURNS boolean
- LANGUAGE plpgsql
-AS $function$
-BEGIN
-IF (
-	SELECT COUNT(*) 
-	FROM public.favourites f 
-	WHERE f.user_id = u_id
-) >= 3 THEN 
-	RETURN False;
-END IF;
-
-RETURN True;
-END
-$function$
 ;
 
 grant delete on table "public"."beer_pub_relationships" to "anon";
