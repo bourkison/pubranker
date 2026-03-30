@@ -196,8 +196,6 @@ export default function HomeMap() {
                     break;
                 }
 
-                // TODO: Probably over grouping here. If you have a group with 25 pubs this could easily be split out into 2 or 3 smaller groups that won't overlap each other. look into logic on how to do that.
-                // TODO: To solve the above, perhaps a maximum distance for certain pubs based on the zoom level?
                 const collision = checkCollision(
                     ellipsePolygon,
                     lastCollisionPoint,
