@@ -58,7 +58,7 @@ const convert = () => {
             '${pub[0].replaceAll("'", "''")}', 
             '${pub[1].replaceAll("'", "''")}',
             '${pub[2].replaceAll("'", "''")}',
-            'Lorem ipsum',
+            '${pub[19].replaceAll("'", "''").trim()}',
             '${pub[3].replaceAll("'", "''")}',
             '${pub[5].replaceAll("'", "''")}',
             ST_SetSRID(ST_MakePoint(${pub[14].split(',')[1].trim()}, ${pub[14]

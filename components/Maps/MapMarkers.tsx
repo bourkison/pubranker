@@ -18,9 +18,6 @@ type MapMarkersProps = {
     onGroupSelect?: (locations: Position[]) => void;
 };
 
-// TODO: Minimum delta to just show all pubs and not have any groupings.
-// TODO: Probably over grouping here. If you have a group with 25 pubs this could easily be split out into 2 or 3 smaller groups that won't overlap each other. look into logic on how to do that.
-
 export default function MapMarkers({
     markers,
     onPubSelect,
