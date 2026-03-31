@@ -14,6 +14,7 @@ module.exports = ({ config }: ConfigContext): ExpoConfig => {
                         process.env.RNMAPBOX_MAPS_DOWNLOAD_TOKEN,
                 },
             ],
+            'react-native-compressor',
         ],
     };
 };
